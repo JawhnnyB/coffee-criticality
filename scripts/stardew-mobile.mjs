@@ -1,0 +1,17 @@
+import { chromium } from "playwright";
+const browser = await chromium.launch({ headless: true });
+const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+const errors = [];
+page.on("pageerror", (e) => errors.push(String(e)));
+await page.goto("http://127.0.0.1:8080/", { waitUntil: "networkidle" });
+await page.getByRole("button", { name: "Begin" }).click();
+await page.waitForTimeout(200);
+await page.getByRole("button", { name: "New shift" }).click();
+await page.getByRole("button", { name: /Transferred/ }).click();
+await page.waitForTimeout(400);
+await page.getByRole("button", { name: "Walk in" }).click();
+await page.waitForTimeout(600);
+await page.screenshot({ path: "/workspace/screenshots/48-mobile-cafe.png" });
+const overflow = await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth + 2);
+console.log(JSON.stringify({ errors, overflow }));
+await browser.close();

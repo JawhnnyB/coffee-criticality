@@ -1,0 +1,73 @@
+You are a senior game designer and social systems expert specializing in high-stakes professional environments (nuclear, aviation, healthcare, military). You are helping design the social layer for *Pixel Nuke Linux*, a pixel-art educational simulator about building and operating nuclear reactors (OpenMC + MOOSE).
+
+**Core Theme**: The game should explore the cultural difference between a **Blame Culture** (perfectionism, ego, fear of error, individual heroism) and a **Just Culture / Learning Culture** (psychological safety, team resilience, catching each other’s mistakes).
+
+**Current Game State**:
+- Players already build reactors through a detailed questionnaire in the Reactor Builder.
+- There is an in-game Nuclear Academy with educational sections on fluid dynamics, heat transfer, and reactor physics.
+- The visual preview shows reactor components and fluid flow.
+
+**Design Goal**:
+Create a Stardew Valley-style social relationship and reputation system, but set inside a nuclear power plant workplace. The social layer should feel meaningful and educational rather than purely cosmetic. The player should experience how social dynamics directly affect operational safety, learning speed, and long-term plant performance.
+
+**Key Requirements**:
+
+### 1. Narrative / Cultural Shift Structure
+Design a multi-stage cultural transformation arc. The player should witness or participate in moving from a toxic, high-pressure, blame-oriented environment to a healthier, team-oriented one.
+
+Two possible narrative frames (design both options):
+- **Option A (Boss Change)**: A harsh, perfectionist senior manager gets promoted. A new, younger manager is brought in who gradually shifts the culture toward psychological safety and Just Culture principles.
+- **Option B (Plant Transfer)**: The player starts at a rigid, high-stress PWR plant where individuals are expected to be perfect and mistakes are punished. They later transfer to a different plant (possibly a BWR or a reformed PWR) that operates with a stronger team-based, error-catching culture.
+
+You may also propose hybrid or alternative triggers for the cultural shift (e.g., a serious near-miss incident, a regulatory audit, a new training program, or player-driven change).
+
+### 2. Social Relationship System (Stardew Valley Style)
+Design a relationship system with key NPCs that includes:
+- Heart / Trust levels with individual characters.
+- Group / Department reputation (e.g., Operations, Engineering, Maintenance, Training).
+- Visible behavioral changes in NPCs as trust/relationship levels increase.
+- Dialogue and events that reflect real nuclear industry social dynamics (ego protection, fear of speaking up, information hoarding, vs. helpful peer checking and open communication).
+
+Key character archetypes to consider:
+- The perfectionist senior engineer who struggles to adapt.
+- The junior operator who is afraid to speak up.
+- The experienced technician who has seen both cultures.
+- The new manager trying to change things.
+- A peer who initially competes with the player.
+
+### 3. Mechanics That Make the Social Layer Matter
+The social system should have tangible effects on gameplay, such as:
+- Access to better information or hints during reactor building.
+- Ability to catch errors in your reactor design through peer review events.
+- Faster learning / better explanations in the Nuclear Academy when relationships are strong.
+- Reduced risk of “incidents” during simulated operations.
+- Different dialogue and support during stressful events depending on your reputation.
+
+### 4. Events & Triggers for Cultural Change
+Brainstorm and detail multiple ways the cultural shift can occur or accelerate, beyond just a new boss. Examples to explore:
+- A significant near-miss or incident that forces reflection.
+- Player-led actions (consistently reporting issues, helping others, admitting uncertainty).
+- Transfer to a different plant with a healthier culture.
+- External pressure (regulator visit, corporate initiative, new training program).
+- Gradual change through multiple small interactions over time.
+
+### 5. Educational Integration
+The social system should reinforce the nuclear engineering education. Players should learn:
+- The difference between individual accountability and systemic blame.
+- Why psychological safety improves safety culture.
+- Real concepts like Just Culture, defense-in-depth (social version), and reporting culture.
+
+### Constraints & Tone
+- Keep the tone educational and thoughtful rather than preachy.
+- Maintain the cute pixel-art aesthetic while handling serious topics respectfully.
+- The system should feel integrated with the existing Reactor Builder and visualization systems rather than tacked on.
+- Avoid making the “good” culture feel unrealistic or overly idealistic — show that change is gradual and sometimes difficult.
+
+**Output Format**:
+Provide a high-level design document including:
+- Recommended narrative structure (choose one primary path or hybrid).
+- Core social mechanics.
+- Key NPCs and their arcs.
+- How social reputation affects gameplay.
+- List of meaningful events that can drive cultural change.
+- How this layer connects to the existing educational content.

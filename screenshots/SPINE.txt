@@ -1,0 +1,13 @@
+Spine walk (west → east, north = lake)
+
+  cafe → lot → hall → control → reactor
+
+1. Cafe east wall. Sit with Mabel. Counter occludes legs. Rug under feet.
+2. Lot: grass, asphalt stalls, curb, lamps, van. Skyline in the sky band, not walkable roofs.
+3. Hall: stone floor, glimpse windows to control / engineering.
+4. Control: Board A is a wall prop. Status on the board, not a slab over torsos.
+5. Reactor: core + 16px glow. East door to maint.
+
+Return: reactor west → control south → hall west → lot west → cafe.
+
+Teaching plant. Catch > heroics.

@@ -1,0 +1,54 @@
+You are working on the Pixel Nuke Linux project, specifically the `ReactorBuilderApp` class in `src/apps/reactor_builder_app.py`.
+
+**Task:** Further enhance the PWR animated preview in the `render()` method and expand the education system.
+
+**Current State:**
+- The PWR preview already has a reactor vessel with glowing blue fuel rod pillars, steam generator, rotating turbine, condenser, and basic animated particles.
+- It uses `self.params` from the questionnaire (e.g. `core_delta_T`, `coolant_mass_flow_rate`, `pressure`, `power_MW`).
+- There is already a basic Nuclear Academy system with `education_section` states.
+
+**Requirements (implement all of the following):**
+
+### 1. Add a Reactor Coolant Pump (RCP)
+- Add a visual representation of at least one Reactor Coolant Pump in the primary loop.
+- Give it a simple rotating animation (similar to the turbine blades).
+- Position it logically between the steam generator and the reactor (on the cold leg side).
+- Keep it lightweight using pure PyGame drawing (circle + rotating internal blades or lines).
+
+### 2. Add a Live Data HUD in the PWR Preview
+- Create a small, clean HUD panel on the right or bottom of the PWR preview.
+- Display the following live values pulled from `self.params`:
+  - Core ΔT (K)
+  - Coolant Mass Flow Rate (kg/s)
+  - Primary System Pressure (MPa)
+  - Estimated Average Linear Heat Rate (kW/m)
+- Format it nicely with labels and units. Use a slightly different background color so it stands out.
+- If a value is not yet set, show a default or "N/A".
+
+### 3. Improve the Secondary Loop Flow
+- Improve the steam particle movement so it clearly travels from the steam generator toward the turbine.
+- Add a clearer return path from the condenser area back toward the steam generator (representing feedwater).
+- Optionally add 1–2 small feedwater pump symbols or directional indicators.
+- Make the overall primary vs secondary loop distinction visually clearer (e.g., different colors, labels, or particle styles).
+
+### 4. Expand the Nuclear Academy
+- Add a new education section called **"PWR Fluid Systems & Loops"**.
+- Content should cover:
+  - Primary Loop (closed loop, high pressure, liquid water, role of RCPs)
+  - Secondary Loop (boiling, steam to turbine, condenser, feedwater return)
+  - Hot Leg vs Cold Leg
+  - Role of the Pressurizer
+  - Why pumps and flow direction matter for safety and heat removal
+- Follow the existing style: clear headings, key formulas if relevant, "Why it matters for simulation" section linking to OpenMC/MOOSE, and pixel-art friendly explanations.
+- Make it accessible via the existing education navigation (e.g. type `3` or `fluid`).
+
+**Technical Constraints:**
+- Keep all changes lightweight (pure PyGame drawing, no heavy libraries).
+- Reuse existing variables like `t = self.animation_time`, `cx`, `cy`, `self.params`, and `font`/`small_font`.
+- Maintain the current cute pixel-art aesthetic.
+- Do not break existing functionality for other reactor types (BWR, Pebble Bed, Molten Salt).
+
+**Deliverables:**
+- Updated PWR rendering code with pump, improved flow, and Data HUD.
+- New education section in the Nuclear Academy.
+- Brief comments in the code explaining the new elements.

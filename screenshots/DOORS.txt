@@ -1,0 +1,18 @@
+Unit 1 door graph — spawnInside(to, from). Teaching layout, not a license.
+Leave east → appear west of destination. Facing = the way you walked.
+
+from        side  to           | return      side  from
+--------------------------------------------------------------
+cafe        e     gate         | gate        w     cafe
+cafe        s     parlor       | parlor      n     cafe
+gate        e     corridor     | corridor    w     gate
+corridor    n     control      | control     s     corridor
+corridor    s     engineering  | engineering n     corridor
+corridor    e     breakroom    | breakroom   w     corridor
+control     e     reactor      | reactor     w     control
+reactor     e     maintenance  | maintenance w     reactor
+engineering s     maintenance  | maintenance n     engineering
+
+Pairs: 9/9. No orphan doors. No stacked west portals on break.
+Mabel still gates the nuclear island (corridor and east of it).
+Cafe / lot / parlor are free. Pause map hops only after seen:${room}.

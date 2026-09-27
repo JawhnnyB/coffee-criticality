@@ -1,0 +1,13 @@
+import { chromium } from "playwright";
+const browser = await chromium.launch({ headless: true });
+const page = await browser.newPage({ viewport: { width: 1280, height: 720 } });
+await page.goto("http://127.0.0.1:8080/", { waitUntil: "networkidle", timeout: 30000 });
+await page.waitForTimeout(900);
+await page.evaluate(() => window.__controlsTest?.bootPlay());
+await page.waitForTimeout(600);
+await page.screenshot({ path: "/workspace/screenshots/cast-cafe.png" });
+await page.evaluate(() => window.__controlsTest.startTalk("mabel"));
+await page.waitForTimeout(400);
+await page.screenshot({ path: "/workspace/screenshots/cast-mabel-talk.png" });
+await browser.close();
+console.log("ok");
