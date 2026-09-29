@@ -474,7 +474,8 @@ export function solidAt(x: number, y: number, s: GameState, roomId: RoomId = s.r
   }
   for (const p of room.props) {
     if (p.block === false) continue;
-    if (overlap(x, y, 9, p.rect)) return true;
+    const boxes = p.hit && p.hit.length ? p.hit : [p.rect];
+    for (const box of boxes) if (overlap(x, y, 9, box)) return true;
   }
   if (hitPeople && roomId === s.room) for (const n of npcsHere(s)) {
     const dx = x - n.x;

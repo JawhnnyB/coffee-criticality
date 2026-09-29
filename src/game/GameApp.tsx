@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, type MutableRefObject, type ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
 import { UserButton } from "@/lib/auth/gates";
+import { authEnabled } from "@/lib/auth/client";
 import { useCurrentUserState } from "@/lib/auth/use-current-user";
 import {
   ACADEMY,
@@ -134,6 +135,16 @@ const PLAY_MODES: Mode[] = [
 
 function AuthChip() {
   const { user, isPending } = useCurrentUserState();
+  const [host, setHost] = useState<string | null>(null);
+  useEffect(() => {
+    setHost(window.location.hostname);
+  }, []);
+  // A laptop has no Grok auth broker. Hide the chip there unless sign-in was
+  // explicitly turned on. The sandbox preview host still shows it.
+  const forced = import.meta.env.VITE_AUTH_ENABLED === "true";
+  const loopback = host === "localhost" || host === "127.0.0.1" || host === "::1" || host === "[::1]";
+  if (!authEnabled || user?.isDevFallback) return null;
+  if (host === null || (loopback && !forced)) return null;
   if (isPending) return <div className="h-8 w-8 animate-pulse rounded-full bg-surface" />;
   if (user) return <UserButton />;
   return (
@@ -2366,7 +2377,7 @@ function LookPreview({ look }: { look: PlayerLook }) {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
     const im = new Image();
-    im.src = "/art/gen/sprites/player_idle_32.png?v=hair3";
+    im.src = "/art/gen/sprites/player_idle_32.png?v=face5";
     im.onload = () => {
       const tinted = tintPlayer(im, look);
       ctx.imageSmoothingEnabled = false;

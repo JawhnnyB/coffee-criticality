@@ -300,7 +300,7 @@ export function drawWorld(
 
   if (s.room === "control") {
     drawables.push({
-      y: 208,
+      y: 212,
       draw: () => drawPaperLog(g, s.day, s.incidentResolved, now),
     });
   }
@@ -352,6 +352,79 @@ function fillEdge(ctx: CanvasRenderingContext2D, room: (typeof ROOMS)[RoomId]) {
   ctx.fillRect(room.w, 0, 8, room.h);
 }
 
+/** 3×5 bitmap glyphs. Canvas fillText at 5px antialiases, then the integer zoom turns it to mush. */
+const GLYPH: Record<string, string[]> = {
+  A: ["010", "101", "111", "101", "101"],
+  B: ["110", "101", "110", "101", "110"],
+  C: ["011", "100", "100", "100", "011"],
+  D: ["110", "101", "101", "101", "110"],
+  E: ["111", "100", "110", "100", "111"],
+  F: ["111", "100", "110", "100", "100"],
+  G: ["011", "100", "101", "101", "011"],
+  H: ["101", "101", "111", "101", "101"],
+  I: ["111", "010", "010", "010", "111"],
+  J: ["001", "001", "001", "101", "010"],
+  K: ["101", "110", "100", "110", "101"],
+  L: ["100", "100", "100", "100", "111"],
+  M: ["101", "111", "111", "101", "101"],
+  N: ["110", "101", "101", "101", "101"],
+  O: ["010", "101", "101", "101", "010"],
+  P: ["110", "101", "110", "100", "100"],
+  Q: ["010", "101", "101", "011", "001"],
+  R: ["110", "101", "110", "101", "101"],
+  S: ["011", "100", "010", "001", "110"],
+  T: ["111", "010", "010", "010", "010"],
+  U: ["101", "101", "101", "101", "011"],
+  V: ["101", "101", "101", "010", "010"],
+  W: ["101", "101", "111", "111", "101"],
+  X: ["101", "101", "010", "101", "101"],
+  Y: ["101", "101", "010", "010", "010"],
+  Z: ["111", "001", "010", "100", "111"],
+  "0": ["111", "101", "101", "101", "111"],
+  "1": ["010", "110", "010", "010", "111"],
+  "2": ["110", "001", "010", "100", "111"],
+  "3": ["110", "001", "110", "001", "110"],
+  "4": ["101", "101", "111", "001", "001"],
+  "5": ["111", "100", "110", "001", "110"],
+  "6": ["011", "100", "110", "101", "011"],
+  "7": ["111", "001", "010", "010", "010"],
+  "8": ["111", "101", "111", "101", "111"],
+  "9": ["111", "101", "111", "001", "110"],
+  "-": ["000", "000", "111", "000", "000"],
+  ".": ["000", "000", "000", "000", "010"],
+  "/": ["001", "001", "010", "100", "100"],
+  ":": ["000", "010", "000", "010", "000"],
+  "!": ["010", "010", "010", "000", "010"],
+  "=": ["000", "111", "000", "111", "000"],
+  " ": ["000", "000", "000", "000", "000"],
+};
+
+function pixText(
+  ctx: CanvasRenderingContext2D,
+  text: string,
+  cx: number,
+  y: number,
+  color: string,
+  maxW: number,
+) {
+  const upper = text.toUpperCase();
+  const wide = upper.length * 8 - 2;
+  const scale = wide <= maxW ? 2 : 1;
+  const adv = scale === 2 ? 8 : 4;
+  const tw = upper.length * adv - scale;
+  let x = Math.round(cx - tw / 2);
+  ctx.fillStyle = color;
+  for (const ch of upper) {
+    const g = GLYPH[ch] ?? GLYPH[" "];
+    for (let row = 0; row < 5; row++) {
+      for (let col = 0; col < 3; col++) {
+        if (g[row][col] === "1") ctx.fillRect(x + col * scale, y + row * scale, scale, scale);
+      }
+    }
+    x += adv;
+  }
+}
+
 function drawBoardA(
   ctx: CanvasRenderingContext2D,
   rect: { x: number; y: number; w: number; h: number },
@@ -366,33 +439,36 @@ function drawBoardA(
   const h = Math.round(rect.h);
   ctx.fillStyle = resolved ? PAL.leaf : `rgba(201,162,39,${0.45 + pulse * 0.5})`;
   ctx.fillRect(x + 6, y + h - 7, w - 12, 3);
-  ctx.fillStyle = resolved ? PAL.leaf : PAL.gold;
-  ctx.font = "5px monospace";
-  ctx.textAlign = "center";
   const line =
     day === 1 ? (resolved ? "14-R CLOSED" : "14-B OPEN")
     : day === 2 ? (resolved ? "2A LOCKED" : "2A IN SVC")
     : day === 3 ? (resolved ? "0.04 mSv/h" : "40 mSv/h")
     : day === 4 ? (resolved ? "LOG SIGNED" : "NO INITIALS")
     : "SHUFFLE DAY";
-  ctx.fillText(line, x + w / 2, y + 12);
+  // Right side of the board. A centered line sits on Holt's head.
+  const color = resolved ? PAL.leaf : PAL.gold;
+  const parts = line.toUpperCase().split(" ");
+  parts.forEach((part, i) => {
+    const tw = part.length * 8 - 2;
+    pixText(ctx, part, x + w - 8 - tw / 2, y - 24 + i * 12, color, tw + 4);
+  });
 }
 
 function drawPaperLog(ctx: CanvasRenderingContext2D, day: number, resolved: boolean, now: number) {
-  const pulse = resolved ? 0.2 : 0.4 + Math.abs(Math.sin(now * 3.2)) * 0.5;
-  ctx.fillStyle = resolved ? "rgba(107,143,113,0.45)" : `rgba(184,92,74,${0.35 + pulse * 0.4})`;
-  ctx.fillRect(48, 176, 64, 32);
-  ctx.fillStyle = PAL.cream;
-  ctx.fillRect(52, 180, 56, 24);
-  ctx.strokeStyle = resolved ? PAL.leaf : PAL.gold;
-  ctx.strokeRect(48.5, 176.5, 63, 31);
-  ctx.fillStyle = PAL.ink;
-  ctx.font = "5px monospace";
-  ctx.textAlign = "center";
-  ctx.fillText("PAPER LOG", 80, 190);
-  ctx.fillText(day === 4 && !resolved ? "—  07:12" : day === 1 ? "14-R CLOSED" : "EV  07:12", 80, 198);
+  const x = 36;
+  const y = 164;
+  const w = 104;
+  const h = 48;
   ctx.fillStyle = resolved ? PAL.leaf : PAL.gold;
-  ctx.fillText(resolved ? "caught" : day === 1 ? "!= 14-B" : day === 4 ? "blank" : "check", 80, 205);
+  ctx.fillRect(x, y, w, h);
+  ctx.fillStyle = PAL.cream;
+  ctx.fillRect(x + 3, y + 3, w - 6, h - 6);
+  const mid = day === 4 && !resolved ? "- 07:12" : day === 1 ? "14-R CLOSED" : "EV 07:12";
+  const foot = resolved ? "CAUGHT" : day === 1 ? "!= 14-B" : day === 4 ? "BLANK" : "CHECK";
+  pixText(ctx, "PAPER LOG", x + w / 2, y + 6, PAL.ink, w - 8);
+  pixText(ctx, mid, x + w / 2, y + 18, PAL.ink, w - 8);
+  pixText(ctx, foot, x + w / 2, y + 30, resolved ? PAL.leaf : "#8a3a32", w - 8);
+  void now;
 }
 
 export function roomName(id: RoomId) {

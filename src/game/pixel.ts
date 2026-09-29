@@ -71,7 +71,7 @@ function blitBody(
   playerLook?: PlayerLook,
   sitting = false,
 ) {
-  const idle = loadArt(`/art/gen/sprites/${who}_idle_32.png?v=hair3`);
+  const idle = loadArt(`/art/gen/sprites/${who}_idle_32.png?v=face5`);
   if (!idle || idle.naturalWidth !== WALK_W || idle.naturalHeight !== WALK_H) return false;
   pix(ctx);
   const frame = moving && !sitting ? Math.floor(phase) % 4 : 0;
@@ -87,8 +87,8 @@ function blitBody(
   ctx.fill();
   ctx.restore();
 
-  const walk = loadArt(`/art/gen/sprites/${who}_walk4.png?v=hair3`);
-  const sit = loadArt(`/art/gen/sprites/${who}_sit.png?v=hair3`);
+  const walk = loadArt(`/art/gen/sprites/${who}_walk4.png?v=face5`);
+  const sit = loadArt(`/art/gen/sprites/${who}_sit.png?v=face5`);
   const hasWalk = !!(walk && walk.naturalWidth === 128 && walk.naturalHeight === 192);
   const hasSit = !!(sit && sit.naturalWidth === WALK_W && sit.naturalHeight === WALK_H);
   let src: CanvasImageSource = idle;

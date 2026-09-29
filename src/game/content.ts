@@ -129,7 +129,7 @@ export interface RoomDef {
   floorPatches?: { rect: Rect; kind: FloorKind }[];
   windows?: { rect: Rect; still: string }[];
   doors: { to: RoomId; rect: Rect; spawn: { x: number; y: number }; label: string }[];
-  props: { rect: Rect; kind: string; label?: string; block?: boolean }[];
+  props: { rect: Rect; kind: string; label?: string; block?: boolean; hit?: Rect[] }[];
   interacts: Interactable[];
 }
 
@@ -279,7 +279,7 @@ export const INTRO: { art: string; scene: string; sprite: string; kicker: string
   {
     art: "/art/gen/stills/plate_pwr.png?v=metal",
     scene: "/art/gen/stills/intro_core.jpg",
-    sprite: "/art/gen/sprites/priya_idle_32.png?v=hair3",
+    sprite: "/art/gen/sprites/priya_idle_32.png?v=face5",
     kicker: "The core  ·  Priya",
     title: "You signed a core. Now it has to live.",
     line: "Priya, not looking up. “I will not sign a peak I cannot walk.”",
@@ -288,7 +288,7 @@ export const INTRO: { art: string; scene: string; sprite: string; kicker: string
   {
     art: "/art/gen/stills/cafe_plate.png?v=eval1",
     scene: "/art/gen/stills/intro_cafe.jpg",
-    sprite: "/art/gen/sprites/mabel_idle_32.png?v=hair3",
+    sprite: "/art/gen/sprites/mabel_idle_32.png?v=face5",
     kicker: "The cafe  ·  Mabel",
     title: "The water is still holding last night.",
     line: "Mabel sets the cup down. She does not ask.",
@@ -297,7 +297,7 @@ export const INTRO: { art: string; scene: string; sprite: string; kicker: string
   {
     art: "/art/gen/stills/gate_plate.png?v=eval1",
     scene: "/art/gen/stills/intro_lot.jpg",
-    sprite: "/art/gen/sprites/elena_idle_32.png?v=hair3",
+    sprite: "/art/gen/sprites/elena_idle_32.png?v=face5",
     kicker: "The lot  ·  Elena",
     title: "She was here before the light.",
     line: "Elena, van door open. A nod. “Two sets of eyes. Or it isn't a catch.”",
@@ -306,7 +306,7 @@ export const INTRO: { art: string; scene: string; sprite: string; kicker: string
   {
     art: "/art/gen/stills/maintenance_plate.png?v=eval1",
     scene: "/art/gen/stills/intro_wing.jpg",
-    sprite: "/art/gen/sprites/tommy_idle_32.png?v=hair3",
+    sprite: "/art/gen/sprites/tommy_idle_32.png?v=face5",
     kicker: "The wing  ·  Tommy",
     title: "Finish the sentence.",
     line: "Tommy taps the lock. “LOTOTO. Out loud.”",
@@ -315,7 +315,7 @@ export const INTRO: { art: string; scene: string; sprite: string; kicker: string
   {
     art: "/art/gen/stills/engineering_plate.png?v=eval1",
     scene: "/art/gen/stills/intro_bench.jpg",
-    sprite: "/art/gen/sprites/marcus_idle_32.png?v=hair3",
+    sprite: "/art/gen/sprites/marcus_idle_32.png?v=face5",
     kicker: "The bench  ·  Marcus",
     title: "Two instruments.",
     line: "Marcus does not turn. “Believe the one you can stand next to.”",
@@ -324,7 +324,7 @@ export const INTRO: { art: string; scene: string; sprite: string; kicker: string
   {
     art: "/art/gen/stills/breakroom_plate.png?v=eval1",
     scene: "/art/gen/stills/intro_break.jpg",
-    sprite: "/art/gen/sprites/jordan_idle_32.png?v=hair3",
+    sprite: "/art/gen/sprites/jordan_idle_32.png?v=face5",
     kicker: "The break  ·  Jordan",
     title: "Distance was the deal.",
     line: "Jordan watches the door, not you. “Share a catch. If you have one.”",
@@ -443,7 +443,7 @@ export const STILLS: Record<string, { src: string; title: string; body: string; 
   cafe: still("/art/gen/stills/cafe_plate.png?v=eval1", "Criticality Cafe", "Sit first. The floor will still be there."),
   culture: still("/art/gen/stills/plate_culture.png?v=beauty", "Just Culture", "Mistakes are expected. Hiding them is the hazard."),
   peer: still("/art/gen/stills/peer.png?v=key", "Peer-check", "Two sets of eyes. Teaching only."),
-  gate: still("/art/gen/stills/gate_plate.png?v=eval1", "Gate / Parking", "Elena's van. Child seat. Cold coffee."),
+  gate: still("/art/gen/stills/gate_plate.png?v=gate2", "Gate / Parking", "Elena's van. Child seat. Cold coffee."),
   corridor: still("/art/gen/stills/corridor_plate.png?v=key", "Main Corridor", "The spine of Unit 1."),
   control: still("/art/gen/stills/control_plate.png?v=key", "Control Room", "Board A and the paper log should agree."),
   reactor: still("/art/gen/stills/reactor_plate.png?v=metal", "Reactor Hall — operating floor", "CRDMs on the head. Insulated legs. Polar crane. Teaching only."),
@@ -764,16 +764,21 @@ export const ROOMS: Record<RoomId, RoomDef> = {
     ],
     props: [
       { rect: t(4, 3, 14, 1), kind: "crane", label: "Polar crane", block: false },
-      { rect: t(9, 4, 5, 5), kind: "core", label: "Vessel" },
+      { rect: t(9, 4, 5, 5), kind: "core", label: "Vessel", hit: [
+        // Opaque tower only. The 80×80 tile box's shoulders are empty floor.
+        { x: 164, y: 64, w: 40, h: 28 },
+        // Opaque base. Stops above the railing so the south lane stays a lane.
+        { x: 146, y: 92, w: 74, h: 46 },
+      ] },
       { rect: t(14, 6, 3, 1), kind: "pipe_run", label: "Hot leg" },
       { rect: t(17, 6, 1, 1), kind: "pipe_corner" },
       { rect: t(17, 7, 1, 4), kind: "pipe_v" },
       { rect: t(6, 7, 3, 1), kind: "pipe_run", label: "Cold leg" },
-      { rect: t(5, 6, 1, 2), kind: "valve", label: "14" },
+      { rect: t(5, 6, 1, 2), kind: "valve", label: "14", hit: [{ x: 80, y: 104, w: 16, h: 24 }] },
       { rect: t(9, 9, 3, 1), kind: "railing" },
       { rect: t(12, 9, 3, 1), kind: "railing" },
       { rect: t(16, 4, 1, 2), kind: "lamp" },
-      { rect: t(2, 8, 2, 3), kind: "cabinet" },
+      { rect: t(2, 8, 2, 3), kind: "cabinet", hit: [{ x: 36, y: 144, w: 24, h: 32 }] },
       { rect: t(2, 1, 2, 2), kind: "poster", block: false },
       { rect: t(18, 10, 2, 2), kind: "console", block: false },
     ],
