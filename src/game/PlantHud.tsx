@@ -33,8 +33,8 @@ export function coreIsHot(plant: PlantDesign) {
 }
 
 export function cutawayStill(type: PlantType, hot = true) {
-  if (type === "pwr") return "/art/gen/stills/plate_pwr.png?v=metal";
-  if (type === "bwr") return "/art/gen/stills/plate_bwr.png?v=metal";
+  if (type === "pwr") return "/art/gen/stills/plate_pwr.png?v=gauge";
+  if (type === "bwr") return "/art/gen/stills/plate_bwr.png?v=gauge";
   if (type === "pebble") return "/art/gen/stills/plate_pebble.png?v=metal";
   return "/art/gen/stills/plate_msr.png?v=metal";
 }

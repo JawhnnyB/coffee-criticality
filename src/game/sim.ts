@@ -138,6 +138,7 @@ export interface GameState {
   announce: string;
   announceT: number;
   introI: number;
+  introJ: number;
   introLock: number;
   dwell: Record<string, number>;
   objective: string;
@@ -266,6 +267,7 @@ export function createState(): GameState {
     announce: "",
     announceT: 0,
     introI: 0,
+    introJ: 0,
     introLock: 0,
     dwell: {},
     objective: "Talk to Mabel before the floor takes you.",
@@ -707,6 +709,7 @@ export function startShift(s: GameState, role: RoleId, look: PlayerLook = DEFAUL
   s.playerLook = { ...look };
   s.mode = "build";
   s.introI = 0;
+  s.introJ = 0;
   s.introLock = .4;
   s.goals = dayDef(1).goals.map((g) => ({
     ...g,
@@ -720,6 +723,7 @@ export function finishBuilder(s: GameState, plant: PlantDesign) {
   bumpTrust(s, "priya", 10);
   s.mode = "intro";
   s.introI = 0;
+  s.introJ = 0;
   s.introLock = 1.05;
 }
 export function beginDay(s: GameState) {
@@ -1417,8 +1421,14 @@ export function update(s: GameState, a: Actions, dt: number) {
       return;
     }
     if (s.introLock <= 0 && (a.confirm || a.interact)) {
-      if (s.introI < INTRO.length - 1) {
+      const beat = INTRO[s.introI];
+      const lastLine = !beat || s.introJ >= beat.exchanges.length - 1;
+      if (!lastLine) {
+        s.introJ += 1;
+        s.introLock = 1.05;
+      } else if (s.introI < INTRO.length - 1) {
         s.introI += 1;
+        s.introJ = 0;
         s.introLock = 1.05;
       } else {
         s.mode = "brief";

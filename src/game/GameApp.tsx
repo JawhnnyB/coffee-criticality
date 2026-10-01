@@ -22,6 +22,7 @@ import {
   periodLabel,
   relationLine,
   trustState,
+  type IntroBeat,
   type Period,
   type RoomId,
 } from "./content";
@@ -329,6 +330,7 @@ export function GameApp() {
       setIntro: (i: number) => {
         const s = stateRef.current;
         s.introI = Math.max(0, Math.min(INTRO.length - 1, i));
+        s.introJ = 0;
         s.mode = "intro";
         modeRef.current = "intro";
         setMode("intro");
@@ -453,6 +455,7 @@ export function GameApp() {
       const sig = [
         s.mode,
         s.introI,
+        s.introJ,
         s.dialogueI,
         s.timeLabel,
         s.period,
@@ -567,9 +570,11 @@ export function GameApp() {
                 : mode === "brief"
                   ? "/art/gen/stills/intro_control.jpg"
                   : mode === "role"
-                    ? "/art/gen/stills/intro_threshold.jpg"
+                    ? "/art/gen/stills/intro_threshold.jpg?v=paint2"
                     : undefined
             }
+            focus={mode === "intro" ? INTRO[s.introI]?.exchanges[s.introJ]?.focus : undefined}
+            zoom={mode === "intro" ? INTRO[s.introI]?.exchanges[s.introJ]?.zoom : undefined}
           />
         )}
 
@@ -794,33 +799,18 @@ export function GameApp() {
         )}
 
         {mode === "intro" && INTRO[s.introI] && (
-          <Panel hint={s.introLock > 0 ? "" : "Space or Continue"}>
-            <img src={INTRO[s.introI].art} alt="" className="mb-4 h-[120px] w-[214px] max-w-full object-contain" style={{ imageRendering: "pixelated" }} />
-            <p className="font-display text-xs uppercase tracking-[0.18em] text-accent">{INTRO[s.introI].kicker}</p>
-            <h2 className="font-display mt-3 max-w-lg text-3xl leading-tight text-fg">{INTRO[s.introI].title}</h2>
-            <div className="mt-5 flex w-full max-w-md items-center gap-4 text-left">
-              <img
-                src={INTRO[s.introI].sprite}
-                alt=""
-                className="h-16 w-8 shrink-0"
-                style={{ imageRendering: "pixelated" }}
-              />
-              <Chatter text={INTRO[s.introI].line} voice={INTRO[s.introI].kicker} className="dialogue-line text-sm leading-relaxed text-fg" />
-            </div>
-            <p className="mt-4 max-w-md text-sm leading-relaxed text-muted">{INTRO[s.introI].body}</p>
-            {s.plant && s.introI === 0 ? <p className="mt-3 font-mono text-xs text-good">{plantTitle(s.plant)}</p> : null}
-            <button
-              type="button"
-              className="btn-primary mt-6 disabled:opacity-40"
-              disabled={s.introLock > 0 && !isRevealing()}
-              onClick={() => {
-                if (isRevealing()) requestSkip();
-                else pulse("Enter");
-              }}
-            >
-              {s.introI < INTRO.length - 1 ? "Continue" : "Morning brief"}
-            </button>
-          </Panel>
+          <IntroStage
+            beat={INTRO[s.introI]}
+            line={Math.min(s.introJ, INTRO[s.introI].exchanges.length - 1)}
+            locked={s.introLock > 0 && !isRevealing()}
+            plant={s.plant && s.introI === 0 ? plantTitle(s.plant) : ""}
+            look={s.playerLook}
+            last={s.introI === INTRO.length - 1 && s.introJ >= INTRO[s.introI].exchanges.length - 1}
+            onContinue={() => {
+              if (isRevealing()) requestSkip();
+              else pulse("Enter");
+            }}
+          />
         )}
 
         {mode === "brief" && (
@@ -2306,7 +2296,7 @@ function MiniMap({
   );
 }
 
-function MenuBackdrop({ scene }: { scene?: string }) {
+function MenuBackdrop({ scene, focus = "50% 50%", zoom = 1 }: { scene?: string; focus?: string; zoom?: number }) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [reduce, setReduce] = useState(false);
   const [live, setLive] = useState(false);
@@ -2336,7 +2326,13 @@ function MenuBackdrop({ scene }: { scene?: string }) {
   return (
     <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden bg-bg">
       {scene ? (
-        <img src={scene} alt="" className="absolute inset-0 h-full w-full object-cover" />
+        <img
+          key={scene}
+          src={scene}
+          alt=""
+          className="intro-still absolute inset-0 h-full w-full object-cover"
+          style={{ objectPosition: focus, transform: `scale(${zoom})`, transformOrigin: focus }}
+        />
       ) : (
         <>
           {(!live || reduce) && (
@@ -2369,7 +2365,71 @@ function MenuBackdrop({ scene }: { scene?: string }) {
   );
 }
 
-function LookPreview({ look }: { look: PlayerLook }) {
+function IntroStage({
+  beat,
+  line,
+  locked,
+  plant,
+  look,
+  last,
+  onContinue,
+}: {
+  beat: IntroBeat;
+  line: number;
+  locked: boolean;
+  plant: string;
+  look: PlayerLook;
+  last: boolean;
+  onContinue: () => void;
+}) {
+  const ex = beat.exchanges[line] ?? beat.exchanges[0];
+  return (
+    <div className="absolute inset-0 z-30 flex items-end justify-center px-4 pb-8 pt-20 sm:px-8" data-testid="intro-stage">
+      <div className="flex w-full max-w-4xl flex-col items-stretch gap-4 sm:flex-row sm:items-end">
+        <div className="relative mx-auto h-56 w-56 shrink-0 sm:mx-0 sm:h-72 sm:w-72">
+          {beat.you ? (
+            <LookPreview look={look} big />
+          ) : (
+            <img
+              src={beat.portrait}
+              alt=""
+              width={288}
+              height={288}
+              className="intro-portrait h-full w-full object-contain"
+              style={{ transform: `rotate(${ex.lean}deg)` }}
+            />
+          )}
+          {ex.prop === "cup" ? <span className="intro-cup" aria-hidden /> : null}
+          {ex.prop === "lock" ? <span className="intro-lock" aria-hidden /> : null}
+          {ex.prop === "pencil" ? <span className="intro-pencil" aria-hidden /> : null}
+        </div>
+        <div className="paper min-w-0 flex-1 p-4 text-left sm:p-5">
+          <p className="font-display text-xs uppercase tracking-[0.18em] text-[#8a5a32]">{beat.kicker}</p>
+          <h2 className="font-display mt-1 text-2xl leading-tight text-[#16110d] sm:text-3xl">{beat.title}</h2>
+          <Chatter
+            key={beat.kicker + line}
+            text={ex.line}
+            voice={beat.kicker}
+            className="dialogue-line mt-3 text-base leading-relaxed text-[#16110d]"
+          />
+          <p className="mt-3 border-t border-[#c9a227]/30 pt-2 font-mono text-[11px] leading-relaxed text-[#6a4a32]">{beat.body}</p>
+          {plant ? <p className="mt-1 font-mono text-xs text-[#3d5c44]">{plant}</p> : null}
+          <button
+            type="button"
+            className="mt-4 bg-[#16110d] px-4 py-2 text-sm font-semibold text-[#f3e6d0] disabled:opacity-40"
+            disabled={locked}
+            onClick={onContinue}
+          >
+            {last ? "Morning brief" : "Continue"}
+          </button>
+          {!locked ? <p className="mt-2 text-xs text-[#8a7864]">Space or Continue</p> : null}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function LookPreview({ look, big = false }: { look: PlayerLook; big?: boolean }) {
   const ref = useRef<HTMLCanvasElement>(null);
   useEffect(() => {
     const canvas = ref.current;
@@ -2382,10 +2442,18 @@ function LookPreview({ look }: { look: PlayerLook }) {
       const tinted = tintPlayer(im, look);
       ctx.imageSmoothingEnabled = false;
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.drawImage(tinted as CanvasImageSource, 0, 0, 32, 64, 0, 0, 128, 256);
+      ctx.drawImage(tinted as CanvasImageSource, 0, 0, 32, 64, 0, 0, canvas.width, canvas.height);
     };
   }, [look]);
-  return <canvas ref={ref} width={128} height={256} className="h-32 w-16" aria-hidden />;
+  return (
+    <canvas
+      ref={ref}
+      width={big ? 144 : 128}
+      height={big ? 288 : 256}
+      className={big ? "intro-portrait mx-auto h-full w-auto" : "h-32 w-16"}
+      aria-hidden
+    />
+  );
 }
 
 function Panel({

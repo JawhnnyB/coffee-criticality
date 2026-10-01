@@ -18,7 +18,7 @@ import {
 const SCALES: { id: DesignScale; title: string; sub: string; art: string }[] = [
   { id: "rod", title: "Fuel rod", sub: "Infinite pin · reflective", art: "/art/gen/stills/term_pellet.png?v=pixel" },
   { id: "assembly", title: "Assembly", sub: "Lattice · axial leak", art: "/art/gen/stills/plate_assembly.png?v=pixel" },
-  { id: "core", title: "Full core", sub: "Buckling + shuffle", art: "/art/gen/stills/plate_pwr.png?v=metal" },
+  { id: "core", title: "Full core", sub: "Buckling + shuffle", art: "/art/gen/stills/plate_pwr.png?v=gauge" },
 ];
 
 function fuelInk(k: number) {

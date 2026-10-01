@@ -275,60 +275,127 @@ export const NPC_SCHEDULE: Record<Period, Record<NpcId, NpcSlot>> = {
   },
 };
 
-export const INTRO: { art: string; scene: string; sprite: string; kicker: string; title: string; line: string; body: string }[] = [
+export type IntroProp = "cup" | "lock" | "pencil";
+
+export type IntroExchange = {
+  line: string;
+  /** object-position on the painted still */
+  focus: string;
+  zoom: number;
+  /** small portrait lean, degrees */
+  lean: number;
+  prop?: IntroProp;
+};
+
+export type IntroBeat = {
+  scene: string;
+  portrait: string;
+  kicker: string;
+  title: string;
+  /** Persistent data footer. Does not change per exchange. */
+  body: string;
+  /** Use the badge the player just picked, not a baked bust. */
+  you?: boolean;
+  exchanges: IntroExchange[];
+};
+
+export const INTRO: IntroBeat[] = [
   {
-    art: "/art/gen/stills/plate_pwr.png?v=metal",
     scene: "/art/gen/stills/intro_core.jpg",
-    sprite: "/art/gen/sprites/priya_idle_32.png?v=face5",
+    portrait: "/art/gen/portraits/priya_talk.png?v=cast",
     kicker: "The core  ·  Priya",
     title: "You signed a core. Now it has to live.",
-    line: "Priya, not looking up. “I will not sign a peak I cannot walk.”",
     body: "Teaching model — not a license. Heat still has to leave.",
+    exchanges: [
+      { line: "Priya, not looking up. “I will not sign a peak I cannot walk.”", focus: "42% 78%", zoom: 1.14, lean: -2 },
+      { line: "She turns the sheet a quarter. “You signed it. Stand next to the tank.”", focus: "22% 68%", zoom: 1.22, lean: 0 },
+      { line: "A glance at the dark stack. “Then we talk.”", focus: "74% 28%", zoom: 1.08, lean: 3 },
+    ],
   },
   {
-    art: "/art/gen/stills/cafe_plate.png?v=eval1",
     scene: "/art/gen/stills/intro_cafe.jpg",
-    sprite: "/art/gen/sprites/mabel_idle_32.png?v=face5",
+    portrait: "/art/gen/portraits/mabel_talk.png?v=cast",
     kicker: "The cafe  ·  Mabel",
     title: "The water is still holding last night.",
-    line: "Mabel sets the cup down. She does not ask.",
     body: "Truth sits here before it becomes a report.",
+    exchanges: [
+      { line: "“Sit.”", focus: "36% 48%", zoom: 1.06, lean: 0 },
+      { line: "The cup meets the tile.", focus: "48% 40%", zoom: 1.2, lean: 2, prop: "cup" },
+      { line: "She does not ask.", focus: "58% 72%", zoom: 1.1, lean: 1 },
+      { line: "“The kettle is the last board I still touch.”", focus: "18% 32%", zoom: 1.08, lean: -2 },
+    ],
   },
   {
-    art: "/art/gen/stills/gate_plate.png?v=eval1",
     scene: "/art/gen/stills/intro_lot.jpg",
-    sprite: "/art/gen/sprites/elena_idle_32.png?v=face5",
+    portrait: "/art/gen/portraits/elena_talk.png?v=cast",
     kicker: "The lot  ·  Elena",
     title: "She was here before the light.",
-    line: "Elena, van door open. A nod. “Two sets of eyes. Or it isn't a catch.”",
     body: "Child seat. Cold coffee. The first glance is not the paper.",
+    exchanges: [
+      { line: "Elena, van door open. A nod. “Two sets of eyes. Or it isn't a catch.”", focus: "32% 64%", zoom: 1.1, lean: 2 },
+      { line: "She looks at the child seat, not at you. “Cold.”", focus: "46% 46%", zoom: 1.24, lean: -3 },
+      { line: "“I was here before the light.”", focus: "78% 34%", zoom: 1.06, lean: 0 },
+    ],
   },
   {
-    art: "/art/gen/stills/maintenance_plate.png?v=eval1",
     scene: "/art/gen/stills/intro_wing.jpg",
-    sprite: "/art/gen/sprites/tommy_idle_32.png?v=face5",
+    portrait: "/art/gen/portraits/tommy_talk.png?v=cast",
     kicker: "The wing  ·  Tommy",
     title: "Finish the sentence.",
-    line: "Tommy taps the lock. “LOTOTO. Out loud.”",
     body: "A tag is a sentence. Leave it unfinished and the pump still thinks it is yours.",
+    exchanges: [
+      { line: "Tommy taps the lock. “LOTOTO. Out loud.”", focus: "72% 42%", zoom: 1.16, lean: 1, prop: "lock" },
+      { line: "The tag turns on its ring. “A sentence.”", focus: "64% 58%", zoom: 1.22, lean: -1 },
+      { line: "“Leave it unfinished and the pump still thinks it is yours.”", focus: "18% 48%", zoom: 1.05, lean: 0 },
+    ],
   },
   {
-    art: "/art/gen/stills/engineering_plate.png?v=eval1",
     scene: "/art/gen/stills/intro_bench.jpg",
-    sprite: "/art/gen/sprites/marcus_idle_32.png?v=face5",
+    portrait: "/art/gen/portraits/marcus_talk.png?v=cast",
     kicker: "The bench  ·  Marcus",
     title: "Two instruments.",
-    line: "Marcus does not turn. “Believe the one you can stand next to.”",
     body: "Youngest senior on this floor, once. That is not a compliment.",
+    exchanges: [
+      { line: "Marcus does not turn. “Believe the one you can stand next to.”", focus: "36% 38%", zoom: 1.14, lean: 0 },
+      { line: "The pencil finds the grid. “Two instruments.”", focus: "72% 68%", zoom: 1.18, lean: 2, prop: "pencil" },
+      { line: "“That is not a compliment.”", focus: "40% 30%", zoom: 1.08, lean: -2 },
+    ],
   },
   {
-    art: "/art/gen/stills/breakroom_plate.png?v=eval1",
     scene: "/art/gen/stills/intro_break.jpg",
-    sprite: "/art/gen/sprites/jordan_idle_32.png?v=face5",
+    portrait: "/art/gen/portraits/jordan_talk.png?v=cast",
     kicker: "The break  ·  Jordan",
     title: "Distance was the deal.",
-    line: "Jordan watches the door, not you. “Share a catch. If you have one.”",
     body: "He notices who keeps a win.",
+    exchanges: [
+      { line: "Jordan watches the door, not you. “Share a catch. If you have one.”", focus: "58% 42%", zoom: 1.1, lean: 3 },
+      { line: "“Distance was the deal.”", focus: "16% 40%", zoom: 1.12, lean: -2 },
+      { line: "He does not look at the chair. “I notice who keeps a win.”", focus: "84% 38%", zoom: 1.06, lean: 1 },
+    ],
+  },
+  {
+    scene: "/art/gen/stills/intro_control.jpg",
+    portrait: "/art/gen/portraits/holt_talk.png?v=cast",
+    kicker: "The board  ·  Holt",
+    title: "Unit 1 is holding. You are not a hero today.",
+    body: "He funds reviews. He does not fund mythology.",
+    exchanges: [
+      { line: "The lights are already up. He doesn't turn.", focus: "34% 72%", zoom: 1.1, lean: 0 },
+      { line: "“A catch. Not a speech.”", focus: "64% 70%", zoom: 1.2, lean: -2 },
+      { line: "His hand stays off the log. “I'll read what you stood next to.”", focus: "82% 28%", zoom: 1.06, lean: 1 },
+    ],
+  },
+  {
+    scene: "/art/gen/stills/intro_threshold.jpg?v=paint2",
+    portrait: "/art/gen/portraits/player_talk.png?v=cast",
+    kicker: "The door  ·  You",
+    title: "The hook is empty.",
+    body: "Flavor. The floor does not care what the hoodie is called.",
+    you: true,
+    exchanges: [
+      { line: "Your coat is still on you.", focus: "28% 42%", zoom: 1.08, lean: -1 },
+      { line: "The door was open before you. The board is already lit.", focus: "72% 48%", zoom: 1.14, lean: 2 },
+    ],
   },
 ];
 
@@ -453,14 +520,14 @@ export const STILLS: Record<string, { src: string; title: string; body: string; 
   window_lake: still("/art/gen/stills/plate_lake.png?v=key", "Master's Power Station", "North glass. The lake holds."),
   window_control: still("/art/gen/stills/control_win.png?v=key", "Control glass", "Board A from the hall."),
   window_reactor: still("/art/gen/stills/glimpse_reactor.png?v=eval1", "Core window", "The vessel has names. CRDMs from above."),
-  pwr: still("/art/gen/stills/plate_pwr.png?v=metal", "PWR loop (this site)", "CRDMs on the head. Cold down the downcomer, core up, hot to the steam generator. Primary stays liquid ~16 MPa. Teaching only."),
-  bwr: still("/art/gen/stills/plate_bwr.png?v=metal", "BWR — teaching comparison", "One vessel does the boiling. Rods from below. ~7 MPa. Teaching only."),
+  pwr: still("/art/gen/stills/plate_pwr.png?v=gauge", "PWR loop (this site)", "CRDMs on the head. Cold down the downcomer, core up, hot to the steam generator. Primary stays liquid ~16 MPa. Teaching only."),
+  bwr: still("/art/gen/stills/plate_bwr.png?v=gauge", "BWR — teaching comparison", "One vessel does the boiling. Rods from below. ~7 MPa. Teaching only."),
   pebble: still("/art/gen/stills/plate_pebble.png?v=metal", "Pebble / TRISO — teaching comparison", "Fuel as 6 cm pebbles. Helium is the courier. The SiC is the pressure vessel of the particle."),
   msr: still("/art/gen/stills/plate_msr.png?v=metal", "MSR — teaching comparison", "Thermal circulating fuel. FLiBe + UF4, 7Li, freeze plug, off-gas. β_eff is smaller than β. Teaching only."),
   msr_fhr: still("/art/gen/stills/plate_msr.png?v=metal", "FHR — salt cools solid fuel", "Not a liquid-fuel MSR. TRISO pebbles. Salt is only the courier. Kairos-family teaching card."),
   msr_fast: still("/art/gen/stills/plate_msr.png?v=metal", "Fast chloride — no graphite", "Fuel dissolved in chloride salt. Compact pool. Freeze plug if circulating. Teaching only."),
   mural_catch: still("/art/gen/stills/plate_culture.png?v=beauty", "Catch > heroics", "Two sets of eyes and a clipboard. The catch is shared."),
-  mural_criticality: still("/art/gen/stills/plate_pwr.png?v=metal", "The core holds", "A living claim. Heat is born here."),
+  mural_criticality: still("/art/gen/stills/plate_pwr.png?v=gauge", "The core holds", "A living claim. Heat is born here."),
   mural_openmc: still("/art/gen/stills/plate_assembly.png?v=metal", "Lattice (teaching)", "Pins and a couple of guide tubes. A map, not a license."),
   alara: still("/art/gen/stills/plate_alara.png?v=beauty", "ALARA with eyes open", "Time, distance, shielding — and still seeing."),
   scales: still("/art/gen/stills/plate_assembly.png?v=metal", "Rod, assembly, core", "A pin is not a plant. Leakage is how k comes down."),

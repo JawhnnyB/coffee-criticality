@@ -120,6 +120,103 @@
   border: 1px solid #6a4a32;
 }
 
+.intro-still {
+  transition: transform 800ms ease, object-position 800ms ease;
+}
+
+.intro-portrait {
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  transition: transform 500ms ease;
+  filter: drop-shadow(4px 6px 0 #16110d);
+}
+
+.intro-cup,
+.intro-lock,
+.intro-pencil {
+  position: absolute;
+  pointer-events: none;
+}
+
+.intro-cup {
+  left: 72%;
+  top: 38%;
+  width: 26px;
+  height: 18px;
+  border: 3px solid #f3e6d0;
+  border-radius: 0 0 8px 8px;
+  background: #f7f1e6;
+  box-shadow: 3px 3px 0 #16110d;
+  animation: intro-cup-set 1.05s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.intro-cup::before {
+  content: "";
+  position: absolute;
+  right: -9px;
+  top: 1px;
+  width: 8px;
+  height: 8px;
+  border: 3px solid #f3e6d0;
+  border-left: 0;
+  border-radius: 0 8px 8px 0;
+}
+@keyframes intro-cup-set {
+  from { transform: translate(0, 24px) rotate(-18deg); }
+  to { transform: translate(120px, -190px) rotate(2deg); }
+}
+
+.intro-lock {
+  right: 10%;
+  top: 16%;
+  width: 18px;
+  height: 14px;
+  background: #b85c4a;
+  border: 2px solid #16110d;
+  box-shadow: 2px 2px 0 #16110d;
+  animation: intro-lock-tap 0.7s ease both;
+}
+.intro-lock::before {
+  content: "";
+  position: absolute;
+  left: 3px;
+  top: -8px;
+  width: 8px;
+  height: 8px;
+  border: 2px solid #16110d;
+  border-bottom: 0;
+  border-radius: 6px 6px 0 0;
+}
+@keyframes intro-lock-tap {
+  0% { transform: rotate(-12deg); }
+  45% { transform: rotate(14deg); }
+  100% { transform: rotate(0deg); }
+}
+
+.intro-pencil {
+  left: 18%;
+  bottom: 10%;
+  width: 42px;
+  height: 5px;
+  background: #c4783a;
+  border: 1px solid #16110d;
+  transform-origin: left center;
+  animation: intro-pencil 0.85s ease both;
+}
+.intro-pencil::after {
+  content: "";
+  position: absolute;
+  right: -6px;
+  top: -2px;
+  border-left: 7px solid #16110d;
+  border-top: 4px solid transparent;
+  border-bottom: 4px solid transparent;
+}
+@keyframes intro-pencil {
+  from { transform: translateX(-24px) rotate(-28deg); }
+  to { transform: translateX(8px) rotate(-8deg); }
+}
+
+
 .paper-btn {
   display: block;
   width: 100%;

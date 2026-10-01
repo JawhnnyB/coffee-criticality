@@ -46,6 +46,48 @@ def save_plate(im: Image.Image, name: str):
     print("plate", name, im.size)
 
 
+def rivets(d: ImageDraw.ImageDraw, x0, y0, x1, y1, n: int):
+    """A row of flange bolts. Teaching cutaway, not a weld map."""
+    if n < 2:
+        return
+    for i in range(n):
+        t = i / (n - 1)
+        x = x0 + (x1 - x0) * t
+        y = y0 + (y1 - y0) * t
+        d.ellipse([x - 2, y - 2, x + 2, y + 2], fill=C["dark"], outline=C["ink"])
+
+
+def handwheel(d: ImageDraw.ImageDraw, cx, cy, r=7):
+    d.ellipse([cx - r, cy - r, cx + r, cy + r], outline=C["ink"], width=2)
+    d.ellipse([cx - r + 3, cy - r + 3, cx + r - 3, cy + r - 3], outline=C["steel"], width=1)
+    d.line([cx - r + 1, cy, cx + r - 1, cy], fill=C["ink"], width=1)
+    d.line([cx, cy - r + 1, cx, cy + r - 1], fill=C["ink"], width=1)
+    d.rectangle([cx - 1, cy - 1, cx + 1, cy + 1], fill=C["gold"])
+
+
+def dial(d: ImageDraw.ImageDraw, cx, cy, r=11):
+    """Pressure gauge. Needle only — no tiny type."""
+    d.ellipse([cx - r - 2, cy - r - 2, cx + r + 2, cy + r + 2], fill=C["vessel"], outline=C["ink"], width=2)
+    d.ellipse([cx - r, cy - r, cx + r, cy + r], fill=C["cream"], outline=C["ink"])
+    d.arc([cx - r + 2, cy - r + 2, cx + r - 2, cy + r - 2], 200, 340, fill=C["ink"], width=1)
+    d.line([cx, cy + 1, cx + 5, cy - 6], fill=C["hot"], width=2)
+    d.rectangle([cx - 1, cy, cx + 1, cy + 2], fill=C["ink"])
+
+
+def thermo(d: ImageDraw.ImageDraw, x, y):
+    """Temperature glyph. A bulb and a stem, not a readout of digits."""
+    d.rectangle([x + 2, y, x + 6, y + 12], fill=C["cream"], outline=C["ink"])
+    d.rectangle([x + 3, y + 5, x + 5, y + 11], fill=C["hot"])
+    d.ellipse([x, y + 9, x + 8, y + 17], fill=C["hot"], outline=C["ink"])
+
+
+def heavy_shell(d: ImageDraw.ImageDraw, box, radius):
+    """Vessel wall reads thicker than the pipe that leaves it."""
+    d.rounded_rectangle(box, radius=radius, outline=C["dark"], width=4)
+    x0, y0, x1, y1 = box
+    d.arc([x0 + 3, y0 + 3, x0 + 18, y0 + 18], 180, 270, fill=C["steam"], width=2)
+
+
 def pwr():
     """PWR: CRDM on top, downcomer, core, SG U-tubes, pump, pressurizer."""
     im, d = canvas()
@@ -88,6 +130,17 @@ def pwr():
     d.rectangle([288, 34, 306, 54], fill=C["steam"])
     d.rectangle([288, 54, 306, 82], fill=C["hot"])
     d.rectangle([214, 48, 284, 56], fill=C["hot"], outline=C["ink"])
+    # Heavier vessel metal than the legs. Instruments sit on the metal, not in the pins.
+    heavy_shell(d, [26, 16, 120, 170], 18)
+    heavy_shell(d, [152, 20, 216, 152], 10)
+    heavy_shell(d, [282, 26, 312, 90], 6)
+    rivets(d, 40, 24, 106, 24, 5)
+    rivets(d, 36, 158, 110, 158, 5)
+    rivets(d, 162, 28, 206, 28, 4)
+    handwheel(d, 128, 48, 7)
+    handwheel(d, 20, 124, 6)
+    dial(d, 297, 46, 9)
+    thermo(d, 132, 28)
     save_plate(im, "plate_pwr")
 
 
@@ -125,6 +178,12 @@ def bwr():
     # condensate hint back
     d.rectangle([268, 78, 284, 150], fill=C["cold"], outline=C["ink"])
     d.rectangle([190, 138, 268, 150], fill=C["cold"], outline=C["ink"])
+    heavy_shell(d, [68, 8, 192, 172], 22)
+    rivets(d, 88, 16, 172, 16, 6)
+    rivets(d, 86, 156, 174, 156, 6)
+    handwheel(d, 218, 22, 7)
+    dial(d, 104, 28, 8)
+    thermo(d, 148, 78)
     save_plate(im, "plate_bwr")
 
 
