@@ -172,7 +172,7 @@ export const NPCS: Record<NpcId, NpcDef> = {
     role: "Cafe / retired floor",
     startTrust: 40,
     note: "Retired floor manager. Grandma warmth, doctorate steel.",
-    portrait: { src: "/art/gen/portraits/mabel_talk.png?v=cast", pos: "center" },
+    portrait: { src: "/art/gen/portraits/mabel_talk.jpg?v=paint3", pos: "center" },
     meet: "Sit. The kettle is the last board I still touch.",
   },
   holt: {
@@ -181,7 +181,7 @@ export const NPCS: Record<NpcId, NpcDef> = {
     role: "Director",
     startTrust: 28,
     note: "Funds reviews, not mythology. Volume, not a speech.",
-    portrait: { src: "/art/gen/portraits/holt_talk.png?v=cast", pos: "center" },
+    portrait: { src: "/art/gen/portraits/holt_talk.jpg?v=paint3", pos: "center" },
     meet: "You designed the core. Now walk it. Catch. I fund reviews, not mythology.",
   },
   elena: {
@@ -190,7 +190,7 @@ export const NPCS: Record<NpcId, NpcDef> = {
     role: "Shift supervisor",
     startTrust: 32,
     note: "Two sets of eyes. The van was here before dawn.",
-    portrait: { src: "/art/gen/portraits/elena_talk.png?v=cast", pos: "center" },
+    portrait: { src: "/art/gen/portraits/elena_talk.jpg?v=paint3", pos: "center" },
     meet: "I will back a catch if you stand where I can see you.",
   },
   tommy: {
@@ -199,7 +199,7 @@ export const NPCS: Record<NpcId, NpcDef> = {
     role: "Maintenance",
     startTrust: 34,
     note: "LOTOTO is a sentence. Finish it.",
-    portrait: { src: "/art/gen/portraits/tommy_talk.png?v=cast", pos: "center" },
+    portrait: { src: "/art/gen/portraits/tommy_talk.jpg?v=paint3", pos: "center" },
     meet: "Isolate. Lock. Tag. Try. IN SERVICE does not hang on a dead pump.",
   },
   marcus: {
@@ -208,7 +208,7 @@ export const NPCS: Record<NpcId, NpcDef> = {
     role: "Senior engineer",
     startTrust: 22,
     note: "Youngest senior once. Hates being wrong in public.",
-    portrait: { src: "/art/gen/portraits/marcus_talk.png?v=cast", pos: "center" },
+    portrait: { src: "/art/gen/portraits/marcus_talk.jpg?v=paint3", pos: "center" },
     meet: "Two instruments. I was the youngest senior on this floor. That is not a compliment.",
   },
   priya: {
@@ -217,7 +217,7 @@ export const NPCS: Record<NpcId, NpcDef> = {
     role: "Reactor engineering",
     startTrust: 36,
     note: "A peak on a screen is a rumor until you stand next to the tank.",
-    portrait: { src: "/art/gen/portraits/priya_talk.png?v=cast", pos: "center" },
+    portrait: { src: "/art/gen/portraits/priya_talk.jpg?v=paint3", pos: "center" },
     meet: "Teaching model — not a license. Heat has to leave.",
   },
   jordan: {
@@ -226,7 +226,7 @@ export const NPCS: Record<NpcId, NpcDef> = {
     role: "Floor tech",
     startTrust: 30,
     note: "Notices who shares a win. Wants distance from a hide.",
-    portrait: { src: "/art/gen/portraits/jordan_talk.png?v=cast", pos: "center" },
+    portrait: { src: "/art/gen/portraits/jordan_talk.jpg?v=paint3", pos: "center" },
     meet: "I want distance. That was the deal. Share a catch if you have one.",
   },
 };
@@ -285,6 +285,8 @@ export type IntroExchange = {
   /** small portrait lean, degrees */
   lean: number;
   prop?: IntroProp;
+  /** This turn is the player. The named portrait stays for their replies. */
+  you?: boolean;
 };
 
 export type IntroBeat = {
@@ -302,98 +304,111 @@ export type IntroBeat = {
 export const INTRO: IntroBeat[] = [
   {
     scene: "/art/gen/stills/intro_core.jpg",
-    portrait: "/art/gen/portraits/priya_talk.png?v=cast",
+    portrait: "/art/gen/portraits/priya_talk.jpg?v=paint3",
     kicker: "The core  ·  Priya",
     title: "You signed a core. Now it has to live.",
     body: "Teaching model — not a license. Heat still has to leave.",
     exchanges: [
-      { line: "Priya, not looking up. “I will not sign a peak I cannot walk.”", focus: "42% 78%", zoom: 1.14, lean: -2 },
-      { line: "She turns the sheet a quarter. “You signed it. Stand next to the tank.”", focus: "22% 68%", zoom: 1.22, lean: 0 },
-      { line: "A glance at the dark stack. “Then we talk.”", focus: "74% 28%", zoom: 1.08, lean: 3 },
+      { you: true, line: "I signed Unit 1 on the sheet. I have not stood at the tank.", focus: "42% 78%", zoom: 1.14, lean: -2 },
+      { line: "Priya, not looking up. “I will not sign a peak I cannot walk. You already did.”", focus: "22% 68%", zoom: 1.22, lean: 0 },
+      { you: true, line: "Then walk me to the rail. I want the heat, not the plot.", focus: "74% 28%", zoom: 1.08, lean: 3 },
+      { line: "She turns the sheet a quarter. “The stack is dark from here. Stand next to it. The heat still has to leave.”", focus: "50% 62%", zoom: 1.16, lean: 1 },
     ],
   },
   {
     scene: "/art/gen/stills/intro_cafe.jpg",
-    portrait: "/art/gen/portraits/mabel_talk.png?v=cast",
+    portrait: "/art/gen/portraits/mabel_talk.jpg?v=paint3",
     kicker: "The cafe  ·  Mabel",
-    title: "The water is still holding last night.",
-    body: "Truth sits here before it becomes a report.",
+    title: "The kettle is still on from the night shift.",
+    body: "Retired floor manager. The cafe is the last board she touches.",
     exchanges: [
-      { line: "“Sit.”", focus: "36% 48%", zoom: 1.06, lean: 0 },
-      { line: "The cup meets the tile.", focus: "48% 40%", zoom: 1.2, lean: 2, prop: "cup" },
-      { line: "She does not ask.", focus: "58% 72%", zoom: 1.1, lean: 1 },
-      { line: "“The kettle is the last board I still touch.”", focus: "18% 32%", zoom: 1.08, lean: -2 },
+      { line: "“Sit. Two-to-ten left this chair warm. I'm Mabel. I ran this floor twenty years.”", focus: "36% 48%", zoom: 1.06, lean: 0 },
+      { you: true, line: "You're not on the board. Why is the kettle still yours?", focus: "58% 72%", zoom: 1.1, lean: 1 },
+      { line: "The cup meets the tile. “I don't ask the board. I watch who won't sit.”", focus: "48% 40%", zoom: 1.2, lean: 2, prop: "cup" },
+      { you: true, line: "Then I'll sit. Tell me who wouldn't.", focus: "22% 55%", zoom: 1.08, lean: -1 },
+      { line: "“The ones with a catch in their pocket. The kettle is the last board I still touch.”", focus: "18% 32%", zoom: 1.12, lean: -2 },
     ],
   },
   {
     scene: "/art/gen/stills/intro_lot.jpg",
-    portrait: "/art/gen/portraits/elena_talk.png?v=cast",
+    portrait: "/art/gen/portraits/elena_talk.jpg?v=paint3",
     kicker: "The lot  ·  Elena",
-    title: "She was here before the light.",
-    body: "Child seat. Cold coffee. The first glance is not the paper.",
+    title: "Child seat first.",
+    body: "Shift supervisor. The van was cold. The seat was not empty.",
     exchanges: [
       { line: "Elena, van door open. A nod. “Two sets of eyes. Or it isn't a catch.”", focus: "32% 64%", zoom: 1.1, lean: 2 },
+      { you: true, line: "The child seat is still in the back. You didn't take it out.", focus: "70% 58%", zoom: 1.16, lean: -1 },
       { line: "She looks at the child seat, not at you. “Cold.”", focus: "46% 46%", zoom: 1.24, lean: -3 },
-      { line: "“I was here before the light.”", focus: "78% 34%", zoom: 1.06, lean: 0 },
+      { you: true, line: "You came from home. Then the gate.", focus: "78% 34%", zoom: 1.06, lean: 0 },
+      { line: "“Child seat first. Then I was here. Stand where I can see your hands.”", focus: "28% 70%", zoom: 1.12, lean: 1 },
     ],
   },
   {
     scene: "/art/gen/stills/intro_wing.jpg",
-    portrait: "/art/gen/portraits/tommy_talk.png?v=cast",
+    portrait: "/art/gen/portraits/tommy_talk.jpg?v=paint3",
     kicker: "The wing  ·  Tommy",
     title: "Finish the sentence.",
-    body: "A tag is a sentence. Leave it unfinished and the pump still thinks it is yours.",
+    body: "Maintenance. Pump two. The tag is the rest of the sentence.",
     exchanges: [
-      { line: "Tommy taps the lock. “LOTOTO. Out loud.”", focus: "72% 42%", zoom: 1.16, lean: 1, prop: "lock" },
-      { line: "The tag turns on its ring. “A sentence.”", focus: "64% 58%", zoom: 1.22, lean: -1 },
-      { line: "“Leave it unfinished and the pump still thinks it is yours.”", focus: "18% 48%", zoom: 1.05, lean: 0 },
+      { line: "Tommy taps the lock. “Pump two. Say LOTOTO out loud.”", focus: "72% 42%", zoom: 1.16, lean: 1, prop: "lock" },
+      { you: true, line: "Lock. Tag. Try. The IN SERVICE card is still on the flange.", focus: "28% 50%", zoom: 1.08, lean: -1 },
+      { line: "The tag turns on its ring. “Then pump two still thinks your hands are on it.”", focus: "64% 58%", zoom: 1.22, lean: -1 },
+      { you: true, line: "I won't touch it until that sentence is finished.", focus: "18% 48%", zoom: 1.05, lean: 0 },
+      { line: "“Good. Boring on purpose. That's how I keep a hand.”", focus: "80% 36%", zoom: 1.1, lean: 2 },
     ],
   },
   {
     scene: "/art/gen/stills/intro_bench.jpg",
-    portrait: "/art/gen/portraits/marcus_talk.png?v=cast",
+    portrait: "/art/gen/portraits/marcus_talk.jpg?v=paint3",
     kicker: "The bench  ·  Marcus",
     title: "Two instruments.",
-    body: "Youngest senior on this floor, once. That is not a compliment.",
+    body: "Senior engineer. Youngest on this floor, once. He was wrong out loud.",
     exchanges: [
-      { line: "Marcus does not turn. “Believe the one you can stand next to.”", focus: "36% 38%", zoom: 1.14, lean: 0 },
-      { line: "The pencil finds the grid. “Two instruments.”", focus: "72% 68%", zoom: 1.18, lean: 2, prop: "pencil" },
-      { line: "“That is not a compliment.”", focus: "40% 30%", zoom: 1.08, lean: -2 },
+      { line: "Marcus does not turn. “Left gauge. I trust the one under my hand.”", focus: "36% 38%", zoom: 1.14, lean: 0 },
+      { you: true, line: "The one on the wall doesn't agree with it.", focus: "62% 42%", zoom: 1.08, lean: -1 },
+      { line: "The pencil finds the grid. “I was wrong on this floor once. Out loud. Youngest senior.”", focus: "72% 68%", zoom: 1.18, lean: 2, prop: "pencil" },
+      { you: true, line: "So I say the number before I defend it.", focus: "40% 30%", zoom: 1.08, lean: -2 },
+      { line: "“That is not a compliment. If the two argue, do not pick the polite one.”", focus: "24% 55%", zoom: 1.12, lean: 1 },
     ],
   },
   {
     scene: "/art/gen/stills/intro_break.jpg",
-    portrait: "/art/gen/portraits/jordan_talk.png?v=cast",
+    portrait: "/art/gen/portraits/jordan_talk.jpg?v=paint3",
     kicker: "The break  ·  Jordan",
-    title: "Distance was the deal.",
-    body: "He notices who keeps a win.",
+    title: "Three tiles off the hide.",
+    body: "Floor tech. He remembers who kept the catch.",
     exchanges: [
-      { line: "Jordan watches the door, not you. “Share a catch. If you have one.”", focus: "58% 42%", zoom: 1.1, lean: 3 },
-      { line: "“Distance was the deal.”", focus: "16% 40%", zoom: 1.12, lean: -2 },
-      { line: "He does not look at the chair. “I notice who keeps a win.”", focus: "84% 38%", zoom: 1.06, lean: 1 },
+      { line: "Jordan watches the door, not you. “Say the catch out here. Not in your pocket.”", focus: "58% 42%", zoom: 1.1, lean: 3 },
+      { you: true, line: "Three tiles off the hide. Is that still where we say it?", focus: "16% 40%", zoom: 1.12, lean: -2 },
+      { line: "“That was the deal. I remember who kept the win. Same row as me.”", focus: "40% 62%", zoom: 1.14, lean: 1 },
+      { you: true, line: "If I hide it, you won't sit next to me.", focus: "84% 38%", zoom: 1.06, lean: 1 },
+      { line: "He does not look at the chair. “Distance. Bowl after shift only if the catch is already said.”", focus: "22% 48%", zoom: 1.08, lean: -1 },
     ],
   },
   {
     scene: "/art/gen/stills/intro_control.jpg",
-    portrait: "/art/gen/portraits/holt_talk.png?v=cast",
+    portrait: "/art/gen/portraits/holt_talk.jpg?v=paint3",
     kicker: "The board  ·  Holt",
     title: "Unit 1 is holding. You are not a hero today.",
-    body: "He funds reviews. He does not fund mythology.",
+    body: "Director. He funds the review. He does not fund the speech.",
     exchanges: [
-      { line: "The lights are already up. He doesn't turn.", focus: "34% 72%", zoom: 1.1, lean: 0 },
-      { line: "“A catch. Not a speech.”", focus: "64% 70%", zoom: 1.2, lean: -2 },
-      { line: "His hand stays off the log. “I'll read what you stood next to.”", focus: "82% 28%", zoom: 1.06, lean: 1 },
+      { line: "The lights are already up. He doesn't turn. “Unit 1 is already lit.”", focus: "34% 72%", zoom: 1.1, lean: 0 },
+      { you: true, line: "I'm not here to be the hero of the board.", focus: "64% 70%", zoom: 1.16, lean: -2 },
+      { line: "“Then don't give me a speech. A catch I can fund.”", focus: "48% 40%", zoom: 1.2, lean: 1 },
+      { you: true, line: "I'll stand next to the line before I ask you to read it.", focus: "82% 28%", zoom: 1.06, lean: 1 },
+      { line: "His hand stays off the log. “I'll read the line you stood next to. Not the one you performed.”", focus: "30% 55%", zoom: 1.1, lean: -1 },
     ],
   },
   {
     scene: "/art/gen/stills/intro_threshold.jpg?v=paint2",
-    portrait: "/art/gen/portraits/player_talk.png?v=cast",
+    portrait: "/art/gen/portraits/player_talk.jpg?v=paint3",
     kicker: "The door  ·  You",
     title: "The hook is empty.",
     body: "Flavor. The floor does not care what the hoodie is called.",
     you: true,
     exchanges: [
-      { line: "Your coat is still on you.", focus: "28% 42%", zoom: 1.08, lean: -1 },
+      { line: "Your coat is still on you. The hook by the door is empty.", focus: "28% 42%", zoom: 1.08, lean: -1 },
+      { line: "Yellow hard hat on the other peg. Not yours. The floor started without your name.", focus: "62% 30%", zoom: 1.16, lean: 1 },
       { line: "The door was open before you. The board is already lit.", focus: "72% 48%", zoom: 1.14, lean: 2 },
     ],
   },
@@ -452,52 +467,106 @@ export function talkLines(npc: NpcId, flags: Record<string, boolean>, culture: n
   const first = !flags[`${npc}Talked`];
   const hid = !!flags.hid || !!flags.catchMiss;
   if (npc === "mabel") {
+    if (!first) {
+      return [
+        { speaker: "Mabel", text: hid ? "You left a lie on the glass. I watched you not sit with it." : "The kettle is still honest. The chair remembers who used it as courage.", mood: "warm" },
+        { speaker: "Mabel", text: "Two-to-ten is gone. I'm still the one who sees who won't sit. What do you need?", mood: "soft",
+          choices: [
+            { id: "mabel-sit", label: "Just the coffee.", reply: "On the house. The night shift already paid for the heat.", trust: 2, culture: 1 },
+            { id: "mabel-catch", label: "Who wouldn't sit today?", reply: "The ones with a catch in their pocket. North wall is Unit 1. I'll chalk it if you say it out loud.", flag: "arcade" },
+            { id: "mabel-load", label: "The load on the north wall.", reply: "You see the pulse. One rod, or one catch. The load is the opponent. I keep the score.", flag: "arcade" },
+          ],
+        },
+      ];
+    }
     return [
-      { speaker: "Mabel", text: first ? "Sit. I'm Mabel Quinn. I ran this floor twenty years. The kettle is the last board I still touch." : "The kettle is still honest. Are you?", mood: "warm" },
-      { speaker: "Mabel", text: hid ? "You left a lie on the glass. The week remembers." : "Catch greater than heroics. North wall is Unit 1. South is after-shift. Same bezel.", mood: "soft" },
-      {
-        speaker: "Mabel",
-        text: "What do you need?",
+      { speaker: "Mabel", text: "Sit. Two-to-ten left this chair warm. I'm Mabel Quinn. I ran this floor twenty years.", mood: "warm" },
+      { speaker: "Mabel", text: "I don't ask the board anymore. I watch who won't sit. The kettle is the last board I still touch.", mood: "soft" },
+      { speaker: "Mabel", text: "Don't use the cup as courage. North wall is Unit 1. South is the parlor. Same bezel. I chalk who says the catch out loud.", mood: "even" },
+      { speaker: "Mabel", text: "What do you need?",
         choices: [
-          { id: "mabel-sit", label: "Just the coffee.", reply: "On the house. Don't use it as courage.", trust: 2, culture: 1 },
-          { id: "mabel-catch", label: "The hunt in the parlor.", reply: "Eyes first. Clock second. North wall is Unit 1. I'll chalk the score.", flag: "arcade" },
-          { id: "mabel-load", label: "The load on the north wall.", reply: "You see the pulse. One rod, or one catch. The load is the opponent.", flag: "arcade" },
+          { id: "mabel-sit", label: "Just the coffee.", reply: "On the house. The night shift already paid for the heat. Don't use it as courage.", trust: 2, culture: 1 },
+          { id: "mabel-catch", label: "Who won't sit?", reply: "The ones carrying a catch in their pocket. Eyes first. Clock second. I'll chalk the score.", flag: "arcade" },
+          { id: "mabel-load", label: "The load on the north wall.", reply: "You see the pulse. One rod, or one catch. The load is the opponent. I keep the score. Twenty years of that, then the kettle.", flag: "arcade" },
         ],
       },
     ];
   }
   if (npc === "holt") {
+    if (!first) {
+      return [
+        { speaker: "Holt", text: `Day ${day}. I still have not turned for a speech.`, mood: "sharp" },
+        { speaker: "Holt", text: culture < 28 ? "Skill without a catch I can fund is unfinished power. Stand next to the line." : "Honest catches. That is a review I can fund. My hand stays off the log.", mood: "even" },
+      ];
+    }
     return [
-      { speaker: "Holt", text: first ? "You designed the core. Now walk it. Catch. I fund reviews, not mythology." : `Day ${day}. Volume. Not a duel.`, mood: "sharp" },
-      { speaker: "Holt", text: culture < 28 ? "Skill without a safe floor is unfinished power." : "Honest catches. That's a review I can fund.", mood: "even" },
+      { speaker: "Holt", text: "Reginald Holt. You designed the core. I did not ask you to narrate it.", mood: "sharp" },
+      { speaker: "Holt", text: "Unit 1 is already lit. I fund a review when the volume is a catch. Not a speech.", mood: "even" },
+      { speaker: "Holt", text: "My hand stays off the log. I'll read the line you stood next to. Day one is not a duel.", mood: "sharp" },
     ];
   }
   if (npc === "elena") {
+    if (!first) {
+      return [
+        { speaker: "Elena", text: flags.elenaSecondEyes ? "I saw your hands. I'll back that catch." : "Two sets of eyes. Stand where I can see you, or it isn't a catch.", mood: "even" },
+        { speaker: "Elena", text: "The seat was cold this morning too. You are not the only one who came through that gate carrying a life.", mood: "soft" },
+      ];
+    }
     return [
-      { speaker: "Elena", text: first ? "Elena Voss. The van was here before dawn. I will back a catch if you stand where I can see you." : "Two sets of eyes. That's the job.", mood: "even" },
-      { speaker: "Elena", text: "Child seat. Cold coffee. You are not the only one carrying a life into this gate.", mood: "soft" },
+      { speaker: "Elena", text: "Elena Voss. The van was here before dawn. Door's still open.", mood: "even" },
+      { speaker: "Elena", text: "Look at the child seat, not at me. Cold. I will back a catch if you stand where I can see your hands.", mood: "soft" },
+      { speaker: "Elena", text: "Child seat first. Then I was here. Two sets of eyes, or it isn't a catch.", mood: "even" },
     ];
   }
   if (npc === "tommy") {
+    if (!first) {
+      return [
+        { speaker: "Tommy", text: "Finish the sentence before you ask me for a wrench. Boring on purpose.", mood: "even" },
+        { speaker: "Tommy", text: day === 2 ? "Pump 2A. The hunt is on the board, not a checklist. IN SERVICE does not hang on a dead pump." : "If the tag isn't yours, pump two still thinks your hands are on it.", mood: "sharp" },
+      ];
+    }
     return [
-      { speaker: "Tommy", text: first ? "Tommy Reyes. Isolate. Lock. Tag. Try. IN SERVICE does not hang on a dead pump." : "Finish the sentence. Boring on purpose. That's respect.", mood: "even" },
-      { speaker: "Tommy", text: day === 2 ? "Pump 2A. The hunt is on the board. Not a checklist." : "Tags tell the truth if you look.", mood: "sharp" },
+      { speaker: "Tommy", text: "Tommy Reyes. Pump two. Say it. Isolate. Lock. Tag. Try.", mood: "even" },
+      { speaker: "Tommy", text: "The IN SERVICE card does not get to stay on a dead pump. No tag, and the pump still thinks your hands are on it.", mood: "sharp" },
+      { speaker: "Tommy", text: "Finish the sentence out loud. Then the wrench. That's how I keep a hand.", mood: "even" },
     ];
   }
   if (npc === "marcus") {
+    if (!first) {
+      return [
+        { speaker: "Marcus", text: "Don't make me wrong in the hallway. I already did that once, out loud.", mood: "tired" },
+        { speaker: "Marcus", text: day === 3 ? "If the sticker says 40, it is not a print error until the gauge under my hand agrees." : "Two instruments. If they argue, do not pick the polite one.", mood: "sharp" },
+      ];
+    }
     return [
-      { speaker: "Marcus", text: first ? "Marcus Hale. I was the youngest senior on this floor. That is not a compliment. Two instruments." : "Don't make me wrong in the hallway.", mood: "tired" },
-      { speaker: "Marcus", text: day === 3 ? "If the sticker is 40, it is not a print error until two instruments agree." : "Data, not vibes — but still catch.", mood: "sharp" },
+      { speaker: "Marcus", text: "Marcus Hale. Left gauge. I trust the one under my hand, not the one on the wall.", mood: "tired" },
+      { speaker: "Marcus", text: "I was the youngest senior on this floor. That is not a compliment. I was wrong here once. Out loud.", mood: "sharp" },
+      { speaker: "Marcus", text: "Say the number before you defend it. Data, not the story that keeps me looking senior.", mood: "even" },
     ];
   }
   if (npc === "priya") {
+    if (!first) {
+      return [
+        { speaker: "Priya", text: flags.physMcHeld ? "You ran analog MC. k ± σ. The bank is the clock. OpenMC stays a letter, and I still will not sign a peak I have not walked." : flags.physPlayed ? "You watched the pin. Leakage is the last two doors. Teaching analog — not a license." : "Heat has to leave. I have not changed my mind about a signature I cannot walk.", mood: "soft" },
+        { speaker: "Priya", text: day >= 5 ? "Outage is Friday. Do not sign a shuffle you cannot walk to the rail." : "Academy first. Then my bench. The sheet is still a rumor until you stand next to the tank.", mood: "even" },
+      ];
+    }
     return [
-      { speaker: "Priya", text: first ? "Priya Sharma. I still walk the floor because a peak on a screen is a rumor until you have stood next to the tank." : "Heat has to leave. Teaching model — not a license.", mood: "soft" },
-      { speaker: "Priya", text: flags.physMcHeld ? "You ran analog MC. k ± σ. The bank is the clock. OpenMC stays a letter." : flags.physPlayed ? "You watched the pin. Leakage is the last two doors. Teaching analog — not a license." : day >= 5 ? "Outage is Friday. Do not sign a shuffle you cannot walk." : "Academy first. Then the bench.", mood: "even" },
+      { speaker: "Priya", text: "Priya Sharma. I still walk the floor. A peak on a screen is a rumor until you have stood next to the tank.", mood: "soft" },
+      { speaker: "Priya", text: "You signed Unit 1. I will not sign a peak I cannot walk. Come to the rail before you call it yours.", mood: "even" },
+      { speaker: "Priya", text: "The stack can look dark from the cafe. The heat still has to leave. Teaching model — not a license.", mood: "soft" },
+    ];
+  }
+  if (!first) {
+    return [
+      { speaker: "Jordan", text: hid ? "You hid. I want the chair empty next to me. That was the deal." : "Bowl after shift if the eyes are tired and the catch is already said.", mood: "even" },
+      { speaker: "Jordan", text: "Three tiles off the hide. I remember who kept the win. Same row as me.", mood: "soft" },
     ];
   }
   return [
-    { speaker: "Jordan", text: first ? "Jordan. I notice who shares a win. I want distance from a hide." : hid ? "You hid. Distance. That was the deal." : "Bowl after shift if the eyes are tired.", mood: "even" },
+    { speaker: "Jordan", text: "Jordan Peck. I watch the door, not your face. Say the catch out here. Not in your pocket.", mood: "even" },
+    { speaker: "Jordan", text: "Three tiles off the hide. That was the deal. I remember who kept the win. Same row as me.", mood: "soft" },
+    { speaker: "Jordan", text: "Hide it and I want distance. Bowl after shift only if the catch is already said.", mood: "even" },
   ];
 }
 

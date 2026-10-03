@@ -376,7 +376,7 @@ export function drawChibi(
 
 export function drawPortrait(ctx: CanvasRenderingContext2D, look: Look, size: number, who?: NpcId | "player") {
   pix(ctx);
-  const im = who ? loadArt(`/art/gen/portraits/${who}_talk.png?v=eval1`) : null;
+  const im = who ? loadArt(`/art/gen/portraits/${who}_talk.jpg?v=paint3`) : null;
   if (im && im.naturalWidth > 0) {
     ctx.drawImage(im, 0, 0, im.naturalWidth, im.naturalHeight, 0, 0, size, size);
     return;

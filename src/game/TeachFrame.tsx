@@ -12,11 +12,11 @@ export function TeachPriya({ line, size = 96 }: { line: string; size?: 64 | 96 |
   return (
     <div className="teach-paper flex gap-3">
       <img
-        src="/art/gen/portraits/priya_talk.png?v=eval1"
+        src="/art/gen/portraits/priya_talk.jpg?v=paint3"
         alt="Dr. Priya Sharma"
         width={size}
         height={size}
-        className={`${px} shrink-0 object-contain teach-pixel`}
+        className={`${px} shrink-0 object-cover object-top`}
       />
       <p className="teach-body min-w-0">{line}</p>
     </div>

@@ -3,6 +3,13 @@ import { AuthProvider } from "@/lib/auth/provider";
 import { PreviewHostBridge } from "@/components/preview-host-bridge";
 import appCss from "../styles.css?url";
 
+// Dev serves /src/styles.css as a JS module unless the request asks for CSS.
+// The preview fetch does not, so the browser rejects the sheet and the page
+// renders unstyled. ?direct is always text/css. Production ?url is a real file.
+const stylesheet = import.meta.env.DEV
+  ? `${appCss}${String(appCss).includes("?") ? "&" : "?"}direct`
+  : appCss;
+
 const APP_NAME = "Coffee & Criticality";
 const host = import.meta.env.VITE_PUBLIC_HOSTNAME;
 const ogImage = host ? `https://${host}/og.jpg` : undefined;
@@ -38,7 +45,7 @@ export const Route = createRootRoute({
     ],
     links: [
       { rel: "icon", type: "image/svg+xml", href: "/favicon.svg" },
-      { rel: "stylesheet", href: appCss },
+      { rel: "stylesheet", href: stylesheet },
       { rel: "manifest", href: "/__grok/manifest.webmanifest" },
       { rel: "apple-touch-icon", href: "/__grok/icon-180.png" },
     ],

@@ -125,10 +125,8 @@
 }
 
 .intro-portrait {
-  image-rendering: pixelated;
-  image-rendering: crisp-edges;
   transition: transform 500ms ease;
-  filter: drop-shadow(4px 6px 0 #16110d);
+  filter: drop-shadow(0 12px 18px rgba(22, 17, 13, 0.45));
 }
 
 .intro-cup,
@@ -378,11 +376,11 @@
 @keyframes chatter-pop {
   0% {
     opacity: 0;
-    transform: translateY(0.42em) scale(0.55);
+    transform: translateY(0.55em) scale(0.45);
   }
-  60% {
+  55% {
     opacity: 1;
-    transform: translateY(-0.22em) scale(1.12);
+    transform: translateY(-0.18em) scale(1.08);
   }
   100% {
     opacity: 1;

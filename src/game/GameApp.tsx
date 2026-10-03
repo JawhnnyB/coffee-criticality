@@ -40,6 +40,7 @@ import { MaintGame } from "./MaintGame";
 import { isMuted, playBed, playBlip, setMuted, unlockAudio, syncWorld, getAudioProbe, bedForRoom } from "./audio";
 import { isRevealing, requestSkip } from "./chatter";
 import { Chatter } from "./Chatter";
+import { paintPlayerPortrait } from "./paintedLook";
 import { heartCount, tintPlayer } from "./pixel";
 import { drawWorld } from "./render";
 import { DEFAULT_PLANT, plantTitle, type PlantDesign } from "./plant";
@@ -1275,7 +1276,7 @@ export function GameApp() {
               />
               <div className="mb-3 flex gap-2">
                 {(["mabel", "elena", "holt", "priya"] as const).map((id) => (
-                  <img key={id} src={`/art/gen/portraits/${id}_talk.png?v=eval1`} alt="" className="h-12 w-12 object-contain" />
+                  <img key={id} src={`/art/gen/portraits/${id}_talk.jpg?v=paint3`} alt="" className="h-14 w-10 object-cover object-top" />
                 ))}
               </div>
               <p className="font-mono text-[10px] tracking-widest text-[#8a7864]">Shift log · {dayDef(s.day).name}</p>
@@ -1452,12 +1453,11 @@ function paperMood(mood?: Line["mood"]) {
 function PixelPortrait({ npc }: { npc: NpcId }) {
   return (
     <img
-      src={`/art/gen/portraits/${npc}_talk.png?v=eval1`}
+      src={`/art/gen/portraits/${npc}_talk.jpg?v=paint3`}
       alt=""
       width={192}
-      height={192}
-      className="h-48 w-48 shrink-0 self-start bg-transparent object-contain sm:self-auto"
-      style={{ imageRendering: "pixelated" }}
+      height={288}
+      className="intro-portrait h-40 w-28 shrink-0 self-start object-cover object-top sm:h-52 sm:w-36"
     />
   );
 }
@@ -1583,12 +1583,11 @@ function IncidentStage({
         data-testid="paper-incident"
       >
         <img
-          src="/art/gen/portraits/elena_talk.png?v=eval1"
+          src="/art/gen/portraits/elena_talk.jpg?v=paint3"
           alt=""
           width={192}
-          height={192}
-          className="h-48 w-48 shrink-0 object-contain"
-          style={{ imageRendering: "pixelated" }}
+          height={288}
+          className="intro-portrait h-40 w-28 shrink-0 object-cover object-top sm:h-52 sm:w-36"
         />
         <div className="min-w-0 flex-1">
           <p className="font-mono text-[10px] tracking-widest text-[#8a7864]">
@@ -2176,7 +2175,7 @@ function PauseStage({
               return (
                 <div key={id} className="flex items-center justify-between gap-2 border border-border bg-surface px-2 py-1.5">
                   <div className="flex items-center gap-2">
-                    <img src={`/art/gen/portraits/${id}_talk.png?v=eval1`} alt="" className="h-8 w-8 object-contain" />
+                    <img src={`/art/gen/portraits/${id}_talk.jpg?v=paint3`} alt="" className="h-10 w-8 object-cover object-top" />
                     <div>
                     <div className="text-sm text-fg">{NPCS[id].name}</div>
                     <div className="text-[11px] text-subtle">
@@ -2384,18 +2383,21 @@ function IntroStage({
 }) {
   const ex = beat.exchanges[line] ?? beat.exchanges[0];
   return (
-    <div className="absolute inset-0 z-30 flex items-end justify-center px-4 pb-8 pt-20 sm:px-8" data-testid="intro-stage">
-      <div className="flex w-full max-w-4xl flex-col items-stretch gap-4 sm:flex-row sm:items-end">
-        <div className="relative mx-auto h-56 w-56 shrink-0 sm:mx-0 sm:h-72 sm:w-72">
-          {beat.you ? (
-            <LookPreview look={look} big />
+    <div
+      className="absolute inset-0 z-30 flex items-end justify-center bg-gradient-to-t from-black/80 via-black/45 to-black/25 px-3 pb-6 pt-16 sm:px-8 sm:pb-10"
+      data-testid="intro-stage"
+    >
+      <div className="paper flex w-full max-w-3xl flex-col gap-4 p-4 sm:flex-row sm:items-stretch sm:gap-6 sm:p-6">
+        <div className="relative mx-auto w-36 shrink-0 sm:mx-0 sm:w-48">
+          {beat.you || ex.you ? (
+            <PaintedPlayer look={look} />
           ) : (
             <img
               src={beat.portrait}
               alt=""
-              width={288}
-              height={288}
-              className="intro-portrait h-full w-full object-contain"
+              width={384}
+              height={576}
+              className="intro-portrait h-auto w-full object-cover object-top"
               style={{ transform: `rotate(${ex.lean}deg)` }}
             />
           )}
@@ -2403,20 +2405,20 @@ function IntroStage({
           {ex.prop === "lock" ? <span className="intro-lock" aria-hidden /> : null}
           {ex.prop === "pencil" ? <span className="intro-pencil" aria-hidden /> : null}
         </div>
-        <div className="paper min-w-0 flex-1 p-4 text-left sm:p-5">
-          <p className="font-display text-xs uppercase tracking-[0.18em] text-[#8a5a32]">{beat.kicker}</p>
-          <h2 className="font-display mt-1 text-2xl leading-tight text-[#16110d] sm:text-3xl">{beat.title}</h2>
+        <div className="flex min-w-0 flex-1 flex-col justify-center text-left">
+          <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-[#8a5a32]">{beat.kicker}</p>
+          <p className="mt-1 font-display text-sm leading-snug text-[#6a4a32]">{beat.title}</p>
           <Chatter
             key={beat.kicker + line}
             text={ex.line}
-            voice={beat.kicker}
-            className="dialogue-line mt-3 text-base leading-relaxed text-[#16110d]"
+            voice={beat.you || ex.you ? "player" : beat.kicker}
+            className="dialogue-line mt-4 font-display text-2xl font-medium leading-snug text-[#16110d] sm:text-3xl"
           />
-          <p className="mt-3 border-t border-[#c9a227]/30 pt-2 font-mono text-[11px] leading-relaxed text-[#6a4a32]">{beat.body}</p>
+          <p className="mt-4 border-t border-[#c9a227]/30 pt-2 font-mono text-[11px] leading-relaxed text-[#6a4a32]">{beat.body}</p>
           {plant ? <p className="mt-1 font-mono text-xs text-[#3d5c44]">{plant}</p> : null}
           <button
             type="button"
-            className="mt-4 bg-[#16110d] px-4 py-2 text-sm font-semibold text-[#f3e6d0] disabled:opacity-40"
+            className="mt-4 self-start bg-[#16110d] px-4 py-2 text-sm font-semibold text-[#f3e6d0] disabled:opacity-40"
             disabled={locked}
             onClick={onContinue}
           >
@@ -2427,6 +2429,27 @@ function IntroStage({
       </div>
     </div>
   );
+}
+
+function PaintedPlayer({ look }: { look: PlayerLook }) {
+  const ref = useRef<HTMLCanvasElement>(null);
+  useEffect(() => {
+    const canvas = ref.current;
+    if (!canvas) return;
+    const im = new Image();
+    im.src = look.glasses
+      ? "/art/gen/portraits/player_glasses.jpg?v=paint3"
+      : "/art/gen/portraits/player_plain.jpg?v=paint3";
+    im.onload = () => {
+      const painted = paintPlayerPortrait(im, look);
+      canvas.width = painted.width;
+      canvas.height = painted.height;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return;
+      ctx.drawImage(painted, 0, 0);
+    };
+  }, [look]);
+  return <canvas ref={ref} className="intro-portrait h-auto w-full" aria-hidden />;
 }
 
 function LookPreview({ look, big = false }: { look: PlayerLook; big?: boolean }) {
