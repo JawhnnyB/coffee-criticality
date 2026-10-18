@@ -128,7 +128,7 @@ export interface RoomDef {
   floorKind: FloorKind;
   floorPatches?: { rect: Rect; kind: FloorKind }[];
   windows?: { rect: Rect; still: string }[];
-  doors: { to: RoomId; rect: Rect; spawn: { x: number; y: number }; label: string }[];
+  doors: { to: RoomId; rect: Rect; spawn?: { x: number; y: number }; label: string }[];
   props: { rect: Rect; kind: string; label?: string; block?: boolean; hit?: Rect[] }[];
   interacts: Interactable[];
 }
@@ -661,8 +661,8 @@ export const ROOMS: Record<RoomId, RoomDef> = {
     floorKind: "wood",
     windows: [{ rect: t(6, 0.4, 5, 2), still: "window_lake" }],
     doors: [
-      { to: "gate", rect: t(19, 6, 1, 4), spawn: { x: 32, y: 200 }, label: "Lot" },
-      { to: "parlor", rect: t(8, 15, 4, 1), spawn: { x: 176, y: 64 }, label: "Parlor" },
+      { to: "gate", rect: t(19, 6, 1, 4), label: "Lot" },
+      { to: "parlor", rect: t(8, 15, 4, 1), label: "Parlor" },
     ],
     props: [
       { rect: t(3, 6, 6, 3), kind: "counter" },
@@ -696,7 +696,7 @@ export const ROOMS: Record<RoomId, RoomDef> = {
     tile: TILE,
     floorKind: "wood",
     windows: [],
-    doors: [{ to: "cafe", rect: t(10, 0, 4, 1), spawn: { x: 160, y: 200 }, label: "Cafe" }],
+    doors: [{ to: "cafe", rect: t(10, 0, 4, 1), label: "Cafe" }],
     props: [
       { rect: t(1, 4, 2, 3), kind: "cab_catch", label: "Catch" },
       { rect: t(5, 4, 2, 3), kind: "cab_delay", label: "Delay" },
@@ -746,8 +746,8 @@ export const ROOMS: Record<RoomId, RoomDef> = {
     ],
     windows: [],
     doors: [
-      { to: "cafe", rect: t(0, 10, 1, 4), spawn: { x: 280, y: 160 }, label: "Cafe" },
-      { to: "corridor", rect: t(41, 10, 1, 4), spawn: { x: 48, y: 160 }, label: "Hall" },
+      { to: "cafe", rect: t(0, 10, 1, 4), label: "Cafe" },
+      { to: "corridor", rect: t(41, 10, 1, 4), label: "Hall" },
     ],
     props: [
       { rect: t(14, 12, 5, 3), kind: "van", label: "Elena's van" },
@@ -773,16 +773,16 @@ export const ROOMS: Record<RoomId, RoomDef> = {
     floorKind: "stone",
     windows: [{ rect: t(10, 0.4, 4, 2), still: "window_control" }],
     doors: [
-      { to: "gate", rect: t(0, 6, 1, 4), spawn: { x: 640, y: 200 }, label: "Lot" },
-      { to: "control", rect: t(10, 0, 4, 1), spawn: { x: 160, y: 220 }, label: "Control" },
-      { to: "engineering", rect: t(10, 15, 4, 1), spawn: { x: 160, y: 64 }, label: "Eng" },
-      { to: "breakroom", rect: t(23, 6, 1, 4), spawn: { x: 48, y: 150 }, label: "Break" },
+      { to: "gate", rect: t(0, 6, 1, 4), label: "Lot" },
+      { to: "control", rect: t(10, 0, 4, 1), label: "Control" },
+      { to: "engineering", rect: t(10, 15, 4, 1), label: "Eng" },
+      { to: "breakroom", rect: t(23, 6, 1, 4), label: "Break" },
     ],
     props: [
-      { rect: t(2, 8, 2, 2), kind: "lamp" },
+      { rect: t(4, 8, 2, 2), kind: "lamp" },
       { rect: t(4, 1, 2, 2), kind: "poster", block: false },
       { rect: t(18, 1, 2, 2), kind: "poster", block: false },
-      { rect: t(20, 8, 2, 3), kind: "cabinet" },
+      { rect: t(18, 8, 2, 3), kind: "cabinet" },
       { rect: t(2, 12, 2, 2), kind: "plant" },
       { rect: t(6, 11, 3, 2), kind: "bench", block: false },
     ],
@@ -802,8 +802,8 @@ export const ROOMS: Record<RoomId, RoomDef> = {
     floorKind: "stone",
     windows: [{ rect: t(8, 0.4, 6, 2), still: "window_reactor" }],
     doors: [
-      { to: "corridor", rect: t(9, 15, 4, 1), spawn: { x: 192, y: 48 }, label: "Hall" },
-      { to: "reactor", rect: t(21, 6, 1, 4), spawn: { x: 48, y: 160 }, label: "Core" },
+      { to: "corridor", rect: t(9, 15, 4, 1), label: "Hall" },
+      { to: "reactor", rect: t(21, 6, 1, 4), label: "Core" },
     ],
     props: [
       { rect: t(4, 5, 6, 3), kind: "board", label: "Board A" },
@@ -836,8 +836,8 @@ export const ROOMS: Record<RoomId, RoomDef> = {
     floorKind: "wood",
     windows: [{ rect: t(8, 0.4, 5, 2), still: "window_lake" }],
     doors: [
-      { to: "corridor", rect: t(9, 0, 4, 1), spawn: { x: 192, y: 200 }, label: "Hall" },
-      { to: "maintenance", rect: t(21, 6, 1, 4), spawn: { x: 48, y: 160 }, label: "Maint" },
+      { to: "corridor", rect: t(9, 0, 4, 1), label: "Hall" },
+      { to: "maintenance", rect: t(21, 6, 1, 4), label: "Maint" },
     ],
     props: [
       { rect: t(4, 6, 4, 3), kind: "desk" },
@@ -870,8 +870,8 @@ export const ROOMS: Record<RoomId, RoomDef> = {
     floorKind: "wood",
     windows: [{ rect: t(6, 0.4, 5, 2), still: "window_lake" }],
     doors: [
-      { to: "corridor", rect: t(0, 5, 1, 4), spawn: { x: 340, y: 140 }, label: "Hall" },
-      { to: "reactor", rect: t(17, 5, 1, 4), spawn: { x: 48, y: 180 }, label: "Core" },
+      { to: "corridor", rect: t(0, 5, 1, 4), label: "Hall" },
+      { to: "reactor", rect: t(13, 0, 4, 1), label: "Core" },
     ],
     props: [
       { rect: t(6, 6, 3, 2), kind: "kettle" },
@@ -894,9 +894,9 @@ export const ROOMS: Record<RoomId, RoomDef> = {
     floorKind: "metal",
     windows: [{ rect: t(8, 0.4, 6, 2), still: "window_reactor" }],
     doors: [
-      { to: "control", rect: t(0, 6, 1, 4), spawn: { x: 300, y: 140 }, label: "Control" },
-      { to: "breakroom", rect: t(0, 11, 1, 3), spawn: { x: 250, y: 140 }, label: "Break" },
-      { to: "maintenance", rect: t(9, 15, 4, 1), spawn: { x: 160, y: 64 }, label: "Maint" },
+      { to: "control", rect: t(0, 6, 1, 4), label: "Control" },
+      { to: "breakroom", rect: t(1, 15, 3, 1), label: "Break" },
+      { to: "maintenance", rect: t(9, 15, 4, 1), label: "Maint" },
     ],
     props: [
       { rect: t(4, 3, 14, 1), kind: "crane", label: "Polar crane", block: false },
@@ -939,8 +939,8 @@ export const ROOMS: Record<RoomId, RoomDef> = {
     floorPatches: [{ rect: t(2, 8, 16, 1), kind: "asphalt" }],
     windows: [],
     doors: [
-      { to: "reactor", rect: t(9, 0, 4, 1), spawn: { x: 176, y: 200 }, label: "Core" },
-      { to: "engineering", rect: t(0, 6, 1, 4), spawn: { x: 300, y: 140 }, label: "Eng" },
+      { to: "reactor", rect: t(9, 0, 4, 1), label: "Core" },
+      { to: "engineering", rect: t(0, 6, 1, 4), label: "Eng" },
     ],
     props: [
       { rect: t(3, 5, 6, 1), kind: "pipe_run", label: "Primary run" },

@@ -50,7 +50,7 @@ import { NuclearDesk } from "./NuclearDesk";
 import { LoopSchematic } from "./LoopSchematic";
 import { DEPARTMENTS, dayDef, eodNpcLine, yesterdayLine } from "./week";
 import { DEFAULT_PLAYER_LOOK, HAIR_HEX, HOODIE_HEX, type HairId, type HoodieId, type PlayerLook } from "./artSpec";
-import { MAP_HUD, ROOM_BLURB, ROOM_LINKS } from "./site";
+import { MAP_HUD, ROOM_BLURB, roomLinks } from "./site";
 import { TeachMeta, TeachPriya, TYPE_THUMB } from "./TeachFrame";
 import {
   abortOverlay,
@@ -2130,7 +2130,7 @@ function PauseStage({
             <span>Eng · Maint · Break · Arcade</span>
           </p>
           <p className="mt-2 text-sm text-fg">{ROOM_BLURB[focus]}</p>
-          <p className="font-mono text-[11px] text-subtle">{ROOM_LINKS[focus]} · teaching layout — not a license</p>
+          <p className="font-mono text-[11px] text-subtle">{roomLinks(focus)} · teaching layout — not a license</p>
           {focus !== s.room && visited ? (
             <button type="button" className="btn-primary mt-2" onClick={() => onTravel(focus)}>
               Walk there

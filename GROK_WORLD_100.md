@@ -27,15 +27,17 @@ Spine (west → east, north = lake):
 
 ```
                 [control]——[reactor]
-                     |          |
-[cafe]—[gate]—[corridor]——[break]
-                     |          |
-              [engineering]—[maintenance]
+                     |       |    \
+[cafe]—[gate]—[corridor]——[break]  |
+                     |              |
+              [engineering]——[maintenance]
 ```
 
 Cafe **east** wall ↔ Gate **west**. Gate **east** ↔ Corridor **west**.
 Corridor **north** ↔ Control **south**. Corridor **south** ↔ Eng **north**.
-Control **east** ↔ Reactor **west**. Reactor **east** ↔ Maint **west**.
+Corridor **east** ↔ Break **west**. Control **east** ↔ Reactor **west**.
+Break **north** ↔ Reactor **south** (west end of that wall).
+Eng **east** ↔ Maint **west**. Reactor **south** ↔ Maint **north**.
 
 ---
 
@@ -103,17 +105,17 @@ Control **east** ↔ Reactor **west**. Reactor **east** ↔ Maint **west**.
 51. Cafe: only **east** door to lot. South wall is kitchen / mural, not a portal.
 52. Corridor is the **spine**. Long E–W. Doors N control, S eng, W lot, E break.
 53. Control: south to hall, east to reactor. Windows north to **core plate**, not lake.
-54. Reactor hall: west control, east maint. Core 64×64 center. ALARA.
-55. Engineering: north hall, south maint, east break optional.
-56. Break: west hall. Kettle 16×16. This is the human room.
-57. Maint: west reactor, north eng. Valve 14. LOTOTO.
+54. Reactor hall: west to control, south to break (west end), south to maint. Core stays center. ALARA.
+55. Engineering: north hall, east maint.
+56. Break: west hall, north core. Kettle 16×16. This is the human room.
+57. Maint: north reactor, west eng. Valve 14. LOTOTO.
 58. Each interior keeps its own floor (wood / stone / metal). Do not share one PNG floor for all.
 59. WALL 48 mural. Door lanes already punch. Keep that.
 60. Room sizes stay as now; do not grow a room to match the aerial photo.
 61. NPCs: schedule by room, not by map xy, until campus merge (gate Elena stays on lot).
 62. Nameplates above 32×48 heads. Do not cover door glimpses.
 63. When two doors share a wall in data, they must share a wall in the plan.
-64. Break’s second door to eng: both west today — **fix** to one west (hall) and one south or west-offset. No two west portals stacked.
+64. Done. Break is west to the hall and north to the core. The core's break door is the west end of the south wall, beside maint, not a second west door.
 65. Poster / culture stills stay on corridor, not floating in campus.
 66. Steam only cafe + leaking valve.
 67. Lighting: interior wallpaper, outdoor sky. Never mix in one room.
@@ -166,4 +168,4 @@ Control **east** ↔ Reactor **west**. Reactor **east** ↔ Maint **west**.
 - 160×90 site plan in the HUD
 - Zoom 3–5, person 32×48, van 96×48
 
-Next concrete slice after this file: **§D campus outdoor tilemap** (steps 33–50), then fix break’s double-west door (step 64).
+Next concrete slice after this file: **§D campus outdoor tilemap** (steps 33–50). Step 64 is done. Do not start the campus map as part of the door fix.

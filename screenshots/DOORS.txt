@@ -1,5 +1,6 @@
 Unit 1 door graph — spawnInside(to, from). Teaching layout, not a license.
-Leave east → appear west of destination. Facing = the way you walked.
+Leave through a door, appear just inside the matching door. Facing = the way you walked.
+spawn fields are not stored. beginTransition calls spawnInside.
 
 from        side  to           | return      side  from
 --------------------------------------------------------------
@@ -10,9 +11,13 @@ corridor    n     control      | control     s     corridor
 corridor    s     engineering  | engineering n     corridor
 corridor    e     breakroom    | breakroom   w     corridor
 control     e     reactor      | reactor     w     control
-reactor     e     maintenance  | maintenance w     reactor
-engineering s     maintenance  | maintenance n     engineering
+breakroom   n     reactor      | reactor     s     breakroom
+engineering e     maintenance  | maintenance w     engineering
+reactor     s     maintenance  | maintenance n     reactor
 
-Pairs: 9/9. No orphan doors. No stacked west portals on break.
+Pairs: 10/10. No orphan doors.
+Break is west to the hall and north to the core. The core's break door is the west end of the south wall, not a second west door.
+Reactor's south wall also holds maint, further east. The two south lanes do not meet.
 Mabel still gates the nuclear island (corridor and east of it).
 Cafe / lot / parlor are free. Pause map hops only after seen:${room}.
+The pause legend is roomLinks(), generated from these rects.

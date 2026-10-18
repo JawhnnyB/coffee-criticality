@@ -6,8 +6,10 @@ Spine walk (west → east, north = lake)
 2. Lot: grass, asphalt stalls, curb, lamps, van. Skyline in the sky band, not walkable roofs.
 3. Hall: stone floor, glimpse windows to control / engineering.
 4. Control: Board A is a wall prop. Status on the board, not a slab over torsos.
-5. Reactor: core + 16px glow. East door to maint.
+5. Reactor: core + 16px glow. South door to maint. The west end of that wall goes to break.
 
 Return: reactor west → control south → hall west → lot west → cafe.
+
+The five-room walk is unchanged, and break now meets the core through the north wall.
 
 Teaching plant. Catch > heroics.

@@ -33,14 +33,19 @@ export const MAP_HUD: Record<RoomId, { x: number; y: number; label: string }> = 
   maintenance: { x: 87.8, y: 81.1, label: "Maint" },
 };
 
+export function sideOf(roomId: RoomId, rect: { x: number; y: number; w: number; h: number }): Cardinal {
+  const room = ROOMS[roomId];
+  const cx = rect.x + rect.w / 2;
+  const cy = rect.y + rect.h / 2;
+  if (rect.w <= rect.h) return cx < room.w / 2 ? "w" : "e";
+  return cy < room.h / 2 ? "n" : "s";
+}
+
 export function doorCardinal(roomId: RoomId, to: RoomId): Cardinal {
   const room = ROOMS[roomId];
   const d = room.doors.find((x) => x.to === to);
   if (!d) return "s";
-  const cx = d.rect.x + d.rect.w / 2;
-  const cy = d.rect.y + d.rect.h / 2;
-  if (d.rect.w <= d.rect.h) return cx < room.w / 2 ? "w" : "e";
-  return cy < room.h / 2 ? "n" : "s";
+  return sideOf(roomId, d.rect);
 }
 
 /** Stand just inside the destination door that leads back to `from`. */
@@ -63,25 +68,24 @@ export const ROOM_BLURB: Record<RoomId, string> = {
   parlor: "North wall is Unit 1. South is after-shift. Same bezel. Cafe is north.",
   gate: "Asphalt and the van. West cafe, east hall.",
   corridor: "The spine. Control north, engineering south, break east.",
-  control: "Board A and the Academy terminal. South to the hall.",
-  engineering: "Priya's ΔT bench. North to the hall.",
-  breakroom: "Kettle and a pause. West hall, east core-side.",
-  reactor: "Operating floor. CRDMs on the head. Legs leave the vessel. South to maint.",
-  maintenance: "Insulated run, flange, handwheel. Finish the sentence. North to the core hall.",
+  control: "Board A and the Academy terminal. South to the hall, east to the core.",
+  engineering: "Priya's ΔT bench. North to the hall, east to maint.",
+  breakroom: "Kettle and a pause. West to the hall, north to the core.",
+  reactor: "Operating floor. CRDMs on the head. Legs leave the vessel. West to control, south to break and maint.",
+  maintenance: "Insulated run, flange, handwheel. Finish the sentence. North to the core, west to engineering.",
 };
 
-/** Neighbors for the pause map legend. */
-export const ROOM_LINKS: Record<RoomId, string> = {
-  cafe: "→ lot",
-  parlor: "↑ cafe",
-  gate: "← cafe  → hall",
-  corridor: "↑ control  ↓ eng  → break",
-  control: "↓ hall",
-  engineering: "↑ hall",
-  breakroom: "← hall  → core",
-  reactor: "↓ maint",
-  maintenance: "↑ core",
-};
+const LINK_ARROW: Record<Cardinal, string> = { n: "↑", e: "→", s: "↓", w: "←" };
+const LINK_ORDER: Record<Cardinal, number> = { n: 0, e: 1, s: 2, w: 3 };
+
+/** Pause-map neighbors, from the door rects. Do not hand-type this. */
+export function roomLinks(id: RoomId): string {
+  return [...ROOMS[id].doors]
+    .map((d) => ({ side: sideOf(id, d.rect), label: MAP_HUD[d.to].label.toLowerCase() }))
+    .sort((a, b) => LINK_ORDER[a.side] - LINK_ORDER[b.side] || a.label.localeCompare(b.label))
+    .map((d) => `${LINK_ARROW[d.side]} ${d.label}`)
+    .join("  ");
+}
 
 export function glimpseSrc(to: RoomId): string {
   return `/art/gen/stills/glimpse_${to}.png?v=eval1`;
