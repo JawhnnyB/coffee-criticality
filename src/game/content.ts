@@ -19,7 +19,7 @@ export type RoomId =
 export type NpcId = "mabel" | "holt" | "elena" | "tommy" | "marcus" | "priya" | "jordan";
 export type RoleId = "transferred" | "promoted" | "military" | "veteran";
 export type Mood = "warm" | "soft" | "tired" | "sharp" | "even" | "wry";
-export type FloorKind = "wood" | "stone" | "grass" | "asphalt" | "metal" | "curb" | "stripe";
+export type FloorKind = "wood" | "stone" | "grass" | "asphalt" | "metal" | "curb" | "stripe" | "water";
 export type PropKind = string;
 
 export type AcademyExtra =
@@ -249,7 +249,7 @@ export const NPC_SCHEDULE: Record<Period, Record<NpcId, NpcSlot>> = {
   morning: {
     mabel: slot("cafe", 210, 150),
     holt: slot("control", 120, 140),
-    elena: slot("gate", 240, 200),
+    elena: slot("gate", 400, 280),
     tommy: slot("maintenance", 180, 160),
     marcus: slot("engineering", 160, 150),
     priya: slot("engineering", 240, 150),
@@ -267,7 +267,7 @@ export const NPC_SCHEDULE: Record<Period, Record<NpcId, NpcSlot>> = {
   afternoon: {
     mabel: slot("parlor", 80, 160),
     holt: slot("control", 120, 140),
-    elena: slot("gate", 200, 220),
+    elena: slot("gate", 380, 300),
     tommy: slot("breakroom", 160, 150),
     marcus: slot("engineering", 200, 150),
     priya: slot("reactor", 64, 180),
@@ -646,6 +646,15 @@ export const ACADEMY: AcademyPage[] = [
 
 export const ACADEMY_FUEL = ACADEMY.findIndex((p) => p.extra === "shuffle");
 
+function fenceLine(): { rect: Rect; kind: string; block?: boolean }[] {
+  const out: { rect: Rect; kind: string; block?: boolean }[] = [];
+  for (let c = 14; c <= 40; c += 2) {
+    if (c >= 22 && c <= 26) continue;
+    out.push({ rect: t(c, 21, 1, 1), kind: "fence" });
+  }
+  return out;
+}
+
 export const ROOMS: Record<RoomId, RoomDef> = {
   cafe: {
     id: "cafe",
@@ -731,8 +740,8 @@ export const ROOMS: Record<RoomId, RoomDef> = {
   gate: {
     id: "gate",
     name: "Lot / Campus",
-    w: 42 * TILE,
-    h: 24 * TILE,
+    w: 96 * TILE,
+    h: 40 * TILE,
     muralH: 48,
     art: "/art/gen/stills/glimpse_gate.png?v=eval1",
     floor: "#2a2926",
@@ -741,23 +750,36 @@ export const ROOMS: Record<RoomId, RoomDef> = {
     tile: TILE,
     floorKind: "grass",
     floorPatches: [
-      { rect: t(10, 8, 22, 12), kind: "asphalt" },
-      { rect: t(10, 19, 22, 1), kind: "curb" },
+      { rect: t(0, 3, 96, 3), kind: "water" },
+      { rect: t(12, 9, 41, 4), kind: "asphalt" },
+      { rect: t(14, 13, 22, 8), kind: "asphalt" },
+      { rect: t(14, 21, 22, 1), kind: "curb" },
+      { rect: t(22, 20, 4, 1), kind: "stripe" },
     ],
     windows: [],
     doors: [
-      { to: "cafe", rect: t(0, 10, 1, 4), label: "Cafe" },
-      { to: "corridor", rect: t(41, 10, 1, 4), label: "Hall" },
+      { to: "cafe", rect: t(12, 9, 1, 4), label: "Cafe" },
+      { to: "corridor", rect: t(52, 9, 1, 4), label: "Hall" },
     ],
     props: [
-      { rect: t(14, 12, 5, 3), kind: "van", label: "Elena's van" },
-      { rect: t(30, 6, 3, 4), kind: "plant" },
-      { rect: t(4, 8, 2, 3), kind: "plant" },
-      { rect: t(22, 6, 1, 2), kind: "lamp", block: false },
-      { rect: t(36, 14, 2, 2), kind: "lamp", block: false },
-      { rect: t(6, 16, 4, 2), kind: "bench", block: false },
+      { rect: t(2, 7, 10, 8), kind: "roof", label: "Cafe" },
+      { rect: t(2, 16, 10, 8), kind: "roof", label: "Arcade" },
+      { rect: t(53, 8, 12, 10), kind: "roof", label: "Hall" },
+      { rect: t(56, 6, 12, 2), kind: "roof", label: "Control" },
+      { rect: t(52, 20, 14, 8), kind: "roof", label: "Eng" },
+      { rect: t(68, 12, 10, 8), kind: "roof", label: "Break" },
+      { rect: t(78, 6, 12, 6), kind: "roof", label: "Core" },
+      { rect: t(70, 22, 16, 8), kind: "roof", label: "Maint" },
+      { rect: t(70, 6, 3, 4), kind: "stack", label: "Stack" },
+      { rect: t(74, 6, 3, 4), kind: "stack", label: "Stack" },
+      { rect: t(16, 14, 6, 3), kind: "van", label: "Elena's van" },
+      { rect: t(23, 19, 1, 2), kind: "boom", block: false },
+      { rect: t(20, 12, 1, 2), kind: "lamp", block: false },
+      { rect: t(36, 12, 1, 2), kind: "lamp", block: false },
+      { rect: t(8, 6, 2, 2), kind: "plant", block: false },
+      ...fenceLine(),
     ],
-    interacts: [{ id: "commute", rect: t(14, 12, 5, 3), label: "The van", kind: "still", still: "gate" }],
+    interacts: [{ id: "commute", rect: t(16, 14, 6, 3), label: "The van", kind: "still", still: "gate" }],
   },
   corridor: {
     id: "corridor",
@@ -966,3 +988,16 @@ export const ROOMS: Record<RoomId, RoomDef> = {
     ],
   },
 };
+
+/** Tile under a point. Matches the floor painter, which tests the tile origin. */
+export function floorKindAt(roomId: RoomId, x: number, y: number): FloorKind {
+  const room = ROOMS[roomId];
+  const tx = Math.floor(x / TILE) * TILE;
+  const ty = Math.floor(y / TILE) * TILE;
+  let kind: FloorKind = room.floorKind;
+  for (const p of room.floorPatches ?? []) {
+    const r = p.rect;
+    if (tx >= r.x && tx < r.x + r.w && ty >= r.y && ty < r.y + r.h) kind = p.kind;
+  }
+  return kind;
+}

@@ -241,6 +241,12 @@ export function stoneFloor(ctx: CanvasRenderingContext2D, x: number, y: number, 
   fill(ctx, x, y, TILE, TILE, seed % 3 === 0 ? "#2c3036" : "#262a30");
 }
 
+export function waterFloor(ctx: CanvasRenderingContext2D, x: number, y: number, seed: number) {
+  if (blitTile(ctx, "water", x, y, seed)) return;
+  fill(ctx, x, y, TILE, TILE, seed % 2 === 0 ? "#2a4a56" : "#345868");
+  fill(ctx, x, y + 6, TILE, 2, "#82a8b0");
+}
+
 export function grassFloor(ctx: CanvasRenderingContext2D, x: number, y: number, seed: number) {
   if (blitTile(ctx, "grass", x, y, seed)) return;
   fill(ctx, x, y, TILE, TILE, seed % 2 === 0 ? "#3d5c44" : "#35553c");
@@ -470,8 +476,17 @@ export function drawPropPixel(
     return;
   }
   if (kind === "roof") {
-    const top =
-      label === "Cafe" ? PAL.copper : label === "Hall" ? PAL.steel : label === "Control" ? "#6a5a30" : label === "Reactor" ? PAL.leaf : PAL.wood;
+    const tops: Record<string, string> = {
+      Cafe: PAL.copper,
+      Arcade: "#8a4a28",
+      Hall: PAL.steel,
+      Control: "#6a5a30",
+      Eng: "#5a6a78",
+      Break: PAL.wood,
+      Core: PAL.leaf,
+      Maint: "#3d5c66",
+    };
+    const top = tops[label ?? ""] ?? PAL.wood;
     fill(ctx, ox, oy, w, h, "#2a221b");
     fill(ctx, ox + 2, oy + 2, w - 4, Math.max(8, h - 10), top);
     fill(ctx, ox, oy + h - 6, w, 6, "#1a1410");
@@ -479,9 +494,11 @@ export function drawPropPixel(
     return;
   }
   if (kind === "stack") {
-    fill(ctx, ox + w / 2 - 6, oy + 8, 12, h - 8, PAL.steel);
-    fill(ctx, ox + w / 2 - 8, oy, 16, 12, "#4a5a48");
-    outlineRect(ctx, ox + w / 2 - 6, oy + 8, 12, h - 8, PAL.ink);
+    fill(ctx, ox + 6, oy + 16, w - 12, h - 16, PAL.steel);
+    fill(ctx, ox + 2, oy + 4, w - 4, 14, "#4a5a48");
+    fill(ctx, ox + 8, oy + h - 10, w - 16, 10, "#2a3238");
+    outlineRect(ctx, ox + 6, oy + 16, w - 12, h - 16, PAL.ink);
+    outlineRect(ctx, ox + 2, oy + 4, w - 4, 14, PAL.ink);
     return;
   }
   fill(ctx, ox, oy, w, h, PAL.woodMid);

@@ -66,7 +66,7 @@ export function spawnInside(to: RoomId, from: RoomId): { x: number; y: number } 
 export const ROOM_BLURB: Record<RoomId, string> = {
   cafe: "Mabel's counter. Sit first. East door to the lot.",
   parlor: "North wall is Unit 1. South is after-shift. Same bezel. Cafe is north.",
-  gate: "Asphalt and the van. West cafe, east hall.",
+  gate: "The campus lot. Lake to the north. West into the cafe, east into the hall.",
   corridor: "The spine. Control north, engineering south, break east.",
   control: "Board A and the Academy terminal. South to the hall, east to the core.",
   engineering: "Priya's ΔT bench. North to the hall, east to maint.",

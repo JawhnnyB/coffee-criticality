@@ -1,7 +1,7 @@
 /** Pillar F — the plant has a voice. Web Audio only. No sample library. */
 
 export type BedKind = "cafe" | "plant" | "menu" | "lot";
-export type FootKind = "wood" | "stone" | "grass" | "asphalt" | "metal" | "curb" | "stripe";
+export type FootKind = "wood" | "stone" | "grass" | "asphalt" | "metal" | "curb" | "stripe" | "water";
 
 type Period = "morning" | "midday" | "afternoon";
 
@@ -532,6 +532,7 @@ const FOOT: Record<FootKind, { f: number; n: number }> = {
   metal: { f: 248, n: 0.022 },
   asphalt: { f: 118, n: 0.04 },
   grass: { f: 96, n: 0.045 },
+  water: { f: 80, n: 0.02 },
   curb: { f: 128, n: 0.036 },
   stripe: { f: 118, n: 0.04 },
 };

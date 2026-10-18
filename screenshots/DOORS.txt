@@ -21,3 +21,6 @@ Reactor's south wall also holds maint, further east. The two south lanes do not 
 Mabel still gates the nuclear island (corridor and east of it).
 Cafe / lot / parlor are free. Pause map hops only after seen:${room}.
 The pause legend is roomLinks(), generated from these rects.
+
+The lot is the campus tilemap, 96×40 at 16px. The cafe door is the east face of the cafe roof, which is the west side of the map. The hall door is the west face of the hall roof, which is the east side. The sides did not change, so the lot line stays → hall  ← cafe.
+

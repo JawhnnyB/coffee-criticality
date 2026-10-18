@@ -8,6 +8,7 @@ import {
   NPC_SCHEDULE,
   ROOMS,
   clockLabel,
+  floorKindAt,
   periodFromMinutes,
   periodLabel,
   talkLines,
@@ -474,6 +475,7 @@ export function solidAt(x: number, y: number, s: GameState, roomId: RoomId = s.r
     if (x < 6 || x > room.w - 6) return true;
     if (y < 6 || y > room.h - 6) return true;
   }
+  if (floorKindAt(roomId, x, y) === "water") return true;
   for (const p of room.props) {
     if (p.block === false) continue;
     const boxes = p.hit && p.hit.length ? p.hit : [p.rect];

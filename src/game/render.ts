@@ -15,7 +15,6 @@ import {
   grassFloor,
   kettleGlow,
   lampGlow,
-  lotSkyline,
   metalFloor,
   pix,
   skyBand,
@@ -23,6 +22,7 @@ import {
   stoneFloor,
   stripeFloor,
   wallpaper,
+  waterFloor,
   windMotes,
   windowWash,
   woodFloor,
@@ -62,18 +62,28 @@ function floorTile(ctx: CanvasRenderingContext2D, kind: string, x: number, y: nu
   else if (kind === "asphalt") asphaltFloor(ctx, x, y, seed);
   else if (kind === "curb") curbFloor(ctx, x, y, seed);
   else if (kind === "stripe") stripeFloor(ctx, x, y, seed);
+  else if (kind === "water") waterFloor(ctx, x, y, seed);
   else if (kind === "metal") metalFloor(ctx, x, y, seed);
   else stoneFloor(ctx, x, y, seed);
 }
 
-function drawTiles(ctx: CanvasRenderingContext2D, room: (typeof ROOMS)[RoomId], period: GameState["period"]) {
+function drawTiles(
+  ctx: CanvasRenderingContext2D,
+  room: (typeof ROOMS)[RoomId],
+  period: GameState["period"],
+  viewX: number,
+  viewY: number,
+  viewW: number,
+  viewH: number,
+) {
   const cols = Math.ceil(room.w / TILE);
   const rows = Math.ceil(room.h / TILE);
   const outdoor = room.floorKind === "grass" || room.floorKind === "asphalt";
-  if (outdoor) {
-    skyBand(ctx, 0, 0, room.w, WALL, period);
-    if (room.id === "gate") lotSkyline(ctx, room.w, WALL);
-  } else {
+  if (outdoor && viewY < WALL) {
+    const sx = Math.max(0, Math.floor(viewX / TILE) * TILE);
+    const sw = Math.min(room.w - sx, Math.ceil((viewW + TILE * 2) / TILE) * TILE);
+    skyBand(ctx, sx, 0, sw, WALL, period);
+  } else if (!outdoor) {
     wallpaper(ctx, 0, 0, room.w, WALL, room.accent, room.id === "control" || room.id === "reactor" || room.id === "maintenance");
   }
 
@@ -87,8 +97,12 @@ function drawTiles(ctx: CanvasRenderingContext2D, room: (typeof ROOMS)[RoomId], 
     if (!outdoor) windowWash(ctx, win.rect.x, win.rect.y, win.rect.w, win.rect.h, period);
   }
 
-  for (let ty = Math.floor(WALL / TILE); ty < rows; ty++) {
-    for (let tx = 0; tx < cols; tx++) {
+  const x0 = Math.max(0, Math.floor((viewX - TILE) / TILE));
+  const x1 = Math.min(cols, Math.ceil((viewX + viewW + TILE) / TILE));
+  const y0 = Math.max(Math.floor(WALL / TILE), Math.floor((viewY - TILE) / TILE));
+  const y1 = Math.min(rows, Math.ceil((viewY + viewH + TILE) / TILE));
+  for (let ty = y0; ty < y1; ty++) {
+    for (let tx = x0; tx < x1; tx++) {
       const x = tx * TILE;
       const y = ty * TILE;
       if (y < WALL - 2 && !outdoor) continue;
@@ -102,7 +116,6 @@ function drawTiles(ctx: CanvasRenderingContext2D, room: (typeof ROOMS)[RoomId], 
       }
       if (room.id === "corridor" && ty >= 6 && ty <= 7) kind = "asphalt";
       if (room.id === "maintenance" && kind === "asphalt") kind = "stripe";
-      if (room.id === "gate" && kind === "asphalt" && (tx - 10) % 4 === 0) kind = "stripe";
       floorTile(ctx, kind, x, y, seed);
     }
   }
@@ -146,7 +159,7 @@ export function drawWorld(
   const room = ROOMS[s.room];
   // Cover the viewport. Crop with the camera instead of floating the room in ink.
   const cover = Math.max(viewW / Math.max(1, room.w), viewH / Math.max(1, room.h));
-  const zoom = Math.max(1, Math.ceil(cover));
+  const zoom = Math.max(3, Math.min(5, Math.ceil(cover)));
   const bw = Math.max(1, Math.min(room.w, Math.ceil(viewW / zoom)));
   const bh = Math.max(1, Math.min(room.h, Math.ceil(viewH / zoom)));
   const off = getBuf(bw, bh);
@@ -185,7 +198,7 @@ export function drawWorld(
   g.save();
   g.translate(Math.round(bw / 2 - camX), Math.round(bh / 2 - camY));
 
-  drawTiles(g, room, s.period);
+  drawTiles(g, room, s.period, camX - bw / 2, camY - bh / 2, bw, bh);
 
   fillEdge(g, room);
 
@@ -224,6 +237,9 @@ export function drawWorld(
       y: py,
       draw: () => {
         drawPropPixel(g, p.kind, p.rect.x, p.rect.y, p.rect.w, p.rect.h, room.accent, now, p.label);
+        if (p.kind === "roof" && p.label) {
+          pixText(g, p.label, p.rect.x + p.rect.w / 2, p.rect.y + 6, PAL.cream, p.rect.w - 8);
+        }
       },
     });
   }

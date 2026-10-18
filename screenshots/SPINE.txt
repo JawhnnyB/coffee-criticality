@@ -11,5 +11,6 @@ Spine walk (west → east, north = lake)
 Return: reactor west → control south → hall west → lot west → cafe.
 
 The five-room walk is unchanged, and break now meets the core through the north wall.
+The lot is the campus map: lake to the north, the cafe roof on the west, the hall roof on the east.
 
 Teaching plant. Catch > heroics.

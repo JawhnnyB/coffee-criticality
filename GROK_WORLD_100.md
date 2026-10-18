@@ -101,6 +101,10 @@ Eng **east** ↔ Maint **west**. Reactor **south** ↔ Maint **north**.
 49. Walk lot → cafe door → interior. Facing preserved.
 50. STOP. Outdoor must feel like the same plant as the HUD plan.
 
+Done. The `gate` room is the campus, 96×40 tiles at 16px. Lake on the north, shore grass, asphalt from the cafe door to the hall door, van on the lot. Roofs for cafe, arcade, hall, control, eng, break, core, and maint are solid shells. Two 48×64 stacks stand on the north shore by the core. Fence, warning stripe, and the boom mark the south edge. Zoom stays 3–5 and the camera follows. The cafe door and the hall door sit on those building faces. Walked the lot west into the cafe facing left, and back facing right. Walked the asphalt east into the hall facing right.
+
+The shipped person is 32×64. The van is 96×48. The person is taller than the van. This slice did not rescale either.
+
 ### E. Interior flow (51–70)
 51. Cafe: only **east** door to lot. South wall is kitchen / mural, not a portal.
 52. Corridor is the **spine**. Long E–W. Doors N control, S eng, W lot, E break.
@@ -168,4 +172,4 @@ Eng **east** ↔ Maint **west**. Reactor **south** ↔ Maint **north**.
 - 160×90 site plan in the HUD
 - Zoom 3–5, person 32×48, van 96×48
 
-Next concrete slice after this file: **§D campus outdoor tilemap** (steps 33–50). Step 64 is done. Do not start the campus map as part of the door fix.
+Next concrete slice: §E interior notes that still describe the older door sides. The campus map is the `gate` room. Do not start a second outdoor map.
