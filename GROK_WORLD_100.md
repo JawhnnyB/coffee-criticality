@@ -81,6 +81,8 @@ Eng **east** ↔ Maint **west**. Reactor **south** ↔ Maint **north**.
 31. Screenshot HUD + cafe east door in one frame.
 32. STOP. Plan must be readable at 80×45.
 
+Done. `site_plan.png` is 160×90 with no letters, baked from the gate roofs by `scripts/bake-site-plan.py`. `FOOTPRINT` and the pause labels are the centers of those same rects. The lot pip is the van. Lake is the north band.
+
 ### D. Campus outdoor (33–50) — the real “full PNG”
 33. Author **one** outdoor tilemap at TILE 16. Size ~ 96×40 tiles (lake band + lot + building roofs).
 34. This is the only place a “full plant PNG” is allowed — as a **baked tilemap**, not under interiors.
@@ -146,7 +148,7 @@ The shipped person is 32×64. The van is 96×48. The person is taller than the v
 84. Fence, boom, warning stripe already exist — place on campus.
 85. Stack / tower 32×64, teaching silhouette.
 86. Door 16×32 keep. East/west use the same, no squash.
-87. Site plan 160×90 — already a stub; redraw once footprints lock.
+87. Site plan 160×90. Redrawn from the roof rects. Do not hand-draw a second one.
 88. Do not Imagine 16:9 rooms.
 89. Do not re-Imagine Mabel.
 90. Van stays 96×48 on the lot.
@@ -172,4 +174,4 @@ The shipped person is 32×64. The van is 96×48. The person is taller than the v
 - 160×90 site plan in the HUD
 - Zoom 3–5, person 32×48, van 96×48
 
-Next concrete slice: §E interior notes that still describe the older door sides. The campus map is the `gate` room. Do not start a second outdoor map.
+Next concrete slice: the ending walk on this campus (step 97). The pause map now matches the roofs. Do not draw a second plan.

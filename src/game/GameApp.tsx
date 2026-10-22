@@ -2254,10 +2254,10 @@ function MiniMap({
   return (
     <div className="relative mt-3 w-full border border-border bg-[#12100e]" aria-label="Plant map">
       <img
-        src="/art/gen/ui/site_plan.png?v=art101"
+        src="/art/gen/ui/site_plan.png?v=plan2"
         alt=""
-        width={320}
-        height={180}
+        width={160}
+        height={90}
         className="w-full"
         style={{ imageRendering: "pixelated" }}
       />
@@ -2555,7 +2555,7 @@ function Hud({
         </div>
         <div className="relative mt-2 hidden h-[45px] w-[80px] border border-border sm:block" data-testid="site-plan">
           <img
-            src="/art/gen/ui/site_plan.png?v=art101"
+            src="/art/gen/ui/site_plan.png?v=plan2"
             alt=""
             width={80}
             height={45}

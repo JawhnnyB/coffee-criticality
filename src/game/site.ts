@@ -2,35 +2,71 @@
  * Unit 1 site — rooms are not floating cards. Doors have a side.
  * Leave east, enter west. Teaching plant, not a licensed layout.
  */
-import { WALL } from "./const";
-import { ROOMS, type RoomId } from "./content";
+import { TILE, WALL } from "./const";
+import { ROOMS, type RoomId, type Rect } from "./content";
 
 export type Cardinal = "n" | "s" | "e" | "w";
 
-/** Footprints on the campus grid (tiles). Minimap + future outdoor merge. */
-export const FOOTPRINT: Record<RoomId, { x: number; y: number; indoor: boolean }> = {
-  cafe: { x: 2, y: 10, indoor: true },
-  parlor: { x: 2, y: 24, indoor: true },
-  gate: { x: 23, y: 10, indoor: false },
-  corridor: { x: 42, y: 12, indoor: true },
-  control: { x: 46, y: 0, indoor: true },
-  engineering: { x: 46, y: 25, indoor: true },
-  breakroom: { x: 67, y: 12, indoor: true },
-  reactor: { x: 69, y: 0, indoor: true },
-  maintenance: { x: 70, y: 25, indoor: true },
+export type Footprint = { x: number; y: number; w: number; h: number; indoor: boolean };
+
+const ROOF_LABEL: Record<Exclude<RoomId, "gate">, string> = {
+  cafe: "Cafe",
+  parlor: "Arcade",
+  corridor: "Hall",
+  control: "Control",
+  engineering: "Eng",
+  breakroom: "Break",
+  reactor: "Core",
+  maintenance: "Maint",
 };
 
-/** Pixel centers on the 320×180 campus plan, as percent. Pause map pip + labels. */
+function gateProp(kind: string, label?: string): Rect {
+  const hit = ROOMS.gate.props.find((p) => p.kind === kind && (label == null || p.label === label));
+  if (!hit) throw new Error(`campus prop missing: ${kind} ${label ?? ""}`);
+  return hit.rect;
+}
+
+function asTiles(rect: Rect, indoor: boolean): Footprint {
+  return {
+    x: rect.x / TILE,
+    y: rect.y / TILE,
+    w: rect.w / TILE,
+    h: rect.h / TILE,
+    indoor,
+  };
+}
+
+/** Roof shells on the campus, in tiles. The lot mark is the van, not a building. */
+export const FOOTPRINT: Record<RoomId, Footprint> = {
+  cafe: asTiles(gateProp("roof", ROOF_LABEL.cafe), true),
+  parlor: asTiles(gateProp("roof", ROOF_LABEL.parlor), true),
+  gate: asTiles(gateProp("van"), false),
+  corridor: asTiles(gateProp("roof", ROOF_LABEL.corridor), true),
+  control: asTiles(gateProp("roof", ROOF_LABEL.control), true),
+  engineering: asTiles(gateProp("roof", ROOF_LABEL.engineering), true),
+  breakroom: asTiles(gateProp("roof", ROOF_LABEL.breakroom), true),
+  reactor: asTiles(gateProp("roof", ROOF_LABEL.reactor), true),
+  maintenance: asTiles(gateProp("roof", ROOF_LABEL.maintenance), true),
+};
+
+function centerPct(foot: Footprint): { x: number; y: number } {
+  const room = ROOMS.gate;
+  const x = ((foot.x + foot.w / 2) * TILE) / room.w;
+  const y = ((foot.y + foot.h / 2) * TILE) / room.h;
+  return { x: Math.round(x * 1000) / 10, y: Math.round(y * 1000) / 10 };
+}
+
+/** Label anchors, percent of the campus plan. Centers of the footprints above. */
 export const MAP_HUD: Record<RoomId, { x: number; y: number; label: string }> = {
-  cafe: { x: 15.9, y: 52.2, label: "Cafe" },
-  parlor: { x: 15.9, y: 80.0, label: "Arcade" },
-  gate: { x: 36.9, y: 54.4, label: "Lot" },
-  corridor: { x: 54.7, y: 52.2, label: "Hall" },
-  control: { x: 56.6, y: 20.6, label: "Control" },
-  engineering: { x: 56.6, y: 81.1, label: "Eng" },
-  breakroom: { x: 70.0, y: 52.2, label: "Break" },
-  reactor: { x: 87.8, y: 21.1, label: "Core" },
-  maintenance: { x: 87.8, y: 81.1, label: "Maint" },
+  cafe: { ...centerPct(FOOTPRINT.cafe), label: "Cafe" },
+  parlor: { ...centerPct(FOOTPRINT.parlor), label: "Arcade" },
+  gate: { ...centerPct(FOOTPRINT.gate), label: "Lot" },
+  corridor: { ...centerPct(FOOTPRINT.corridor), label: "Hall" },
+  control: { ...centerPct(FOOTPRINT.control), label: "Control" },
+  engineering: { ...centerPct(FOOTPRINT.engineering), label: "Eng" },
+  breakroom: { ...centerPct(FOOTPRINT.breakroom), label: "Break" },
+  reactor: { ...centerPct(FOOTPRINT.reactor), label: "Core" },
+  maintenance: { ...centerPct(FOOTPRINT.maintenance), label: "Maint" },
 };
 
 export function sideOf(roomId: RoomId, rect: { x: number; y: number; w: number; h: number }): Cardinal {
