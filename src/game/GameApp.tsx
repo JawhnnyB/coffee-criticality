@@ -162,6 +162,7 @@ function AuthChip() {
 export function GameApp() {
   const wrapRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const veilRef = useRef<HTMLDivElement>(null);
   const stateRef = useRef<GameState>(createState());
   const keysRef = useRef<Set<string>>(new Set());
   const edgesRef = useRef<Set<string>>(new Set());
@@ -485,6 +486,16 @@ export function GameApp() {
       edges.clear();
       if (PLAY_MODES.includes(s.mode)) {
         paint(canvasRef.current, wrapRef.current, s, now / 1000, dt);
+      }
+      const veil = veilRef.current;
+      if (veil) {
+        if (s.mapHop) {
+          veil.style.opacity = String(Math.min(1, s.fade));
+          veil.style.pointerEvents = "auto";
+        } else if (veil.style.opacity !== "0") {
+          veil.style.opacity = "0";
+          veil.style.pointerEvents = "none";
+        }
       }
       raf = requestAnimationFrame(loop);
     };
@@ -1437,6 +1448,12 @@ export function GameApp() {
           </div>
         </div>
       ) : null}
+      <div
+        ref={veilRef}
+        data-testid="map-veil"
+        className="pointer-events-none absolute inset-0 z-[80] bg-[#16110d] opacity-0"
+        aria-hidden
+      />
     </div>
   );
 }

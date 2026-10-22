@@ -133,6 +133,9 @@ export interface GameState {
   doorCd: number;
   edgeCd: number;
   fade: number;
+  /** Map hop covers the pause screen. Cleared when the fade finishes. */
+  mapHop: boolean;
+  fadeHold: number;
   pendingRoom: RoomId | null;
   pendingSpawn: { x: number; y: number } | null;
   pendingFacing: "left" | "right" | "up" | "down" | null;
@@ -262,6 +265,8 @@ export function createState(): GameState {
     doorCd: 0,
     edgeCd: 0,
     fade: 0,
+    mapHop: false,
+    fadeHold: 0,
     pendingRoom: null,
     pendingSpawn: null,
     pendingFacing: null,
@@ -662,6 +667,7 @@ export function applyTransition(s: GameState) {
   markSeen(s, to);
   s.sitting = false;
   unstick(s);
+  if (s.mode === "pause") s.mode = "play";
   s.announce = ROOMS[to].name;
   s.announceT = 2.1;
   addMinutes(s, 2);
@@ -671,9 +677,10 @@ export function applyTransition(s: GameState) {
   }
   refreshObjective(s);
 }
-/** Pause-map hop. Only rooms you have already stood in. Mabel still gates the island. */
+/** Pause-map hop. Fades to black, then arrives. Only rooms you have stood in. */
 export function travelTo(s: GameState, to: RoomId) {
   if (s.mode !== "pause" && s.mode !== "play") return;
+  if (s.mapHop || s.pendingRoom) return;
   if (to === s.room) {
     s.mode = "play";
     return;
@@ -686,8 +693,10 @@ export function travelTo(s: GameState, to: RoomId) {
     pushMsg(s, "Mabel's eyes follow you. Sit first. The plant will still be there.");
     return;
   }
-  s.mode = "play";
+  s.mapHop = true;
+  s.fadeHold = 0;
   beginTransition(s, to, spawnInside(to, s.room), facingOut(s.room, to));
+  if (!s.pendingRoom) s.mapHop = false;
 }
 export function finishDay(s: GameState) {
   if (s.flags.catchMiss) {
@@ -1401,9 +1410,19 @@ export function update(s: GameState, a: Actions, dt: number) {
   for (const m of s.messages) m.t -= t;
   s.messages = s.messages.filter((m) => m.t > 0);
   if (s.pendingRoom) {
-    s.fade = Math.min(1, s.fade + t * 3.5);
-    if (s.fade >= 1) applyTransition(s);
-  } else if (s.fade > 0) s.fade = Math.max(0, s.fade - t * 2.9);
+    const rate = s.mapHop ? 2.2 : 3.5;
+    s.fade = Math.min(1, s.fade + t * rate);
+    if (s.fade >= 1) {
+      if (s.mapHop && s.fadeHold < 0.22) s.fadeHold += t;
+      else {
+        applyTransition(s);
+        s.fadeHold = 0;
+      }
+    }
+  } else if (s.fade > 0) {
+    s.fade = Math.max(0, s.fade - t * (s.mapHop ? 2.2 : 2.9));
+    if (s.fade === 0) s.mapHop = false;
+  }
   if (s.mode === "splash") {
     if (a.confirm || a.interact) s.mode = "menu";
     return;
@@ -1462,6 +1481,7 @@ export function update(s: GameState, a: Actions, dt: number) {
     return;
   }
   if (s.mode === "pause") {
+    if (s.pendingRoom || s.mapHop) return;
     if (a.back || a.pause) s.mode = "play";
     return;
   }

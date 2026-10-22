@@ -354,7 +354,7 @@ export function drawWorld(
   ctx.fillStyle = periodTint(s.period, !outdoor);
   ctx.fillRect(0, 0, viewW, viewH);
 
-  if (s.fade > 0) {
+  if (s.fade > 0 && !s.mapHop) {
     ctx.fillStyle = `rgba(22,17,13,${Math.min(1, s.fade)})`;
     ctx.fillRect(0, 0, viewW, viewH);
   }
