@@ -23,7 +23,7 @@ export interface WeekLogEntry {
 /** Days 2–5: on the lot, east of the cafe door and west of the van, facing the hall. */
 export const COMMUTE_SPAWN = { room: "gate" as const, x: 240, y: 200, facing: "right" as const };
 /** Friday close: east shore, facing the lake. The stacks are further east. */
-export const DUSK_SPAWN = { room: "gate" as const, x: 1100, y: 108, facing: "up" as const };
+export const DUSK_SPAWN = { room: "gate" as const, x: 1100, y: 180, facing: "up" as const };
 
 export const WEEK: DayDef[] = [
   {

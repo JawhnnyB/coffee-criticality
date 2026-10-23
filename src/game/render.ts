@@ -114,7 +114,6 @@ function drawTiles(
           break;
         }
       }
-      if (room.id === "corridor" && ty >= 6 && ty <= 7) kind = "asphalt";
       if (room.id === "maintenance" && kind === "asphalt") kind = "stripe";
       floorTile(ctx, kind, x, y, seed);
     }
@@ -351,8 +350,12 @@ export function drawWorld(
   const oy = Math.floor((viewH - dh) / 2);
   ctx.drawImage(off, 0, 0, bw, bh, ox, oy, dw, dh);
 
-  ctx.fillStyle = periodTint(s.period, !outdoor);
+  ctx.fillStyle = periodTint(s.period, room.floorKind !== "grass" && room.floorKind !== "asphalt");
   ctx.fillRect(0, 0, viewW, viewH);
+  if (s.flags.endingWalk && (room.floorKind === "grass" || room.floorKind === "asphalt")) {
+    ctx.fillStyle = "rgba(16, 20, 32, 0.22)";
+    ctx.fillRect(0, 0, viewW, viewH);
+  }
 
   if (s.fade > 0 && !s.mapHop) {
     ctx.fillStyle = `rgba(22,17,13,${Math.min(1, s.fade)})`;
@@ -471,7 +474,7 @@ function drawBoardA(
 }
 
 function drawPaperLog(ctx: CanvasRenderingContext2D, day: number, resolved: boolean, now: number) {
-  const x = 36;
+  const x = 88;
   const y = 164;
   const w = 104;
   const h = 48;

@@ -765,7 +765,7 @@ export const ROOMS: Record<RoomId, RoomDef> = {
       { rect: t(2, 7, 10, 8), kind: "roof", label: "Cafe" },
       { rect: t(2, 16, 10, 8), kind: "roof", label: "Arcade" },
       { rect: t(53, 8, 12, 10), kind: "roof", label: "Hall" },
-      { rect: t(56, 6, 12, 2), kind: "roof", label: "Control" },
+      { rect: t(56, 4, 12, 4), kind: "roof", label: "Control" },
       { rect: t(52, 20, 14, 8), kind: "roof", label: "Eng" },
       { rect: t(68, 12, 10, 8), kind: "roof", label: "Break" },
       { rect: t(78, 6, 12, 6), kind: "roof", label: "Core" },

@@ -608,6 +608,7 @@ export function GameApp() {
             stage={stage}
             time={s.timeLabel}
             period={s.period}
+            dusk={!!s.flags.endingWalk}
             toast={s.toastT > 0 ? s.toast : ""}
             objective={s.objective}
             day={s.day}
@@ -2271,7 +2272,7 @@ function MiniMap({
   return (
     <div className="relative mt-3 w-full border border-border bg-[#12100e]" aria-label="Plant map">
       <img
-        src="/art/gen/ui/site_plan.png?v=plan2"
+        src="/art/gen/ui/site_plan.png?v=plan3"
         alt=""
         width={160}
         height={90}
@@ -2538,6 +2539,7 @@ function Hud({
   stage,
   time,
   period,
+  dusk = false,
   toast,
   objective,
   day,
@@ -2549,6 +2551,7 @@ function Hud({
   stage: string;
   time: string;
   period: Period;
+  dusk?: boolean;
   toast: string;
   objective: string;
   day: number;
@@ -2563,7 +2566,7 @@ function Hud({
         <div className="flex items-baseline gap-2 font-mono text-[11px]">
           <span className="text-base tabular leading-none text-fg">{time}</span>
           <span className="text-muted">
-            Day {day} · {periodLabel(period)}
+            Day {day} · {dusk ? "Dusk" : periodLabel(period)}
           </span>
         </div>
         <div className="mt-1 flex items-center gap-1.5 text-sm text-fg">
@@ -2572,7 +2575,7 @@ function Hud({
         </div>
         <div className="relative mt-2 hidden h-[45px] w-[80px] border border-border sm:block" data-testid="site-plan">
           <img
-            src="/art/gen/ui/site_plan.png?v=plan2"
+            src="/art/gen/ui/site_plan.png?v=plan3"
             alt=""
             width={80}
             height={45}

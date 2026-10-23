@@ -569,8 +569,9 @@ export function addMinutes(s: GameState, n: number) {
 export function refreshObjective(s: GameState) {
   const d = dayDef(s.day);
   if (s.flags.endingWalk) {
-    s.objective = "Walk the lot. Lake north. The stack is still breathing.";
-    s.closePrompt = true;
+    s.objective = s.closePrompt
+      ? "The week can close. The stack is still breathing."
+      : "Walk the lot. Lake north. The stack is still breathing.";
     return;
   }
   if (s.day === 5 && !s.shuffleDone) {
@@ -794,7 +795,7 @@ export function beginEndingWalk(s: GameState) {
   s.y = DUSK_SPAWN.y;
   s.facing = DUSK_SPAWN.facing;
   s.mode = "play";
-  s.closePrompt = true;
+  s.closePrompt = false;
   s.sitting = false;
   s.poseHold = 0;
   s.dwell = { ending: 0 };
@@ -1562,12 +1563,8 @@ export function update(s: GameState, a: Actions, dt: number) {
   }
   if (!s.moving) addMinutes(s, t * .05);
   if (s.flags.endingWalk) {
-    s.dwell.ending = (s.dwell.ending ?? 0) + t;
-    if (s.dwell.ending > 5) s.closePrompt = true;
-    if (a.interact && (s.nearId === "commute" || (s.dwell.ending ?? 0) > 4)) {
-      s.mode = "ending";
-      return;
-    }
+    if (s.moving) s.dwell.ending = (s.dwell.ending ?? 0) + t;
+    if ((s.dwell.ending ?? 0) > 2) s.closePrompt = true;
   }
   if (a.interact) useInteract(s);
   if (a.peer) {
@@ -1605,6 +1602,10 @@ export function canCloseShift(s: GameState) {
 }
 export function tryCloseShift(s: GameState) {
   if (s.flags.endingWalk) {
+    if (!s.closePrompt) {
+      pushMsg(s, "Walk the lot first. Lake north.");
+      return;
+    }
     s.mode = "ending";
     return;
   }

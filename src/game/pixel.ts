@@ -430,7 +430,7 @@ export function drawPropPixel(
 ) {
   const ox = Math.floor(x);
   const oy = Math.floor(y);
-  const im = kind === "roof" || kind === "stack" ? null : loadArt(`/art/gen/props/${kind}.png?v=eval1`);
+  const im = kind === "roof" || kind === "stack" ? null : loadArt(`/art/gen/props/${kind}.png?v=${kind === "boom" ? "gate2" : "eval1"}`);
   if (im) {
     pix(ctx);
     const nw = im.naturalWidth;
@@ -494,9 +494,13 @@ export function drawPropPixel(
     return;
   }
   if (kind === "stack") {
+    const puff = 2 + Math.round((Math.sin(now * 1.4 + ox * 0.02) + 1) * 2);
     fill(ctx, ox + 6, oy + 16, w - 12, h - 16, PAL.steel);
     fill(ctx, ox + 2, oy + 4, w - 4, 14, "#4a5a48");
     fill(ctx, ox + 8, oy + h - 10, w - 16, 10, "#2a3238");
+    const px = ox + Math.floor(w / 2) - 2;
+    fill(ctx, px, oy + 2 - puff, 4, puff, "#9aa898");
+    fill(ctx, px + 1, oy - puff - 2, 2, 2, "#d5ddd0");
     outlineRect(ctx, ox + 6, oy + 16, w - 12, h - 16, PAL.ink);
     outlineRect(ctx, ox + 2, oy + 4, w - 4, 14, PAL.ink);
     return;

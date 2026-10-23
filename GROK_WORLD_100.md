@@ -108,7 +108,7 @@ Done. The `gate` room is the campus, 96×40 tiles at 16px. Lake on the north, sh
 The shipped person is 32×64. The van is 96×48. The person is taller than the van. This slice did not rescale either.
 
 ### E. Interior flow (51–70)
-51. Cafe: only **east** door to lot. South wall is kitchen / mural, not a portal.
+51. Cafe: **east** door to the lot. **South** door to the arcade. The rest of the south wall is the kitchen mural, not another portal.
 52. Corridor is the **spine**. Long E–W. Doors N control, S eng, W lot, E break.
 53. Control: south to hall, east to reactor. Windows north to **core plate**, not lake.
 54. Reactor hall: west to control, south to break (west end), south to maint. Core stays center. ALARA.
@@ -161,6 +161,8 @@ The shipped person is 32×64. The van is 96×48. The person is taller than the v
 95. Commute still starts at the van on the lot.
 96. Friday shuffle is in reactor, not a separate dimension.
 97. Ending walk: lot at dusk, lake north, stack breathing — campus map, not a slideshow.
+
+Done. Day 5 leaves you on the campus at 17:10, facing the lake, under a dusk wash. The stack plume moves. The close button stays down until you have walked. The paper card comes after that walk, not instead of it.
 98. Never claim the floorplan is a licensed plant.
 99. `tsc` clean. `startup.sh` and WASD unchanged. A = left.
 100. STOP. Deliver: door graph, spine walk, site plan HUD, glimpse QC, this file.
@@ -172,6 +174,6 @@ The shipped person is 32×64. The van is 96×48. The person is taller than the v
 - `spawnInside` + cafe **east** door
 - Door glimpse of destination plate
 - 160×90 site plan in the HUD
-- Zoom 3–5, person 32×48, van 96×48
+- Zoom 3–5, person 32×64, van 96×48. The person is taller than the van. Do not rescale either.
 
-Next concrete slice: the ending walk on this campus (step 97). The pause map now matches the roofs. Do not draw a second plan.
+Next concrete slice: nothing in the easy-leftover list. Do not start a second outdoor map.
