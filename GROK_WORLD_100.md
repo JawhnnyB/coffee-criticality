@@ -176,4 +176,4 @@ Done. Day 5 leaves you on the campus at 17:10, facing the lake, under a dusk was
 - 160×90 site plan in the HUD
 - Zoom 3–5, person 32×64, van 96×48. The person is taller than the van. Do not rescale either.
 
-Next concrete slice: nothing in the easy-leftover list. Do not start a second outdoor map.
+Next concrete slice: [GROK_FEEL.md](GROK_FEEL.md). The week has to be visible on the floor. Do not start a second outdoor map.
