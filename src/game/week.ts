@@ -1,4 +1,5 @@
-import type { NpcId, NpcSlot, Period } from "./content";
+import type { NpcId, NpcSlot, Residue } from "./content";
+import { anyHid } from "./content";
 
 export interface DayDef {
   n: number;
@@ -132,7 +133,7 @@ export const INCIDENTS: Record<
   valve: {
     title: "Valve 14 does not match the paper",
     body: "Board A shows 14-B OPEN. The paper log initials 14-R CLOSED. Steam is talking in Maintenance. The easy path is to initial the paper and keep walking. That is how quiet plants fail.",
-    report: "You write it up with your ugly handwriting and a time. Uncomfortable. Correct. Elena's shoulders drop half an inch.",
+    report: "You write it up with your ugly handwriting and a time. Uncomfortable. Correct. The board now agrees with the paper.",
     peer: "You pull Elena in. Two sets of eyes. The tag is wrong; the catch is shared. She mutters 'thank you' like it costs her, which means it is real.",
     hide: "The log looks like church. The hiss in Maintenance does not care. Hide paths grow later, in people you like.",
   },
@@ -221,9 +222,35 @@ export function eodNpcLine(args: {
   return "Holt: Skill without a safe floor is unfinished power.";
 }
 
-/** Yesterday's last catch or hide, for the morning brief. */
-export function yesterdayLine(day: number, log: WeekLogEntry[]): string | null {
+export function shoreLine(ended: "a" | "c" | null, residue: Residue, shuffleDone: boolean, elenaSecondEyes: boolean) {
+  if (ended !== "a") return "The shore is empty except Mabel and Jordan. The hiss kept talking.";
+  const names = ["Mabel"];
+  if (residue.log === "caught") names.push("Holt");
+  if (residue.valve === "caught" || elenaSecondEyes) names.push("Elena");
+  if (!anyHid(residue)) names.push("Jordan");
+  if (residue.tag === "caught") names.push("Tommy");
+  if (residue.dose === "caught") names.push("Marcus");
+  if (shuffleDone && !anyHid(residue)) names.push("Priya");
+  return `${names.join(", ")} came to the shore. The floor held because they saw the catches.`;
+}
+
+/** Yesterday's last catch or hide, for the morning brief. Names the object that is still in the room. */
+export function yesterdayLine(day: number, log: WeekLogEntry[], residue: Residue): string | null {
   if (day <= 1) return null;
+  const prev = day - 1;
+  const how = prev === 1 ? residue.valve : prev === 2 ? residue.tag : prev === 3 ? residue.dose : prev === 4 ? residue.log : "open";
+  if (how === "hid") {
+    if (prev === 1) return "Yesterday you hid. The paper still disagrees with the board.";
+    if (prev === 2) return "Yesterday you hid. The tag is still up.";
+    if (prev === 3) return "Yesterday you hid. The sticker still says 40.";
+    return "Yesterday you hid. The log has your name on a blank.";
+  }
+  if (how === "caught") {
+    if (prev === 1) return "Yesterday the board and the paper agreed.";
+    if (prev === 2) return "Yesterday the tag came down.";
+    if (prev === 3) return "Yesterday someone said 40 out loud.";
+    return "Yesterday the log got a real signature.";
+  }
   const yest = log.filter((e) => e.day === day - 1);
   if (!yest.length) return "Yesterday the floor was quiet. Today it will not be.";
   const hide = [...yest].reverse().find((e) => e.kind === "hide");
@@ -234,21 +261,55 @@ export function yesterdayLine(day: number, log: WeekLogEntry[]): string | null {
 }
 
 /**
- * Day-specific posts. Geography serves the week:
- * d2 Tommy at the lockout, d3 Marcus at the dose, d4 Holt at the unsigned log, d5 Priya at the shuffle.
+ * Posts that hold a face. Radius 12 so they do not wander off it.
+ * Day posts ignore the clock. The dusk lot ignores the day.
  */
-export function occupancyOverlay(day: number, period: Period, id: NpcId): NpcSlot | undefined {
-  if (day === 2 && id === "tommy" && period !== "afternoon") {
-    return { room: "maintenance", x: 208, y: 160, face: "up", radius: 16 };
+export function occupancyOverlay(
+  day: number,
+  id: NpcId,
+  residue: Residue,
+  ending: boolean,
+  ended: "a" | "c" | null,
+  shuffleDone: boolean,
+  elenaSecondEyes: boolean,
+): NpcSlot | undefined {
+  if (ending) return duskPost(id, residue, ended, shuffleDone, elenaSecondEyes) ?? OFFSTAGE;
+  if (id === "jordan" && anyHid(residue)) return { room: "breakroom", x: 248, y: 160, face: "right", radius: 12 };
+  if (day === 1 && id === "elena") {
+    if (residue.valve === "caught") return { room: "gate", x: 368, y: 248, face: "left", radius: 12 };
+    return { room: "gate", x: 220, y: 248, face: "right", radius: 12 };
   }
-  if (day === 3 && id === "marcus" && period !== "afternoon") {
-    return { room: "maintenance", x: 128, y: 144, face: "up", radius: 16 };
+  if (day === 2 && id === "tommy") {
+    return { room: "maintenance", x: 208, y: 160, face: residue.tag === "caught" ? "down" : "up", radius: 12 };
   }
-  if (day === 4 && id === "holt" && period !== "afternoon") {
-    return { room: "control", x: 96, y: 210, face: "up", radius: 14 };
+  if (day === 3 && id === "marcus") {
+    return { room: "maintenance", x: 232, y: 168, face: residue.dose === "caught" ? "left" : "up", radius: 12 };
   }
-  if (day === 5 && id === "priya") {
-    return { room: "reactor", x: 88, y: 196, face: "up", radius: 16 };
+  if (day === 4 && id === "holt") {
+    if (residue.log === "caught") return { room: "control", x: 112, y: 140, face: "up", radius: 12 };
+    return { room: "control", x: 140, y: 236, face: "up", radius: 12 };
   }
+  if (day === 5 && id === "priya" && shuffleDone && !anyHid(residue)) {
+    return { room: "reactor", x: 88, y: 196, face: "up", radius: 12 };
+  }
+  return undefined;
+}
+
+const OFFSTAGE: NpcSlot = { room: "engineering", x: 96, y: 160, face: "down", radius: 12 };
+
+function duskPost(id: NpcId, residue: Residue, ended: "a" | "c" | null, shuffleDone: boolean, elenaSecondEyes: boolean): NpcSlot | undefined {
+  const hid = anyHid(residue);
+  if (ended !== "a") {
+    if (id === "mabel") return { room: "gate", x: 1048, y: 172, face: "left", radius: 12 };
+    if (id === "jordan") return { room: "gate", x: 1224, y: 172, face: "right", radius: 12 };
+    return undefined;
+  }
+  if (id === "mabel") return { room: "gate", x: 1058, y: 172, face: "up", radius: 12 };
+  if (id === "holt" && residue.log === "caught") return { room: "gate", x: 1094, y: 172, face: "up", radius: 12 };
+  if (id === "elena" && (residue.valve === "caught" || elenaSecondEyes)) return { room: "gate", x: 1130, y: 172, face: "up", radius: 12 };
+  if (id === "jordan" && !hid) return { room: "gate", x: 1166, y: 172, face: "up", radius: 12 };
+  if (id === "tommy" && residue.tag === "caught") return { room: "gate", x: 1202, y: 172, face: "up", radius: 12 };
+  if (id === "marcus" && residue.dose === "caught") return { room: "gate", x: 1230, y: 172, face: "up", radius: 12 };
+  if (id === "priya" && shuffleDone && !hid) return { room: "gate", x: 1112, y: 142, face: "up", radius: 12 };
   return undefined;
 }

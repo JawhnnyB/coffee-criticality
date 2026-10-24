@@ -6,18 +6,23 @@ import {
   INTRO,
   NPCS,
   NPC_SCHEDULE,
+  ROLES,
   ROOMS,
   clockLabel,
+  emptyResidue,
   floorKindAt,
   periodFromMinutes,
   periodLabel,
+  residueKey,
   talkLines,
+  anyHid,
   type Choice,
   type Line,
   type NpcId,
   type NpcSlot,
   type Period,
   type Rect,
+  type Residue,
   type RoleId,
   type RoomId,
 } from "./content";
@@ -115,6 +120,7 @@ export interface GameState {
   academyI: number;
   incidentOpen: boolean;
   incidentResolved: boolean;
+  residue: Residue;
   nearLabel: string;
   nearId: string;
   nearNpc: NpcId | null;
@@ -247,6 +253,7 @@ export function createState(): GameState {
     academyI: 0,
     incidentOpen: false,
     incidentResolved: false,
+    residue: emptyResidue(),
     nearLabel: "",
     nearId: "",
     nearNpc: null,
@@ -348,7 +355,7 @@ export function npcsHere(s: GameState) {
   return out;
 }
 export function slotOf(s: GameState, id: NpcId) {
-  const overlay = occupancyOverlay(s.day, s.period, id);
+  const overlay = occupancyOverlay(s.day, id, s.residue, !!s.flags.endingWalk, s.ended, s.shuffleDone, !!s.flags.elenaSecondEyes);
   if (overlay) return overlay;
   return NPC_SCHEDULE[s.period][id] ?? {
     room: "cafe",
@@ -423,10 +430,17 @@ export function tickNpcs(s: GameState, dt: number) {
       const pdx = home.x - live.x;
       const pdy = home.y - live.y;
       const pd = Math.hypot(pdx, pdy);
-      if (pd > 2) {
+      if (pd > 48) {
+        live.x = home.x;
+        live.y = home.y;
+        live.tx = home.x;
+        live.ty = home.y;
+        if (home.face) live.facing = home.face;
+      } else if (pd > 2) {
         const step = Math.min(pd, 40 * dt);
         live.x += pdx / pd * step;
         live.y += pdy / pd * step;
+        live.facing = Math.abs(pdx) > Math.abs(pdy) ? pdx < 0 ? "left" : "right" : pdy < 0 ? "up" : "down";
       } else if (home.face) live.facing = home.face;
     } else {
       const pdx = live.x - s.x;
@@ -464,7 +478,7 @@ export function tickNpcs(s: GameState, dt: number) {
       }
     }
     if (live.room !== s.room || s.mode !== "play") live.emote = null;
-    else if (id === "mabel" && s.flags.hid) live.emote = "dots";
+    else if (id === "mabel" && (s.flags.hid || anyHid(s.residue))) live.emote = "dots";
     else if (id === "mabel") live.emote = s.flags.mabelTalked ? null : "mug";
     else if (!s.flags[`${id}Talked`]) live.emote = "bang";
     else live.emote = null;
@@ -612,10 +626,15 @@ export function refreshObjective(s: GameState) {
     return;
   }
   if (d.incident && !s.incidentResolved) {
-    if (d.incident === "valve") s.objective = "Board A vs the paper log. Valve 14.";
-    else if (d.incident === "lockout") s.objective = "Maintenance — LOTOTO board. Pump 2A.";
-    else if (d.incident === "dose") s.objective = "Dose sticker in Maintenance. Decimal walked.";
-    else s.objective = "Control — the shift log has no initials.";
+    const job =
+      d.incident === "valve"
+        ? "Board A vs the paper log. Valve 14."
+        : d.incident === "lockout"
+          ? "Maintenance — LOTOTO board. Pump 2A."
+          : d.incident === "dose"
+            ? "Dose sticker in Maintenance. Decimal walked."
+            : "Control — the shift log has no initials.";
+    s.objective = s.flags.ruleSeen ? job : `${job} A catch changes the board. A hide leaves it wrong.`;
     return;
   }
   if (s.day === 2 && !s.maintDone) {
@@ -816,7 +835,11 @@ export function nextDay(s: GameState) {
   beginDay(s);
 }
 export function openTalk(s: GameState, npc: NpcId) {
-  s.dialogue = talkLines(npc, s.flags, s.culture, s.period, s.day);
+  s.dialogue = talkLines(npc, s.flags, s.culture, s.period, s.day, s.role, s.residue, !!s.flags.endingWalk, s.ended);
+  if (npc === "mabel" && s.day === 2 && s.role) {
+    const heard = ROLES.find((r) => r.id === s.role);
+    if (heard && s.dialogue.some((l) => l.text === heard.line)) s.flags.roleHeard = true;
+  }
   s.dialogueI = 0;
   s.mode = "dialogue";
   s.talkNpc = npc;
@@ -824,7 +847,7 @@ export function openTalk(s: GameState, npc: NpcId) {
   const first = !s.flags[`${npc}Talked`];
   s.flags[`${npc}Talked`] = true;
   bumpTrust(s, npc, first ? 4 : 1);
-  if (npc === "holt") {
+  if (npc === "holt" && s.residue.log === "open" && !s.flags.endingWalk) {
     const quoted = [...s.weekLog].reverse().find((e) => /CATCH/.test(e.text));
     if (quoted) s.dialogue.splice(1, 0, {
       speaker: "Holt",
@@ -1284,7 +1307,10 @@ export function finishMaint(s: GameState, score: number) {
     bumpCulture(s, 6);
     bumpTrust(s, "tommy", 10);
     s.catches += 1;
-    if (s.day === 2) s.incidentResolved = true;
+    if (s.day === 2) {
+      s.incidentResolved = true;
+      s.residue.tag = "caught";
+    }
     pushLog(s, "report", "Day 2 · LOTOTO hunt. The orange tag did not belong.");
   }
   pushMsg(s, score >= 1 ? "Tommy: That's a lockout. The pump can stay quiet." : "Tommy: Look again. IN SERVICE does not hang here.");
@@ -1297,6 +1323,9 @@ export function resolveIncident(s: GameState, how: "report" | "peer" | "hide") {
   setGoal(s, "truth");
   addMinutes(s, 8);
   const pack = dayIncident(s);
+  const key = residueKey(s.day);
+  if (key) s.residue[key] = how === "hide" ? "hid" : "caught";
+  s.flags.ruleSeen = true;
   if (how === "report") {
     s.reports += 1;
     s.catches += 1;
@@ -1311,6 +1340,7 @@ export function resolveIncident(s: GameState, how: "report" | "peer" | "hide") {
     s.catches += 1;
     s.flags.peered = true;
     s.flags.reported = true;
+    s.flags.elenaSecondEyes = true;
     bumpCulture(s, 12);
     bumpTrust(s, "elena", 12);
     setGoal(s, "peer");

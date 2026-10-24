@@ -6,6 +6,31 @@ export const THESIS = "A reactor only makes power in the right environment. Peop
 export const SITE = "Lake Master teaching plant";
 
 export type Period = "morning" | "midday" | "afternoon";
+
+export type ResidueHow = "open" | "caught" | "hid";
+
+export interface Residue {
+  valve: ResidueHow;
+  tag: ResidueHow;
+  dose: ResidueHow;
+  log: ResidueHow;
+}
+
+export function emptyResidue(): Residue {
+  return { valve: "open", tag: "open", dose: "open", log: "open" };
+}
+
+export function residueKey(day: number): keyof Residue | null {
+  if (day === 1) return "valve";
+  if (day === 2) return "tag";
+  if (day === 3) return "dose";
+  if (day === 4) return "log";
+  return null;
+}
+
+export function anyHid(r: Residue) {
+  return r.valve === "hid" || r.tag === "hid" || r.dose === "hid" || r.log === "hid";
+}
 export type RoomId =
   | "cafe"
   | "parlor"
@@ -463,21 +488,41 @@ export function relationLine(id: NpcId, flags: Record<string, boolean>, trust: n
   return trustState(trust);
 }
 
-export function talkLines(npc: NpcId, flags: Record<string, boolean>, culture: number, period: Period, day: number): Line[] {
+export function talkLines(
+  npc: NpcId,
+  flags: Record<string, boolean>,
+  culture: number,
+  _period: Period,
+  day: number,
+  role: RoleId | null,
+  residue: Residue,
+  ending: boolean,
+  ended: "a" | "c" | null,
+): Line[] {
+  if (ending) return endingLines(npc, residue, ended);
   const first = !flags[`${npc}Talked`];
-  const hid = !!flags.hid || !!flags.catchMiss;
+  const hid = anyHid(residue) || !!flags.hid || !!flags.catchMiss;
   if (npc === "mabel") {
     if (!first) {
-      return [
-        { speaker: "Mabel", text: hid ? "You left a lie on the glass. I watched you not sit with it." : "The kettle is still honest. The chair remembers who used it as courage.", mood: "warm" },
-        { speaker: "Mabel", text: "Two-to-ten is gone. I'm still the one who sees who won't sit. What do you need?", mood: "soft",
+      const lines: Line[] = [
+        { speaker: "Mabel", text: hid ? "You left a lie on the glass. I watched you not sit with it." : "The chair remembers who used the cup as courage.", mood: hid ? "sharp" : "warm" },
+      ];
+      if (day === 2 && role && !flags.roleHeard) {
+        const heard = ROLES.find((r) => r.id === role);
+        if (heard) lines.push({ speaker: "Mabel", text: heard.line, mood: "even" });
+      } else if (!hid) {
+        lines.push({
+          speaker: "Mabel",
+          text: "What do you need?",
+          mood: "soft",
           choices: [
             { id: "mabel-sit", label: "Just the coffee.", reply: "On the house. The night shift already paid for the heat.", trust: 2, culture: 1 },
             { id: "mabel-catch", label: "Who wouldn't sit today?", reply: "The ones with a catch in their pocket. North wall is Unit 1. I'll chalk it if you say it out loud.", flag: "arcade" },
             { id: "mabel-load", label: "The load on the north wall.", reply: "You see the pulse. One rod, or one catch. The load is the opponent. I keep the score.", flag: "arcade" },
           ],
-        },
-      ];
+        });
+      }
+      return lines;
     }
     return [
       { speaker: "Mabel", text: "Sit. Two-to-ten left this chair warm. I'm Mabel Quinn. I ran this floor twenty years.", mood: "warm" },
@@ -494,10 +539,13 @@ export function talkLines(npc: NpcId, flags: Record<string, boolean>, culture: n
   }
   if (npc === "holt") {
     if (!first) {
-      return [
-        { speaker: "Holt", text: `Day ${day}. I still have not turned for a speech.`, mood: "sharp" },
-        { speaker: "Holt", text: culture < 28 ? "Skill without a catch I can fund is unfinished power. Stand next to the line." : "Honest catches. That is a review I can fund. My hand stays off the log.", mood: "even" },
-      ];
+      if (residue.log === "hid") return [{ speaker: "Holt", text: "Your initials are on a blank. I will not fund that.", mood: "sharp" }];
+      if (residue.log === "caught") {
+        const lines: Line[] = [{ speaker: "Holt", text: "I will read the line. My hand stays off it.", mood: "even" }];
+        if (culture >= 28) lines.push({ speaker: "Holt", text: "Honest catches. That is a review I can fund.", mood: "even" });
+        return lines;
+      }
+      return [{ speaker: "Holt", text: `Day ${day}. Stand next to a line I can fund.`, mood: "sharp" }];
     }
     return [
       { speaker: "Holt", text: "Reginald Holt. You designed the core. I did not ask you to narrate it.", mood: "sharp" },
@@ -507,10 +555,9 @@ export function talkLines(npc: NpcId, flags: Record<string, boolean>, culture: n
   }
   if (npc === "elena") {
     if (!first) {
-      return [
-        { speaker: "Elena", text: flags.elenaSecondEyes ? "I saw your hands. I'll back that catch." : "Two sets of eyes. Stand where I can see you, or it isn't a catch.", mood: "even" },
-        { speaker: "Elena", text: "The seat was cold this morning too. You are not the only one who came through that gate carrying a life.", mood: "soft" },
-      ];
+      if (residue.valve === "hid") return [{ speaker: "Elena", text: "I'm still looking at the van.", mood: "even" }];
+      if (residue.valve === "caught" || flags.elenaSecondEyes) return [{ speaker: "Elena", text: "I saw your hands. I'll back that catch.", mood: "soft" }];
+      return [{ speaker: "Elena", text: "Stand where I can see your hands.", mood: "even" }];
     }
     return [
       { speaker: "Elena", text: "Elena Voss. The van was here before dawn. Door's still open.", mood: "even" },
@@ -520,10 +567,10 @@ export function talkLines(npc: NpcId, flags: Record<string, boolean>, culture: n
   }
   if (npc === "tommy") {
     if (!first) {
-      return [
-        { speaker: "Tommy", text: "Finish the sentence before you ask me for a wrench. Boring on purpose.", mood: "even" },
-        { speaker: "Tommy", text: day === 2 ? "Pump 2A. The hunt is on the board, not a checklist. IN SERVICE does not hang on a dead pump." : "If the tag isn't yours, pump two still thinks your hands are on it.", mood: "sharp" },
-      ];
+      if (residue.tag === "caught") return [{ speaker: "Tommy", text: "The tag is down. Pump two can stay quiet.", mood: "even" }];
+      if (residue.tag === "hid") return [{ speaker: "Tommy", text: "IN SERVICE is still on the flange.", mood: "sharp" }];
+      if (day === 2) return [{ speaker: "Tommy", text: "Pump 2A. The hunt is on the board.", mood: "sharp" }];
+      return [{ speaker: "Tommy", text: "Finish the sentence before you ask me for a wrench.", mood: "even" }];
     }
     return [
       { speaker: "Tommy", text: "Tommy Reyes. Pump two. Say it. Isolate. Lock. Tag. Try.", mood: "even" },
@@ -533,10 +580,9 @@ export function talkLines(npc: NpcId, flags: Record<string, boolean>, culture: n
   }
   if (npc === "marcus") {
     if (!first) {
-      return [
-        { speaker: "Marcus", text: "Don't make me wrong in the hallway. I already did that once, out loud.", mood: "tired" },
-        { speaker: "Marcus", text: day === 3 ? "If the sticker says 40, it is not a print error until the gauge under my hand agrees." : "Two instruments. If they argue, do not pick the polite one.", mood: "sharp" },
-      ];
+      if (residue.dose === "caught") return [{ speaker: "Marcus", text: "You said forty out loud. That is the number.", mood: "tired" }];
+      if (residue.dose === "hid") return [{ speaker: "Marcus", text: "The sticker still says 40. I am not turning around.", mood: "sharp" }];
+      return [{ speaker: "Marcus", text: "Say the number before you defend it.", mood: "even" }];
     }
     return [
       { speaker: "Marcus", text: "Marcus Hale. Left gauge. I trust the one under my hand, not the one on the wall.", mood: "tired" },
@@ -546,10 +592,11 @@ export function talkLines(npc: NpcId, flags: Record<string, boolean>, culture: n
   }
   if (npc === "priya") {
     if (!first) {
-      return [
-        { speaker: "Priya", text: flags.physMcHeld ? "You ran analog MC. k ± σ. The bank is the clock. OpenMC stays a letter, and I still will not sign a peak I have not walked." : flags.physPlayed ? "You watched the pin. Leakage is the last two doors. Teaching analog — not a license." : "Heat has to leave. I have not changed my mind about a signature I cannot walk.", mood: "soft" },
-        { speaker: "Priya", text: day >= 5 ? "Outage is Friday. Do not sign a shuffle you cannot walk to the rail." : "Academy first. Then my bench. The sheet is still a rumor until you stand next to the tank.", mood: "even" },
-      ];
+      if (anyHid(residue)) return [{ speaker: "Priya", text: "I will not sign. The rail is empty.", mood: "sharp" }];
+      if (day >= 5) return [{ speaker: "Priya", text: "I will walk that peak to the rail.", mood: "soft" }];
+      if (flags.physMcHeld) return [{ speaker: "Priya", text: "You ran analog MC. k ± σ. The bank is the clock. OpenMC stays a letter, and I still will not sign a peak I have not walked.", mood: "soft" }];
+      if (flags.physPlayed) return [{ speaker: "Priya", text: "You watched the pin. Leakage is the last two doors. Teaching analog — not a license.", mood: "even" }];
+      return [{ speaker: "Priya", text: "The sheet is still a rumor until you stand next to the tank.", mood: "even" }];
     }
     return [
       { speaker: "Priya", text: "Priya Sharma. I still walk the floor. A peak on a screen is a rumor until you have stood next to the tank.", mood: "soft" },
@@ -558,16 +605,29 @@ export function talkLines(npc: NpcId, flags: Record<string, boolean>, culture: n
     ];
   }
   if (!first) {
-    return [
-      { speaker: "Jordan", text: hid ? "You hid. I want the chair empty next to me. That was the deal." : "Bowl after shift if the eyes are tired and the catch is already said.", mood: "even" },
-      { speaker: "Jordan", text: "Three tiles off the hide. I remember who kept the win. Same row as me.", mood: "soft" },
-    ];
+    if (hid) return [{ speaker: "Jordan", text: "Distance.", mood: "even" }];
+    if (flags.peered || flags.jordanCredit) return [{ speaker: "Jordan", text: "The catch was said. The chair is yours.", mood: "soft" }];
+    return [{ speaker: "Jordan", text: "Say the catch out here.", mood: "even" }];
   }
   return [
     { speaker: "Jordan", text: "Jordan Peck. I watch the door, not your face. Say the catch out here. Not in your pocket.", mood: "even" },
     { speaker: "Jordan", text: "Three tiles off the hide. That was the deal. I remember who kept the win. Same row as me.", mood: "soft" },
     { speaker: "Jordan", text: "Hide it and I want distance. Bowl after shift only if the catch is already said.", mood: "even" },
   ];
+}
+
+function endingLines(npc: NpcId, residue: Residue, ended: "a" | "c" | null): Line[] {
+  if (ended !== "a") {
+    if (npc === "jordan") return [{ speaker: "Jordan", text: "Distance. That was the deal.", mood: "even" }];
+    return [{ speaker: "Mabel", text: "I will not pretend this week was honest.", mood: "sharp" }];
+  }
+  if (npc === "elena") return [{ speaker: "Elena", text: "I saw your hands on the valve. That was the catch.", mood: "soft" }];
+  if (npc === "tommy") return [{ speaker: "Tommy", text: "The tag is down. Pump two is quiet on purpose.", mood: "even" }];
+  if (npc === "marcus") return [{ speaker: "Marcus", text: "You said forty out loud.", mood: "tired" }];
+  if (npc === "holt") return [{ speaker: "Holt", text: "I will read the line. I will not fund a blank.", mood: "even" }];
+  if (npc === "priya") return [{ speaker: "Priya", text: "I will walk that peak to the rail.", mood: "soft" }];
+  if (npc === "jordan") return [{ speaker: "Jordan", text: "The catch was said. I'll stand here.", mood: "soft" }];
+  return [{ speaker: "Mabel", text: "You sat with it. The kettle can rest.", mood: "warm" }];
 }
 
 function still(src: string, title: string, body: string, extra: { video?: string; photo?: boolean; teaching?: boolean } = {}) {

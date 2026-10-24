@@ -1,4 +1,4 @@
-import { STILLS, ROOMS, type RoomId } from "./content";
+import { STILLS, ROOMS, residueKey, type ResidueHow, type RoomId } from "./content";
 import { TILE, WALL } from "./const";
 import { DEBUG_ART, WALK_H, WALK_W } from "./artSpec";
 import {
@@ -226,7 +226,7 @@ export function drawWorld(
 
   if (s.room === "control") {
     const board = room.props.find((p) => p.kind === "board");
-    drawBoardA(g, board?.rect ?? { x: 64, y: 16, w: 80, h: 32 }, s.day, s.incidentResolved, now);
+    drawBoardA(g, board?.rect ?? { x: 64, y: 16, w: 80, h: 32 }, s.day, dayMark(s), now);
   }
 
   for (const p of room.props) {
@@ -305,7 +305,7 @@ export function drawWorld(
       });
     }
   }
-  if (s.room === "maintenance" && s.day === 1 && !s.incidentResolved) {
+  if (s.room === "maintenance" && s.residue.valve !== "caught") {
     const valve = room.props.find((p) => p.kind === "valve");
     const vx = valve ? valve.rect.x + valve.rect.w / 2 : 80;
     const vy = valve ? valve.rect.y : 96;
@@ -316,7 +316,7 @@ export function drawWorld(
   if (s.room === "control") {
     drawables.push({
       y: 212,
-      draw: () => drawPaperLog(g, s.day, s.incidentResolved, now),
+      draw: () => drawPaperLog(g, s.day, dayMark(s)),
     });
   }
 
@@ -444,28 +444,33 @@ function pixText(
   }
 }
 
+function dayMark(s: GameState): ResidueHow {
+  const key = residueKey(s.day);
+  return key ? s.residue[key] : "open";
+}
+
 function drawBoardA(
   ctx: CanvasRenderingContext2D,
   rect: { x: number; y: number; w: number; h: number },
   day: number,
-  resolved: boolean,
+  mark: ResidueHow,
   now: number,
 ) {
-  const pulse = resolved ? 0.2 : 0.45 + Math.abs(Math.sin(now * 3.2)) * 0.5;
+  const caught = mark === "caught";
+  const pulse = caught ? 0.2 : 0.45 + Math.abs(Math.sin(now * 3.2)) * 0.5;
   const x = Math.round(rect.x);
   const y = Math.round(rect.y);
   const w = Math.round(rect.w);
   const h = Math.round(rect.h);
-  ctx.fillStyle = resolved ? PAL.leaf : `rgba(201,162,39,${0.45 + pulse * 0.5})`;
+  ctx.fillStyle = caught ? PAL.leaf : `rgba(201,162,39,${0.45 + pulse * 0.5})`;
   ctx.fillRect(x + 6, y + h - 7, w - 12, 3);
   const line =
-    day === 1 ? (resolved ? "14-R CLOSED" : "14-B OPEN")
-    : day === 2 ? (resolved ? "2A LOCKED" : "2A IN SVC")
-    : day === 3 ? (resolved ? "0.04 mSv/h" : "40 mSv/h")
-    : day === 4 ? (resolved ? "LOG SIGNED" : "NO INITIALS")
+    day === 1 ? (caught ? "14-R CLOSED" : "14-B OPEN")
+    : day === 2 ? (caught ? "2A LOCKED" : "2A IN SVC")
+    : day === 3 ? (caught ? "0.04 mSv/h" : "40 mSv/h")
+    : day === 4 ? (caught ? "LOG SIGNED" : mark === "hid" ? "YOUR NAME" : "NO INITIALS")
     : "SHUFFLE DAY";
-  // Right side of the board. A centered line sits on Holt's head.
-  const color = resolved ? PAL.leaf : PAL.gold;
+  const color = caught ? PAL.leaf : PAL.gold;
   const parts = line.toUpperCase().split(" ");
   parts.forEach((part, i) => {
     const tw = part.length * 8 - 2;
@@ -473,21 +478,37 @@ function drawBoardA(
   });
 }
 
-function drawPaperLog(ctx: CanvasRenderingContext2D, day: number, resolved: boolean, now: number) {
+function drawPaperLog(ctx: CanvasRenderingContext2D, day: number, mark: ResidueHow) {
   const x = 88;
   const y = 164;
   const w = 104;
   const h = 48;
-  ctx.fillStyle = resolved ? PAL.leaf : PAL.gold;
+  const caught = mark === "caught";
+  ctx.fillStyle = caught ? PAL.leaf : PAL.gold;
   ctx.fillRect(x, y, w, h);
   ctx.fillStyle = PAL.cream;
   ctx.fillRect(x + 3, y + 3, w - 6, h - 6);
-  const mid = day === 4 && !resolved ? "- 07:12" : day === 1 ? "14-R CLOSED" : "EV 07:12";
-  const foot = resolved ? "CAUGHT" : day === 1 ? "!= 14-B" : day === 4 ? "BLANK" : "CHECK";
+  let mid = "EV 07:12";
+  let foot = "CHECK";
+  if (day === 1) {
+    mid = "14-R CLOSED";
+    foot = caught ? "CAUGHT" : mark === "hid" ? "HID" : "!= 14-B";
+  } else if (day === 2) {
+    mid = caught ? "2A LOCKED" : "2A IN SVC";
+    foot = caught ? "CAUGHT" : mark === "hid" ? "HID" : "CHECK";
+  } else if (day === 3) {
+    mid = caught ? "0.04" : "40";
+    foot = caught ? "CAUGHT" : mark === "hid" ? "HID" : "CHECK";
+  } else if (day === 4) {
+    mid = caught ? "SIGNED" : mark === "hid" ? "YOUR NAME" : "- 07:12";
+    foot = caught ? "CAUGHT" : "BLANK";
+  } else {
+    mid = "SHUFFLE";
+    foot = "DAY";
+  }
   pixText(ctx, "PAPER LOG", x + w / 2, y + 6, PAL.ink, w - 8);
   pixText(ctx, mid, x + w / 2, y + 18, PAL.ink, w - 8);
-  pixText(ctx, foot, x + w / 2, y + 30, resolved ? PAL.leaf : "#8a3a32", w - 8);
-  void now;
+  pixText(ctx, foot, x + w / 2, y + 30, caught ? PAL.leaf : "#8a3a32", w - 8);
 }
 
 export function roomName(id: RoomId) {

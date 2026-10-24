@@ -48,7 +48,7 @@ import { hasSave, hydrateSave, peekSave, wipeSave, writeSave } from "./save";
 import { computeKeff } from "./nuclearLab";
 import { NuclearDesk } from "./NuclearDesk";
 import { LoopSchematic } from "./LoopSchematic";
-import { DEPARTMENTS, dayDef, eodNpcLine, yesterdayLine } from "./week";
+import { DEPARTMENTS, dayDef, eodNpcLine, shoreLine, yesterdayLine } from "./week";
 import { DEFAULT_PLAYER_LOOK, HAIR_HEX, HOODIE_HEX, type HairId, type HoodieId, type PlayerLook } from "./artSpec";
 import { MAP_HUD, ROOM_BLURB, roomLinks } from "./site";
 import { TeachMeta, TeachPriya, TYPE_THUMB } from "./TeachFrame";
@@ -75,6 +75,7 @@ import {
   openCab,
   openShufflePractice,
   pickChoice,
+  resolveIncident,
   startShift,
   travelTo,
   tryCloseShift,
@@ -380,6 +381,35 @@ export function GameApp() {
         modeRef.current = s.mode;
         setMode(s.mode);
       },
+      resolve: (how: string) => {
+        const s = stateRef.current;
+        const way = how === "hide" || how === "peer" || how === "report" ? how : "report";
+        s.mode = "play";
+        resolveIncident(s, way);
+        modeRef.current = s.mode;
+        setMode(s.mode);
+        bump((n) => n + 1);
+      },
+      getLines: () => stateRef.current.dialogue.map((l) => l.text),
+      getResidue: () => ({ ...stateRef.current.residue }),
+      setShuffle: (v: boolean) => {
+        stateRef.current.shuffleDone = v;
+      },
+      getLive: () => {
+        const s = stateRef.current;
+        return (Object.keys(s.npcLive) as (keyof typeof s.npcLive)[]).map((id) => {
+          const n = s.npcLive[id];
+          if (!n) return null;
+          return {
+            id,
+            room: n.room,
+            x: Math.round(n.x),
+            y: Math.round(n.y),
+            face: n.facing,
+            emote: n.emote,
+          };
+        }).filter(Boolean);
+      },
       choose: (id: string) => {
         const s = stateRef.current;
         for (let i = 0; i < s.dialogue.length; i++) {
@@ -440,7 +470,7 @@ export function GameApp() {
         room: s.room,
         period: s.period,
         mode: s.mode,
-        valveSteam: s.room === "maintenance" && s.day === 1 && !s.incidentResolved,
+        valveSteam: s.room === "maintenance" && s.residue.valve !== "caught",
         dt,
       });
       if (s.mode === "play") {
@@ -832,8 +862,8 @@ export function GameApp() {
               <p className="font-display text-xs uppercase tracking-[0.18em] text-accent">{dayDef(s.day).kicker}</p>
               <h2 className="font-display mt-3 max-w-lg text-3xl leading-tight text-fg">{dayDef(s.day).title}</h2>
               <Chatter text={dayDef(s.day).holt} voice="holt" className="dialogue-line mt-3 max-w-md text-sm leading-relaxed text-muted" />
-              {yesterdayLine(s.day, s.weekLog) ? (
-                <p className="mt-3 max-w-md text-sm leading-relaxed text-subtle">{yesterdayLine(s.day, s.weekLog)}</p>
+              {yesterdayLine(s.day, s.weekLog, s.residue) ? (
+                <p className="mt-3 max-w-md text-sm leading-relaxed text-subtle">{yesterdayLine(s.day, s.weekLog, s.residue)}</p>
               ) : null}
               <ul className="mt-4 max-w-md space-y-1.5 text-left text-sm leading-relaxed text-subtle">
                 {dayDef(s.day).items.map((item) => (
@@ -1367,8 +1397,8 @@ export function GameApp() {
               <h2 className="font-display mt-2 text-3xl">{s.ended === "a" ? "The floor holds" : "Unfinished power"}</h2>
               <p className="mt-3 text-sm leading-relaxed">
                 {s.ended === "a"
-                  ? "You caught it cheap. Elena, Tommy, Priya, Holt still have names. The floor held because people did. The stack is still breathing."
-                  : "Hides outran catches. Culture can look fine on a poster while the hiss keeps talking. The lot is quiet. The plant is not."}
+                  ? shoreLine(s.ended, s.residue, s.shuffleDone, !!s.flags.elenaSecondEyes)
+                  : "The shore is empty except Mabel and Jordan. The hiss kept talking. The lot is quiet. The plant is not."}
               </p>
               {s.weekLog.length > 0 ? (
                 <ul className="mt-3 space-y-1 text-left text-[12px] leading-relaxed text-[#3a2818]" data-testid="week-log-ending">
@@ -1615,16 +1645,19 @@ function IncidentStage({
           </p>
           <h2 className="font-display mt-1 text-2xl">{title}</h2>
           <p className="mt-2 text-sm leading-relaxed">{body}</p>
+          <p className="mt-2 text-sm leading-relaxed text-[#3a2818]">
+            A catch changes the board. A hide leaves it wrong. Three hides end the week unfinished.
+          </p>
           <p className="mt-1 text-[11px] text-[#8a7864]">The cheaper truth. Teaching model — not a license.</p>
           <div className="mt-4 flex flex-col gap-2">
             <button type="button" className="paper-btn" onPointerDown={onReport}>
-              <span className="font-mono text-[11px] text-[#6a4a32]">R · Report.</span> {report}
+              <span className="font-mono text-[11px] text-[#6a4a32]">R · Report.</span> Your name goes on it. The board changes.
             </button>
             <button type="button" className="paper-btn" onPointerDown={onPeer}>
-              <span className="font-mono text-[11px] text-[#6a4a32]">P · Peer-check.</span> {peer}
+              <span className="font-mono text-[11px] text-[#6a4a32]">P · Peer-check.</span> Someone looks with you. The board changes.
             </button>
             <button type="button" className="paper-btn" onPointerDown={onHide}>
-              <span className="font-mono text-[11px] text-[#6a4a32]">H · Hide.</span> {hide}
+              <span className="font-mono text-[11px] text-[#6a4a32]">H · Hide.</span> The board stays wrong.
             </button>
           </div>
         </div>
@@ -2805,6 +2838,11 @@ declare global {
       getAcademyTitle: () => string;
       forceEod: () => void;
       beginEnding: () => void;
+      resolve: (how: string) => void;
+      getLines: () => string[];
+      getResidue: () => { valve: string; tag: string; dose: string; log: string };
+      setShuffle: (v: boolean) => void;
+      getLive: () => Array<{ id: string; room: string; x: number; y: number; face: string; emote: string | null } | null>;
       choose: (id: string) => void;
       getFlags: () => Record<string, boolean>;
       getWeekLog: () => { day: number; kind: string; text: string }[];

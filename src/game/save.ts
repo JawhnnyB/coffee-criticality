@@ -3,7 +3,7 @@
  * Overlay modes collapse to play. Dialogue is never snapshotted.
  * Teaching plant is stored as JSON — not a license.
  */
-import { ROOMS, type NpcId, type RoleId, type RoomId } from "./content";
+import { ROOMS, emptyResidue, type NpcId, type Residue, type RoleId, type RoomId } from "./content";
 import type { PlantDesign } from "./plant";
 import { DEFAULT_PLANT } from "./plant";
 import { DEFAULT_PLAYER_LOOK, type PlayerLook } from "./artSpec";
@@ -62,6 +62,7 @@ export interface SaveV1 {
   maintDone: boolean;
   ended: "a" | "c" | null;
   incidentResolved: boolean;
+  residue?: Residue;
   closePrompt: boolean;
   fq: number;
   stillsSeen: number;
@@ -102,6 +103,7 @@ export function snapshot(s: GameState): SaveV1 {
     maintDone: s.maintDone,
     ended: s.ended,
     incidentResolved: s.incidentResolved,
+    residue: { ...s.residue },
     closePrompt: s.closePrompt,
     fq: s.fq,
     stillsSeen: s.stillsSeen,
@@ -198,6 +200,7 @@ export function hydrateSave(s: GameState): boolean {
   s.maintDone = data.maintDone;
   s.ended = data.ended;
   s.incidentResolved = data.incidentResolved;
+  s.residue = { ...emptyResidue(), ...data.residue };
   s.closePrompt = data.closePrompt;
   s.fq = data.fq;
   s.stillsSeen = data.stillsSeen;
