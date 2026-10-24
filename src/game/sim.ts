@@ -787,9 +787,9 @@ export function beginEndingWalk(s: GameState) {
     s.ended = s.hides >= 3 ? "c" : honest && s.culture >= 28 ? "a" : "c";
   }
   s.flags.endingWalk = true;
-  s.minutes = 1030;
+  s.minutes = 17 * 60 + 10;
   s.period = "afternoon";
-  s.timeLabel = "17:10";
+  s.timeLabel = clockLabel(s.minutes);
   s.room = DUSK_SPAWN.room;
   s.x = DUSK_SPAWN.x;
   s.y = DUSK_SPAWN.y;
@@ -1077,6 +1077,10 @@ export function useInteract(s: GameState) {
   }
   if (s.nearId === "commute") {
     if (s.flags.endingWalk) {
+      if (!s.closePrompt) {
+        pushMsg(s, "Walk the lot first. Lake north.");
+        return;
+      }
       s.mode = "ending";
       return;
     }

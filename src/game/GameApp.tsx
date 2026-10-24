@@ -1361,7 +1361,9 @@ export function GameApp() {
         {mode === "ending" && (
           <div className="absolute inset-0 z-30 flex items-end justify-center overflow-y-auto bg-bg/55 p-3 pb-28 sm:items-center sm:p-6">
             <div className="paper mx-auto w-full max-w-xl p-4 sm:p-5" data-testid="paper-ending">
-              <p className="font-mono text-[10px] tracking-widest text-[#8a7864]">Dusk · Lot · Lake north</p>
+              <p className="font-mono text-[10px] tracking-widest text-[#8a7864]">
+                Dusk · {s.timeLabel} · Lot · Lake north
+              </p>
               <h2 className="font-display mt-2 text-3xl">{s.ended === "a" ? "The floor holds" : "Unfinished power"}</h2>
               <p className="mt-3 text-sm leading-relaxed">
                 {s.ended === "a"
@@ -1387,7 +1389,7 @@ export function GameApp() {
                   data-testid="new-shift-ending"
                   onClick={() => setAskWipe(true)}
                 >
-                  New shift
+                  New week
                 </button>
                 <button
                   type="button"
@@ -1415,7 +1417,7 @@ export function GameApp() {
                 refresh();
               }}
             >
-              The {s.flags.endingWalk ? "stack is breathing · Close the week" : "light is long · Close the shift"}
+              {s.flags.endingWalk ? `${s.timeLabel} · Close the week` : "The light is long · Close the shift"}
             </button>
           </div>
         )}
@@ -2138,7 +2140,7 @@ function PauseStage({
       <div className="mx-auto grid max-w-5xl gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2">
           <p className="instrument inline-block px-2 py-1 font-mono text-[11px] tracking-widest text-fg">
-            SHIFT PAUSED · DAY {s.day} · {s.timeLabel} · {stage}
+            {s.flags.endingWalk ? `DUSK · DAY ${s.day} · ${s.timeLabel}` : `SHIFT PAUSED · DAY ${s.day} · ${s.timeLabel}`} · {stage}
           </p>
           <h2 className="font-display mt-2 text-2xl">Plant map</h2>
           <MiniMap room={s.room} focus={focus} onFocus={setFocus} flags={s.flags} onTravel={onTravel} period={s.period} />
