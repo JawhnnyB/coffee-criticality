@@ -190,6 +190,14 @@ export const ROLES: { id: RoleId; title: string; line: string }[] = [
   { id: "veteran", title: "Cautious Veteran", line: "You have seen a hide path. You did not like where it went." },
 ];
 
+/** Day-2, once, in Mabel's mouth. The menu keeps ROLES.line. She does not recite the poster. */
+export function roleMouth(role: RoleId): string {
+  if (role === "promoted") return "The title is new. The hiss is not. I am listening for the catch.";
+  if (role === "military") return "The catch is the order here. Not the rank.";
+  if (role === "veteran") return "You have seen a hide. I am watching whether you do it again.";
+  return "New site. I'll know you by what you say out loud.";
+}
+
 export const NPCS: Record<NpcId, NpcDef> = {
   mabel: {
     id: "mabel",
@@ -504,12 +512,20 @@ export function talkLines(
   const hid = anyHid(residue) || !!flags.hid || !!flags.catchMiss;
   if (npc === "mabel") {
     if (!first) {
+      const caughtWeek = residue.valve === "caught" || residue.tag === "caught" || residue.dose === "caught" || residue.log === "caught";
       const lines: Line[] = [
-        { speaker: "Mabel", text: hid ? "You left a lie on the glass. I watched you not sit with it." : "The chair remembers who used the cup as courage.", mood: hid ? "sharp" : "warm" },
+        {
+          speaker: "Mabel",
+          text: hid
+            ? "You left a lie on the glass. I watched you not sit with it."
+            : day >= 3 && caughtWeek
+              ? "You sat with the last one. The kettle is still on."
+              : "The chair remembers who used the cup as courage.",
+          mood: hid ? "sharp" : "warm",
+        },
       ];
       if (day === 2 && role && !flags.roleHeard) {
-        const heard = ROLES.find((r) => r.id === role);
-        if (heard) lines.push({ speaker: "Mabel", text: heard.line, mood: "even" });
+        lines.push({ speaker: "Mabel", text: roleMouth(role), mood: "even" });
       } else if (!hid) {
         lines.push({
           speaker: "Mabel",
@@ -556,7 +572,11 @@ export function talkLines(
   if (npc === "elena") {
     if (!first) {
       if (residue.valve === "hid") return [{ speaker: "Elena", text: "I'm still looking at the van.", mood: "even" }];
-      if (residue.valve === "caught" || flags.elenaSecondEyes) return [{ speaker: "Elena", text: "I saw your hands. I'll back that catch.", mood: "soft" }];
+      if (residue.valve === "caught" || flags.elenaSecondEyes) {
+        const lines: Line[] = [{ speaker: "Elena", text: "I saw your hands. I'll back that catch.", mood: "soft" }];
+        if (day >= 2) lines.push({ speaker: "Elena", text: "I am not looking at the van anymore.", mood: "soft" });
+        return lines;
+      }
       return [{ speaker: "Elena", text: "Stand where I can see your hands.", mood: "even" }];
     }
     return [
@@ -567,7 +587,11 @@ export function talkLines(
   }
   if (npc === "tommy") {
     if (!first) {
-      if (residue.tag === "caught") return [{ speaker: "Tommy", text: "The tag is down. Pump two can stay quiet.", mood: "even" }];
+      if (residue.tag === "caught") {
+        const lines: Line[] = [{ speaker: "Tommy", text: "The tag is down. Pump two can stay quiet.", mood: "even" }];
+        if (day >= 3) lines.push({ speaker: "Tommy", text: "You can ask for the wrench.", mood: "even" });
+        return lines;
+      }
       if (residue.tag === "hid") return [{ speaker: "Tommy", text: "IN SERVICE is still on the flange.", mood: "sharp" }];
       if (day === 2) return [{ speaker: "Tommy", text: "Pump 2A. The hunt is on the board.", mood: "sharp" }];
       return [{ speaker: "Tommy", text: "Finish the sentence before you ask me for a wrench.", mood: "even" }];
@@ -580,7 +604,15 @@ export function talkLines(
   }
   if (npc === "marcus") {
     if (!first) {
-      if (residue.dose === "caught") return [{ speaker: "Marcus", text: "You said forty out loud. That is the number.", mood: "tired" }];
+      if (residue.dose === "caught") {
+        const lines: Line[] = [{ speaker: "Marcus", text: "You said forty out loud. That is the number.", mood: "tired" }];
+        lines.push({
+          speaker: "Marcus",
+          text: day >= 4 ? "I will turn around for the next one." : "I turned. That was the number, not me.",
+          mood: "tired",
+        });
+        return lines;
+      }
       if (residue.dose === "hid") return [{ speaker: "Marcus", text: "The sticker still says 40. I am not turning around.", mood: "sharp" }];
       return [{ speaker: "Marcus", text: "Say the number before you defend it.", mood: "even" }];
     }
@@ -593,7 +625,11 @@ export function talkLines(
   if (npc === "priya") {
     if (!first) {
       if (anyHid(residue)) return [{ speaker: "Priya", text: "I will not sign. The rail is empty.", mood: "sharp" }];
-      if (day >= 5) return [{ speaker: "Priya", text: "I will walk that peak to the rail.", mood: "soft" }];
+      if (day >= 5) {
+        const lines: Line[] = [{ speaker: "Priya", text: "I will walk that peak to the rail.", mood: "soft" }];
+        if (flags.shuffle) lines.push({ speaker: "Priya", text: "You stood next to the tank. So will I.", mood: "soft" });
+        return lines;
+      }
       if (flags.physMcHeld) return [{ speaker: "Priya", text: "You ran analog MC. k ± σ. The bank is the clock. OpenMC stays a letter, and I still will not sign a peak I have not walked.", mood: "soft" }];
       if (flags.physPlayed) return [{ speaker: "Priya", text: "You watched the pin. Leakage is the last two doors. Teaching analog — not a license.", mood: "even" }];
       return [{ speaker: "Priya", text: "The sheet is still a rumor until you stand next to the tank.", mood: "even" }];
@@ -605,8 +641,12 @@ export function talkLines(
     ];
   }
   if (!first) {
-    if (hid) return [{ speaker: "Jordan", text: "Distance.", mood: "even" }];
-    if (flags.peered || flags.jordanCredit) return [{ speaker: "Jordan", text: "The catch was said. The chair is yours.", mood: "soft" }];
+    if (hid) return [{ speaker: "Jordan", text: day >= 4 ? "Distance. The chair stayed empty." : "Distance.", mood: "even" }];
+    if (flags.peered || flags.jordanCredit) {
+      const lines: Line[] = [{ speaker: "Jordan", text: "The catch was said. The chair is yours.", mood: "soft" }];
+      if (day >= 3 && !anyHid(residue)) lines.push({ speaker: "Jordan", text: "I'll sit the same row.", mood: "soft" });
+      return lines;
+    }
     return [{ speaker: "Jordan", text: "Say the catch out here.", mood: "even" }];
   }
   return [

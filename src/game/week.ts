@@ -231,7 +231,7 @@ export function shoreLine(ended: "a" | "c" | null, residue: Residue, shuffleDone
   if (residue.tag === "caught") names.push("Tommy");
   if (residue.dose === "caught") names.push("Marcus");
   if (shuffleDone && !anyHid(residue)) names.push("Priya");
-  return `${names.join(", ")} came to the shore. The floor held because they saw the catches.`;
+  return `${names.join(", ")} came to the shore. They turned to look at you.`;
 }
 
 /** Yesterday's last catch or hide, for the morning brief. Names the object that is still in the room. */
@@ -273,17 +273,19 @@ export function occupancyOverlay(
   shuffleDone: boolean,
   elenaSecondEyes: boolean,
 ): NpcSlot | undefined {
-  if (ending) return duskPost(id, residue, ended, shuffleDone, elenaSecondEyes) ?? OFFSTAGE;
+  if (ending) return duskPost(id, residue, ended, shuffleDone, elenaSecondEyes) ?? away(id);
   if (id === "jordan" && anyHid(residue)) return { room: "breakroom", x: 248, y: 160, face: "right", radius: 12 };
   if (day === 1 && id === "elena") {
-    if (residue.valve === "caught") return { room: "gate", x: 368, y: 248, face: "left", radius: 12 };
+    if (residue.valve === "caught") return { room: "gate", x: 400, y: 248, face: "right", radius: 12 };
     return { room: "gate", x: 220, y: 248, face: "right", radius: 12 };
   }
   if (day === 2 && id === "tommy") {
-    return { room: "maintenance", x: 208, y: 160, face: residue.tag === "caught" ? "down" : "up", radius: 12 };
+    if (residue.tag === "caught") return { room: "maintenance", x: 208, y: 220, face: "down", radius: 12 };
+    return { room: "maintenance", x: 208, y: 160, face: "up", radius: 12 };
   }
   if (day === 3 && id === "marcus") {
-    return { room: "maintenance", x: 232, y: 168, face: residue.dose === "caught" ? "left" : "up", radius: 12 };
+    if (residue.dose === "caught") return { room: "maintenance", x: 140, y: 200, face: "left", radius: 12 };
+    return { room: "maintenance", x: 232, y: 168, face: "up", radius: 12 };
   }
   if (day === 4 && id === "holt") {
     if (residue.log === "caught") return { room: "control", x: 112, y: 140, face: "up", radius: 12 };
@@ -295,7 +297,16 @@ export function occupancyOverlay(
   return undefined;
 }
 
-const OFFSTAGE: NpcSlot = { room: "engineering", x: 96, y: 160, face: "down", radius: 12 };
+/** Not on the lot. One person, their own room, not a pile. */
+function away(id: NpcId): NpcSlot {
+  if (id === "holt") return { room: "control", x: 120, y: 140, face: "up", radius: 12 };
+  if (id === "tommy") return { room: "maintenance", x: 180, y: 160, face: "up", radius: 12 };
+  if (id === "marcus") return { room: "engineering", x: 160, y: 150, face: "down", radius: 12 };
+  if (id === "priya") return { room: "engineering", x: 240, y: 150, face: "left", radius: 12 };
+  if (id === "jordan") return { room: "breakroom", x: 140, y: 150, face: "left", radius: 12 };
+  if (id === "elena") return { room: "cafe", x: 96, y: 180, face: "right", radius: 12 };
+  return { room: "cafe", x: 210, y: 150, face: "down", radius: 12 };
+}
 
 function duskPost(id: NpcId, residue: Residue, ended: "a" | "c" | null, shuffleDone: boolean, elenaSecondEyes: boolean): NpcSlot | undefined {
   const hid = anyHid(residue);
@@ -304,12 +315,12 @@ function duskPost(id: NpcId, residue: Residue, ended: "a" | "c" | null, shuffleD
     if (id === "jordan") return { room: "gate", x: 1224, y: 172, face: "right", radius: 12 };
     return undefined;
   }
-  if (id === "mabel") return { room: "gate", x: 1058, y: 172, face: "up", radius: 12 };
-  if (id === "holt" && residue.log === "caught") return { room: "gate", x: 1094, y: 172, face: "up", radius: 12 };
-  if (id === "elena" && (residue.valve === "caught" || elenaSecondEyes)) return { room: "gate", x: 1130, y: 172, face: "up", radius: 12 };
-  if (id === "jordan" && !hid) return { room: "gate", x: 1166, y: 172, face: "up", radius: 12 };
-  if (id === "tommy" && residue.tag === "caught") return { room: "gate", x: 1202, y: 172, face: "up", radius: 12 };
-  if (id === "marcus" && residue.dose === "caught") return { room: "gate", x: 1230, y: 172, face: "up", radius: 12 };
-  if (id === "priya" && shuffleDone && !hid) return { room: "gate", x: 1112, y: 142, face: "up", radius: 12 };
+  if (id === "mabel") return { room: "gate", x: 1058, y: 172, face: "down", radius: 12 };
+  if (id === "holt" && residue.log === "caught") return { room: "gate", x: 1094, y: 172, face: "down", radius: 12 };
+  if (id === "elena" && (residue.valve === "caught" || elenaSecondEyes)) return { room: "gate", x: 1130, y: 172, face: "down", radius: 12 };
+  if (id === "jordan" && !hid) return { room: "gate", x: 1166, y: 172, face: "down", radius: 12 };
+  if (id === "tommy" && residue.tag === "caught") return { room: "gate", x: 1202, y: 172, face: "down", radius: 12 };
+  if (id === "marcus" && residue.dose === "caught") return { room: "gate", x: 1230, y: 172, face: "down", radius: 12 };
+  if (id === "priya" && shuffleDone && !hid) return { room: "gate", x: 1112, y: 142, face: "down", radius: 12 };
   return undefined;
 }

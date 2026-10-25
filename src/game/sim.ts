@@ -6,7 +6,6 @@ import {
   INTRO,
   NPCS,
   NPC_SCHEDULE,
-  ROLES,
   ROOMS,
   clockLabel,
   emptyResidue,
@@ -14,6 +13,7 @@ import {
   periodFromMinutes,
   periodLabel,
   residueKey,
+  roleMouth,
   talkLines,
   anyHid,
   type Choice,
@@ -29,7 +29,7 @@ import {
 import { RADIUS, SPEED, WALL } from "./const";
 import { type PlantDesign, type ShuffleCell } from "./plant";
 import { DEFAULT_PLAYER_LOOK, type PlayerLook } from "./artSpec";
-import { INCIDENTS, occupancyOverlay, dayDef, COMMUTE_SPAWN, DUSK_SPAWN, type WeekLogEntry } from "./week";
+import { INCIDENTS, occupancyOverlay, dayDef, shoreLine, COMMUTE_SPAWN, DUSK_SPAWN, type WeekLogEntry } from "./week";
 import { writeSave, wipeSave } from "./save";
 import { playCatch, playDoor, playFoot, playHide, playReport, playSit, playStand, playTalk } from "./audio";
 import { isRevealing, requestSkip } from "./chatter";
@@ -583,9 +583,10 @@ export function addMinutes(s: GameState, n: number) {
 export function refreshObjective(s: GameState) {
   const d = dayDef(s.day);
   if (s.flags.endingWalk) {
-    s.objective = s.closePrompt
-      ? "The week can close. The stack is still breathing."
-      : "Walk the lot. Lake north. The stack is still breathing.";
+    const who = s.ended === "a"
+      ? shoreLine(s.ended, s.residue, s.shuffleDone, !!s.flags.elenaSecondEyes)
+      : "Only Mabel and Jordan are on the shore. They are not looking at you.";
+    s.objective = s.closePrompt ? who : `${who} Walk once.`;
     return;
   }
   if (s.day === 5 && !s.shuffleDone) {
@@ -824,7 +825,7 @@ export function beginEndingWalk(s: GameState) {
   s.announce = "Dusk · Lot";
   s.announceT = 2.6;
   s.objective = "Walk the lot. Lake north. The stack is still breathing.";
-  pushMsg(s, s.ended === "a" ? "The stack is still breathing. Walk once. Lake north." : "The lot is quiet. The hiss is not. Walk once.");
+  pushMsg(s, s.ended === "a" ? "They came. Walk once. Lake north." : "Only Mabel and Jordan. They are not looking at you.");
 }
 export function nextDay(s: GameState) {
   if (s.day >= 5) {
@@ -837,8 +838,7 @@ export function nextDay(s: GameState) {
 export function openTalk(s: GameState, npc: NpcId) {
   s.dialogue = talkLines(npc, s.flags, s.culture, s.period, s.day, s.role, s.residue, !!s.flags.endingWalk, s.ended);
   if (npc === "mabel" && s.day === 2 && s.role) {
-    const heard = ROLES.find((r) => r.id === s.role);
-    if (heard && s.dialogue.some((l) => l.text === heard.line)) s.flags.roleHeard = true;
+    if (s.dialogue.some((l) => l.text === roleMouth(s.role as RoleId))) s.flags.roleHeard = true;
   }
   s.dialogueI = 0;
   s.mode = "dialogue";

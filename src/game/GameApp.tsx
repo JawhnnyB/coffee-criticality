@@ -861,10 +861,10 @@ export function GameApp() {
             <div key={s.day} className="flex w-full flex-col items-center">
               <p className="font-display text-xs uppercase tracking-[0.18em] text-accent">{dayDef(s.day).kicker}</p>
               <h2 className="font-display mt-3 max-w-lg text-3xl leading-tight text-fg">{dayDef(s.day).title}</h2>
-              <Chatter text={dayDef(s.day).holt} voice="holt" className="dialogue-line mt-3 max-w-md text-sm leading-relaxed text-muted" />
               {yesterdayLine(s.day, s.weekLog, s.residue) ? (
-                <p className="mt-3 max-w-md text-sm leading-relaxed text-subtle">{yesterdayLine(s.day, s.weekLog, s.residue)}</p>
+                <p className="mt-4 max-w-md font-display text-lg leading-snug text-fg">{yesterdayLine(s.day, s.weekLog, s.residue)}</p>
               ) : null}
+              <Chatter text={dayDef(s.day).holt} voice="holt" className="dialogue-line mt-3 max-w-md text-sm leading-relaxed text-muted" />
               <ul className="mt-4 max-w-md space-y-1.5 text-left text-sm leading-relaxed text-subtle">
                 {dayDef(s.day).items.map((item) => (
                   <li key={item}>{item}</li>
@@ -1398,7 +1398,7 @@ export function GameApp() {
               <p className="mt-3 text-sm leading-relaxed">
                 {s.ended === "a"
                   ? shoreLine(s.ended, s.residue, s.shuffleDone, !!s.flags.elenaSecondEyes)
-                  : "The shore is empty except Mabel and Jordan. The hiss kept talking. The lot is quiet. The plant is not."}
+                  : "The shore is empty except Mabel and Jordan. They are not looking at you. The hiss kept talking."}
               </p>
               {s.weekLog.length > 0 ? (
                 <ul className="mt-3 space-y-1 text-left text-[12px] leading-relaxed text-[#3a2818]" data-testid="week-log-ending">
@@ -1407,10 +1407,6 @@ export function GameApp() {
                   ))}
                 </ul>
               ) : null}
-              <p className="mt-3 text-sm leading-relaxed text-[#6a4a32]">
-                Every plant, every person, every kid needs an environment that lets them thrive. Be allowed to err.
-                Grow into who you need to be. Reach criticality surrounded by those who love you enough to catch you.
-              </p>
               <p className="mt-3 text-[11px] text-[#8a7864]">Teaching model — not a license. Catch greater than heroics.</p>
               <div className="mt-5 flex flex-col gap-2">
                 <button
