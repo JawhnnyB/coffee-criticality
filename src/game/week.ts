@@ -23,8 +23,8 @@ export interface WeekLogEntry {
 
 /** Days 2–5: on the lot, east of the cafe door and west of the van, facing the hall. */
 export const COMMUTE_SPAWN = { room: "gate" as const, x: 240, y: 200, facing: "right" as const };
-/** Friday close: east shore, facing the lake. The stacks are further east. */
-export const DUSK_SPAWN = { room: "gate" as const, x: 1100, y: 180, facing: "up" as const };
+/** Friday close: the alley west of the shore, looking up at the people. Not in the row. */
+export const DUSK_SPAWN = { room: "gate" as const, x: 1072, y: 216, facing: "up" as const };
 
 export const WEEK: DayDef[] = [
   {
@@ -134,13 +134,13 @@ export const INCIDENTS: Record<
     title: "Valve 14 does not match the paper",
     body: "Board A shows 14-B OPEN. The paper log initials 14-R CLOSED. Steam is talking in Maintenance. The easy path is to initial the paper and keep walking. That is how quiet plants fail.",
     report: "You write it up with your ugly handwriting and a time. Uncomfortable. Correct. The board now agrees with the paper.",
-    peer: "You pull Elena in. Two sets of eyes. The tag is wrong; the catch is shared. She mutters 'thank you' like it costs her, which means it is real.",
+    peer: "You pull Elena in. Two sets of eyes. The board now agrees with the paper.",
     hide: "The log looks like church. The hiss in Maintenance does not care. Hide paths grow later, in people you like.",
   },
   lockout: {
     title: "Pump 2A reads IN SERVICE",
     body: "Tommy's board has two LOTOTO tags and one IN SERVICE hung on a pump that is supposed to be dead. Someone will call it a leftover. Leftovers spin.",
-    report: "You log the wrong tag. Tommy initials next to you without making a speech. That is respect.",
+    report: "You log the wrong tag. Tommy's initials land next to yours. The tag comes down.",
     peer: "You and Tommy hang the lockout together. Two sets of eyes. The pump stays quiet on purpose.",
     hide: "You leave IN SERVICE up. The pump looks busy. So does the next mistake.",
   },
@@ -148,14 +148,14 @@ export const INCIDENTS: Record<
     title: "Area sticker says 40 mSv/h",
     body: "The other stickers say 0.04. A decimal walked. Marcus will want it to be print. Print still shines.",
     report: "You write 40 mSv/h with a circle around the decimal. ALARA is a verb today.",
-    peer: "Elena looks once and swears under her breath. Shared catch. You both step back from the shine.",
+    peer: "Shared catch. The sticker stays 40 until the board says 0.04.",
     hide: "You stick a new label over it. The shine does not care about paper.",
   },
   log: {
     title: "The shift log has no initials",
     body: "Times. Valves. A blank where a person should be. An unsigned log is a room pretending it was empty.",
     report: "You refuse to initial someone else's blank. Holt gets a sentence with a time on it.",
-    peer: "You find Elena. She laughs once, no humor, and signs what she actually did. The blank dies.",
+    peer: "You find Elena. She signs what she actually did. The blank gets a real line.",
     hide: "You initial it because the line looks lonely. Lonely lines become incidents with your name already on them.",
   },
 };
@@ -275,22 +275,14 @@ export function occupancyOverlay(
 ): NpcSlot | undefined {
   if (ending) return duskPost(id, residue, ended, shuffleDone, elenaSecondEyes) ?? away(id);
   if (id === "jordan" && anyHid(residue)) return { room: "breakroom", x: 248, y: 160, face: "right", radius: 12 };
-  if (day === 1 && id === "elena") {
-    if (residue.valve === "caught") return { room: "gate", x: 400, y: 248, face: "right", radius: 12 };
-    return { room: "gate", x: 220, y: 248, face: "right", radius: 12 };
-  }
-  if (day === 2 && id === "tommy") {
-    if (residue.tag === "caught") return { room: "maintenance", x: 208, y: 220, face: "down", radius: 12 };
-    return { room: "maintenance", x: 208, y: 160, face: "up", radius: 12 };
-  }
-  if (day === 3 && id === "marcus") {
-    if (residue.dose === "caught") return { room: "maintenance", x: 140, y: 200, face: "left", radius: 12 };
-    return { room: "maintenance", x: 232, y: 168, face: "up", radius: 12 };
-  }
-  if (day === 4 && id === "holt") {
-    if (residue.log === "caught") return { room: "control", x: 112, y: 140, face: "up", radius: 12 };
-    return { room: "control", x: 140, y: 236, face: "up", radius: 12 };
-  }
+  if (id === "elena" && residue.valve === "caught") return { room: "gate", x: 400, y: 248, face: "right", radius: 12 };
+  if (id === "elena" && (residue.valve === "hid" || day === 1)) return { room: "gate", x: 220, y: 248, face: "right", radius: 12 };
+  if (id === "tommy" && residue.tag === "caught") return { room: "maintenance", x: 208, y: 220, face: "down", radius: 12 };
+  if (id === "tommy" && (residue.tag === "hid" || day === 2)) return { room: "maintenance", x: 208, y: 160, face: "up", radius: 12 };
+  if (id === "marcus" && residue.dose === "caught") return { room: "maintenance", x: 140, y: 200, face: "left", radius: 12 };
+  if (id === "marcus" && (residue.dose === "hid" || day === 3)) return { room: "maintenance", x: 232, y: 168, face: "up", radius: 12 };
+  if (id === "holt" && residue.log === "caught") return { room: "control", x: 112, y: 140, face: "up", radius: 12 };
+  if (id === "holt" && (residue.log === "hid" || day === 4)) return { room: "control", x: 140, y: 236, face: "up", radius: 12 };
   if (day === 5 && id === "priya" && shuffleDone && !anyHid(residue)) {
     return { room: "reactor", x: 88, y: 196, face: "up", radius: 12 };
   }

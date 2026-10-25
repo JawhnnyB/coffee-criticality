@@ -29,7 +29,7 @@ import {
 import { RADIUS, SPEED, WALL } from "./const";
 import { type PlantDesign, type ShuffleCell } from "./plant";
 import { DEFAULT_PLAYER_LOOK, type PlayerLook } from "./artSpec";
-import { INCIDENTS, occupancyOverlay, dayDef, shoreLine, COMMUTE_SPAWN, DUSK_SPAWN, type WeekLogEntry } from "./week";
+import { INCIDENTS, occupancyOverlay, dayDef, COMMUTE_SPAWN, DUSK_SPAWN, type WeekLogEntry } from "./week";
 import { writeSave, wipeSave } from "./save";
 import { playCatch, playDoor, playFoot, playHide, playReport, playSit, playStand, playTalk } from "./audio";
 import { isRevealing, requestSkip } from "./chatter";
@@ -583,10 +583,9 @@ export function addMinutes(s: GameState, n: number) {
 export function refreshObjective(s: GameState) {
   const d = dayDef(s.day);
   if (s.flags.endingWalk) {
-    const who = s.ended === "a"
-      ? shoreLine(s.ended, s.residue, s.shuffleDone, !!s.flags.elenaSecondEyes)
-      : "Only Mabel and Jordan are on the shore. They are not looking at you.";
-    s.objective = s.closePrompt ? who : `${who} Walk once.`;
+    s.objective = s.ended === "a"
+      ? (s.closePrompt ? "They turned to look at you." : "They came. Walk once.")
+      : (s.closePrompt ? "They are not looking at you." : "Walk the empty shore.");
     return;
   }
   if (s.day === 5 && !s.shuffleDone) {
@@ -622,10 +621,6 @@ export function refreshObjective(s: GameState) {
     s.objective = "Meet the floor — Elena, Tommy, Priya, Marcus, Jordan.";
     return;
   }
-  if (!s.flags.academy && !s.flags.trainer && s.day <= 2) {
-    s.objective = "Academy in Control, or Priya's ΔT bench in Engineering.";
-    return;
-  }
   if (d.incident && !s.incidentResolved) {
     const job =
       d.incident === "valve"
@@ -640,6 +635,10 @@ export function refreshObjective(s: GameState) {
   }
   if (s.day === 2 && !s.maintDone) {
     s.objective = "Hang the lockout on Tommy's board.";
+    return;
+  }
+  if (!s.flags.academy && !s.flags.trainer && s.day <= 2) {
+    s.objective = "Academy in Control, or Priya's ΔT bench in Engineering.";
     return;
   }
   if (s.period !== "afternoon") {
@@ -700,6 +699,10 @@ export function applyTransition(s: GameState) {
 }
 /** Pause-map hop. Fades to black, then arrives. Only rooms you have stood in. */
 export function travelTo(s: GameState, to: RoomId) {
+  if (s.flags.endingWalk) {
+    pushMsg(s, "The shore is the week. The plant can wait.");
+    return;
+  }
   if (s.mode !== "pause" && s.mode !== "play") return;
   if (s.mapHop || s.pendingRoom) return;
   if (to === s.room) {
@@ -1429,6 +1432,7 @@ export function movePlayer(s: GameState, a: Actions, dt: number) {
   if (s.doorCd > 0) return;
   const room = ROOMS[s.room];
   for (const d of room.doors) if (overlap(s.x, s.y, 8, d.rect)) {
+    if (s.flags.endingWalk) break;
     beginTransition(s, d.to, spawnInside(d.to, s.room), facingOut(s.room, d.to));
     break;
   }
