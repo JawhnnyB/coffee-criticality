@@ -265,13 +265,13 @@ export const NPCS: Record<NpcId, NpcDef> = {
 };
 
 export const NPC_INTRO: Record<NpcId, { who: string; meet: string; beat: string }> = {
-  mabel: { who: "Dr. Mabel Quinn. Retired floor manager. Doctorate steel, grandma warmth. The cafe is the last board she still touches — kettle, cabinet, and the rule on the wall.", meet: NPCS.mabel.meet, beat: "Kettle. Cabinet. Catch." },
-  holt: { who: "Mr. Reginald Holt. Director. He funds reviews, not mythology.", meet: NPCS.holt.meet, beat: "Volume. Not a speech." },
-  elena: { who: "Elena Voss. Shift supervisor. Child seat. Cold coffee. She was here before dawn.", meet: NPCS.elena.meet, beat: "Two sets of eyes." },
-  tommy: { who: "Tommy Reyes. Maintenance. LOTOTO is a sentence he will make you finish.", meet: NPCS.tommy.meet, beat: "Finish the sentence." },
-  marcus: { who: "Marcus Hale. Senior engineer. Youngest senior on this floor once — that is not a compliment. Identity built on never being wrong in public.", meet: NPCS.marcus.meet, beat: "Two instruments." },
-  priya: { who: "Dr. Priya Sharma. Reactor engineering. Still walks the floor. A peak on a screen is a rumor until she has stood next to the tank.", meet: NPCS.priya.meet, beat: "Heat has to leave." },
-  jordan: { who: "Jordan Peck. Floor tech. Notices who shares a win.", meet: NPCS.jordan.meet, beat: "Share a catch." },
+  mabel: { who: "She poured before you spoke. Chalk only moves for a catch.", meet: NPCS.mabel.meet, beat: "Cup, then chalk." },
+  holt: { who: "He funds the line. He will not fund the introduction.", meet: NPCS.holt.meet, beat: "Ink already spent." },
+  elena: { who: "She places boots. The van door has been open since before dawn.", meet: NPCS.elena.meet, beat: "The van counts too." },
+  tommy: { who: "He talks to flanges. People get the short version.", meet: NPCS.tommy.meet, beat: "Dead flange." },
+  marcus: { who: "Youngest senior once. He still won't turn for a soft number.", meet: NPCS.marcus.meet, beat: "The ugly number." },
+  priya: { who: "A peak is a rumor until her shoes are next to the tank.", meet: NPCS.priya.meet, beat: "Feet, then the peak." },
+  jordan: { who: "He remembers who said the win where the door could hear it.", meet: NPCS.jordan.meet, beat: "The door keeps score." },
 };
 
 function slot(room: RoomId, x: number, y: number): NpcSlot {
@@ -559,10 +559,10 @@ export function talkLines(
       return lines;
     }
     return [
-      { speaker: "Mabel", text: "Sit. Two-to-ten left this chair warm. I'm Mabel Quinn. I ran this floor twenty years.", mood: "warm" },
-      { speaker: "Mabel", text: "I don't ask the board anymore. I watch who won't sit. The kettle is the last board I still touch.", mood: "soft" },
-      { speaker: "Mabel", text: "Don't use the cup as courage. North wall is Unit 1. South is the parlor. Same bezel. I chalk who says the catch out loud.", mood: "even" },
-      { speaker: "Mabel", text: "What do you need?",
+      { speaker: "Mabel", text: "Cup's poured. Sit before the name.", mood: "warm" },
+      { speaker: "Mabel", text: "Badges stay on the lanyard. I watch the cup.", mood: "soft" },
+      { speaker: "Mabel", text: "Chalk's for a catch said in this room. Pockets don't get a mark.", mood: "even" },
+      { speaker: "Mabel", text: "Coffee, or the chalk?",
         choices: [
           { id: "mabel-sit", label: "Just the coffee.", reply: "On the house. The night shift already paid for the heat. Don't use it as courage.", trust: 2, culture: 1 },
           { id: "mabel-catch", label: "Who won't sit?", reply: "The ones carrying a catch in their pocket. Eyes first. Clock second. I'll chalk the score.", flag: "arcade" },
@@ -601,9 +601,9 @@ export function talkLines(
       ];
     }
     return [
-      { speaker: "Holt", text: "Reginald Holt. You designed the core. I did not ask you to narrate it.", mood: "sharp" },
-      { speaker: "Holt", text: "Unit 1 is already lit. I fund a review when the volume is a catch. Not a speech.", mood: "even" },
-      { speaker: "Holt", text: "My hand stays off the log. I'll read the line you stood next to. Day one is not a duel.", mood: "sharp" },
+      { speaker: "Holt", text: "Skip the hello. The org chart already spent the ink.", mood: "sharp" },
+      { speaker: "Holt", text: "I buy a catch. I do not buy the person telling it.", mood: "even" },
+      { speaker: "Holt", text: "Bring a line. Leave the speech in the hall.", mood: "sharp" },
     ];
   }
   if (npc === "elena") {
@@ -632,9 +632,9 @@ export function talkLines(
       ];
     }
     return [
-      { speaker: "Elena", text: "Elena Voss. The van was here before dawn. Door's still open.", mood: "even" },
-      { speaker: "Elena", text: "Look at the child seat, not at me. Cold. I will back a catch if you stand where I can see your hands.", mood: "soft" },
-      { speaker: "Elena", text: "Child seat first. Then I was here. Two sets of eyes, or it isn't a catch.", mood: "even" },
+      { speaker: "Elena", text: "Boots on the paint. I don't do doorways.", mood: "even" },
+      { speaker: "Elena", text: "Cupholder's cold. The door is open for the lot, not for you.", mood: "soft" },
+      { speaker: "Elena", text: "Both hands where the van can see them. Then it's a catch.", mood: "even" },
     ];
   }
   if (npc === "tommy") {
@@ -669,9 +669,9 @@ export function talkLines(
       ];
     }
     return [
-      { speaker: "Tommy", text: "Tommy Reyes. Pump two. Say it. Isolate. Lock. Tag. Try.", mood: "even" },
-      { speaker: "Tommy", text: "The IN SERVICE card does not get to stay on a dead pump. No tag, and the pump still thinks your hands are on it.", mood: "sharp" },
-      { speaker: "Tommy", text: "Finish the sentence out loud. Then the wrench. That's how I keep a hand.", mood: "even" },
+      { speaker: "Tommy", text: "Pump two's dressed for a shift it isn't working.", mood: "even" },
+      { speaker: "Tommy", text: "IN SERVICE. Zip-tied to a dead flange. Rude.", mood: "sharp" },
+      { speaker: "Tommy", text: "Four words. Isolate, lock, tag, try. I'm not your audience.", mood: "even" },
     ];
   }
   if (npc === "marcus") {
@@ -704,9 +704,9 @@ export function talkLines(
       ];
     }
     return [
-      { speaker: "Marcus", text: "Marcus Hale. Left gauge. I trust the one under my hand, not the one on the wall.", mood: "tired" },
-      { speaker: "Marcus", text: "I was the youngest senior on this floor. That is not a compliment. I was wrong here once. Out loud.", mood: "sharp" },
-      { speaker: "Marcus", text: "Say the number before you defend it. Data, not the story that keeps me looking senior.", mood: "even" },
+      { speaker: "Marcus", text: "Stay on that side of the bench. I'm not turning for a name.", mood: "tired" },
+      { speaker: "Marcus", text: "Wall gauge is the crowd. The one under my hand is the work.", mood: "sharp" },
+      { speaker: "Marcus", text: "I missed once. Out loud. Don't dress the next number up.", mood: "even" },
     ];
   }
   if (npc === "priya") {
@@ -733,9 +733,9 @@ export function talkLines(
       ];
     }
     return [
-      { speaker: "Priya", text: "Priya Sharma. I still walk the floor. A peak on a screen is a rumor until you have stood next to the tank.", mood: "soft" },
-      { speaker: "Priya", text: "You signed Unit 1. I will not sign a peak I cannot walk. Come to the rail before you call it yours.", mood: "even" },
-      { speaker: "Priya", text: "The stack can look dark from the cafe. The heat still has to leave. Teaching model — not a license.", mood: "soft" },
+      { speaker: "Priya", text: "No handshake. A schematic doesn't have a pulse.", mood: "soft" },
+      { speaker: "Priya", text: "A signature from a chair. The tank didn't feel it.", mood: "even" },
+      { speaker: "Priya", text: "Stand at the metal. Heat leaves there. Not a license.", mood: "soft" },
     ];
   }
   if (!first) {
@@ -762,9 +762,9 @@ export function talkLines(
     ];
   }
   return [
-    { speaker: "Jordan", text: "Jordan Peck. I watch the door, not your face. Say the catch out here. Not in your pocket.", mood: "even" },
-    { speaker: "Jordan", text: "Three tiles off the hide. That was the deal. I remember who kept the win. Same row as me.", mood: "soft" },
-    { speaker: "Jordan", text: "Hide it and I want distance. Bowl after shift only if the catch is already said.", mood: "even" },
+    { speaker: "Jordan", text: "Door, then you. I like that order.", mood: "even" },
+    { speaker: "Jordan", text: "A win in a pocket doesn't get split. I don't do quiet credit.", mood: "soft" },
+    { speaker: "Jordan", text: "Say it where the door hears. Same row. Three tiles if you don't.", mood: "even" },
   ];
 }
 
