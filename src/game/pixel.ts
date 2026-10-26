@@ -71,7 +71,7 @@ function blitBody(
   playerLook?: PlayerLook,
   sitting = false,
 ) {
-  const idle = loadArt(`/art/gen/sprites/${who}_idle_32.png?v=soft7`);
+  const idle = loadArt(`/art/gen/sprites/${who}_idle_32.png?v=soft8`);
   if (!idle || idle.naturalWidth !== WALK_W || idle.naturalHeight !== WALK_H) return false;
   pix(ctx);
   const frame = moving && !sitting ? Math.floor(phase) % 4 : 0;
@@ -87,8 +87,8 @@ function blitBody(
   ctx.fill();
   ctx.restore();
 
-  const walk = loadArt(`/art/gen/sprites/${who}_walk4.png?v=soft7`);
-  const sit = loadArt(`/art/gen/sprites/${who}_sit.png?v=soft7`);
+  const walk = loadArt(`/art/gen/sprites/${who}_walk4.png?v=soft8`);
+  const sit = loadArt(`/art/gen/sprites/${who}_sit.png?v=soft8`);
   const hasWalk = !!(walk && walk.naturalWidth === 128 && walk.naturalHeight === 192);
   const hasSit = !!(sit && sit.naturalWidth === WALK_W && sit.naturalHeight === WALK_H);
   let src: CanvasImageSource = idle;
@@ -118,7 +118,7 @@ function blitBody(
 
   const blink = !moving && facing !== "up" && phase % 8 < 0.28;
   if (blink) {
-    fill(ctx, dx + 11, dy + (sitting ? 24 : 16), 10, 2, "rgba(22,17,13,0.85)");
+    fill(ctx, dx + 9, dy + (sitting ? 19 : 13), 14, 2, "rgba(62,40,32,0.8)");
   }
   return true;
 }
@@ -163,8 +163,8 @@ export function tintPlayer(im: HTMLImageElement, look: PlayerLook): CanvasImageS
     const r = d[i];
     const gv = d[i + 1];
     const b = d[i + 2];
-    if (isBlush(r, gv, b) || isFace(r, gv, b) || isEyePixel(r, gv, b)) continue;
-    // Shirt cluster first. Copper cloth also passes isWarmSkin, so it must win.
+    if (isBlush(r, gv, b)) continue;
+    // Shirt before the eye test. Copper cloth is red enough to look like an iris.
     if (py > 22 && py < 58 && near(r, gv, b, 223, 136, 66, 46)) {
       paint(d, i, hoodieL);
       continue;
@@ -173,13 +173,17 @@ export function tintPlayer(im: HTMLImageElement, look: PlayerLook): CanvasImageS
       paint(d, i, hoodie);
       continue;
     }
-    if (py > 22 && py < 58 && near(r, gv, b, 121, 74, 36, 55)) {
+    if (py > 22 && py < 58 && near(r, gv, b, 121, 74, 36, 70)) {
       paint(d, i, hoodieD);
       continue;
     }
+    if (isFace(r, gv, b) || isEyePixel(r, gv, b)) continue;
+    // Hair stays above the collar. Luminance keeps highlight and shade after recolor.
     if (py < 22 && max3(r, gv, b) > 42) {
-      const dark = r + gv + b < 150;
-      paint(d, i, dark ? hairD : hair);
+      const lum = r + gv + b;
+      if (lum < 125) paint(d, i, hairD);
+      else if (lum > 210) paint(d, i, shade(hair, 1.18));
+      else paint(d, i, hair);
     }
   }
   g.putImageData(img, 0, 0);
@@ -196,8 +200,10 @@ function isFace(r: number, g: number, b: number) {
 }
 
 function isEyePixel(r: number, g: number, b: number) {
-  if (Math.min(r, g, b) > 168) return true;
-  return r > 180 && g > 80 && b < 140 && r > g;
+  const hi = Math.max(r, g, b);
+  const lo = Math.min(r, g, b);
+  if (lo > 200 && hi - lo < 36) return true;
+  return hi < 48 && hi - lo < 22;
 }
 
 function paint(d: Uint8ClampedArray, i: number, rgb: [number, number, number]) {
