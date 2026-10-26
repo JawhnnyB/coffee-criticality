@@ -28,7 +28,7 @@ import {
 } from "./content";
 import { RADIUS, SPEED, WALL } from "./const";
 import { type PlantDesign, type ShuffleCell } from "./plant";
-import { DEFAULT_PLAYER_LOOK, type PlayerLook } from "./artSpec";
+import { DEFAULT_PLAYER_LOOK, PROP_NATIVE, type PlayerLook } from "./artSpec";
 import { INCIDENTS, occupancyOverlay, dayDef, incidentOwner, COMMUTE_SPAWN, DUSK_SPAWN, type WeekLogEntry } from "./week";
 import { writeSave, wipeSave } from "./save";
 import { playCatch, playDoor, playFoot, playHide, playReport, playSit, playStand, playTalk } from "./audio";
@@ -311,6 +311,19 @@ export function overlap(ax: number, ay: number, ar: number, r: Rect) {
   const dy = ay - ny;
   return dx * dx + dy * dy < ar * ar;
 }
+/** Pipes tile across the rect. Everything else is drawn bottom-centred at its native size. */
+const SPAN_PROP = new Set(["pipe_h", "pipe_run", "pipe_v", "railing", "crane", "water", "asphalt", "curb", "stripe", "fence", "roof", "stack"]);
+function propBoxes(p: { kind: string; rect: Rect; hit?: Rect[] }): Rect[] {
+  if (p.hit && p.hit.length) return p.hit;
+  const native = PROP_NATIVE[p.kind];
+  if (!native || SPAN_PROP.has(p.kind)) return [p.rect];
+  return [{
+    x: p.rect.x + Math.round((p.rect.w - native.w) / 2),
+    y: p.rect.y + p.rect.h - native.h,
+    w: native.w,
+    h: native.h,
+  }];
+}
 /** Doorways punch a walkable lane through the mural / outer walls. */
 export function inDoorLane(x: number, y: number, roomId: RoomId) {
   const room = ROOMS[roomId];
@@ -497,7 +510,7 @@ export function solidAt(x: number, y: number, s: GameState, roomId: RoomId = s.r
   if (floorKindAt(roomId, x, y) === "water") return true;
   for (const p of room.props) {
     if (p.block === false) continue;
-    const boxes = p.hit && p.hit.length ? p.hit : [p.rect];
+    const boxes = propBoxes(p);
     for (const box of boxes) if (overlap(x, y, 9, box)) return true;
   }
   if (hitPeople && roomId === s.room) for (const n of npcsHere(s)) {
@@ -1430,8 +1443,19 @@ export function movePlayer(s: GameState, a: Actions, dt: number) {
   if (!solidAt(nx, s.y, s)) s.x = nx;
   if (!solidAt(s.x, ny, s)) s.y = ny;
   if (s.x === ox && s.y === oy) {
-    if (!solidAt(nx, oy, s)) s.x = nx;
-    else if (!solidAt(ox, ny, s)) s.y = ny;
+    // A corner graze blocks the forward step. Slide off a prop when only one
+    // way around it is open. A long wall (both ways still blocked ahead) does
+    // not skate.
+    const horiz = Math.abs(mx) >= Math.abs(my);
+    const fwd: [number, number] = horiz ? [Math.sign(mx) * step, 0] : [0, Math.sign(my) * step];
+    const perp: Array<[number, number]> = horiz ? [[0, step], [0, -step]] : [[step, 0], [-step, 0]];
+    const open = perp.filter(([px, py]) => !solidAt(ox + px, oy + py, s));
+    const around = open.filter(([px, py]) => !solidAt(ox + px + fwd[0], oy + py + fwd[1], s));
+    const pick = around.length === 1 ? around[0] : open.length === 1 ? open[0] : null;
+    if (pick) {
+      s.x = ox + pick[0];
+      s.y = oy + pick[1];
+    }
   }
   if (s.doorCd > 0) return;
   const room = ROOMS[s.room];
