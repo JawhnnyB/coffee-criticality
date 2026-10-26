@@ -21,6 +21,7 @@ import {
   cultureStage,
   periodLabel,
   relationLine,
+  floorTies,
   trustState,
   type IntroBeat,
   type Period,
@@ -2166,6 +2167,7 @@ function PauseStage({
 }) {
   const [focus, setFocus] = useState<RoomId>(s.room);
   const here = npcsHere(s);
+  const ties = floorTies(s.residue, s.flags);
   const k = s.plant ? computeKeff(s.plant) : null;
   const visited = !!s.flags[`seen:${focus}`];
   return (
@@ -2221,7 +2223,7 @@ function PauseStage({
         </div>
         <div>
           <h2 className="font-display text-2xl">Relationships</h2>
-          <p className="mt-1 text-xs text-subtle">Hearts are trust. Departments move when people do.</p>
+          <p className="mt-1 text-xs text-subtle">Hearts are with you. The lines under the list are between them.</p>
           <div className="mt-3 space-y-2">
             {(Object.keys(NPCS) as NpcId[]).map((id) => {
               const met = !!s.flags[`${id}Talked`];
@@ -2243,6 +2245,18 @@ function PauseStage({
               );
             })}
           </div>
+          {ties.length === 0 ? (
+            <p className="mt-3 text-[11px] text-subtle">Meet two of them. The floor between them shows up here.</p>
+          ) : (
+            <ul className="mt-3 space-y-1" data-testid="floor-ties">
+              {ties.map((t) => (
+                <li key={t.pair} className="border border-border bg-surface px-2 py-1.5 text-[11px]">
+                  <div className="font-mono tracking-wide text-fg">{t.pair}</div>
+                  <div className="text-muted">{t.line}</div>
+                </li>
+              ))}
+            </ul>
+          )}
           <div className="mt-3 grid grid-cols-2 gap-2 text-[11px] text-muted">
             {DEPARTMENTS.map((d) => {
               const avg = d.members.reduce((n, id) => n + s.trust[id], 0) / d.members.length;

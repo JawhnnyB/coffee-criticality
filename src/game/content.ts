@@ -496,6 +496,84 @@ export function relationLine(id: NpcId, flags: Record<string, boolean>, trust: n
   return trustState(trust);
 }
 
+/** How two people stand with each other. Only after you have met both. Does not move trust. */
+export function floorTies(residue: Residue, flags: Record<string, boolean>): { pair: string; line: string }[] {
+  const met = (id: NpcId) => !!flags[`${id}Talked`];
+  const ties: { pair: string; line: string }[] = [];
+  const push = (a: NpcId, b: NpcId, pair: string, line: string) => {
+    if (met(a) && met(b)) ties.push({ pair, line });
+  };
+  const hid = anyHid(residue);
+
+  push(
+    "elena",
+    "jordan",
+    "Elena · Jordan",
+    hid
+      ? "Jordan took the far side. Elena is still counting hands."
+      : residue.valve === "caught"
+        ? "Elena saw the hands. Jordan will take the same row."
+        : "Elena wants the hands. Jordan wants it said at the door.",
+  );
+  push(
+    "mabel",
+    "jordan",
+    "Mabel · Jordan",
+    hid ? "Mabel watched the chair. Jordan left it." : "Mabel keeps the chalk. Jordan keeps the row.",
+  );
+  push(
+    "holt",
+    "elena",
+    "Holt · Elena",
+    residue.valve === "hid"
+      ? "Elena is on the van. Holt will not fund what she did not see."
+      : residue.valve === "caught"
+        ? "Elena saw the hands. Holt can read that line."
+        : "Elena has not called it. Holt has nothing to buy.",
+  );
+  push(
+    "mabel",
+    "elena",
+    "Mabel · Elena",
+    residue.valve === "caught"
+      ? "Elena left the van. Mabel can chalk the hands."
+      : residue.valve === "hid"
+        ? "Elena stayed on the van. Mabel watched you not sit."
+        : "Elena counts hands. Mabel waits for one said out loud.",
+  );
+  push(
+    "tommy",
+    "marcus",
+    "Tommy · Marcus",
+    residue.tag === "hid" || residue.dose === "hid"
+      ? "A lie is still on the wall. They will not dress it."
+      : residue.tag === "caught" && residue.dose === "caught"
+        ? "Tag down. Forty said. They will both turn."
+        : "Tommy wants the sentence. Marcus wants the number.",
+  );
+  push(
+    "priya",
+    "marcus",
+    "Priya · Marcus",
+    residue.dose === "hid"
+      ? "The sticker still says 40. Priya will not sign past it."
+      : residue.dose === "caught"
+        ? "Marcus said forty. Priya still wants the rail."
+        : "Marcus has not turned. Priya has not walked it.",
+  );
+  push(
+    "priya",
+    "holt",
+    "Priya · Holt",
+    hid
+      ? "Priya will not sign. Holt will not fund the blank."
+      : residue.log === "caught"
+        ? "Holt will read the line. Priya still walks it."
+        : "Holt wants a line. Priya wants feet on the metal.",
+  );
+  return ties;
+}
+
 export interface WeekVoice {
   catches: number;
   hides: number;
