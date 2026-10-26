@@ -144,7 +144,7 @@ export function MaintGame({
         ctx.lineTo(t.x + 8, t.y + t.h - 10);
         ctx.closePath();
         ctx.fill();
-        ctx.fillStyle = "#07140f";
+        ctx.fillStyle = "#2a2218";
         ctx.font = "8px monospace";
         ctx.fillText(t.lie ? "SVC" : t.label, t.x + 22, t.y + 24);
       }
@@ -153,7 +153,7 @@ export function MaintGame({
         ctx.fillStyle = `rgba(184,92,74,${flash * 0.4})`;
         ctx.fillRect(0, 0, W, H);
       }
-      ctx.fillStyle = "#07140f";
+      ctx.fillStyle = "#2a2218";
       ctx.fillRect(0, 0, W, 16);
       ctx.fillStyle = clock < 8 ? "#b85c4a" : "#f3e6d0";
       ctx.font = "8px monospace";

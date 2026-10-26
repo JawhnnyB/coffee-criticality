@@ -844,9 +844,9 @@ export const ROOMS: Record<RoomId, RoomDef> = {
     h: 40 * TILE,
     muralH: 48,
     art: "/art/gen/stills/glimpse_gate.png?v=eval1",
-    floor: "#2a2926",
+    floor: "#7aaa58",
     accent: "#c9a227",
-    grout: "#1a1916",
+    grout: "#5e8a40",
     tile: TILE,
     floorKind: "grass",
     floorPatches: [

@@ -141,9 +141,9 @@ function drawTiles(
 }
 
 function periodTint(period: GameState["period"], indoor: boolean): string {
-  if (period === "morning") return indoor ? "rgba(243,230,208,0.07)" : "rgba(243,230,208,0.08)";
+  if (period === "morning") return indoor ? "rgba(243,230,208,0.07)" : "rgba(243,230,208,0.10)";
   if (period === "midday") return "rgba(0,0,0,0)";
-  return indoor ? "rgba(18,16,14,0.16)" : "rgba(18,16,14,0.12)";
+  return indoor ? "rgba(90,48,28,0.08)" : "rgba(232,168,96,0.12)";
 }
 
 export function drawWorld(
@@ -199,9 +199,19 @@ export function drawWorld(
 
   drawTiles(g, room, s.period, camX - bw / 2, camY - bh / 2, bw, bh);
 
+  const outdoor = room.floorKind === "grass" || room.floorKind === "asphalt";
+  if (outdoor && (s.period === "afternoon" || s.flags.endingWalk)) {
+    const warm = g.createLinearGradient(0, 0, 0, WALL + 48);
+    const hot = s.flags.endingWalk ? 0.34 : 0.22;
+    warm.addColorStop(0, `rgba(255,186,96,${hot})`);
+    warm.addColorStop(0.55, `rgba(196,120,58,${hot * 0.45})`);
+    warm.addColorStop(1, "rgba(196,120,58,0)");
+    g.fillStyle = warm;
+    g.fillRect(0, 0, room.w, WALL + 48);
+  }
+
   fillEdge(g, room);
 
-  const outdoor = room.floorKind === "grass" || room.floorKind === "asphalt";
   if (outdoor) windMotes(g, room.w, room.h, now, WALL);
 
   for (const p of room.props) {
@@ -361,7 +371,11 @@ export function drawWorld(
   ctx.fillStyle = periodTint(s.period, room.floorKind !== "grass" && room.floorKind !== "asphalt");
   ctx.fillRect(0, 0, viewW, viewH);
   if (s.flags.endingWalk && (room.floorKind === "grass" || room.floorKind === "asphalt")) {
-    ctx.fillStyle = "rgba(16, 20, 32, 0.22)";
+    const g = ctx.createLinearGradient(0, 0, 0, viewH);
+    g.addColorStop(0, "rgba(255, 196, 120, 0.42)");
+    g.addColorStop(0.42, "rgba(232, 150, 80, 0.16)");
+    g.addColorStop(1, "rgba(120, 64, 36, 0.10)");
+    ctx.fillStyle = g;
     ctx.fillRect(0, 0, viewW, viewH);
   }
 

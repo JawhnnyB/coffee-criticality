@@ -284,7 +284,7 @@ export function DelayGame({ onDone, onAbort }: { onDone: (score: number) => void
         return;
       }
 
-      ctx.fillStyle = "#07140f";
+      ctx.fillStyle = "#2a2218";
       ctx.fillRect(0, 0, W, H);
       ctx.fillStyle = "#1a1410";
       ctx.beginPath();

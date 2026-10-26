@@ -71,7 +71,7 @@ function blitBody(
   playerLook?: PlayerLook,
   sitting = false,
 ) {
-  const idle = loadArt(`/art/gen/sprites/${who}_idle_32.png?v=face5`);
+  const idle = loadArt(`/art/gen/sprites/${who}_idle_32.png?v=soft7`);
   if (!idle || idle.naturalWidth !== WALK_W || idle.naturalHeight !== WALK_H) return false;
   pix(ctx);
   const frame = moving && !sitting ? Math.floor(phase) % 4 : 0;
@@ -87,8 +87,8 @@ function blitBody(
   ctx.fill();
   ctx.restore();
 
-  const walk = loadArt(`/art/gen/sprites/${who}_walk4.png?v=face5`);
-  const sit = loadArt(`/art/gen/sprites/${who}_sit.png?v=face5`);
+  const walk = loadArt(`/art/gen/sprites/${who}_walk4.png?v=soft7`);
+  const sit = loadArt(`/art/gen/sprites/${who}_sit.png?v=soft7`);
   const hasWalk = !!(walk && walk.naturalWidth === 128 && walk.naturalHeight === 192);
   const hasSit = !!(sit && sit.naturalWidth === WALK_W && sit.naturalHeight === WALK_H);
   let src: CanvasImageSource = idle;
@@ -118,7 +118,7 @@ function blitBody(
 
   const blink = !moving && facing !== "up" && phase % 8 < 0.28;
   if (blink) {
-    fill(ctx, dx + 12, dy + (sitting ? 25 : 13), 8, 2, "rgba(22,17,13,0.85)");
+    fill(ctx, dx + 11, dy + (sitting ? 24 : 16), 10, 2, "rgba(22,17,13,0.85)");
   }
   return true;
 }
@@ -154,6 +154,7 @@ export function tintPlayer(im: HTMLImageElement, look: PlayerLook): CanvasImageS
   const d = img.data;
   const hoodie = parseHex(HOODIE_HEX[look.hoodie]);
   const hoodieD = shade(hoodie, 0.62);
+  const hoodieL = shade(hoodie, 1.22);
   const hair = parseHex(HAIR_HEX[look.hair]);
   const hairD = shade(hair, 0.62);
   for (let i = 0; i < d.length; i += 4) {
@@ -162,24 +163,32 @@ export function tintPlayer(im: HTMLImageElement, look: PlayerLook): CanvasImageS
     const r = d[i];
     const gv = d[i + 1];
     const b = d[i + 2];
+    if (isBlush(r, gv, b) || isFace(r, gv, b) || isEyePixel(r, gv, b)) continue;
     // Shirt cluster first. Copper cloth also passes isWarmSkin, so it must win.
-    if (py > 16 && py < 52 && near(r, gv, b, 196, 120, 58, 80)) {
+    if (py > 22 && py < 58 && near(r, gv, b, 223, 136, 66, 46)) {
+      paint(d, i, hoodieL);
+      continue;
+    }
+    if (py > 22 && py < 58 && near(r, gv, b, 196, 120, 58, 80)) {
       paint(d, i, hoodie);
       continue;
     }
-    if (py > 16 && py < 52 && near(r, gv, b, 138, 72, 32, 60)) {
+    if (py > 22 && py < 58 && near(r, gv, b, 121, 74, 36, 55)) {
       paint(d, i, hoodieD);
       continue;
     }
-    if (isFace(r, gv, b) || isEyePixel(r, gv, b)) continue;
-    if (py < 18 && max3(r, gv, b) > 42) {
-      const dark = r + gv + b < 280;
+    if (py < 22 && max3(r, gv, b) > 42) {
+      const dark = r + gv + b < 150;
       paint(d, i, dark ? hairD : hair);
     }
   }
   g.putImageData(img, 0, 0);
   recolorCache.set(key, c);
   return c;
+}
+
+function isBlush(r: number, g: number, b: number) {
+  return r > 150 && r < 210 && g > 70 && g < 140 && b > 60 && b < 130 && r > g + 30;
 }
 
 function isFace(r: number, g: number, b: number) {
@@ -217,7 +226,7 @@ export function drawEmote(
 }
 
 function blitTile(ctx: CanvasRenderingContext2D, name: string, x: number, y: number, seed = 0) {
-  const im = loadArt(`/art/gen/tiles/${name}.png?v=campus`);
+  const im = loadArt(`/art/gen/tiles/${name}.png?v=warm7`);
   if (!im || !isTileSource(im.naturalWidth, im.naturalHeight, TILE)) return false;
   pix(ctx);
   const nw = im.naturalWidth;
@@ -250,17 +259,19 @@ export function waterFloor(ctx: CanvasRenderingContext2D, x: number, y: number, 
 
 export function grassFloor(ctx: CanvasRenderingContext2D, x: number, y: number, seed: number) {
   if (blitTile(ctx, "grass", x, y, seed)) return;
-  fill(ctx, x, y, TILE, TILE, seed % 2 === 0 ? "#3d5c44" : "#35553c");
+  fill(ctx, x, y, TILE, TILE, seed % 2 === 0 ? "#8fbf5a" : "#74a84a");
+  fill(ctx, x + (seed % 5), y + (seed % 7), 2, 2, seed % 2 === 0 ? "#d4e68a" : "#5e9238");
 }
 
 export function asphaltFloor(ctx: CanvasRenderingContext2D, x: number, y: number, seed: number) {
   if (blitTile(ctx, "asphalt", x, y, seed)) return;
-  fill(ctx, x, y, TILE, TILE, "#2a2926");
+  fill(ctx, x, y, TILE, TILE, seed % 3 === 0 ? "#c4a078" : "#d2b48c");
+  if (seed % 4 === 0) fill(ctx, x + 4, y + 9, 3, 2, "#a88460");
 }
 
 export function stripeFloor(ctx: CanvasRenderingContext2D, x: number, y: number, seed: number) {
   if (blitTile(ctx, "warning_stripe", x, y, seed)) return;
-  fill(ctx, x, y, TILE, TILE, "#2a2926");
+  fill(ctx, x, y, TILE, TILE, "#c4a078");
   fill(ctx, x, y + 6, TILE, 4, PAL.gold);
 }
 
@@ -277,7 +288,7 @@ export function metalFloor(ctx: CanvasRenderingContext2D, x: number, y: number, 
 
 export function wallpaper(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, accent: string, steel = false) {
   const paper = steel ? "wallpaper_control" : "wallpaper_cafe";
-  const im = loadArt(`/art/gen/tiles/${paper}.png?v=campus`);
+  const im = loadArt(`/art/gen/tiles/${paper}.png?v=warm7`);
   const railH = RAIL_H;
   if (im && isTileSource(im.naturalWidth, im.naturalHeight)) {
     pix(ctx);
@@ -289,7 +300,7 @@ export function wallpaper(ctx: CanvasRenderingContext2D, x: number, y: number, w
   } else {
     fill(ctx, x, y, w, h - railH, "#2a221b");
   }
-  const rail = loadArt("/art/gen/tiles/wainscot.png?v=campus");
+  const rail = loadArt("/art/gen/tiles/wainscot.png?v=warm7");
   if (rail && rail.naturalWidth >= TILE && rail.naturalHeight >= railH) {
     pix(ctx);
     const sy = Math.max(0, rail.naturalHeight - railH);
@@ -312,7 +323,7 @@ export function skyBand(
   period: "morning" | "midday" | "afternoon",
 ) {
   const name = period === "afternoon" ? "sky_dusk" : period === "midday" ? "sky_midday" : "sky_morning";
-  const im = loadArt(`/art/gen/tiles/${name}.png?v=campus`);
+  const im = loadArt(`/art/gen/tiles/${name}.png?v=warm7`);
   const band = h - 6;
   if (im && isTileSource(im.naturalWidth, im.naturalHeight)) {
     pix(ctx);
@@ -324,7 +335,7 @@ export function skyBand(
   } else {
     fill(ctx, x, y, w, h, period === "afternoon" ? PAL.skyDusk : PAL.sky);
   }
-  fill(ctx, x, y + h - 6, w, 6, period === "afternoon" ? "#4a5a48" : "#6b8f71");
+  fill(ctx, x, y + h - 6, w, 6, period === "afternoon" ? "#e8b070" : "#7aaa58");
 }
 
 /** Distant shells in the outdoor sky band. Unwalkable. Not 16:9 rooms. */
@@ -418,6 +429,74 @@ export function drawNameplate(ctx: CanvasRenderingContext2D, x: number, y: numbe
   }
 }
 
+/** Campus shell: peaked roof, plaster, lit windows. Not a flat color block. */
+function drawCampusBuilding(
+  ctx: CanvasRenderingContext2D,
+  ox: number,
+  oy: number,
+  w: number,
+  h: number,
+  label: string | undefined,
+  now: number,
+) {
+  const roofs: Record<string, string> = {
+    Cafe: PAL.copper,
+    Arcade: "#a85a30",
+    Hall: PAL.steel,
+    Control: "#8a7040",
+    Eng: "#6a7e8a",
+    Break: PAL.wood,
+    Core: PAL.leaf,
+    Maint: "#4a6a72",
+  };
+  const roof = roofs[label ?? ""] ?? PAL.wood;
+  const wall = "#e7d3b4";
+  const wallD = "#c9b08a";
+  const eave = Math.max(12, Math.min(h - 16, Math.floor(h * 0.4)));
+  fill(ctx, ox + 3, oy + h - 3, w - 4, 3, "#5a4330");
+  fill(ctx, ox + 4, oy + eave - 2, w - 8, h - eave - 1, wall);
+  fill(ctx, ox + w - 8, oy + eave, 4, Math.max(4, h - eave - 4), wallD);
+  for (let i = 0; i < eave; i++) {
+    const t = i / Math.max(1, eave - 1);
+    const inset = Math.round((1 - t) * Math.min(16, Math.floor(w * 0.16)));
+    const stripe = i % 5 === 0 ? PAL.copperD : roof;
+    fill(ctx, ox + inset, oy + i, Math.max(4, w - inset * 2), 1, stripe);
+  }
+  fill(ctx, ox + 2, oy + eave - 3, w - 4, 3, PAL.copperL);
+  if (label === "Cafe" || label === "Core" || label === "Break") {
+    const cx = ox + w - 18;
+    fill(ctx, cx, oy + 6, 6, Math.max(6, eave - 4), "#5a6a70");
+    fill(ctx, cx - 1, oy + 3, 8, 4, "#3a4a50");
+    const puff = 1 + Math.round((Math.sin(now * 1.6 + ox) + 1) * 1.5);
+    fill(ctx, cx + 1, oy + 1 - puff, 3, puff + 2, "rgba(243,230,208,0.7)");
+  }
+  const cols = Math.max(1, Math.min(4, Math.floor((w - 22) / 16)));
+  const rows = Math.max(1, Math.min(3, Math.floor((h - eave - 18) / 14)));
+  const glow = 0.35 + Math.sin(now * 2.2 + ox * 0.01) * 0.08;
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      const wx = ox + 12 + c * 16;
+      const wy = oy + eave + 4 + r * 14;
+      if (wy + 8 > oy + h - 14) continue;
+      fill(ctx, wx - 1, wy - 1, 10, 9, `rgba(232,168,96,${glow})`);
+      fill(ctx, wx, wy, 8, 7, PAL.ink);
+      fill(ctx, wx + 1, wy + 1, 6, 5, "#ffe0a0");
+      fill(ctx, wx + 4, wy + 1, 1, 5, PAL.ink);
+      fill(ctx, wx + 1, wy + 3, 6, 1, PAL.ink);
+    }
+  }
+  if (h > 28 && w > 24) {
+    const dw = Math.max(6, Math.min(10, Math.floor(w / 7)));
+    const dh = Math.max(8, Math.min(18, Math.floor(h * 0.28)));
+    const dx = ox + Math.floor(w / 2) - Math.floor(dw / 2);
+    const dy = oy + h - dh - 4;
+    fill(ctx, dx, dy, dw, dh, PAL.woodDark);
+    fill(ctx, dx + 1, dy + 1, dw - 2, 2, PAL.woodL);
+    fill(ctx, dx + dw - 3, dy + Math.floor(dh / 2), 2, 2, PAL.gold);
+  }
+  outlineRect(ctx, ox + 4, oy + eave - 2, w - 8, h - eave - 1, PAL.ink);
+}
+
 export function drawPropPixel(
   ctx: CanvasRenderingContext2D,
   kind: string,
@@ -477,21 +556,7 @@ export function drawPropPixel(
     return;
   }
   if (kind === "roof") {
-    const tops: Record<string, string> = {
-      Cafe: PAL.copper,
-      Arcade: "#8a4a28",
-      Hall: PAL.steel,
-      Control: "#6a5a30",
-      Eng: "#5a6a78",
-      Break: PAL.wood,
-      Core: PAL.leaf,
-      Maint: "#3d5c66",
-    };
-    const top = tops[label ?? ""] ?? PAL.wood;
-    fill(ctx, ox, oy, w, h, "#2a221b");
-    fill(ctx, ox + 2, oy + 2, w - 4, Math.max(8, h - 10), top);
-    fill(ctx, ox, oy + h - 6, w, 6, "#1a1410");
-    outlineRect(ctx, ox, oy, w, h, PAL.ink);
+    drawCampusBuilding(ctx, ox, oy, w, h, label, now);
     return;
   }
   if (kind === "stack") {
@@ -625,11 +690,15 @@ export function lampGlow(
 ) {
   pix(ctx);
   const dusk = period === "afternoon";
-  const a = (dusk ? 0.34 : period === "morning" ? 0.18 : 0.1) + Math.sin(now * 2.1) * 0.04;
+  const a = (dusk ? 0.62 : period === "morning" ? 0.22 : 0.12) + Math.sin(now * 2.1) * 0.05;
   ctx.save();
-  ctx.fillStyle = `rgba(201,162,39,${Math.max(0.06, a)})`;
+  ctx.fillStyle = `rgba(232,168,96,${Math.max(0.08, a)})`;
   ctx.beginPath();
-  ctx.ellipse(Math.round(x), Math.round(y) - 4, dusk ? 16 : 12, dusk ? 11 : 8, 0, 0, Math.PI * 2);
+  ctx.ellipse(Math.round(x), Math.round(y) - 4, dusk ? 40 : 14, dusk ? 22 : 9, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = `rgba(255,214,140,${Math.max(0.05, a * 0.45)})`;
+  ctx.beginPath();
+  ctx.ellipse(Math.round(x), Math.round(y) - 6, dusk ? 16 : 6, dusk ? 8 : 4, 0, 0, Math.PI * 2);
   ctx.fill();
   ctx.restore();
 }

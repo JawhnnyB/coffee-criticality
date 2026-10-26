@@ -224,8 +224,8 @@ export function ReactorTrainer({
 function Term({ children, scroll }: { children: ReactNode; scroll?: boolean }) {
   return (
     <div className={"absolute inset-0 z-30 grid place-items-center bg-bg/80 px-3 pb-24 pt-16 " + (scroll ? "overflow-y-auto" : "")}>
-      <div className="w-full max-w-2xl border-8 border-[#1a1410] bg-[#0a1612] p-1 shadow-[0_0_0_3px_#6b8f71]">
-        <div className="border border-[#6b8f71]/40 bg-[#07140f] p-4 sm:p-5">{children}</div>
+      <div className="w-full max-w-2xl border-8 border-[#1a1410] bg-[#f3e6d0] p-1 shadow-[0_0_0_4px_#c4783a]">
+        <div className="border border-[#c4783a]/50 bg-[#2a2218] p-4 sm:p-5">{children}</div>
       </div>
     </div>
   );

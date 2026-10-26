@@ -397,31 +397,32 @@
   display: flex;
   max-height: 100%;
   flex-direction: column;
-  border: 10px solid #1a1410;
-  background: #241810;
+  border: 8px solid #c4783a;
+  background: #f3e6d0;
   box-shadow:
-    0 0 0 4px #c4783a,
-    inset 0 0 0 3px #3a2818;
+    0 0 0 4px #1a1410,
+    inset 0 0 0 3px #e8c9a0;
 }
 .cabinet-marquee {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  background: #3a2818;
+  background: linear-gradient(#e8a860, #c4783a);
   padding: 6px 10px;
   font-family: var(--font-mono);
   font-size: 10px;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: #c9a227;
+  color: #1a1410;
 }
 .cabinet-screen {
   position: relative;
   min-height: 0;
   flex: 1;
   overflow: auto;
-  background: #07140f;
+  background: #2a2218;
+  color: #f3e6d0;
   padding: 10px;
 }
 .cabinet-screen::after {
@@ -431,10 +432,10 @@
   inset: 0;
   background: repeating-linear-gradient(
     to bottom,
-    rgba(0, 0, 0, 0.18) 0px,
-    rgba(0, 0, 0, 0.18) 1px,
+    rgba(90, 48, 24, 0.1) 0px,
+    rgba(90, 48, 24, 0.1) 1px,
     transparent 1px,
-    transparent 3px
+    transparent 4px
   );
   mix-blend-mode: multiply;
 }
@@ -442,7 +443,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  background: #1a1410;
+  background: #3a2818;
   padding: 8px 12px;
 }
 .cabinet-deck span {

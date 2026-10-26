@@ -55,17 +55,17 @@ export function ArcadeHall({
 }) {
   return (
     <Bezel>
-      <p className="font-mono text-xs tracking-widest text-good">MABEL.PARLOR</p>
-      <h2 className="font-display mt-2 text-2xl text-good">Same bezel. Different jobs.</h2>
-      <p className="mt-2 font-mono text-xs text-good/70">
+      <p className="font-mono text-xs tracking-widest text-[#c9a227]">MABEL.PARLOR</p>
+      <h2 className="font-display mt-2 text-2xl text-[#f3e6d0]">Same bezel. Different jobs.</h2>
+      <p className="mt-2 max-w-xl text-sm text-[#dcc8aa]">
         North wall is Unit 1. South is after-shift. Pebble is a comparison. The floor still wants a catch.
       </p>
       <div className="mt-4 space-y-4">
         {WALLS.map((w) => (
           <div key={w.id}>
-            <p className="font-mono text-[10px] tracking-widest text-good/80">
+            <p className="font-mono text-[10px] tracking-widest text-[#c9a227]">
               {w.title}
-              <span className="ml-2 text-good/50">{w.line}</span>
+              <span className="ml-2 text-[#b5a48c]">{w.line}</span>
             </p>
             <div className={"mt-1 grid gap-2 " + (w.id === "compare" ? "grid-cols-2 sm:grid-cols-5" : "grid-cols-5")}>
               {CABS.filter((c) => c.wall === w.id).map((c) => (
@@ -73,12 +73,12 @@ export function ArcadeHall({
                   key={c.id}
                   type="button"
                   onClick={() => onPick(c.id)}
-                  className="flex flex-col items-center border border-good/30 bg-[#07140f] px-2 py-3 text-center hover:bg-good/10"
+                  className="flex flex-col items-center border border-[#c9a227]/40 bg-[#1a1410] px-2 py-3 text-center hover:border-[#c4783a] hover:bg-[#2a2218]"
                   data-testid={"cab-" + c.id}
                 >
                   <img src={c.art} alt="" width={32} height={48} className="h-8 w-5" style={{ imageRendering: "pixelated" }} />
-                  <span className="mt-1 font-mono text-[10px] tracking-widest text-good">{c.title}</span>
-                  <span className="mt-0.5 font-mono text-[9px] leading-snug text-good/70">{c.line}</span>
+                  <span className="mt-1 font-mono text-[10px] tracking-widest text-[#f3e6d0]">{c.title}</span>
+                  <span className="mt-0.5 text-[9px] leading-snug text-[#b5a48c]">{c.line}</span>
                 </button>
               ))}
             </div>
@@ -374,7 +374,7 @@ function drawTag(ctx: CanvasRenderingContext2D, it: Item) {
   ctx.lineTo(it.x + 16, it.y + 56);
   ctx.closePath();
   ctx.fill();
-  ctx.fillStyle = "#07140f";
+  ctx.fillStyle = "#2a2218";
   ctx.font = "6px monospace";
   ctx.fillText(it.svc ? "SVC" : "LOTO", it.x + 20, it.y + 50);
 }
@@ -655,7 +655,7 @@ export function Arcade({
 
       ctx.save();
       if (shake > 0) ctx.translate((Math.random() - 0.5) * 8, (Math.random() - 0.5) * 6);
-      ctx.fillStyle = "#0a1210";
+      ctx.fillStyle = "#1a1410";
       ctx.fillRect(0, 0, CW, CH);
       ctx.fillStyle = "#1a1814";
       for (let i = 0; i < 18; i++) {
@@ -676,7 +676,7 @@ export function Arcade({
         ctx.fillStyle = `rgba(107,143,113,${hitFlash * 0.4})`;
         ctx.fillRect(0, 0, CW, CH);
       }
-      ctx.fillStyle = "#07140f";
+      ctx.fillStyle = "#2a2218";
       ctx.fillRect(0, 0, CW, 16);
       ctx.fillStyle = clock < 10 ? "#b85c4a" : "#f3e6d0";
       ctx.font = "8px monospace";

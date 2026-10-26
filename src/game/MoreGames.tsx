@@ -429,7 +429,7 @@ export function RodsGame({ onDone, onAbort }: { onDone: (score: number) => void;
         return;
       }
 
-      ctx.fillStyle = "#07140f";
+      ctx.fillStyle = "#2a2218";
       ctx.fillRect(0, 0, W, H);
       ctx.fillStyle = "#f3e6d0";
       ctx.font = "8px monospace";

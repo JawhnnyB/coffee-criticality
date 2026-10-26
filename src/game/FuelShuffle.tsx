@@ -90,13 +90,13 @@ export function FuelShuffle({
   };
 
   return (
-    <div className="absolute inset-0 z-30 overflow-y-auto bg-[#0d2018] px-4 pb-28 pt-16 sm:px-8">
-      <div className="mx-auto max-w-3xl">
-        <p className="font-mono text-xs tracking-widest text-good">
+    <div className="absolute inset-0 z-30 overflow-y-auto bg-[#1a1410]/85 px-3 pb-28 pt-16 sm:px-8">
+      <div className="mx-auto max-w-3xl border-8 border-[#1a1410] bg-[#f3e6d0] p-4 shadow-[0_0_0_4px_#c4783a] sm:p-6">
+        <p className="font-mono text-xs tracking-widest text-[#8a4820]">
           FUEL.SHUFFLE  ·  {plant.type.toUpperCase()}  ·  {plant.enrich}%  ·  {practice ? "practice" : "outage"}  ·  teaching only
         </p>
-        <h2 className="font-mono mt-2 text-2xl text-good">Program the core</h2>
-        <p className="mt-2 max-w-xl text-sm leading-relaxed text-good/80">
+        <h2 className="font-display mt-2 text-2xl text-[#1a1410]">Program the core</h2>
+        <p className="mt-2 max-w-xl text-sm leading-relaxed text-[#3a2818]">
           Fresh in the dead center peaking. Twice-burned belongs on the rim. Click two assemblies to swap.
           Hold Fq under 1.48 and keep fresh off the fence.
         </p>
@@ -122,14 +122,14 @@ export function FuelShuffle({
               </button>
             ))}
           </div>
-          <div className="font-mono text-xs text-good">
+          <div className="font-mono text-xs text-[#3a2818]">
             <p>Fq {flux.fq.toFixed(3)}</p>
             <p className="mt-1">Fresh on edge {edgeFresh}</p>
             <p className="mt-1">Swaps {swaps}</p>
-            <p className="mt-3 text-good/70">F fresh · 1 once · 2 twice</p>
-            <p className="mt-3 text-good/70">Color is flux. Red is a peak you will have to explain.</p>
-            {ok ? <p className="mt-3 text-fg">Band held. Priya can sign this.</p> : <p className="mt-3">Not yet.</p>}
-            <p className="mt-3 text-[10px] text-good/60">Teaching model only — not a license. Fq is a classroom proxy.</p>
+            <p className="mt-3 text-[#6a4a32]">F fresh · 1 once · 2 twice</p>
+            <p className="mt-3 text-[#6a4a32]">Color is flux. Red is a peak you will have to explain.</p>
+            {ok ? <p className="mt-3 text-[#1a1410]">Band held. Priya can sign this.</p> : <p className="mt-3">Not yet.</p>}
+            <p className="mt-3 text-[10px] text-[#8a7864]">Teaching model only — not a license. Fq is a classroom proxy.</p>
           </div>
         </div>
         <div className="mt-5 flex flex-wrap gap-2">

@@ -23,12 +23,12 @@ WOOD_L = (138, 98, 64, 255)
 WOOD_D = (58, 40, 24, 255)
 STEEL_L = (90, 122, 130, 255)
 STEEL_D = (36, 56, 62, 255)
-GRASS_L = (90, 122, 96, 255)
-GRASS = (61, 92, 68, 255)
-GRASS_D = (42, 70, 50, 255)
-ASH = (48, 46, 42, 255)
-ASH_L = (70, 66, 60, 255)
-ASH_D = (28, 26, 24, 255)
+GRASS_L = (198, 216, 112, 255)
+GRASS = (126, 176, 72, 255)
+GRASS_D = (78, 132, 52, 255)
+ASH = (196, 164, 118, 255)
+ASH_L = (222, 194, 150, 255)
+ASH_D = (154, 120, 80, 255)
 SKY_M = (120, 168, 186, 255)
 SKY_N = (154, 196, 206, 255)
 SKY_D = (90, 74, 88, 255)
@@ -82,7 +82,7 @@ def tile_grass() -> Image.Image:
     d = ImageDraw.Draw(im)
     d.point((2, 4), fill=LEAF)
     d.point((11, 9), fill=GRASS_L)
-    d.rectangle([0, 0, 15, 15], outline=GRASS_D)
+    d.point((7, 12), fill=(232, 196, 96, 255))
     return im
 
 
@@ -128,7 +128,7 @@ def sky(morning=True, midday=False) -> Image.Image:
     elif morning:
         top, bot = SKY_N, SKY_M
     else:
-        top, bot = (74, 58, 72, 255), SKY_D
+        top, bot = (255, 198, 124, 255), (186, 104, 92, 255)
     im = Image.new("RGBA", (16, 16), bot)
     d = ImageDraw.Draw(im)
     for y in range(16):

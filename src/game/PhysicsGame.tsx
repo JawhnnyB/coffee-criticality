@@ -736,7 +736,7 @@ export function PhysicsGame({
 
       playPeriodTick(board === "fiss" ? (kEma > 1.05 ? 6 : 14) : 18);
 
-      ctx.fillStyle = "#07140f";
+      ctx.fillStyle = "#2a2218";
       ctx.fillRect(0, 0, W, H);
 
       if (board === "fiss" || board === "mc") {

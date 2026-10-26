@@ -142,7 +142,7 @@ export function LoadGame({ onDone, onAbort }: { onDone: (score: number) => void;
     let resolving = 0;
 
     const paint = () => {
-      ctx.fillStyle = "#07140f";
+      ctx.fillStyle = "#2a2218";
       ctx.fillRect(0, 0, W, H);
       ctx.fillStyle = "#f3e6d0";
       ctx.font = "8px monospace";
@@ -157,7 +157,7 @@ export function LoadGame({ onDone, onAbort }: { onDone: (score: number) => void;
         const hotCol = hover?.kind === "col" && hover.a === c;
         ctx.fillStyle = telegraph.axis === "col" && telegraph.i === c ? "#c9a227" : hotCol ? "#6b8f71" : "#8a7864";
         ctx.fillRect(x, OY - 16, CW - 4, 12);
-        ctx.fillStyle = "#07140f";
+        ctx.fillStyle = "#2a2218";
         ctx.fillText(names[c], x + 20, OY - 7);
       }
       for (let r = 0; r < N; r++) {
@@ -165,7 +165,7 @@ export function LoadGame({ onDone, onAbort }: { onDone: (score: number) => void;
         const hotRow = hover?.kind === "row" && hover.a === r;
         ctx.fillStyle = telegraph.axis === "row" && telegraph.i === r ? "#c9a227" : hotRow ? "#6b8f71" : "#8a7864";
         ctx.fillRect(OX - 22, y, 18, CH - 4);
-        ctx.fillStyle = "#07140f";
+        ctx.fillStyle = "#2a2218";
         ctx.fillText(String(r + 1), OX - 15, y + 18);
       }
 

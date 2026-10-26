@@ -2513,7 +2513,7 @@ function LookPreview({ look, big = false }: { look: PlayerLook; big?: boolean })
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
     const im = new Image();
-    im.src = "/art/gen/sprites/player_idle_32.png?v=face5";
+    im.src = "/art/gen/sprites/player_idle_32.png?v=soft7";
     im.onload = () => {
       const tinted = tintPlayer(im, look);
       ctx.imageSmoothingEnabled = false;
