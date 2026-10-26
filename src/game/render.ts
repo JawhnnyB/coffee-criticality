@@ -26,6 +26,10 @@ import {
   windMotes,
   windowWash,
   woodFloor,
+  cafePlanks,
+  controlLino,
+  engConcrete,
+  hungSignSpot,
 } from "./pixel";
 import { glimpseSrc } from "./site";
 import { npcsHere, type GameState } from "./sim";
@@ -56,7 +60,19 @@ function getBuf(w: number, h: number) {
   return buf;
 }
 
-function floorTile(ctx: CanvasRenderingContext2D, kind: string, x: number, y: number, seed: number) {
+function floorTile(
+  ctx: CanvasRenderingContext2D,
+  kind: string,
+  x: number,
+  y: number,
+  seed: number,
+  roomId: string,
+  tx: number,
+  ty: number,
+) {
+  if (roomId === "cafe") return cafePlanks(ctx, x, y, seed);
+  if (roomId === "control") return controlLino(ctx, x, y, seed);
+  if (roomId === "engineering") return engConcrete(ctx, x, y, seed, tx, ty);
   if (kind === "wood") woodFloor(ctx, x, y, seed);
   else if (kind === "grass") grassFloor(ctx, x, y, seed);
   else if (kind === "asphalt") asphaltFloor(ctx, x, y, seed);
@@ -115,7 +131,7 @@ function drawTiles(
         }
       }
       if (room.id === "maintenance" && kind === "asphalt") kind = "stripe";
-      floorTile(ctx, kind, x, y, seed);
+      floorTile(ctx, kind, x, y, seed, room.id, tx, ty);
     }
   }
 
@@ -249,9 +265,20 @@ export function drawWorld(
       y: py,
       draw: () => {
         drawPropPixel(g, p.kind, p.rect.x, p.rect.y, p.rect.w, p.rect.h, room.accent, now, p.label);
-        if (outdoor && p.kind === "roof" && (s.period === "afternoon" || s.flags.endingWalk)) {
-          windowWash(g, p.rect.x, p.rect.y + Math.floor(p.rect.h * 0.35), p.rect.w, 10, "afternoon");
-          lampGlow(g, p.rect.x + p.rect.w * 0.5, p.rect.y + p.rect.h, now, "afternoon");
+        if (p.kind === "roof" && p.label) {
+          const spot = hungSignSpot(p.label, p.rect.x, p.rect.y, p.rect.w, p.rect.h);
+          const viewLeft = camX - bw / 2;
+          const viewRight = camX + bw / 2;
+          const viewTop = camY - bh / 2;
+          const viewBot = camY + bh / 2;
+          const half = (p.label.length * 4) / 2;
+          const cx = Math.max(viewLeft + 8 + half, Math.min(viewRight - 8 - half, spot.x));
+          const sy = Math.max(viewTop + 4, Math.min(viewBot - 16, spot.y));
+          g.fillStyle = PAL.wood;
+          g.fillRect(cx - half - 3, sy - 2, half * 2 + 6, 12);
+          g.fillStyle = PAL.woodDark;
+          g.fillRect(cx - 1, sy - 4, 2, 3);
+          pixText(g, p.label, cx, sy, PAL.cream, Math.max(24, p.label.length * 4 + 4));
         }
       },
     });

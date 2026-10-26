@@ -655,7 +655,7 @@ export function Arcade({
 
       ctx.save();
       if (shake > 0) ctx.translate((Math.random() - 0.5) * 8, (Math.random() - 0.5) * 6);
-      ctx.fillStyle = "#1a1410";
+      ctx.fillStyle = "#2a1c14";
       ctx.fillRect(0, 0, CW, CH);
       ctx.fillStyle = "#1a1814";
       for (let i = 0; i < 18; i++) {
@@ -681,7 +681,7 @@ export function Arcade({
       ctx.fillStyle = clock < 10 ? "#b85c4a" : "#f3e6d0";
       ctx.font = "8px monospace";
       ctx.fillText(`CATCH  ${round + 1}/${BOARDS}   ${clock.toFixed(1)}s   caught ${caught}   miss ${miss}`, 6, 11);
-      ctx.fillStyle = "#8a7864";
+      ctx.fillStyle = "#e8d8b8";
       ctx.fillText(board.prompt, 6, CH - 6);
       ctx.restore();
 

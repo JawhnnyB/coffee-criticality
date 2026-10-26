@@ -638,15 +638,19 @@ export function talkLines(
     }
     return [
       { speaker: "Mabel", text: "Cup's poured. Sit before the name.", mood: "warm" },
-      { speaker: "Mabel", text: "Badges stay on the lanyard. I watch the cup.", mood: "soft" },
-      { speaker: "Mabel", text: "Chalk's for a catch said in this room. Pockets don't get a mark.", mood: "even" },
-      { speaker: "Mabel", text: "Coffee, or the chalk?",
+      { speaker: "Mabel", text: "Dr. Mabel Quinn. I ran this floor — the kettle is what's left of the board.", mood: "soft" },
+      { speaker: "Mabel", text: "Say one catch out loud today. I chalk what gets said — a pocket does not.", mood: "even" },
+      {
+        speaker: "Mabel",
+        text: "Coffee, or the chalk?",
+        mood: "warm",
         choices: [
-          { id: "mabel-sit", label: "Just the coffee.", reply: "On the house. The night shift already paid for the heat. Don't use it as courage.", trust: 2, culture: 1 },
-          { id: "mabel-catch", label: "Who won't sit?", reply: "The ones carrying a catch in their pocket. Eyes first. Clock second. I'll chalk the score.", flag: "arcade" },
-          { id: "mabel-load", label: "The load on the north wall.", reply: "You see the pulse. One rod, or one catch. The load is the opponent. I keep the score. Twenty years of that, then the kettle.", flag: "arcade" },
+          { id: "mabel-sit", label: "Just the coffee.", reply: "On the house. Don't use it as courage.", trust: 2, culture: 1 },
+          { id: "mabel-catch", label: "Who won't sit?", reply: "The ones carrying a catch in their pocket. I'll chalk it if you say it.", trust: 1, flag: "arcade" },
+          { id: "mabel-load", label: "I'll say one out loud.", reply: "Then the chalk moves. North wall is Unit 1.", trust: 2, flag: "arcade" },
         ],
       },
+      { speaker: "Mabel", text: "Chalk's for this room. Pockets don't get a mark.", mood: "even" },
     ];
   }
   if (npc === "holt") {
@@ -680,8 +684,19 @@ export function talkLines(
     }
     return [
       { speaker: "Holt", text: "Skip the hello. The org chart already spent the ink.", mood: "sharp" },
-      { speaker: "Holt", text: "I buy a catch. I do not buy the person telling it.", mood: "even" },
-      { speaker: "Holt", text: "Bring a line. Leave the speech in the hall.", mood: "sharp" },
+      { speaker: "Holt", text: "Reginald Holt. I direct the site, and I buy the line, not the person.", mood: "even" },
+      { speaker: "Holt", text: "Stand next to a number today. That is the only thing I can fund.", mood: "sharp" },
+      {
+        speaker: "Holt",
+        text: "Well?",
+        mood: "sharp",
+        choices: [
+          { id: "holt-line", label: "Here's the line.", reply: "Then I will read it. Not the speech around it.", trust: 2 },
+          { id: "holt-review", label: "I need a review.", reply: "Bring the volume. Then we talk about the check.", trust: 1 },
+          { id: "holt-later", label: "Not today.", reply: "Then the log stays blank. I do not fund a blank.", flag: "holtDeferred" },
+        ],
+      },
+      { speaker: "Holt", text: "Leave the speech in the hall.", mood: "even" },
     ];
   }
   if (npc === "elena") {
@@ -711,7 +726,18 @@ export function talkLines(
     }
     return [
       { speaker: "Elena", text: "Boots on the paint. I don't do doorways.", mood: "even" },
-      { speaker: "Elena", text: "Cupholder's cold. The door is open for the lot, not for you.", mood: "soft" },
+      { speaker: "Elena", text: "Elena Voss. I put people where they can be seen. That's the whole job.", mood: "even" },
+      { speaker: "Elena", text: "That van's been open since before dawn. Cupholder's cold. Somebody sat there and left.", mood: "soft" },
+      {
+        speaker: "Elena",
+        text: "Look at it.",
+        mood: "even",
+        choices: [
+          { id: "elena-seat", label: "The child seat.", reply: "Good. Eyes before opinions.", trust: 2 },
+          { id: "elena-whose", label: "Whose van is it?", reply: "Mine. Next question, you'll like it less.", trust: 1 },
+          { id: "elena-reactor", label: "I'm here for the reactor.", reply: "Everybody is. Today the van is the reactor.", flag: "elenaReactor" },
+        ],
+      },
       { speaker: "Elena", text: "Both hands where the van can see them. Then it's a catch.", mood: "even" },
     ];
   }
@@ -748,8 +774,19 @@ export function talkLines(
     }
     return [
       { speaker: "Tommy", text: "Pump two's dressed for a shift it isn't working.", mood: "even" },
-      { speaker: "Tommy", text: "IN SERVICE. Zip-tied to a dead flange. Rude.", mood: "sharp" },
-      { speaker: "Tommy", text: "Four words. Isolate, lock, tag, try. I'm not your audience.", mood: "even" },
+      { speaker: "Tommy", text: "Tommy Reyes, maintenance. I finish the sentence the pump can't.", mood: "sharp" },
+      { speaker: "Tommy", text: "IN SERVICE is zip-tied to a dead flange. Take the lie off before you ask for a wrench.", mood: "sharp" },
+      {
+        speaker: "Tommy",
+        text: "Four words. Or don't.",
+        mood: "even",
+        choices: [
+          { id: "tommy-four", label: "Isolate. Lock. Tag. Try.", reply: "Four words. Now the wrench can come off the hook.", trust: 2 },
+          { id: "tommy-where", label: "Where's the tag?", reply: "On the board. It does not walk itself over.", trust: 1 },
+          { id: "tommy-leave", label: "I'll leave it.", reply: "Then the pump keeps your hands. That's the deal.", flag: "tommyLeft" },
+        ],
+      },
+      { speaker: "Tommy", text: "I'm not your audience. The flange is.", mood: "even" },
     ];
   }
   if (npc === "marcus") {
@@ -783,8 +820,19 @@ export function talkLines(
     }
     return [
       { speaker: "Marcus", text: "Stay on that side of the bench. I'm not turning for a name.", mood: "tired" },
-      { speaker: "Marcus", text: "Wall gauge is the crowd. The one under my hand is the work.", mood: "sharp" },
-      { speaker: "Marcus", text: "I missed once. Out loud. Don't dress the next number up.", mood: "even" },
+      { speaker: "Marcus", text: "Marcus Hale, senior engineer. The room kept the day I was wrong.", mood: "sharp" },
+      { speaker: "Marcus", text: "Say the number before you defend it. The wall gauge is the crowd.", mood: "even" },
+      {
+        speaker: "Marcus",
+        text: "Well. The number.",
+        mood: "tired",
+        choices: [
+          { id: "marcus-forty", label: "Forty.", reply: "Out loud. That's the number. I can turn for that.", trust: 2 },
+          { id: "marcus-which", label: "Which gauge?", reply: "The one under the hand. Not the one on the wall.", trust: 1 },
+          { id: "marcus-sheet", label: "I'll check the sheet.", reply: "The sheet is the crowd. Come back with a mouth.", flag: "marcusSheet" },
+        ],
+      },
+      { speaker: "Marcus", text: "Don't dress the next one up.", mood: "even" },
     ];
   }
   if (npc === "priya") {
@@ -812,8 +860,19 @@ export function talkLines(
     }
     return [
       { speaker: "Priya", text: "No handshake. A schematic doesn't have a pulse.", mood: "soft" },
-      { speaker: "Priya", text: "A signature from a chair. The tank didn't feel it.", mood: "even" },
-      { speaker: "Priya", text: "Stand at the metal. Heat leaves there. Not a license.", mood: "soft" },
+      { speaker: "Priya", text: "Priya Sharma, reactor engineering. I walk what I sign.", mood: "even" },
+      { speaker: "Priya", text: "You signed from a chair. Stand at the tank today — heat leaves through the metal.", mood: "soft" },
+      {
+        speaker: "Priya",
+        text: "Teaching model. Not a license.",
+        mood: "even",
+        choices: [
+          { id: "priya-walk", label: "I'll walk it.", reply: "Then I will meet you at the rail.", trust: 2, flag: "priyaWalk" },
+          { id: "priya-sheet", label: "The sheet is enough.", reply: "A sheet is a rumor. I will not sign it.", flag: "priyaSheet" },
+          { id: "priya-peak", label: "Show me the peak.", reply: "After your feet. Not before.", trust: 1 },
+        ],
+      },
+      { speaker: "Priya", text: "Stand at the metal. Then we can use the word peak.", mood: "soft" },
     ];
   }
   if (!first) {
@@ -841,8 +900,19 @@ export function talkLines(
   }
   return [
     { speaker: "Jordan", text: "Door, then you. I like that order.", mood: "even" },
-    { speaker: "Jordan", text: "A win in a pocket doesn't get split. I don't do quiet credit.", mood: "soft" },
-    { speaker: "Jordan", text: "Say it where the door hears. Same row. Three tiles if you don't.", mood: "even" },
+    { speaker: "Jordan", text: "Jordan Peck, floor tech. I keep the row for a catch the door can hear.", mood: "soft" },
+    { speaker: "Jordan", text: "Say one out loud today. A win in a pocket does not get split.", mood: "even" },
+    {
+      speaker: "Jordan",
+      text: "Your call.",
+      mood: "even",
+      choices: [
+        { id: "jordan-out", label: "The catch is out here.", reply: "Then the chair is still in play.", trust: 2, flag: "jordanSaid" },
+        { id: "jordan-quiet", label: "Not in front of them.", reply: "Then I'm three tiles off. That was the deal.", flag: "jordanQuiet" },
+        { id: "jordan-later", label: "After the shift.", reply: "Bowl only if it is already said.", flag: "jordanLater" },
+      ],
+    },
+    { speaker: "Jordan", text: "Same row if you say it. Distance if you don't.", mood: "even" },
   ];
 }
 

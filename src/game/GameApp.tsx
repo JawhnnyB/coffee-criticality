@@ -111,6 +111,24 @@ const GAME_CODES = new Set([
   "Escape",
 ]);
 
+const BEZEL_MODES: Mode[] = [
+  "arcade",
+  "reactor",
+  "shuffle",
+  "maint",
+  "cabs",
+  "fish",
+  "plot",
+  "horde",
+  "delay",
+  "golf",
+  "rods",
+  "pebble",
+  "bowl",
+  "phys",
+  "load",
+];
+
 const PLAY_MODES: Mode[] = [
   "play",
   "dialogue",
@@ -600,7 +618,7 @@ export function GameApp() {
           <div className="pointer-events-none h-8" />
         )}
         <div className="pointer-events-auto flex items-center gap-2">
-          <MuteToggle />
+          {BEZEL_MODES.includes(mode) ? null : <MuteToggle />}
           <AuthChip />
         </div>
       </header>
@@ -2611,7 +2629,7 @@ function Hud({
     period === "afternoon" ? "rgba(61,92,102,0.28)" : period === "morning" ? "rgba(196,120,58,0.16)" : "transparent";
   return (
     <>
-      <div className="instrument pointer-events-none absolute left-3 top-14 z-10 px-2.5 py-2 sm:left-4 sm:top-16" data-testid="instrument">
+      <div className="instrument pointer-events-none absolute bottom-16 left-3 z-10 max-w-[14rem] px-2.5 py-2 sm:left-4" data-testid="instrument">
         <div className="flex items-baseline gap-2 font-mono text-[11px]">
           <span className="text-base tabular leading-none text-fg">{time}</span>
           <span className="text-muted">

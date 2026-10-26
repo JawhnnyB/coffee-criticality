@@ -270,7 +270,7 @@ export function GolfGame({ onDone, onAbort }: { onDone: (score: number) => void;
       const tot = cardStrokes.reduce((a, b) => a + b, 0) + strokes;
       const par = HOLES.reduce((a, h) => a + h.par, 0);
       ctx.fillText(`${holeI + 1}/5  ${hole.name}  par ${hole.par}  this ${strokes}  card ${tot}/${par}`, 8, 14);
-      ctx.fillStyle = "#8a7864";
+      ctx.fillStyle = "#e8d8b8";
       ctx.fillText("Aim mouse · hold click/space for power", 8, H - 8);
       if (charging) {
         ctx.fillStyle = "#c4783a";
@@ -429,7 +429,7 @@ export function RodsGame({ onDone, onAbort }: { onDone: (score: number) => void;
         return;
       }
 
-      ctx.fillStyle = "#2a2218";
+      ctx.fillStyle = "#2a1c14";
       ctx.fillRect(0, 0, W, H);
       ctx.fillStyle = "#f3e6d0";
       ctx.font = "8px monospace";
@@ -452,7 +452,7 @@ export function RodsGame({ onDone, onAbort }: { onDone: (score: number) => void;
       ctx.fillRect(8, H - 18, Math.max(2, Math.min(200, demand * 140)), 3);
       ctx.fillStyle = inBand ? "#6b8f71" : "#8a7864";
       ctx.fillRect(8, H - 14, Math.max(2, Math.min(200, dWorth * 140)), 3);
-      ctx.fillStyle = inBand ? "#6b8f71" : "#8a7864";
+      ctx.fillStyle = "#e8d8b8";
       ctx.fillText(inBand ? "on demand — keep overlapping" : scram > 0 ? "SCRAM" : "gold=demand  1–4 in  shift/right-click out", 8, H - 4);
 
       raf = requestAnimationFrame(loop);

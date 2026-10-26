@@ -284,7 +284,7 @@ export function DelayGame({ onDone, onAbort }: { onDone: (score: number) => void
         return;
       }
 
-      ctx.fillStyle = "#2a2218";
+      ctx.fillStyle = "#2a1c14";
       ctx.fillRect(0, 0, W, H);
       ctx.fillStyle = "#1a1410";
       ctx.beginPath();
@@ -332,7 +332,7 @@ export function DelayGame({ onDone, onAbort }: { onDone: (score: number) => void
       ctx.fillStyle = "#f3e6d0";
       ctx.font = "8px monospace";
       ctx.fillText(`n ${n.toFixed(2)}   $ ${dollars.toFixed(2)}   T ${T > 40 ? "—" : T.toFixed(1) + "s"}`, 6, 12);
-      ctx.fillStyle = "#8a7864";
+      ctx.fillStyle = "#e8d8b8";
       ctx.fillText(`rod ${Math.round(insert * 100)}% in   hold ${hold.toFixed(1)}/${HOLD_TOTAL}${xe > 0.05 ? "   Xe" : ""}${wave > 1 ? "   W2" : ""}`, 6, 22);
       if (bannerT > 0) {
         ctx.fillStyle = "#b85c4a";
@@ -342,7 +342,7 @@ export function DelayGame({ onDone, onAbort }: { onDone: (score: number) => void
       }
       ctx.fillStyle = dollars >= 0.8 ? "#b85c4a" : inBand ? "#6b8f71" : "#c9a227";
       ctx.fillRect(6, H - 10, Math.min(120, Math.max(2, (dollars + 0.2) * 80)), 4);
-      ctx.fillStyle = "#8a7864";
+      ctx.fillStyle = "#e8d8b8";
       ctx.fillText("$0", 6, H - 14);
       ctx.fillText("$1 cliff", 90, H - 14);
       ctx.fillText("A/D slide  W in  S out  or drag", 150, H - 8);
