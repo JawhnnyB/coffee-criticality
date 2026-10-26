@@ -839,7 +839,12 @@ export function nextDay(s: GameState) {
   beginDay(s);
 }
 export function openTalk(s: GameState, npc: NpcId) {
-  s.dialogue = talkLines(npc, s.flags, s.culture, s.period, s.day, s.role, s.residue, !!s.flags.endingWalk, s.ended);
+  s.dialogue = talkLines(npc, s.flags, s.culture, s.period, s.day, s.role, s.residue, !!s.flags.endingWalk, s.ended, {
+    catches: s.catches,
+    hides: s.hides,
+    reports: s.reports,
+    trust: s.trust[npc] ?? 0,
+  });
   if (npc === "mabel" && s.day === 2 && s.role) {
     if (s.dialogue.some((l) => l.text === roleMouth(s.role as RoleId))) s.flags.roleHeard = true;
   }
@@ -852,11 +857,11 @@ export function openTalk(s: GameState, npc: NpcId) {
   bumpTrust(s, npc, first ? 4 : 1);
   if (npc === "holt" && s.residue.log === "open" && !s.flags.endingWalk) {
     const quoted = [...s.weekLog].reverse().find((e) => /CATCH/.test(e.text));
-    if (quoted) s.dialogue.splice(1, 0, {
-      speaker: "Holt",
-      text: `Parlor board. ${quoted.text} Volume I can use.`,
-      mood: "even"
-    });
+    if (quoted) {
+      const line: Line = { speaker: "Holt", text: `Parlor board. ${quoted.text} Volume I can use.`, mood: "even" };
+      if (s.dialogue.length >= 2) s.dialogue[1] = line;
+      else s.dialogue.push(line);
+    }
   }
   if (npc === "mabel") setGoal(s, "mabel");
   if (npc === "marcus") setGoal(s, "marcus");
