@@ -210,9 +210,10 @@ export function drawEmote(
 ) {
   const im = loadArt(`/art/gen/ui/emote_${kind}.png?v=eval1`);
   pix(ctx);
-  const px = Math.round(x - 8);
-  const py = Math.round(y - WALK_H - 14 + Math.sin(now * 4) * 1);
-  if (im) ctx.drawImage(im, 0, 0, 8, 8, px, py, 16, 16);
+  const size = 10;
+  const px = Math.round(x + 8);
+  const py = Math.round(y - WALK_H - size - 6 + Math.sin(now * 4));
+  if (im) ctx.drawImage(im, 0, 0, 8, 8, px, py, size, size);
 }
 
 function blitTile(ctx: CanvasRenderingContext2D, name: string, x: number, y: number, seed = 0) {

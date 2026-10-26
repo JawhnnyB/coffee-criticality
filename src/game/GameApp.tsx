@@ -48,7 +48,7 @@ import { hasSave, hydrateSave, peekSave, wipeSave, writeSave } from "./save";
 import { computeKeff } from "./nuclearLab";
 import { NuclearDesk } from "./NuclearDesk";
 import { LoopSchematic } from "./LoopSchematic";
-import { DEPARTMENTS, dayDef, eodNpcLine, shoreLine, yesterdayLine } from "./week";
+import { DEPARTMENTS, dayDef, eodNpcLine, incidentOwner, shoreLine, yesterdayLine } from "./week";
 import { DEFAULT_PLAYER_LOOK, HAIR_HEX, HOODIE_HEX, type HairId, type HoodieId, type PlayerLook } from "./artSpec";
 import { MAP_HUD, ROOM_BLURB, roomLinks } from "./site";
 import { TeachMeta, TeachPriya, TYPE_THUMB } from "./TeachFrame";
@@ -391,6 +391,7 @@ export function GameApp() {
         bump((n) => n + 1);
       },
       getLines: () => stateRef.current.dialogue.map((l) => l.text),
+      getTrust: (id: string) => stateRef.current.trust[id as keyof typeof stateRef.current.trust] ?? 0,
       getResidue: () => ({ ...stateRef.current.residue }),
       setShuffle: (v: boolean) => {
         stateRef.current.shuffleDone = v;
@@ -1172,6 +1173,7 @@ export function GameApp() {
 
         {mode === "incident" && (
           <IncidentStage
+            npc={incidentOwner(dayDef(s.day).incident)}
             title={dayIncident(s).title}
             body={dayIncident(s).body}
             report={dayIncident(s).report}
@@ -1600,6 +1602,7 @@ function DialogueStage({
 }
 
 function IncidentStage({
+  npc,
   title,
   body,
   report,
@@ -1611,6 +1614,7 @@ function IncidentStage({
   onPeer,
   onHide,
 }: {
+  npc: string;
   title: string;
   body: string;
   report: string;
@@ -1629,7 +1633,7 @@ function IncidentStage({
         data-testid="paper-incident"
       >
         <img
-          src="/art/gen/portraits/elena_talk.jpg?v=paint3"
+          src={`/art/gen/portraits/${npc}_talk.jpg?v=paint3`}
           alt=""
           width={192}
           height={288}
@@ -2628,14 +2632,14 @@ function Hud({
         <p className="font-display mt-1 max-w-[12.5rem] text-sm leading-snug text-muted">{objective}</p>
       </div>
       {nearLabel ? (
-        <div className="pointer-events-none absolute inset-x-0 bottom-10 z-20 flex justify-center px-4 sm:bottom-8">
+        <div className="pointer-events-none absolute inset-x-0 bottom-3 z-20 flex justify-center px-4">
           <p className="border border-accent bg-bg-elevated px-3 py-1.5 font-mono text-sm tracking-wide text-fg">
             E · {nearLabel}
           </p>
         </div>
       ) : null}
       {toast && (
-        <div className="pointer-events-none absolute inset-x-0 bottom-24 z-10 flex justify-center px-4 sm:bottom-10">
+        <div className={`pointer-events-none absolute inset-x-0 z-10 flex justify-center px-4 ${nearLabel ? "bottom-16" : "bottom-4"}`}>
           <div className="max-w-lg border border-border bg-bg-elevated/92 px-3 py-2 text-center font-display text-sm text-fg">
             {toast}
           </div>
@@ -2836,6 +2840,7 @@ declare global {
       beginEnding: () => void;
       resolve: (how: string) => void;
       getLines: () => string[];
+      getTrust: (id: string) => number;
       getResidue: () => { valve: string; tag: string; dose: string; log: string };
       setShuffle: (v: boolean) => void;
       getLive: () => Array<{ id: string; room: string; x: number; y: number; face: string; emote: string | null } | null>;

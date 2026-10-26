@@ -29,7 +29,7 @@ import {
 import { RADIUS, SPEED, WALL } from "./const";
 import { type PlantDesign, type ShuffleCell } from "./plant";
 import { DEFAULT_PLAYER_LOOK, type PlayerLook } from "./artSpec";
-import { INCIDENTS, occupancyOverlay, dayDef, COMMUTE_SPAWN, DUSK_SPAWN, type WeekLogEntry } from "./week";
+import { INCIDENTS, occupancyOverlay, dayDef, incidentOwner, COMMUTE_SPAWN, DUSK_SPAWN, type WeekLogEntry } from "./week";
 import { writeSave, wipeSave } from "./save";
 import { playCatch, playDoor, playFoot, playHide, playReport, playSit, playStand, playTalk } from "./audio";
 import { isRevealing, requestSkip } from "./chatter";
@@ -1327,6 +1327,7 @@ export function resolveIncident(s: GameState, how: "report" | "peer" | "hide") {
   addMinutes(s, 8);
   const pack = dayIncident(s);
   const key = residueKey(s.day);
+  const owner = incidentOwner(dayDef(s.day).incident);
   if (key) s.residue[key] = how === "hide" ? "hid" : "caught";
   s.flags.ruleSeen = true;
   if (how === "report") {
@@ -1334,8 +1335,7 @@ export function resolveIncident(s: GameState, how: "report" | "peer" | "hide") {
     s.catches += 1;
     s.flags.reported = true;
     bumpCulture(s, 10);
-    bumpTrust(s, "elena", 8);
-    bumpTrust(s, "holt", 6);
+    bumpTrust(s, owner, 8);
     playReport();
     pushLog(s, "report", `Day ${s.day} · Reported. ${pack.title}`);
     pushMsg(s, pack.report);
@@ -1343,9 +1343,9 @@ export function resolveIncident(s: GameState, how: "report" | "peer" | "hide") {
     s.catches += 1;
     s.flags.peered = true;
     s.flags.reported = true;
-    s.flags.elenaSecondEyes = true;
+    if (owner === "elena") s.flags.elenaSecondEyes = true;
     bumpCulture(s, 12);
-    bumpTrust(s, "elena", 12);
+    bumpTrust(s, owner, 12);
     setGoal(s, "peer");
     if (s.flags.jordanTalked) s.flags.jordanCredit = true;
     playCatch();
@@ -1355,8 +1355,7 @@ export function resolveIncident(s: GameState, how: "report" | "peer" | "hide") {
     s.hides += 1;
     s.flags.hid = true;
     bumpCulture(s, -8);
-    bumpTrust(s, "elena", -6);
-    bumpTrust(s, "holt", -4);
+    bumpTrust(s, owner, -6);
     playHide();
     pushLog(s, "hide", `Day ${s.day} · Hid. ${pack.title}`);
     pushMsg(s, pack.hide);

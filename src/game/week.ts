@@ -195,6 +195,13 @@ export function dayDef(n: number) {
   return WEEK[Math.max(0, Math.min(WEEK.length - 1, n - 1))];
 }
 
+export function incidentOwner(kind: DayDef["incident"]): NpcId {
+  if (kind === "lockout") return "tommy";
+  if (kind === "dose") return "marcus";
+  if (kind === "log") return "holt";
+  return "elena";
+}
+
 export function incidentRooms(kind: DayDef["incident"]): string[] {
   if (kind === "valve") return ["control", "maintenance"];
   if (kind === "lockout") return ["maintenance"];
@@ -282,7 +289,7 @@ export function occupancyOverlay(
   if (id === "marcus" && residue.dose === "caught") return { room: "maintenance", x: 140, y: 200, face: "left", radius: 12 };
   if (id === "marcus" && (residue.dose === "hid" || day === 3)) return { room: "maintenance", x: 232, y: 168, face: "up", radius: 12 };
   if (id === "holt" && residue.log === "caught") return { room: "control", x: 112, y: 140, face: "up", radius: 12 };
-  if (id === "holt" && (residue.log === "hid" || day === 4)) return { room: "control", x: 140, y: 236, face: "up", radius: 12 };
+  if (id === "holt" && (residue.log === "hid" || day === 4)) return { room: "control", x: 230, y: 210, face: "left", radius: 12 };
   if (day === 5 && id === "priya" && shuffleDone && !anyHid(residue)) {
     return { room: "reactor", x: 88, y: 196, face: "up", radius: 12 };
   }

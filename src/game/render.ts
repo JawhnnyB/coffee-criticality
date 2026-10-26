@@ -231,13 +231,21 @@ export function drawWorld(
 
   for (const p of room.props) {
     if (FLOOR_PROP.has(p.kind) || WALL_PROP.has(p.kind)) continue;
-    const py = p.rect.y + p.rect.h;
+    const foot = p.rect.y + p.rect.h;
+    // A lamp's fixture is in the air. Sort by the head, not the pole base,
+    // so the post draws behind anyone standing at the pole.
+    const py = p.kind === "lamp" ? p.rect.y + 4 : foot;
     drawables.push({
       y: py,
       draw: () => {
         drawPropPixel(g, p.kind, p.rect.x, p.rect.y, p.rect.w, p.rect.h, room.accent, now, p.label);
         if (p.kind === "roof" && p.label) {
-          pixText(g, p.label, p.rect.x + p.rect.w / 2, p.rect.y + 6, PAL.cream, p.rect.w - 8);
+          const viewLeft = camX - bw / 2;
+          const viewRight = camX + bw / 2;
+          const half = (p.label.length * 8 - 2) / 2;
+          const pad = 10;
+          const cx = Math.max(viewLeft + pad + half, Math.min(viewRight - pad - half, p.rect.x + p.rect.w / 2));
+          pixText(g, p.label, cx, p.rect.y + 6, PAL.cream, Math.max(p.rect.w - 8, p.label.length * 8));
         }
       },
     });
@@ -501,7 +509,7 @@ function drawPaperLog(ctx: CanvasRenderingContext2D, day: number, mark: ResidueH
     foot = caught ? "CAUGHT" : mark === "hid" ? "HID" : "CHECK";
   } else if (day === 4) {
     mid = caught ? "SIGNED" : mark === "hid" ? "YOUR NAME" : "- 07:12";
-    foot = caught ? "CAUGHT" : "BLANK";
+    foot = caught ? "CAUGHT" : mark === "hid" ? "HID" : "BLANK";
   } else {
     mid = "SHUFFLE";
     foot = "DAY";
