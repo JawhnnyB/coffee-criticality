@@ -29,7 +29,7 @@ const WALLS: { id: CabWall; title: string; line: string }[] = [
 
 export function Bezel({ children }: { children: ReactNode }) {
   return (
-    <div className="absolute inset-0 z-30 flex items-stretch justify-center bg-[#0b0908]/88 p-2 sm:p-4">
+    <div className="absolute inset-0 z-30 flex items-stretch justify-center bg-[#2a1c14]/80 p-2 sm:p-4">
       <div className="cabinet w-full max-w-6xl">
         <div className="cabinet-marquee">
           <span>Mabel’s parlor</span>
@@ -73,12 +73,12 @@ export function ArcadeHall({
                   key={c.id}
                   type="button"
                   onClick={() => onPick(c.id)}
-                  className="flex flex-col items-center border border-[#c9a227]/40 bg-[#1a1410] px-2 py-3 text-center hover:border-[#c4783a] hover:bg-[#2a2218]"
+                  className="flex flex-col items-center border border-[#c4783a]/50 bg-[#f3e6d0] px-2 py-3 text-center hover:border-[#8a4820]"
                   data-testid={"cab-" + c.id}
                 >
                   <img src={c.art} alt="" width={32} height={48} className="h-8 w-5" style={{ imageRendering: "pixelated" }} />
-                  <span className="mt-1 font-mono text-[10px] tracking-widest text-[#f3e6d0]">{c.title}</span>
-                  <span className="mt-0.5 text-[9px] leading-snug text-[#b5a48c]">{c.line}</span>
+                  <span className="mt-1 font-mono text-[10px] tracking-widest text-[#2a2218]">{c.title}</span>
+                  <span className="mt-0.5 text-[9px] leading-snug text-[#6a4a32]">{c.line}</span>
                 </button>
               ))}
             </div>

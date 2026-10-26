@@ -73,7 +73,7 @@ export function OpenMCPane({ plant, tall = true }: { plant: PlantDesign; tall?: 
       <pre
         data-testid="openmc-source"
         className={
-          "mt-2 overflow-auto rounded-md border border-border bg-[#0b0a09] p-4 font-mono text-[12px] leading-relaxed text-[#6b8f71] " +
+          "mt-2 overflow-auto rounded-md border border-[#c4783a] bg-[#2a2218] p-4 font-mono text-[12px] leading-relaxed text-[#f3e6d0] " +
           (tall ? "min-h-[22rem] max-h-[36rem]" : "max-h-72")
         }
       >
@@ -89,7 +89,7 @@ export function OpenMCPane({ plant, tall = true }: { plant: PlantDesign; tall?: 
 
 function TermWindow({ lesson, onClose }: { lesson: TermLesson; onClose: () => void }) {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#0b0a09]/85 p-3 sm:p-6" onClick={onClose}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#2a1c14]/80 p-3 sm:p-6" onClick={onClose}>
       <div
         className="max-h-[92vh] w-full max-w-3xl overflow-y-auto border border-[#6a4a32] bg-[#f3e6d0] p-6 text-[#16110d] sm:p-8"
         onClick={(e) => e.stopPropagation()}
@@ -122,7 +122,7 @@ function TermWindow({ lesson, onClose }: { lesson: TermLesson; onClose: () => vo
         </section>
         <section className="mt-6">
           <h4 className="font-mono text-xs tracking-widest text-[#6a4a32]">IN THE EQUATION</h4>
-          <pre className="mt-2 overflow-x-auto border border-[#6a4a32] bg-[#16110d] p-4 font-mono text-[15px] leading-relaxed text-[#6b8f71]">
+          <pre className="mt-2 overflow-x-auto border border-[#c4783a] bg-[#2a2218] p-4 font-mono text-[15px] leading-relaxed text-[#f3e6d0]">
             {lesson.equation}
           </pre>
         </section>

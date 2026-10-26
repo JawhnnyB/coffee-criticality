@@ -143,16 +143,18 @@ def door():
 
 
 def van():
-    im = new(96, 48)
+    """Taller than a 64px person. A Pacifica roof clears a head. Footprint stays the lot rect."""
+    im = new(120, 72)
     d = ImageDraw.Draw(im)
-    box(d, 8, 10, 80, 30, STEEL_L, STEEL, STEEL_D)
-    d.rectangle([8, 22, 87, 26], fill=COPPER)
-    d.rectangle([18, 14, 38, 24], fill=CREAM, outline=INK)
-    d.rectangle([44, 14, 64, 24], fill=CREAM, outline=INK)
-    d.ellipse([18, 34, 32, 46], fill=INK)
-    d.ellipse([62, 34, 76, 46], fill=INK)
-    d.ellipse([21, 37, 29, 43], fill=COPPER)
-    d.ellipse([65, 37, 73, 43], fill=COPPER)
+    box(d, 8, 16, 104, 40, STEEL_L, STEEL, STEEL_D)
+    d.rectangle([8, 36, 111, 42], fill=COPPER)
+    d.rectangle([16, 22, 48, 38], fill=CREAM, outline=INK)
+    d.rectangle([54, 22, 86, 38], fill=CREAM, outline=INK)
+    d.rectangle([92, 24, 108, 36], fill=(232, 168, 96, 255), outline=INK)
+    d.ellipse([18, 50, 38, 68], fill=INK)
+    d.ellipse([78, 50, 98, 68], fill=INK)
+    d.ellipse([22, 54, 34, 64], fill=COPPER)
+    d.ellipse([82, 54, 94, 64], fill=COPPER)
     save(im, PROP / "van.png")
 
 

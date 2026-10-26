@@ -330,8 +330,16 @@ export function skyBand(
 ) {
   const name = period === "afternoon" ? "sky_dusk" : period === "midday" ? "sky_midday" : "sky_morning";
   const im = loadArt(`/art/gen/tiles/${name}.png?v=warm7`);
-  const band = h - 6;
-  if (im && isTileSource(im.naturalWidth, im.naturalHeight)) {
+  const band = h - 8;
+  if (period === "afternoon") {
+    const g = ctx.createLinearGradient(x, y, x, y + h);
+    g.addColorStop(0, "#6a3a48");
+    g.addColorStop(0.45, "#c4784a");
+    g.addColorStop(0.78, "#e8a060");
+    g.addColorStop(1, "#f3c9a0");
+    ctx.fillStyle = g;
+    ctx.fillRect(x, y, w, h);
+  } else if (im && isTileSource(im.naturalWidth, im.naturalHeight)) {
     pix(ctx);
     for (let yy = y; yy < y + band; yy += TILE) {
       for (let xx = x; xx < x + w; xx += TILE) {
@@ -339,9 +347,9 @@ export function skyBand(
       }
     }
   } else {
-    fill(ctx, x, y, w, h, period === "afternoon" ? PAL.skyDusk : PAL.sky);
+    fill(ctx, x, y, w, h, PAL.sky);
   }
-  fill(ctx, x, y + h - 6, w, 6, period === "afternoon" ? "#e8b070" : "#7aaa58");
+  fill(ctx, x, y + h - 8, w, 8, period === "afternoon" ? "#f0c090" : "#7aaa58");
 }
 
 /** Distant shells in the outdoor sky band. Unwalkable. Not 16:9 rooms. */
@@ -435,7 +443,7 @@ export function drawNameplate(ctx: CanvasRenderingContext2D, x: number, y: numbe
   }
 }
 
-/** Campus shell: peaked roof, plaster, lit windows. Not a flat color block. */
+/** Campus shell. One peaked roof is not a building. Each label gets its own wall, windows, and door side. */
 function drawCampusBuilding(
   ctx: CanvasRenderingContext2D,
   ox: number,
@@ -445,62 +453,105 @@ function drawCampusBuilding(
   label: string | undefined,
   now: number,
 ) {
-  const roofs: Record<string, string> = {
-    Cafe: PAL.copper,
-    Arcade: "#a85a30",
-    Hall: PAL.steel,
-    Control: "#8a7040",
-    Eng: "#6a7e8a",
-    Break: PAL.wood,
-    Core: PAL.leaf,
-    Maint: "#4a6a72",
+  type Face = "south" | "north" | "east" | "west";
+  type Spec = {
+    roof: string;
+    roofD: string;
+    wall: string;
+    wallD: string;
+    trim: string;
+    face: Face;
+    door: number;
+    win: "pane" | "slit" | "bay" | "pair";
+    cols: number;
+    rows: number;
+    chimney?: boolean;
+    brick?: boolean;
+    rib?: boolean;
   };
-  const roof = roofs[label ?? ""] ?? PAL.wood;
-  const wall = "#e7d3b4";
-  const wallD = "#c9b08a";
-  const eave = Math.max(12, Math.min(h - 16, Math.floor(h * 0.4)));
-  fill(ctx, ox + 3, oy + h - 3, w - 4, 3, "#5a4330");
-  fill(ctx, ox + 4, oy + eave - 2, w - 8, h - eave - 1, wall);
-  fill(ctx, ox + w - 8, oy + eave, 4, Math.max(4, h - eave - 4), wallD);
-  for (let i = 0; i < eave; i++) {
-    const t = i / Math.max(1, eave - 1);
-    const inset = Math.round((1 - t) * Math.min(16, Math.floor(w * 0.16)));
-    const stripe = i % 5 === 0 ? PAL.copperD : roof;
-    fill(ctx, ox + inset, oy + i, Math.max(4, w - inset * 2), 1, stripe);
-  }
-  fill(ctx, ox + 2, oy + eave - 3, w - 4, 3, PAL.copperL);
-  if (label === "Cafe" || label === "Core" || label === "Break") {
-    const cx = ox + w - 18;
-    fill(ctx, cx, oy + 6, 6, Math.max(6, eave - 4), "#5a6a70");
-    fill(ctx, cx - 1, oy + 3, 8, 4, "#3a4a50");
-    const puff = 1 + Math.round((Math.sin(now * 1.6 + ox) + 1) * 1.5);
-    fill(ctx, cx + 1, oy + 1 - puff, 3, puff + 2, "rgba(243,230,208,0.7)");
-  }
-  const cols = Math.max(1, Math.min(4, Math.floor((w - 22) / 16)));
-  const rows = Math.max(1, Math.min(3, Math.floor((h - eave - 18) / 14)));
-  const glow = 0.35 + Math.sin(now * 2.2 + ox * 0.01) * 0.08;
-  for (let r = 0; r < rows; r++) {
-    for (let c = 0; c < cols; c++) {
-      const wx = ox + 12 + c * 16;
-      const wy = oy + eave + 4 + r * 14;
-      if (wy + 8 > oy + h - 14) continue;
-      fill(ctx, wx - 1, wy - 1, 10, 9, `rgba(232,168,96,${glow})`);
-      fill(ctx, wx, wy, 8, 7, PAL.ink);
-      fill(ctx, wx + 1, wy + 1, 6, 5, "#ffe0a0");
-      fill(ctx, wx + 4, wy + 1, 1, 5, PAL.ink);
-      fill(ctx, wx + 1, wy + 3, 6, 1, PAL.ink);
+  const specs: Record<string, Spec> = {
+    Cafe: { roof: PAL.copper, roofD: PAL.copperD, wall: "#e7d3b4", wallD: "#c9b08a", trim: PAL.copperL, face: "east", door: 0.86, win: "pane", cols: 3, rows: 2, chimney: true },
+    Arcade: { roof: "#a85a30", roofD: "#6a3018", wall: "#d7c4a4", wallD: "#b89a74", trim: PAL.gold, face: "south", door: 0.5, win: "bay", cols: 2, rows: 1 },
+    Hall: { roof: "#6a7a82", roofD: "#3a4a52", wall: "#c4b29a", wallD: "#9a8068", trim: PAL.steelL, face: "west", door: 0.42, win: "slit", cols: 5, rows: 2, brick: true },
+    Control: { roof: "#8a7040", roofD: "#5a4020", wall: "#d2c2a4", wallD: "#a89070", trim: PAL.gold, face: "south", door: 0.5, win: "slit", cols: 4, rows: 1 },
+    Eng: { roof: "#5a727c", roofD: "#2e444c", wall: "#d8d0c4", wallD: "#aea498", trim: PAL.steelL, face: "north", door: 0.5, win: "pair", cols: 3, rows: 2 },
+    Break: { roof: PAL.wood, roofD: PAL.woodDark, wall: "#ead8bc", wallD: "#c8b090", trim: PAL.copperL, face: "west", door: 0.55, win: "bay", cols: 2, rows: 1, chimney: true },
+    Core: { roof: "#4a6a52", roofD: "#243828", wall: "#c8c2b4", wallD: "#8a8478", trim: PAL.leaf, face: "west", door: 0.28, win: "slit", cols: 3, rows: 1, rib: true },
+    Maint: { roof: "#4a6a72", roofD: "#24383c", wall: "#c2beb4", wallD: "#8a8680", trim: "#7a9aa0", face: "north", door: 0.5, win: "slit", cols: 6, rows: 1, rib: true },
+  };
+  const spec = specs[label ?? ""] ?? specs.Cafe;
+  const eave = Math.max(8, Math.min(h - 18, Math.floor(h * (h < 72 ? 0.28 : 0.36))));
+  fill(ctx, ox + 2, oy + h - 3, w - 2, 3, "#5a4330");
+  fill(ctx, ox + 3, oy + eave - 1, w - 6, h - eave, spec.wall);
+  fill(ctx, ox + w - 8, oy + eave, 5, Math.max(4, h - eave - 3), spec.wallD);
+  for (let yy = eave; yy < h - 2; yy += 4) {
+    for (let xx = 4; xx < w - 8; xx += 5) {
+      const n = ((ox + xx) * 13 + (oy + yy) * 7) & 7;
+      if (n === 0) fill(ctx, ox + xx, oy + yy, spec.brick ? 3 : 1, 1, spec.wallD);
+      if (spec.brick && n === 3) fill(ctx, ox + xx, oy + yy + 2, 2, 1, "#b89a78");
     }
   }
-  if (h > 28 && w > 24) {
-    const dw = Math.max(6, Math.min(10, Math.floor(w / 7)));
-    const dh = Math.max(8, Math.min(18, Math.floor(h * 0.28)));
-    const dx = ox + Math.floor(w / 2) - Math.floor(dw / 2);
-    const dy = oy + h - dh - 4;
-    fill(ctx, dx, dy, dw, dh, PAL.woodDark);
-    fill(ctx, dx + 1, dy + 1, dw - 2, 2, PAL.woodL);
-    fill(ctx, dx + dw - 3, dy + Math.floor(dh / 2), 2, 2, PAL.gold);
+  for (let i = 0; i < eave; i++) {
+    const t = i / Math.max(1, eave - 1);
+    const inset = Math.round((1 - t) * Math.min(18, Math.floor(w * 0.18)));
+    const shade = spec.rib ? (i % 3 === 0 ? spec.roofD : spec.roof) : i % 4 === 0 ? spec.roofD : spec.roof;
+    fill(ctx, ox + inset, oy + i, Math.max(4, w - inset * 2), 1, shade);
+    if (i < eave * 0.45 && inset + 2 < w / 2) fill(ctx, ox + inset, oy + i, 2, 1, spec.trim);
   }
-  outlineRect(ctx, ox + 4, oy + eave - 2, w - 8, h - eave - 1, PAL.ink);
+  fill(ctx, ox + 1, oy + eave - 2, w - 2, 2, spec.trim);
+  if (spec.chimney && h > 48) {
+    const cx = ox + w - 16;
+    fill(ctx, cx, oy + 4, 5, Math.max(4, eave - 6), "#5a6a70");
+    fill(ctx, cx - 1, oy + 2, 7, 3, "#3a4a50");
+    const puff = 1 + Math.round((Math.sin(now * 1.6 + ox) + 1) * 1.5);
+    fill(ctx, cx + 1, oy - puff, 3, puff + 2, "rgba(243,230,208,0.75)");
+  }
+  const glow = 0.42 + Math.sin(now * 2.2 + ox * 0.01) * 0.1;
+  const cols = Math.max(1, Math.min(spec.cols, Math.floor((w - 20) / (spec.win === "slit" ? 12 : 16))));
+  const rows = Math.max(1, Math.min(spec.rows, Math.floor((h - eave - 16) / 12)));
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      const gap = spec.win === "slit" ? 12 : 16;
+      const wx = ox + 10 + c * gap;
+      const wy = oy + eave + 3 + r * 12;
+      if (wy + 6 > oy + h - 12) continue;
+      if (spec.win === "slit") {
+        fill(ctx, wx, wy + 2, 8, 3, `rgba(232,168,96,${glow})`);
+        fill(ctx, wx + 1, wy + 3, 6, 1, "#ffe0a0");
+      } else if (spec.win === "bay") {
+        fill(ctx, wx - 1, wy - 1, 14, 10, `rgba(232,168,96,${glow})`);
+        fill(ctx, wx, wy, 12, 8, "#1a1410");
+        fill(ctx, wx + 1, wy + 1, 10, 6, "#ffe0a0");
+        fill(ctx, wx + 6, wy + 1, 1, 6, PAL.ink);
+      } else if (spec.win === "pair") {
+        fill(ctx, wx, wy, 6, 7, `rgba(232,168,96,${glow * 0.8})`);
+        fill(ctx, wx + 1, wy + 1, 4, 5, "#d8e4ea");
+        fill(ctx, wx + 8, wy, 6, 7, `rgba(232,168,96,${glow})`);
+        fill(ctx, wx + 9, wy + 1, 4, 5, "#ffe0a0");
+      } else {
+        fill(ctx, wx - 1, wy - 1, 10, 8, `rgba(232,168,96,${glow})`);
+        fill(ctx, wx, wy, 8, 6, PAL.ink);
+        fill(ctx, wx + 1, wy + 1, 6, 4, "#ffe0a0");
+        fill(ctx, wx + 4, wy + 1, 1, 4, PAL.ink);
+        fill(ctx, wx + 1, wy + 3, 6, 1, PAL.ink);
+      }
+    }
+  }
+  if (h > 26 && w > 22) {
+    const dw = Math.max(6, Math.min(10, Math.floor(w / 8)));
+    const dh = Math.max(8, Math.min(16, Math.floor((h - eave) * 0.42)));
+    const along = Math.max(0, Math.min(1, spec.door));
+    let dx = ox + 6;
+    let dy = oy + h - dh - 3;
+    if (spec.face === "east") dx = ox + w - dw - 6;
+    else if (spec.face === "west") dx = ox + 6;
+    else dx = ox + Math.round((w - dw - 12) * along) + 6;
+    if (spec.face === "north") dy = oy + eave + 1;
+    fill(ctx, dx, dy, dw, dh, PAL.woodDark);
+    fill(ctx, dx + 1, dy + 1, dw - 2, Math.max(2, Math.floor(dh * 0.35)), PAL.woodL);
+    fill(ctx, dx + dw - 3, dy + Math.floor(dh * 0.45), 2, 2, PAL.gold);
+  }
+  outlineRect(ctx, ox + 3, oy + eave - 1, w - 6, h - eave, PAL.ink);
 }
 
 export function drawPropPixel(
@@ -516,7 +567,7 @@ export function drawPropPixel(
 ) {
   const ox = Math.floor(x);
   const oy = Math.floor(y);
-  const im = kind === "roof" || kind === "stack" ? null : loadArt(`/art/gen/props/${kind}.png?v=${kind === "boom" ? "gate2" : "eval1"}`);
+  const im = kind === "roof" || kind === "stack" ? null : loadArt(`/art/gen/props/${kind}.png?v=${kind === "boom" ? "gate2" : kind === "van" ? "tall1" : "eval1"}`);
   if (im) {
     pix(ctx);
     const nw = im.naturalWidth;

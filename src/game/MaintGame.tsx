@@ -122,7 +122,7 @@ export function MaintGame({
 
       ctx.save();
       if (shake > 0) ctx.translate((Math.random() - 0.5) * 6, (Math.random() - 0.5) * 4);
-      ctx.fillStyle = "#0a1210";
+      ctx.fillStyle = "#2a2218";
       ctx.fillRect(0, 0, W, H);
       ctx.fillStyle = "#1a1814";
       ctx.fillRect(70, 22, 180, 130);

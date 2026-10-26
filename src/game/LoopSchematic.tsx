@@ -5,7 +5,7 @@ export function LoopSchematic({ hot = true }: { hot?: boolean }) {
   const core = hot ? "#2a86a0" : "#8a9088";
   const glow = hot ? "#7ec8d8" : "#c8c4b8";
   return (
-    <div className="overflow-hidden rounded-md border border-border bg-[#0a1220] p-2" data-testid="loop-schematic">
+    <div className="overflow-hidden rounded-md border border-[#c4783a]/60 bg-[#2a2218] p-2" data-testid="loop-schematic">
       <p className="font-mono text-[10px] tracking-widest text-good">PRIMARY LOOP  ·  this site  ·  teaching only</p>
       <svg viewBox="0 0 320 100" className="mt-1 h-[100px] w-full" aria-hidden>
         <rect x="8" y="10" width="70" height="72" rx="6" fill="#3d5c66" stroke="#1a1410" strokeWidth="3" />

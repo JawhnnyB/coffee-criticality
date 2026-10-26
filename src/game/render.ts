@@ -249,13 +249,9 @@ export function drawWorld(
       y: py,
       draw: () => {
         drawPropPixel(g, p.kind, p.rect.x, p.rect.y, p.rect.w, p.rect.h, room.accent, now, p.label);
-        if (p.kind === "roof" && p.label) {
-          const viewLeft = camX - bw / 2;
-          const viewRight = camX + bw / 2;
-          const half = (p.label.length * 8 - 2) / 2;
-          const pad = 10;
-          const cx = Math.max(viewLeft + pad + half, Math.min(viewRight - pad - half, p.rect.x + p.rect.w / 2));
-          pixText(g, p.label, cx, p.rect.y + 6, PAL.cream, Math.max(p.rect.w - 8, p.label.length * 8));
+        if (outdoor && p.kind === "roof" && (s.period === "afternoon" || s.flags.endingWalk)) {
+          windowWash(g, p.rect.x, p.rect.y + Math.floor(p.rect.h * 0.35), p.rect.w, 10, "afternoon");
+          lampGlow(g, p.rect.x + p.rect.w * 0.5, p.rect.y + p.rect.h, now, "afternoon");
         }
       },
     });
@@ -372,9 +368,10 @@ export function drawWorld(
   ctx.fillRect(0, 0, viewW, viewH);
   if (s.flags.endingWalk && (room.floorKind === "grass" || room.floorKind === "asphalt")) {
     const g = ctx.createLinearGradient(0, 0, 0, viewH);
-    g.addColorStop(0, "rgba(255, 196, 120, 0.42)");
-    g.addColorStop(0.42, "rgba(232, 150, 80, 0.16)");
-    g.addColorStop(1, "rgba(120, 64, 36, 0.10)");
+    g.addColorStop(0, "rgba(255, 176, 120, 0.55)");
+    g.addColorStop(0.28, "rgba(232, 120, 90, 0.28)");
+    g.addColorStop(0.62, "rgba(232, 168, 96, 0.12)");
+    g.addColorStop(1, "rgba(90, 40, 28, 0.08)");
     ctx.fillStyle = g;
     ctx.fillRect(0, 0, viewW, viewH);
   }
