@@ -419,6 +419,7 @@ export function drawWorld(
     g.fillRect(0, 0, 1, room.h);
     g.fillRect(room.w - 1, 0, 1, room.h);
     g.fillRect(0, room.h - 1, room.w, 1);
+    if (room.id === "gate") g.fillRect(0, 0, room.w, 1);
   }
 
   g.restore();
