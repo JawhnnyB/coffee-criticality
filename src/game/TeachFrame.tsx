@@ -1,6 +1,9 @@
 "use client";
 
-import type { ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
+import { ART } from "./artFlags";
+import { Chatter } from "./Chatter";
+import { isRevealing, subscribeReveal } from "./chatter";
 
 /** Shared teaching chrome for Priya's designer and Academy. Visual only. */
 export function TeachMeta({ children }: { children: ReactNode }) {
@@ -8,6 +11,24 @@ export function TeachMeta({ children }: { children: ReactNode }) {
 }
 
 export function TeachPriya({ line, size = 96 }: { line: string; size?: 64 | 96 | 128 }) {
+  const [talk, setTalk] = useState(isRevealing);
+  useEffect(() => subscribeReveal(setTalk), []);
+  if (ART.menu) {
+    const zoom = 6;
+    return (
+      <div className="teach-paper flex flex-wrap items-start gap-3">
+        <img
+          src={talk ? "/art/ui/priya-talk.png" : "/art/ui/priya-48.png"}
+          alt="Dr. Priya Sharma"
+          width={48}
+          height={48}
+          className="shrink-0"
+          style={{ width: 48 * zoom, height: 48 * zoom, imageRendering: "pixelated" }}
+        />
+        <Chatter key={line} text={line} voice="priya" className="teach-body cc-prose min-w-0 flex-1" />
+      </div>
+    );
+  }
   const px = size === 64 ? "h-16 w-16" : size === 128 ? "h-32 w-32" : "h-24 w-24";
   return (
     <div className="teach-paper flex gap-3">

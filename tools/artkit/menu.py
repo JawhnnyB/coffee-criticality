@@ -172,6 +172,53 @@ def menu():
     cv.r(W-52, 5, 46, 11, OL); cv.r(W-51, 6, 44, 9, hx('#2a1610')); text(cv, W-47, 9, 'SOUND ON', hx('#f3e6d0'))
     return cv
 
+def button_sprite(label, sel):
+    """Idle and selected buttons, including the 2px drop and the selection arrows.
+    The button body sits at x=6 so the left arrow (centre at body-6) stays inside."""
+    bw, bh = 84, 14
+    cv = Cv(100, 16)
+    button(cv, 6, 0, bw, bh, label, sel)
+    return cv
+
+def chip_sprite(label):
+    cv = Cv(46, 11)
+    cv.r(0, 0, 46, 11, OL)
+    cv.r(1, 1, 44, 9, hx('#2a1610'))
+    text(cv, 5, 4, label, hx('#f3e6d0'))
+    return cv
+
+def _diffs(a, b):
+    if a.size != b.size: return -1
+    pa, pb = a.load(), b.load()
+    n = 0
+    for y in range(a.height):
+        for x in range(a.width):
+            if pa[x, y] != pb[x, y]: n += 1
+    return n
+
+def save_parts(menu_cv):
+    labels = ('BEGIN', 'CONTINUE', 'SETTINGS')
+    sheet = Cv(100, 16 * 6)
+    for i, label in enumerate(labels):
+        for k, sel in enumerate((True, False)):
+            spr = button_sprite(label, sel)
+            sheet.im.alpha_composite(spr.im, (0, (i * 2 + k) * 16))
+    sheet.save(f'{OUT}/menu-parts.png')
+    chips = Cv(46, 22)
+    on, off = chip_sprite('SOUND ON'), chip_sprite('SOUND OFF')
+    chips.im.alpha_composite(on.im, (0, 0))
+    chips.im.alpha_composite(off.im, (0, 11))
+    chips.save(f'{OUT}/menu-chips.png')
+    # Idle CONTINUE in the reference is this sprite's body. Selected SOUND ON chip too.
+    body = button_sprite('CONTINUE', False).im.crop((6, 0, 90, 16))
+    crop = menu_cv.im.crop((150, 103, 234, 119))
+    chip = menu_cv.im.crop((332, 5, 378, 16))
+    db, dc = _diffs(body, crop), _diffs(on.im, chip)
+    if db or dc:
+        raise SystemExit(f'menu parts drifted from menu.png (button {db}, chip {dc})')
+
 if __name__ == '__main__':
     m = menu(); m.save(f'{OUT}/menu.png'); m.save(f'{OUT}/menu-3x.png', 3); print('menu')
     s = scene(); s.save(f'{OUT}/menu-scene.png')
+    save_parts(m)
+

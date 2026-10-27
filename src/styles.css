@@ -174,7 +174,7 @@
   border-radius: 0;
   border: 1px solid #3b2318;
   background: #f3e6d0;
-  line-height: 0;
+  line-height: normal;
 }
 .pixel-fold {
   border: 1px solid #3b2318;
@@ -198,6 +198,205 @@
   display: block;
   height: 100%;
   background: #c4783a;
+}
+
+/* Stage 2 pixel UI. Sizes stay on the 10 / 20 / 30 grid. No blur, no radius, no gradient. */
+.art-on {
+  --font-display: "CCPixel5x7", monospace;
+  --font-sans: "CCPixel3x5", monospace;
+  --font-mono: "CCPixel3x5", monospace;
+  font-family: "CCPixel3x5", monospace;
+  -webkit-font-smoothing: none;
+  -moz-osx-font-smoothing: unset;
+  font-smooth: never;
+  text-rendering: optimizeSpeed;
+}
+.art-on .font-display,
+.art-on h1,
+.art-on h2,
+.art-on .teach-title {
+  font-family: "CCPixel5x7", monospace;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+.art-on .text-4xl,
+.art-on .text-5xl,
+.art-on .sm\:text-4xl,
+.art-on .sm\:text-5xl,
+.art-on .text-3xl,
+.art-on .sm\:text-3xl {
+  font-family: "CCPixel5x7", monospace !important;
+  font-size: 30px !important;
+  line-height: 1 !important;
+  letter-spacing: 0 !important;
+}
+.art-on .text-2xl,
+.art-on .text-xl,
+.art-on .text-lg,
+.art-on .sm\:text-2xl,
+.art-on .sm\:text-xl,
+.art-on .teach-title {
+  font-family: "CCPixel5x7", monospace !important;
+  font-size: 20px !important;
+  line-height: 1 !important;
+  letter-spacing: 0 !important;
+}
+.art-on .text-base,
+.art-on .text-sm,
+.art-on .text-xs,
+.art-on .text-\[10px\],
+.art-on .text-\[11px\],
+.art-on .text-\[12px\],
+.art-on .font-mono,
+.art-on .teach-meta,
+.art-on .teach-kicker {
+  font-family: "CCPixel3x5", monospace !important;
+  font-size: 10px !important;
+  line-height: 1.2 !important;
+  letter-spacing: 0 !important;
+}
+.art-on .dialogue-line,
+.art-on .teach-body,
+.art-on .cc-prose {
+  font-family: "Pixelify Sans", sans-serif !important;
+  font-size: 16px !important;
+  line-height: 1.35 !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  -webkit-font-smoothing: none;
+  font-smooth: never;
+  text-rendering: optimizeSpeed;
+}
+.art-on .cc-label {
+  font-family: "CCPixel3x5", monospace !important;
+  font-size: 20px !important;
+  line-height: 20px !important;
+  letter-spacing: 0 !important;
+  text-transform: uppercase;
+  -webkit-font-smoothing: none;
+  font-smooth: never;
+  text-rendering: optimizeSpeed;
+}
+.art-on .cc-label-sm {
+  font-family: "CCPixel3x5", monospace !important;
+  font-size: 10px !important;
+  line-height: 10px !important;
+  letter-spacing: 0 !important;
+  text-transform: uppercase;
+  -webkit-font-smoothing: none;
+  font-smooth: never;
+  text-rendering: optimizeSpeed;
+}
+.art-on .cc-title {
+  font-family: "CCPixel5x7", monospace !important;
+  font-size: 20px !important;
+  line-height: 14px !important;
+  letter-spacing: 0 !important;
+  text-transform: uppercase;
+  color: #f3e6d0;
+  -webkit-font-smoothing: none;
+  font-smooth: never;
+  text-rendering: optimizeSpeed;
+}
+.cc-sound,
+.art-on .cc-sound {
+  font-family: "CCPixel3x5", monospace;
+  font-size: 20px;
+  line-height: 10px;
+  letter-spacing: 0;
+  text-transform: uppercase;
+  color: #f3e6d0;
+  background: #2a1610;
+  border: 1px solid #3b2318;
+  border-radius: 0;
+  padding: 4px 6px;
+  box-shadow: none;
+  -webkit-font-smoothing: none;
+  font-smooth: never;
+  text-rendering: optimizeSpeed;
+}
+.cc-btn {
+  display: block;
+  width: 100%;
+  margin-top: 8px;
+  font-family: "CCPixel3x5", monospace;
+  font-size: 20px;
+  line-height: 10px;
+  letter-spacing: 0;
+  text-transform: uppercase;
+  color: #3b2318;
+  background: #f3e6d0;
+  border: 1px solid #3b2318;
+  border-radius: 0;
+  padding: 6px 8px;
+  box-shadow: none;
+  -webkit-font-smoothing: none;
+  font-smooth: never;
+  text-rendering: optimizeSpeed;
+}
+.cc-sheet {
+  width: min(420px, 100%);
+  background: #2a1610;
+  color: #f3e6d0;
+  border: 1px solid #3b2318;
+  border-radius: 0;
+  padding: 12px;
+  box-shadow: none;
+}
+.cc-sheet .cc-title {
+  display: block;
+  margin-bottom: 8px;
+}
+.cc-hit {
+  position: absolute;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+.art-on .btn-primary,
+.art-on .btn-ghost {
+  font-family: "CCPixel3x5", monospace;
+  font-size: 20px;
+  line-height: 10px;
+  letter-spacing: 0;
+  text-transform: uppercase;
+  border-radius: 0;
+  box-shadow: none;
+  -webkit-font-smoothing: none;
+  font-smooth: never;
+  text-rendering: optimizeSpeed;
+}
+.art-on .btn-primary:active,
+.art-on .btn-primary:hover {
+  transform: none;
+  opacity: 1;
+}
+.art-on button,
+.art-on .paper,
+.art-on .teach-paper,
+.art-on .rounded,
+.art-on .rounded-sm,
+.art-on .rounded-md,
+.art-on .rounded-lg,
+.art-on .rounded-full,
+.art-on a {
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+.art-on .backdrop-blur-sm,
+.art-on [class*="backdrop-blur"] {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+.art-on .intro-portrait {
+  filter: none !important;
+}
+.art-on .bg-gradient-to-t {
+  background-image: none !important;
+  background-color: rgba(22, 17, 13, 0.72) !important;
 }
 
 .paper {

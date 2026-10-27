@@ -57,3 +57,4 @@ if __name__ == '__main__':
         p = priya(m, ('#f3c9a0', '#a8d0c8', '#d8c8f0')[i]); sheet.im.alpha_composite(p.im, (16+i*(48+16), 16))
     sheet.save(f'{OUT}/priya-sheet.png', 6)
     priya().save(f'{OUT}/priya-48.png'); priya().save(f'{OUT}/priya-48-6x.png', 6)
+    priya('talk').save(f'{OUT}/priya-talk.png'); priya('talk').save(f'{OUT}/priya-talk-6x.png', 6)

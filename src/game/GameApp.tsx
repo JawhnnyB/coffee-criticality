@@ -39,7 +39,7 @@ import { ReactorBuilder } from "./ReactorBuilder";
 import { FuelShuffle } from "./FuelShuffle";
 import { MaintGame } from "./MaintGame";
 import { isMuted, playBed, playBlip, setMuted, unlockAudio, syncWorld, getAudioProbe, bedForRoom } from "./audio";
-import { isRevealing, requestSkip } from "./chatter";
+import { isRevealing, requestSkip, subscribeReveal } from "./chatter";
 import { Chatter } from "./Chatter";
 import { paintPlayerPortrait } from "./paintedLook";
 import { heartCount, tintA6 } from "./pixel";
@@ -53,6 +53,8 @@ import { DEPARTMENTS, dayDef, eodNpcLine, incidentOwner, shoreLine, yesterdayLin
 import { DEFAULT_PLAYER_LOOK, HAIR_HEX, HOODIE_HEX, type HairId, type HoodieId, type PlayerLook } from "./artSpec";
 import { MAP_HUD, ROOM_BLURB, roomLinks } from "./site";
 import { TeachMeta, TeachPriya, TYPE_THUMB } from "./TeachFrame";
+import { ART } from "./artFlags";
+import { PixelMenu, PixelRead } from "./PixelMenu";
 import {
   abortOverlay,
   beginDay,
@@ -616,10 +618,10 @@ export function GameApp() {
   };
 
   return (
-    <div className="relative flex h-svh min-h-[100dvh] flex-col overflow-hidden bg-bg text-fg">
+    <div className={"relative flex h-svh min-h-[100dvh] flex-col overflow-hidden bg-bg text-fg" + (ART.hud || ART.menu ? " art-on" : "")}>
       <header className="pointer-events-none absolute inset-x-0 top-0 z-40 flex items-start justify-between gap-3 p-3 sm:p-4">
-        {!playing && mode !== "splash" && mode !== "brief" && mode !== "intro" ? (
-          <div className="pointer-events-auto max-w-[58%] rounded-lg border border-border bg-bg-elevated/90 px-3 py-2 backdrop-blur-sm">
+        {!playing && mode !== "splash" && mode !== "brief" && mode !== "intro" && !(ART.menu && mode === "menu") ? (
+          <div className="pointer-events-auto max-w-[58%] border border-border bg-bg-elevated px-3 py-2">
             <p className="font-display text-[11px] uppercase tracking-[0.16em] text-muted">{SITE}</p>
             <p className="font-display text-lg leading-none text-fg">{TITLE}</p>
           </div>
@@ -627,7 +629,9 @@ export function GameApp() {
           <div className="pointer-events-none h-8" />
         )}
         <div className="pointer-events-auto flex items-center gap-2">
-          {BEZEL_MODES.includes(mode) ? null : <MuteToggle pixel={mode === "play"} />}
+          {BEZEL_MODES.includes(mode) || (ART.menu && (mode === "menu" || mode === "splash")) ? null : (
+            <MuteToggle />
+          )}
           <AuthChip />
         </div>
       </header>
@@ -677,11 +681,39 @@ export function GameApp() {
 
         {mode === "play" && s.announceT > 0.15 && (
           <div className="pointer-events-none absolute inset-x-0 top-[22%] z-20 text-center">
-            <p className="font-display text-xl text-fg sm:text-2xl">{s.announce}</p>
+            <p className={ART.hud ? "cc-title" : "font-display text-xl text-fg sm:text-2xl"}>{s.announce}</p>
           </div>
         )}
 
-        {mode === "splash" && (
+        {ART.menu && (mode === "splash" || mode === "menu") && (
+          <PixelMenu
+            saved={saved}
+            onBegin={() => {
+              if (saved) {
+                setAskWipe(true);
+                return;
+              }
+              beginNewWeek();
+            }}
+            onContinue={() => {
+              if (!hydrateSave(s)) {
+                setSaved(false);
+                return;
+              }
+              unlockAudio();
+              playBlip("ok");
+              const next = "play";
+              s.mode = next;
+              playBed(bedForRoom(s.room, "play"));
+              applyMode(next);
+              refresh();
+            }}
+            onHow={() => goMenu("how")}
+            onCredits={() => goMenu("credits")}
+          />
+        )}
+
+        {!ART.menu && mode === "splash" && (
           <Panel onActivate={() => goMenu("menu")} hint="Click anywhere · Enter">
             <p className="font-display text-xs uppercase tracking-[0.2em] text-muted">Lake Master</p>
             <h1 className="font-display mt-2 max-w-xl text-4xl leading-[1.05] text-fg sm:text-5xl">{TITLE}</h1>
@@ -704,7 +736,7 @@ export function GameApp() {
           </Panel>
         )}
 
-        {mode === "menu" && (
+        {!ART.menu && mode === "menu" && (
           <Panel>
             <h1 className="font-display text-3xl text-fg sm:text-4xl">{TITLE}</h1>
             <p className="mt-2 max-w-md text-sm leading-relaxed text-muted">
@@ -759,7 +791,18 @@ export function GameApp() {
           </Panel>
         )}
 
-        {mode === "how" && (
+        {mode === "how" && ART.menu && (
+          <PixelRead title="HOW TO PLAY" onBack={() => goMenu("menu")}>
+            <ul>
+              <li>New shift starts at the academic designer. You build the core you will walk. It discards a saved week.</li>
+              <li>WASD or the stick to walk. A is left, D is right. The clock pauses while you talk, study, or play.</li>
+              <li>E is the near prompt. P peer-checks. R reports. H hides. Three hides close the week as unfinished power.</li>
+              <li>ESC pauses for the plant map, hearts, Academy, and the arcade. K closes the shift.</li>
+              <li>Teaching model only. Not a real plant. Not a license.</li>
+            </ul>
+          </PixelRead>
+        )}
+        {mode === "how" && !ART.menu && (
           <Panel>
             <h2 className="font-display text-2xl">How to play</h2>
             <ul className="mt-4 max-w-md space-y-2 text-sm leading-relaxed text-muted">
@@ -778,7 +821,19 @@ export function GameApp() {
           </Panel>
         )}
 
-        {mode === "credits" && (
+        {mode === "credits" && ART.menu && (
+          <PixelRead title="THESIS" onBack={() => goMenu("menu")}>
+            <p>
+              A reactor only makes power in the right environment. People are the same. Mistakes are expected. Hiding them
+              is the hazard. Catch greater than heroics.
+            </p>
+            <p>
+              Director: Mr. Reginald Holt. Cafe: Dr. Mabel Quinn. Academic designer: Dr. Priya Sharma. Site: {SITE} on Lake
+              Master. Education is frozen teaching content, not a license.
+            </p>
+          </PixelRead>
+        )}
+        {mode === "credits" && !ART.menu && (
           <Panel>
             <h2 className="font-display text-2xl">Thesis</h2>
             <p className="mt-3 max-w-md text-sm leading-relaxed text-muted">
@@ -1527,6 +1582,20 @@ function paperMood(mood?: Line["mood"]) {
 }
 
 function PixelPortrait({ npc }: { npc: NpcId }) {
+  const [talk, setTalk] = useState(isRevealing());
+  useEffect(() => subscribeReveal(setTalk), []);
+  if (ART.menu && npc === "priya") {
+    return (
+      <img
+        src={talk ? "/art/ui/priya-talk.png" : "/art/ui/priya-48.png"}
+        alt=""
+        width={48}
+        height={48}
+        className="shrink-0 self-start"
+        style={{ width: 48 * 6, height: 48 * 6, imageRendering: "pixelated" }}
+      />
+    );
+  }
   return (
     <img
       src={`/art/gen/portraits/${npc}_talk.jpg?v=paint3`}
@@ -2151,17 +2220,17 @@ function AcademyStage({
   );
 }
 
-function MuteToggle({ pixel = false }: { pixel?: boolean }) {
+function MuteToggle() {
   const [mute, setMute] = useState(isMuted());
   const toggle = () => {
     unlockAudio();
     setMuted(!mute);
     setMute(!mute);
   };
-  if (pixel) {
+  if (ART.hud) {
     return (
-      <button type="button" data-testid="mute" className="pixel-chip" onClick={toggle}>
-        <PixelLine text={mute ? "SOUND OFF" : "SOUND ON"} color="#3b2318" scale={2} />
+      <button type="button" data-testid="mute" className="cc-sound" onClick={toggle}>
+        {mute ? "SOUND OFF" : "SOUND ON"}
       </button>
     );
   }
@@ -2669,11 +2738,17 @@ function Hud({
     period === "afternoon" ? "rgba(90,48,28,0.28)" : period === "morning" ? "rgba(243,214,170,0.22)" : "rgba(170,200,220,0.16)";
   const when = `${time} D${day} ${dusk ? "DUSK" : periodLabel(period)}`;
   const obj = objective.length > 24 ? `${objective.slice(0, 23)}.` : objective;
+  const label = (text: string, small = false) =>
+    ART.hud ? (
+      <span className={small ? "cc-label-sm" : "cc-label"}>{text}</span>
+    ) : (
+      <PixelLine text={text} color={small ? "#6a4a32" : "#16110d"} scale={small ? 1 : 2} />
+    );
   return (
     <>
       <div className="pixel-panel pointer-events-none absolute bottom-14 left-3 z-10" data-testid="instrument">
         <div className="flex items-start justify-between gap-2">
-          <PixelLine text={when} color="#16110d" scale={2} />
+          {label(when)}
           <button
             type="button"
             className="pixel-fold pointer-events-auto"
@@ -2681,12 +2756,14 @@ function Hud({
             onClick={() => setOpen((v) => !v)}
             aria-expanded={open}
           >
-            <PixelLine text={open ? "LESS" : "MORE"} color="#3b2318" scale={1} />
+            {ART.hud ? (
+              <span className="cc-label-sm">{open ? "LESS" : "MORE"}</span>
+            ) : (
+              <PixelLine text={open ? "LESS" : "MORE"} color="#3b2318" scale={1} />
+            )}
           </button>
         </div>
-        <div className="mt-1">
-          <PixelLine text={room} color="#3b2318" scale={2} />
-        </div>
+        <div className="mt-1">{label(room)}</div>
         {open ? (
           <>
             <div className="relative mt-1 h-8 w-16 border border-[#1a1410]" data-testid="site-plan">
@@ -2705,13 +2782,13 @@ function Hud({
               />
             </div>
             <div className="mt-1 flex items-center gap-1">
-              <PixelLine text={stage} color="#16110d" scale={1} />
+              {ART.hud ? <span className="cc-label-sm">{stage}</span> : <PixelLine text={stage} color="#16110d" scale={1} />}
               <div className="pixel-meter" aria-hidden>
                 <span style={{ width: `${Math.max(4, Math.min(100, culture))}%` }} />
               </div>
             </div>
             <div className="mt-1">
-              <PixelLine text={obj} color="#6a4a32" scale={1} />
+              {ART.hud ? <span className="cc-label-sm">{obj}</span> : <PixelLine text={obj} color="#6a4a32" scale={1} />}
             </div>
           </>
         ) : null}
@@ -2719,14 +2796,18 @@ function Hud({
       {nearLabel ? (
         <div className="pointer-events-none absolute inset-x-0 bottom-3 z-20 flex justify-center px-4">
           <div className="pixel-chip">
-            <PixelLine text={`E · ${nearLabel}`} color="#3b2318" scale={2} />
+            {ART.hud ? (
+              <span className="cc-label">{`E - ${nearLabel}`}</span>
+            ) : (
+              <PixelLine text={`E · ${nearLabel}`} color="#3b2318" scale={2} />
+            )}
           </div>
         </div>
       ) : null}
       {toast && (
         <div className={`pointer-events-none absolute inset-x-0 z-10 flex justify-center px-4 ${nearLabel ? "bottom-16" : "bottom-4"}`}>
           <div className="pixel-chip">
-            <PixelLine text={toast} color="#3b2318" scale={1} />
+            {ART.hud ? <span className="cc-label-sm">{toast}</span> : <PixelLine text={toast} color="#3b2318" scale={1} />}
           </div>
         </div>
       )}

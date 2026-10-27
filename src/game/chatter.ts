@@ -2,6 +2,7 @@
 
 let revealing = false;
 const subs = new Set<() => void>();
+const revealSubs = new Set<(v: boolean) => void>();
 
 export function isRevealing() {
   return revealing;
@@ -9,11 +10,20 @@ export function isRevealing() {
 
 export function setRevealing(v: boolean) {
   revealing = v;
+  for (const fn of revealSubs) fn(v);
+}
+
+export function subscribeReveal(fn: (v: boolean) => void) {
+  revealSubs.add(fn);
+  fn(revealing);
+  return () => {
+    revealSubs.delete(fn);
+  };
 }
 
 export function requestSkip() {
   if (!revealing) return;
-  revealing = false;
+  setRevealing(false);
   for (const fn of subs) fn();
 }
 
