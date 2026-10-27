@@ -2,16 +2,27 @@ import { useEffect, useRef, useState } from "react";
 import { playVoice } from "./audio";
 import { setRevealing, subscribeSkip } from "./chatter";
 
+declare global {
+  interface Window {
+    __ccHold?: number;
+    __ccOy?: number;
+  }
+}
+
 const STEP = 28;
 
 function spoken(ch: string) {
   return /[A-Za-z0-9]/.test(ch);
 }
 
-/** Letter-by-letter line. Each glyph pops in. Spaces keep their width so the box does not jump. */
+function holdCount() {
+  const n = window.__ccHold;
+  return typeof n === "number" ? n : null;
+}
+
+/** One element, one size, one baseline. Characters appear by slicing the string — never by transforming glyphs. */
 export function Chatter({ text, voice, className }: { text: string; voice: string; className?: string }) {
   const [count, setCount] = useState(0);
-  const [instant, setInstant] = useState(false);
   const gen = useRef(0);
 
   useEffect(() => {
@@ -19,13 +30,32 @@ export function Chatter({ text, voice, className }: { text: string; voice: strin
     let i = 0;
     let timer = 0;
     let dead = false;
-    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const alive = () => !dead && gen.current === id;
+    const held = holdCount();
+    if (held != null) {
+      const n = Math.max(0, Math.min(text.length, held));
+      setCount(n);
+      setRevealing(n < text.length);
+      const onHold = () => {
+        if (!alive()) return;
+        const next = holdCount();
+        if (next == null) return;
+        const c = Math.max(0, Math.min(text.length, next));
+        setCount(c);
+        setRevealing(c < text.length);
+      };
+      window.addEventListener("cc-hold", onHold);
+      return () => {
+        dead = true;
+        window.removeEventListener("cc-hold", onHold);
+        setRevealing(false);
+      };
+    }
 
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const finish = (quiet: boolean) => {
       if (!alive()) return;
       window.clearTimeout(timer);
-      setInstant(true);
       setCount(text.length);
       setRevealing(false);
       if (!quiet && reduce && text.length) playVoice(voice);
@@ -39,7 +69,6 @@ export function Chatter({ text, voice, className }: { text: string; voice: strin
     }
 
     setCount(0);
-    setInstant(false);
     setRevealing(true);
     const off = subscribeSkip(() => finish(true));
 
@@ -66,34 +95,10 @@ export function Chatter({ text, voice, className }: { text: string; voice: strin
     };
   }, [text, voice]);
 
-  const words: { ch: string; i: number }[][] = [];
-  let word: { ch: string; i: number }[] = [];
-  for (let i = 0; i < text.length; i++) {
-    const ch = text[i];
-    if (ch === " ") {
-      if (word.length) words.push(word);
-      word = [];
-      words.push([{ ch, i }]);
-    } else {
-      word.push({ ch, i });
-    }
-  }
-  if (word.length) words.push(word);
-
   return (
     <p className={className}>
       <span className="sr-only">{text}</span>
-      <span aria-hidden="true">
-        {words.map((group) => (
-          <span key={group[0].i} className={group[0].ch === " " ? undefined : "inline-block whitespace-nowrap"}>
-            {group.map(({ ch, i }) => (
-              <span key={i} className={i < count ? (instant ? "chatter-set" : "chatter-ch") : "chatter-wait"}>
-                {ch}
-              </span>
-            ))}
-          </span>
-        ))}
-      </span>
+      <span aria-hidden="true">{text.slice(0, count)}</span>
     </p>
   );
 }

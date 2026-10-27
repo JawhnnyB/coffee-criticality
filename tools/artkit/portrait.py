@@ -9,7 +9,7 @@ def priya(mouth='smile', bg='#f3c9a0'):
     cv.r(0, 40, 48, 8, drk(hx(bg), .12))
     SK, SKS, SKL = hx('#c98e62'), hx('#a8704a'), hx('#dca878')
     HR, HRL, HRD = hx('#2b1d18'), hx('#4a3328'), hx('#1b110e')
-    SW_, SWL, SWD = hx('#3a8a8a'), hx('#5ab0a8'), hx('#2a6a6c')
+    SW_, SWL, SWD = hx('#488038'), hx('#68a058'), hx('#305824')
     d = cv.d
     # shoulders / sweater
     d.ellipse([2, 36, 46, 60], fill=OL); d.ellipse([3, 37, 45, 59], fill=SW_)

@@ -33,11 +33,12 @@ export function TeachPriya({ line, size = 96 }: { line: string; size?: 64 | 96 |
   return (
     <div className="teach-paper flex gap-3">
       <img
-        src="/art/gen/portraits/priya_talk.jpg?v=paint3"
+        src={talk ? "/art/ui/priya-talk.png" : "/art/ui/priya-48.png"}
         alt="Dr. Priya Sharma"
         width={size}
         height={size}
-        className={`${px} shrink-0 object-cover object-top`}
+        className={`${px} shrink-0 object-cover`}
+        style={{ imageRendering: "pixelated" }}
       />
       <p className="teach-body min-w-0">{line}</p>
     </div>

@@ -10,7 +10,6 @@ import {
   CAFE_SPAWN,
   INTRO,
   NPCS,
-  ROLES,
   ROOMS,
   SITE,
   STILLS,
@@ -23,7 +22,6 @@ import {
   relationLine,
   floorTies,
   trustState,
-  type IntroBeat,
   type Period,
   type RoomId,
 } from "./content";
@@ -39,10 +37,9 @@ import { ReactorBuilder } from "./ReactorBuilder";
 import { FuelShuffle } from "./FuelShuffle";
 import { MaintGame } from "./MaintGame";
 import { isMuted, playBed, playBlip, setMuted, unlockAudio, syncWorld, getAudioProbe, bedForRoom } from "./audio";
-import { isRevealing, requestSkip, subscribeReveal } from "./chatter";
+import { isRevealing, requestSkip } from "./chatter";
 import { Chatter } from "./Chatter";
-import { paintPlayerPortrait } from "./paintedLook";
-import { heartCount, tintA6 } from "./pixel";
+import { heartCount } from "./pixel";
 import { drawWorld, glyphWidth, paintGlyphs, preloadRoomArt } from "./render";
 import { DEFAULT_PLANT, plantTitle, type PlantDesign } from "./plant";
 import { hasSave, hydrateSave, peekSave, wipeSave, writeSave } from "./save";
@@ -50,11 +47,12 @@ import { computeKeff } from "./nuclearLab";
 import { NuclearDesk } from "./NuclearDesk";
 import { LoopSchematic } from "./LoopSchematic";
 import { DEPARTMENTS, dayDef, eodNpcLine, incidentOwner, shoreLine, yesterdayLine } from "./week";
-import { DEFAULT_PLAYER_LOOK, HAIR_HEX, HOODIE_HEX, type HairId, type HoodieId, type PlayerLook } from "./artSpec";
+import { DEFAULT_PLAYER_LOOK, type PlayerLook } from "./artSpec";
 import { MAP_HUD, ROOM_BLURB, roomLinks } from "./site";
 import { TeachMeta, TeachPriya, TYPE_THUMB } from "./TeachFrame";
 import { ART } from "./artFlags";
 import { PixelMenu, PixelRead } from "./PixelMenu";
+import { CastFace, PixelBadge, PixelBeat, PixelBrief } from "./IntroScreens";
 import {
   abortOverlay,
   beginDay,
@@ -285,11 +283,13 @@ export function GameApp() {
         if (n >= 16 * 60 + 20) s.closePrompt = true;
       },
       setLook: (hoodie: string, hair: string, glasses: boolean) => {
-        stateRef.current.playerLook = {
+        const next: PlayerLook = {
           hoodie: hoodie as PlayerLook["hoodie"],
           hair: hair as PlayerLook["hair"],
           glasses,
         };
+        stateRef.current.playerLook = next;
+        setLook(next);
       },
       finishBuild: () => {
         const s = stateRef.current;
@@ -359,13 +359,35 @@ export function GameApp() {
         modeRef.current = "incident";
         setMode("incident");
       },
-      setIntro: (i: number) => {
+      setIntro: (i: number, j?: number) => {
         const s = stateRef.current;
         s.introI = Math.max(0, Math.min(INTRO.length - 1, i));
-        s.introJ = 0;
+        s.introJ = Math.max(0, j ?? 0);
         s.mode = "intro";
         modeRef.current = "intro";
         setMode("intro");
+      },
+      setRole: () => {
+        stateRef.current.mode = "role";
+        modeRef.current = "role";
+        setMode("role");
+      },
+      setBrief: () => {
+        const s = stateRef.current;
+        if (!s.day) s.day = 1;
+        s.mode = "brief";
+        modeRef.current = "brief";
+        setMode("brief");
+      },
+      setHold: (n: number | null) => {
+        if (n == null) delete window.__ccHold;
+        else window.__ccHold = n;
+        window.dispatchEvent(new Event("cc-hold"));
+      },
+      setOy: (n: number | null) => {
+        if (n == null) delete window.__ccOy;
+        else window.__ccOy = n;
+        window.dispatchEvent(new Event("cc-oy"));
       },
       setBuild: () => {
         const s = stateRef.current;
@@ -620,7 +642,7 @@ export function GameApp() {
   return (
     <div className={"relative flex h-svh min-h-[100dvh] flex-col overflow-hidden bg-bg text-fg" + (ART.hud || ART.menu ? " art-on" : "")}>
       <header className="pointer-events-none absolute inset-x-0 top-0 z-40 flex items-start justify-between gap-3 p-3 sm:p-4">
-        {!playing && mode !== "splash" && mode !== "brief" && mode !== "intro" && !(ART.menu && mode === "menu") ? (
+        {!playing && mode !== "splash" && mode !== "brief" && mode !== "intro" && mode !== "role" && !(ART.menu && mode === "menu") ? (
           <div className="pointer-events-auto max-w-[58%] border border-border bg-bg-elevated px-3 py-2">
             <p className="font-display text-[11px] uppercase tracking-[0.16em] text-muted">{SITE}</p>
             <p className="font-display text-lg leading-none text-fg">{TITLE}</p>
@@ -629,7 +651,8 @@ export function GameApp() {
           <div className="pointer-events-none h-8" />
         )}
         <div className="pointer-events-auto flex items-center gap-2">
-          {BEZEL_MODES.includes(mode) || (ART.menu && (mode === "menu" || mode === "splash")) ? null : (
+          {BEZEL_MODES.includes(mode) ||
+          (ART.menu && (mode === "menu" || mode === "splash" || mode === "role" || mode === "intro" || mode === "brief")) ? null : (
             <MuteToggle />
           )}
           <AuthChip />
@@ -637,20 +660,8 @@ export function GameApp() {
       </header>
 
       <div ref={wrapRef} className="relative min-h-0 flex-1">
-        {!playing && (
-          <MenuBackdrop
-            scene={
-              mode === "intro"
-                ? INTRO[s.introI]?.scene
-                : mode === "brief"
-                  ? "/art/gen/stills/intro_control.jpg"
-                  : mode === "role"
-                    ? "/art/gen/stills/intro_threshold.jpg?v=paint2"
-                    : undefined
-            }
-            focus={mode === "intro" ? INTRO[s.introI]?.exchanges[s.introJ]?.focus : undefined}
-            zoom={mode === "intro" ? INTRO[s.introI]?.exchanges[s.introJ]?.zoom : undefined}
-          />
+        {!playing && !(ART.menu && (mode === "role" || mode === "intro" || mode === "brief")) && (
+          <MenuBackdrop />
         )}
 
         <canvas
@@ -851,67 +862,15 @@ export function GameApp() {
         )}
 
         {mode === "role" && (
-          <Panel>
-            <p className="font-display text-xs uppercase tracking-[0.18em] text-accent">Badge</p>
-            <h2 className="font-display mt-2 text-2xl">Who walks in</h2>
-            <p className="mt-2 text-sm text-muted">Flavor only. First you design the unit with Priya. Then you walk it.</p>
-            <div className="mt-4 flex flex-wrap items-center gap-4">
-              <LookPreview look={look} />
-              <div className="text-left">
-                <p className="font-mono text-sm font-semibold uppercase tracking-[0.16em] text-[#f3e6d0]">Hoodie</p>
-                <div className="mt-1 flex gap-1">
-                  {(["copper", "leaf", "steel", "gold"] as HoodieId[]).map((id) => (
-                    <button
-                      key={id}
-                      type="button"
-                      aria-label={"Hoodie " + id}
-                      className={"h-7 w-7 border-2 " + (look.hoodie === id ? "border-[#f3e6d0]" : "border-[#6a4a32]")}
-                      style={{ background: HOODIE_HEX[id] }}
-                      onClick={() => setLook((l) => ({ ...l, hoodie: id }))}
-                    />
-                  ))}
-                </div>
-                <p className="mt-3 font-mono text-sm font-semibold uppercase tracking-[0.16em] text-[#f3e6d0]">Hair</p>
-                <div className="mt-1 flex gap-1">
-                  {(["brown", "ink", "silver", "copper"] as HairId[]).map((id) => (
-                    <button
-                      key={id}
-                      type="button"
-                      aria-label={"Hair " + id}
-                      className={"h-7 w-7 border-2 " + (look.hair === id ? "border-[#f3e6d0]" : "border-[#6a4a32]")}
-                      style={{ background: HAIR_HEX[id] }}
-                      onClick={() => setLook((l) => ({ ...l, hair: id }))}
-                    />
-                  ))}
-                </div>
-                <label className="mt-2 flex items-center gap-2 font-mono text-[11px] text-muted">
-                  <input
-                    type="checkbox"
-                    checked={look.glasses}
-                    onChange={(e) => setLook((l) => ({ ...l, glasses: e.target.checked }))}
-                  />
-                  Glasses
-                </label>
-              </div>
-            </div>
-            <div className="mt-5 grid w-full max-w-xl gap-2 sm:grid-cols-2">
-              {ROLES.map((r) => (
-                <button
-                  key={r.id}
-                  type="button"
-                  className="rounded-lg border border-border bg-surface px-4 py-3 text-left transition-colors hover:border-border-strong hover:bg-surface-hot"
-                  data-testid={"role-" + r.id}
-                  onClick={() => pickRole(r.id)}
-                >
-                  <div className="font-medium text-fg">{r.title}</div>
-                  <div className="mt-1 text-xs leading-relaxed text-muted">{r.line}</div>
-                </button>
-              ))}
-            </div>
-            <button type="button" className="btn-ghost mt-4" onClick={() => goMenu("menu")}>
-              Back
-            </button>
-          </Panel>
+          <PixelBadge
+            look={look}
+            onLook={(next) => {
+              setLook(next);
+              s.playerLook = next;
+            }}
+            onRole={pickRole}
+            onBack={() => goMenu("menu")}
+          />
         )}
 
         {mode === "build" && (
@@ -926,13 +885,11 @@ export function GameApp() {
         )}
 
         {mode === "intro" && INTRO[s.introI] && (
-          <IntroStage
+          <PixelBeat
+            index={s.introI}
+            exchange={Math.min(s.introJ, INTRO[s.introI].exchanges.length - 1)}
             beat={INTRO[s.introI]}
-            line={Math.min(s.introJ, INTRO[s.introI].exchanges.length - 1)}
-            locked={s.introLock > 0 && !isRevealing()}
-            plant={s.plant && s.introI === 0 ? plantTitle(s.plant) : ""}
-            look={s.playerLook}
-            last={s.introI === INTRO.length - 1 && s.introJ >= INTRO[s.introI].exchanges.length - 1}
+            look={look}
             onContinue={() => {
               if (isRevealing()) requestSkip();
               else pulse("Enter");
@@ -941,33 +898,18 @@ export function GameApp() {
         )}
 
         {mode === "brief" && (
-          <Panel hint={s.introLock > 0 ? "" : "Space · Walk in"}>
-            <div key={s.day} className="flex w-full flex-col items-center">
-              <p className="font-display text-xs uppercase tracking-[0.18em] text-accent">{dayDef(s.day).kicker}</p>
-              <h2 className="font-display mt-3 max-w-lg text-3xl leading-tight text-fg">{dayDef(s.day).title}</h2>
-              {yesterdayLine(s.day, s.weekLog, s.residue) ? (
-                <p className="mt-4 max-w-md font-display text-lg leading-snug text-fg">{yesterdayLine(s.day, s.weekLog, s.residue)}</p>
-              ) : null}
-              <Chatter text={dayDef(s.day).holt} voice="holt" className="dialogue-line mt-3 max-w-md text-sm leading-relaxed text-muted" />
-              <ul className="mt-4 max-w-md space-y-1.5 text-left text-sm leading-relaxed text-subtle">
-                {dayDef(s.day).items.map((item) => (
-                  <li key={item}>{item}</li>
-                ))}
-              </ul>
-              {s.plant ? <p className="mt-3 font-mono text-xs text-good">{plantTitle(s.plant)}</p> : null}
-            <button
-              type="button"
-              className="btn-primary mt-6 disabled:opacity-40"
-              disabled={s.introLock > 0 && !isRevealing()}
-              onClick={() => {
-                if (isRevealing()) requestSkip();
-                else pulse("Enter");
-              }}
-            >
-              Walk in
-            </button>
-            </div>
-          </Panel>
+          <PixelBrief
+            day={s.day || 1}
+            kicker={dayDef(s.day || 1).kicker}
+            title={dayDef(s.day || 1).title}
+            holt={dayDef(s.day || 1).holt}
+            items={dayDef(s.day || 1).items}
+            yesterday={yesterdayLine(s.day || 1, s.weekLog, s.residue)}
+            onWalk={() => {
+              if (isRevealing()) requestSkip();
+              else pulse("Enter");
+            }}
+          />
         )}
 
         {mode === "dialogue" && line && (
@@ -1403,7 +1345,7 @@ export function GameApp() {
               />
               <div className="mb-3 flex gap-2">
                 {(["mabel", "elena", "holt", "priya"] as const).map((id) => (
-                  <img key={id} src={`/art/gen/portraits/${id}_talk.jpg?v=paint3`} alt="" className="h-14 w-10 object-cover object-top" />
+                  <CastFace key={id} id={id} zoom={1} />
                 ))}
               </div>
               <p className="font-mono text-[10px] tracking-widest text-[#8a7864]">Shift log · {dayDef(s.day).name}</p>
@@ -1582,29 +1524,7 @@ function paperMood(mood?: Line["mood"]) {
 }
 
 function PixelPortrait({ npc }: { npc: NpcId }) {
-  const [talk, setTalk] = useState(isRevealing());
-  useEffect(() => subscribeReveal(setTalk), []);
-  if (ART.menu && npc === "priya") {
-    return (
-      <img
-        src={talk ? "/art/ui/priya-talk.png" : "/art/ui/priya-48.png"}
-        alt=""
-        width={48}
-        height={48}
-        className="shrink-0 self-start"
-        style={{ width: 48 * 6, height: 48 * 6, imageRendering: "pixelated" }}
-      />
-    );
-  }
-  return (
-    <img
-      src={`/art/gen/portraits/${npc}_talk.jpg?v=paint3`}
-      alt=""
-      width={192}
-      height={288}
-      className="intro-portrait h-40 w-28 shrink-0 self-start object-cover object-top sm:h-52 sm:w-36"
-    />
-  );
+  return <CastFace id={npc} zoom={4} live />;
 }
 
 function HeartRow({ n }: { n: number }) {
@@ -1729,13 +1649,7 @@ function IncidentStage({
         className="paper flex w-full max-w-2xl flex-col gap-3 p-3 sm:flex-row sm:gap-4 sm:p-5 max-h-[min(74vh,36rem)] overflow-y-auto"
         data-testid="paper-incident"
       >
-        <img
-          src={`/art/gen/portraits/${npc}_talk.jpg?v=paint3`}
-          alt=""
-          width={192}
-          height={288}
-          className="intro-portrait h-40 w-28 shrink-0 object-cover object-top sm:h-52 sm:w-36"
-        />
+        <CastFace id={npc} zoom={4} />
         <div className="min-w-0 flex-1">
           <p className="font-mono text-[10px] tracking-widest text-[#8a7864]">
             {time} · {room} · Just Culture
@@ -2329,7 +2243,7 @@ function PauseStage({
               return (
                 <div key={id} className="flex items-center justify-between gap-2 border border-border bg-surface px-2 py-1.5">
                   <div className="flex items-center gap-2">
-                    <img src={`/art/gen/portraits/${id}_talk.jpg?v=paint3`} alt="" className="h-10 w-8 object-cover object-top" />
+                    <CastFace id={id} zoom={1} />
                     <div>
                     <div className="text-sm text-fg">{NPCS[id].name}</div>
                     <div className="text-[11px] text-subtle">
@@ -2527,121 +2441,6 @@ function MenuBackdrop({ scene, focus = "50% 50%", zoom = 1 }: { scene?: string; 
       )}
       <div className="absolute inset-0 bg-gradient-to-t from-bg/80 via-bg/25 to-bg/30" />
     </div>
-  );
-}
-
-function IntroStage({
-  beat,
-  line,
-  locked,
-  plant,
-  look,
-  last,
-  onContinue,
-}: {
-  beat: IntroBeat;
-  line: number;
-  locked: boolean;
-  plant: string;
-  look: PlayerLook;
-  last: boolean;
-  onContinue: () => void;
-}) {
-  const ex = beat.exchanges[line] ?? beat.exchanges[0];
-  return (
-    <div
-      className="absolute inset-0 z-30 flex items-end justify-center bg-gradient-to-t from-black/80 via-black/45 to-black/25 px-3 pb-6 pt-16 sm:px-8 sm:pb-10"
-      data-testid="intro-stage"
-    >
-      <div className="paper flex w-full max-w-3xl flex-col gap-4 p-4 sm:flex-row sm:items-stretch sm:gap-6 sm:p-6">
-        <div className="relative mx-auto w-36 shrink-0 sm:mx-0 sm:w-48">
-          {beat.you || ex.you ? (
-            <PaintedPlayer look={look} />
-          ) : (
-            <img
-              src={beat.portrait}
-              alt=""
-              width={384}
-              height={576}
-              className="intro-portrait h-auto w-full object-cover object-top"
-              style={{ transform: `rotate(${ex.lean}deg)` }}
-            />
-          )}
-          {ex.prop === "cup" ? <span className="intro-cup" aria-hidden /> : null}
-          {ex.prop === "lock" ? <span className="intro-lock" aria-hidden /> : null}
-          {ex.prop === "pencil" ? <span className="intro-pencil" aria-hidden /> : null}
-        </div>
-        <div className="flex min-w-0 flex-1 flex-col justify-center text-left">
-          <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-[#8a5a32]">{beat.kicker}</p>
-          <p className="mt-1 font-display text-sm leading-snug text-[#6a4a32]">{beat.title}</p>
-          <Chatter
-            key={beat.kicker + line}
-            text={ex.line}
-            voice={beat.you || ex.you ? "player" : beat.kicker}
-            className="dialogue-line mt-4 font-display text-2xl font-medium leading-snug text-[#16110d] sm:text-3xl"
-          />
-          <p className="mt-4 border-t border-[#c9a227]/30 pt-2 font-mono text-[11px] leading-relaxed text-[#6a4a32]">{beat.body}</p>
-          {plant ? <p className="mt-1 font-mono text-xs text-[#3d5c44]">{plant}</p> : null}
-          <button
-            type="button"
-            className="mt-4 self-start bg-[#16110d] px-4 py-2 text-sm font-semibold text-[#f3e6d0] disabled:opacity-40"
-            disabled={locked}
-            onClick={onContinue}
-          >
-            {last ? "Morning brief" : "Continue"}
-          </button>
-          {!locked ? <p className="mt-2 text-xs text-[#8a7864]">Space or Continue</p> : null}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function PaintedPlayer({ look }: { look: PlayerLook }) {
-  const ref = useRef<HTMLCanvasElement>(null);
-  useEffect(() => {
-    const canvas = ref.current;
-    if (!canvas) return;
-    const im = new Image();
-    im.src = look.glasses
-      ? "/art/gen/portraits/player_glasses.jpg?v=paint3"
-      : "/art/gen/portraits/player_plain.jpg?v=paint3";
-    im.onload = () => {
-      const painted = paintPlayerPortrait(im, look);
-      canvas.width = painted.width;
-      canvas.height = painted.height;
-      const ctx = canvas.getContext("2d");
-      if (!ctx) return;
-      ctx.drawImage(painted, 0, 0);
-    };
-  }, [look]);
-  return <canvas ref={ref} className="intro-portrait h-auto w-full" aria-hidden />;
-}
-
-function LookPreview({ look, big = false }: { look: PlayerLook; big?: boolean }) {
-  const ref = useRef<HTMLCanvasElement>(null);
-  useEffect(() => {
-    const canvas = ref.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-    const im = new Image();
-    im.src = "/art/gen/sprites/player_walk4.png";
-    im.onload = () => {
-      const tinted = tintA6(im, look);
-      ctx.imageSmoothingEnabled = false;
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.drawImage(tinted as CanvasImageSource, 0, 0, 32, 64, 0, 0, canvas.width, canvas.height);
-    };
-  }, [look]);
-  return (
-    <canvas
-      ref={ref}
-      width={big ? 144 : 128}
-      height={big ? 288 : 256}
-      className={big ? "intro-portrait mx-auto h-full w-auto" : "h-32 w-16"}
-      aria-hidden
-    />
   );
 }
 
@@ -2998,7 +2797,11 @@ declare global {
       travel: (room: string) => void;
       startTalk: (npc: string) => void;
       openIncident: () => void;
-      setIntro: (i: number) => void;
+      setIntro: (i: number, j?: number) => void;
+      setRole: () => void;
+      setBrief: () => void;
+      setHold: (n: number | null) => void;
+      setOy: (n: number | null) => void;
       setBuild: () => void;
       setAcademy: (i: number) => void;
       openStillId: (id: string) => void;

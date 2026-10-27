@@ -205,7 +205,7 @@ export const NPCS: Record<NpcId, NpcDef> = {
     role: "Cafe / retired floor",
     startTrust: 40,
     note: "Retired floor manager. Grandma warmth, doctorate steel.",
-    portrait: { src: "/art/gen/portraits/mabel_talk.jpg?v=paint3", pos: "center" },
+    portrait: { src: "/art/ui/portraits/portrait-mabel-smile.png", pos: "center" },
     meet: "Sit. The kettle is the last board I still touch.",
   },
   holt: {
@@ -214,7 +214,7 @@ export const NPCS: Record<NpcId, NpcDef> = {
     role: "Director",
     startTrust: 28,
     note: "Funds reviews, not mythology. Volume, not a speech.",
-    portrait: { src: "/art/gen/portraits/holt_talk.jpg?v=paint3", pos: "center" },
+    portrait: { src: "/art/ui/portraits/portrait-holt-smile.png", pos: "center" },
     meet: "You designed the core. Now walk it. Catch. I fund reviews, not mythology.",
   },
   elena: {
@@ -223,7 +223,7 @@ export const NPCS: Record<NpcId, NpcDef> = {
     role: "Shift supervisor",
     startTrust: 32,
     note: "Two sets of eyes. The van was here before dawn.",
-    portrait: { src: "/art/gen/portraits/elena_talk.jpg?v=paint3", pos: "center" },
+    portrait: { src: "/art/ui/portraits/portrait-elena-smile.png", pos: "center" },
     meet: "I will back a catch if you stand where I can see you.",
   },
   tommy: {
@@ -232,7 +232,7 @@ export const NPCS: Record<NpcId, NpcDef> = {
     role: "Maintenance",
     startTrust: 34,
     note: "LOTOTO is a sentence. Finish it.",
-    portrait: { src: "/art/gen/portraits/tommy_talk.jpg?v=paint3", pos: "center" },
+    portrait: { src: "/art/ui/portraits/portrait-tommy-smile.png", pos: "center" },
     meet: "Isolate. Lock. Tag. Try. IN SERVICE does not hang on a dead pump.",
   },
   marcus: {
@@ -241,7 +241,7 @@ export const NPCS: Record<NpcId, NpcDef> = {
     role: "Senior engineer",
     startTrust: 22,
     note: "Youngest senior once. Hates being wrong in public.",
-    portrait: { src: "/art/gen/portraits/marcus_talk.jpg?v=paint3", pos: "center" },
+    portrait: { src: "/art/ui/portraits/portrait-marcus-smile.png", pos: "center" },
     meet: "Two instruments. I was the youngest senior on this floor. That is not a compliment.",
   },
   priya: {
@@ -250,7 +250,7 @@ export const NPCS: Record<NpcId, NpcDef> = {
     role: "Reactor engineering",
     startTrust: 36,
     note: "A peak on a screen is a rumor until you stand next to the tank.",
-    portrait: { src: "/art/gen/portraits/priya_talk.jpg?v=paint3", pos: "center" },
+    portrait: { src: "/art/ui/portraits/portrait-priya-smile.png", pos: "center" },
     meet: "Teaching model — not a license. Heat has to leave.",
   },
   jordan: {
@@ -259,7 +259,7 @@ export const NPCS: Record<NpcId, NpcDef> = {
     role: "Floor tech",
     startTrust: 30,
     note: "Notices who shares a win. Wants distance from a hide.",
-    portrait: { src: "/art/gen/portraits/jordan_talk.jpg?v=paint3", pos: "center" },
+    portrait: { src: "/art/ui/portraits/portrait-jordan-smile.png", pos: "center" },
     meet: "I want distance. That was the deal. Share a catch if you have one.",
   },
 };
@@ -336,8 +336,8 @@ export type IntroBeat = {
 
 export const INTRO: IntroBeat[] = [
   {
-    scene: "/art/gen/stills/intro_core.jpg",
-    portrait: "/art/gen/portraits/priya_talk.jpg?v=paint3",
+    scene: "/art/intro/scene-core.png",
+    portrait: "/art/ui/portraits/portrait-priya-talk.png",
     kicker: "The core  ·  Priya",
     title: "You signed a core. Now it has to live.",
     body: "Teaching model — not a license. Heat still has to leave.",
@@ -349,8 +349,8 @@ export const INTRO: IntroBeat[] = [
     ],
   },
   {
-    scene: "/art/gen/stills/intro_cafe.jpg",
-    portrait: "/art/gen/portraits/mabel_talk.jpg?v=paint3",
+    scene: "/art/intro/scene-cafe.png",
+    portrait: "/art/ui/portraits/portrait-mabel-talk.png",
     kicker: "The cafe  ·  Mabel",
     title: "The kettle is still on from the night shift.",
     body: "Retired floor manager. The cafe is the last board she touches.",
@@ -363,8 +363,8 @@ export const INTRO: IntroBeat[] = [
     ],
   },
   {
-    scene: "/art/gen/stills/intro_lot.jpg",
-    portrait: "/art/gen/portraits/elena_talk.jpg?v=paint3",
+    scene: "/art/intro/scene-lot.png",
+    portrait: "/art/ui/portraits/portrait-elena-talk.png",
     kicker: "The lot  ·  Elena",
     title: "Child seat first.",
     body: "Shift supervisor. The van was cold. The seat was not empty.",
@@ -377,8 +377,8 @@ export const INTRO: IntroBeat[] = [
     ],
   },
   {
-    scene: "/art/gen/stills/intro_wing.jpg",
-    portrait: "/art/gen/portraits/tommy_talk.jpg?v=paint3",
+    scene: "/art/intro/scene-wing.png",
+    portrait: "/art/ui/portraits/portrait-tommy-talk.png",
     kicker: "The wing  ·  Tommy",
     title: "Finish the sentence.",
     body: "Maintenance. Pump two. The tag is the rest of the sentence.",
@@ -391,8 +391,8 @@ export const INTRO: IntroBeat[] = [
     ],
   },
   {
-    scene: "/art/gen/stills/intro_bench.jpg",
-    portrait: "/art/gen/portraits/marcus_talk.jpg?v=paint3",
+    scene: "/art/intro/scene-bench.png",
+    portrait: "/art/ui/portraits/portrait-marcus-talk.png",
     kicker: "The bench  ·  Marcus",
     title: "Two instruments.",
     body: "Senior engineer. Youngest on this floor, once. He was wrong out loud.",
@@ -405,8 +405,8 @@ export const INTRO: IntroBeat[] = [
     ],
   },
   {
-    scene: "/art/gen/stills/intro_break.jpg",
-    portrait: "/art/gen/portraits/jordan_talk.jpg?v=paint3",
+    scene: "/art/intro/scene-break.png",
+    portrait: "/art/ui/portraits/portrait-jordan-talk.png",
     kicker: "The break  ·  Jordan",
     title: "Three tiles off the hide.",
     body: "Floor tech. He remembers who kept the catch.",
@@ -419,8 +419,8 @@ export const INTRO: IntroBeat[] = [
     ],
   },
   {
-    scene: "/art/gen/stills/intro_control.jpg",
-    portrait: "/art/gen/portraits/holt_talk.jpg?v=paint3",
+    scene: "/art/intro/scene-control.png",
+    portrait: "/art/ui/portraits/portrait-holt-talk.png",
     kicker: "The board  ·  Holt",
     title: "Unit 1 is holding. You are not a hero today.",
     body: "Director. He funds the review. He does not fund the speech.",
@@ -433,8 +433,8 @@ export const INTRO: IntroBeat[] = [
     ],
   },
   {
-    scene: "/art/gen/stills/intro_threshold.jpg?v=paint2",
-    portrait: "/art/gen/portraits/player_talk.jpg?v=paint3",
+    scene: "/art/intro/scene-threshold.png",
+    portrait: "/art/ui/portraits/portrait-player-talk.png",
     kicker: "The door  ·  You",
     title: "The hook is empty.",
     body: "Flavor. The floor does not care what the hoodie is called.",
