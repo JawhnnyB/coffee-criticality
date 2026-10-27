@@ -215,7 +215,7 @@ export const TERM_LESSONS: Record<string, TermLesson> = {
     id: "Fq",
     title: "F_q — the hottest pin versus the average",
     plain:
-      "k = 1 means the core as a WHOLE is steady. It does not mean every assembly is polite. F_q is the loudest local heat flux divided by the average. Fresh fuel in the middle shouts. Burned fuel on the rim is quieter. A shuffle map is how you keep F_q from becoming a personality: once- and twice-burned toward the centre, fresh toward the edge, so the hill of power is flatter. The courier still has to carry the peak, not the average. Q = ṁ cp ΔT for the loop; q' for the pin. If F_q is high, one pin asks the water for more than the loop’s average promised.",
+      "k = 1 means the core as a WHOLE is steady. It does not mean every assembly is polite. F_q is the loudest local heat flux divided by the average. Fresh fuel in the middle shouts. Burned fuel on the rim is quieter. A shuffle map is how you keep F_q from becoming a personality: fresh on the rim would flatten the hill of power, but the rim leaks, so a low-leakage map puts burned fuel toward the rim and scatters the fresh assemblies through the interior. The courier still has to carry the peak, not the average. Q = ṁ cp ΔT for the loop; q' for the pin. If F_q is high, one pin asks the water for more than the loop’s average promised.",
     steps: [
       "Power is not flat. Cosine hill plus enrichment differences plus burnup.",
       "q''_max / q''_avg = F_q. Design limits live on the max, not the mean.",

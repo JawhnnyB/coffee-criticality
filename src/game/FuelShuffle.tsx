@@ -2,55 +2,15 @@
 
 import { useMemo, useState } from "react";
 import type { PlantDesign, ShuffleCell } from "./plant";
+import { type Burn, FQ_MAX, N, RIM_MAX, fluxOf, passes, startMap } from "./shuffleModel";
 
-const N = 6;
-type Burn = 0 | 1 | 2;
-
-function startMap(): Burn[] {
-  const g: Burn[] = [];
-  for (let y = 0; y < N; y++) {
-    for (let x = 0; x < N; x++) {
-      const r = Math.hypot(x - 2.5, y - 2.5);
-      if (r < 1.6) g.push(0);
-      else if (r < 2.6) g.push(1);
-      else g.push(2);
-    }
-  }
-  return g;
-}
-
-function fluxOf(grid: Burn[], enrich: number) {
-  const power: number[] = [];
-  let sum = 0;
-  let max = 0;
-  for (let i = 0; i < N * N; i++) {
-    const x = i % N;
-    const y = Math.floor(i / N);
-    const r = Math.hypot(x - 2.5, y - 2.5) / 3.6;
-    const fresh = 1.35 - grid[i] * 0.38;
-    const shape = 1.12 - 0.55 * r;
-    let couple = 0;
-    const nbs = [i - 1, i + 1, i - N, i + N];
-    for (const n of nbs) {
-      if (n < 0 || n >= N * N) continue;
-      if (Math.abs((n % N) - x) + Math.abs(Math.floor(n / N) - y) !== 1) continue;
-      couple += 0.08 * (1.2 - grid[n] * 0.3);
-    }
-    const p = Math.max(0.15, fresh * shape * (0.85 + enrich / 10) + couple);
-    power.push(p);
-    sum += p;
-    if (p > max) max = p;
-  }
-  const avg = sum / (N * N);
-  return { power, fq: max / avg, avg, max };
-}
-
-function heat(v: number, max: number) {
+/** rgba(), not "rgb(...)aa": an rgb() with a hex-alpha suffix is invalid CSS and drops the whole declaration. */
+function heat(v: number, max: number, alpha: number) {
   const t = Math.max(0, Math.min(1, v / (max * 1.02)));
   const r = Math.round(40 + t * 200);
   const g = Math.round(180 - t * 140);
   const b = Math.round(90 - t * 70);
-  return `rgb(${r},${g},${b})`;
+  return `rgba(${r},${g},${b},${alpha})`;
 }
 
 export function FuelShuffle({
@@ -68,8 +28,7 @@ export function FuelShuffle({
   const [sel, setSel] = useState<number | null>(null);
   const [swaps, setSwaps] = useState(0);
   const flux = useMemo(() => fluxOf(grid, plant.enrich), [grid, plant.enrich]);
-  const edgeFresh = edgeFreshCount(grid);
-  const ok = flux.fq < 1.48 && edgeFresh <= 4 && swaps >= 3;
+  const ok = passes(flux, swaps);
 
   const click = (i: number) => {
     if (sel === null) {
@@ -97,8 +56,9 @@ export function FuelShuffle({
         </p>
         <h2 className="font-display mt-2 text-2xl text-[#1a1410]">Program the core</h2>
         <p className="mt-2 max-w-xl text-sm leading-relaxed text-[#3a2818]">
-          Fresh in the dead center peaking. Twice-burned belongs on the rim. Click two assemblies to swap.
-          Hold Fq under 1.48 and keep fresh off the fence.
+          Fresh in the middle peaks the core. Fresh on the rim flattens it but the rim leaks. Click two assemblies to
+          swap. Hold Fq under {FQ_MAX.toFixed(2)} and keep the rim share at {Math.round(RIM_MAX * 100)}% or less:
+          burned toward the fence, fresh scattered inside.
         </p>
         <div className="mt-4 grid gap-4 sm:grid-cols-[1fr_11rem]">
           <div className="grid grid-cols-6 gap-1">
@@ -111,7 +71,8 @@ export function FuelShuffle({
                 style={{
                   borderColor: sel === i ? "#f3e6d0" : "#1a1410",
                   color: "#f3e6d0",
-                  backgroundImage: `linear-gradient(${heat(flux.power[i], flux.max)}aa, ${heat(flux.power[i], flux.max)}66), url(/art/gen/ui/fuel_${b === 0 ? "F" : b}.png?v=art101)`,
+                  backgroundColor: heat(flux.power[i], flux.max, 0.6),
+                  backgroundImage: `url(/art/gen/ui/fuel_${b === 0 ? "F" : b}.png?v=art101)`,
                   backgroundSize: "32px 32px",
                   backgroundRepeat: "no-repeat",
                   backgroundPosition: "center",
@@ -124,7 +85,7 @@ export function FuelShuffle({
           </div>
           <div className="font-mono text-xs text-[#3a2818]">
             <p>Fq {flux.fq.toFixed(3)}</p>
-            <p className="mt-1">Fresh on edge {edgeFresh}</p>
+            <p className="mt-1">Rim share {(flux.rim * 100).toFixed(0)}%</p>
             <p className="mt-1">Swaps {swaps}</p>
             <p className="mt-3 text-[#6a4a32]">F fresh · 1 once · 2 twice</p>
             <p className="mt-3 text-[#6a4a32]">Color is flux. Red is a peak you will have to explain.</p>
@@ -159,12 +120,3 @@ function toMap(grid: Burn[]): ShuffleCell[] {
   return out;
 }
 
-function edgeFreshCount(grid: Burn[]) {
-  let n = 0;
-  for (let i = 0; i < N * N; i++) {
-    const x = i % N;
-    const y = Math.floor(i / N);
-    if ((x === 0 || y === 0 || x === N - 1 || y === N - 1) && grid[i] === 0) n += 1;
-  }
-  return n;
-}
