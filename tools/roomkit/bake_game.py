@@ -242,12 +242,26 @@ def write_ts(stamps):
     (ROOT / "src/game/roomArt.ts").write_text("\n".join(lines) + "\n")
 
 
+def bake_atlases():
+    """One atlas PNG and one JSON per room. pack_atlas keeps the 0-diff check."""
+    import importlib.util
+
+    path = Path(__file__).with_name("pack_atlas.py")
+    spec = importlib.util.spec_from_file_location("pack_atlas", path)
+    if spec is None or spec.loader is None:
+        raise SystemExit("pack_atlas missing")
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    mod.main()
+
+
 def main():
     stamps = bake_rooms()
     bake_kind_pngs()
     bake_tiles()
     bake_sprites()
     write_ts(stamps)
+    bake_atlases()
     print("baked")
 
 

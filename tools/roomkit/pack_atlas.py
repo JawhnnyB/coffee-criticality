@@ -66,6 +66,9 @@ def pack(rid):
     if n:
         raise SystemExit(f"{rid} atlas drifted by {n}px")
     atlas.save(ART / rid / "atlas.png")
+    (ART / rid / "atlas.json").write_text(
+        __import__("json").dumps({"src": f"/art/rooms/{rid}/atlas.png", "w": shell.width, "h": shell.height, "stamps": meta})
+    )
     print(rid, atlas.size, "stamps", len(meta))
     return meta
 

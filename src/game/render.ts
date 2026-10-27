@@ -44,17 +44,15 @@ function getBuf(w: number, h: number) {
   return buf;
 }
 
-function periodTint(period: GameState["period"]): string {
-  if (period === "morning") return "rgba(243,214,170,0.18)";
-  if (period === "midday") return "rgba(170,200,220,0.08)";
-  return "rgba(90,48,28,0.16)";
-}
-
-function lampPool(ctx: CanvasRenderingContext2D, x: number, y: number, period: GameState["period"]) {
-  const a = period === "afternoon" ? 0.55 : period === "morning" ? 0.34 : 0.2;
-  ctx.fillStyle = `rgba(255,228,160,${a})`;
+function lampPool(ctx: CanvasRenderingContext2D, x: number, y: number) {
+  const cx = Math.round(x);
+  const cy = Math.round(y);
+  ctx.fillStyle = "rgba(255,226,160,0.22)";
   ctx.beginPath();
-  ctx.ellipse(Math.round(x), Math.round(y) + 4, 26, 9, 0, 0, Math.PI * 2);
+  ctx.ellipse(cx, cy, 22, 9, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.beginPath();
+  ctx.ellipse(cx, cy, 10, 4, 0, 0, Math.PI * 2);
   ctx.fill();
 }
 
@@ -124,7 +122,7 @@ export function drawWorld(
     }
     for (const p of room.props) {
       if (p.kind !== "lamp") continue;
-      lampPool(g, p.rect.x + p.rect.w / 2, p.rect.y + p.rect.h, s.period);
+      lampPool(g, p.rect.x + p.rect.w / 2, p.rect.y + p.rect.h);
     }
   }
 
@@ -187,8 +185,13 @@ export function drawWorld(
   const oy = Math.floor((viewH - dh) / 2);
   ctx.drawImage(off, 0, 0, bw, bh, ox, oy, dw, dh);
 
-  ctx.fillStyle = periodTint(s.period);
-  ctx.fillRect(0, 0, viewW, viewH);
+  if (s.period !== "midday") {
+    ctx.save();
+    ctx.globalCompositeOperation = "multiply";
+    ctx.fillStyle = s.period === "morning" ? "#fff2dc" : "#f0c8a0";
+    ctx.fillRect(ox, oy, dw, dh);
+    ctx.restore();
+  }
 
   if (s.fade > 0 && !s.mapHop) {
     ctx.fillStyle = `rgba(22,17,13,${Math.min(1, s.fade)})`;

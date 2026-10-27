@@ -1,0 +1,1 @@
+{"src": "/art/rooms/breakroom/atlas.png", "w": 288, "h": 224, "stamps": [{"kind": "kettle", "x": 96, "y": 87, "foot": 128, "sx": 288, "sy": 0, "sw": 50, "sh": 43}, {"kind": "couch", "x": 158, "y": 128, "foot": 160, "sx": 288, "sy": 43, "sw": 36, "sh": 34}, {"kind": "vending", "x": 48, "y": 128, "foot": 160, "sx": 288, "sy": 77, "sw": 34, "sh": 34}]}

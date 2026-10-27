@@ -103,15 +103,16 @@ function blitBody(
   return true;
 }
 
-const A6_SHIRT: Array<[number, number, number]> = [
-  [0x98, 0xc8, 0x60],
-  [0x5a, 0x94, 0x38],
-  [0x3a, 0x68, 0x24],
-];
-const A6_HAIR: Array<[number, number, number]> = [
-  [0xc4, 0x78, 0x40],
-  [0x7a, 0x40, 0x28],
+const SHIRT_LIGHT: [number, number, number] = [0x98, 0xc8, 0x60];
+const SHIRT_BASE: [number, number, number] = [0x5a, 0x94, 0x38];
+const SHIRT_SHADE: [number, number, number] = [0x3a, 0x68, 0x24];
+const HAIR_LIGHT: [number, number, number] = [0xc4, 0x78, 0x40];
+const HAIR_BASE: [number, number, number] = [0x7a, 0x40, 0x28];
+const HAIR_STEP: [number, number, number] = [0x6a, 0x40, 0x28];
+const HAIR_DARK: Array<[number, number, number]> = [
   [0x4e, 0x28, 0x18],
+  [0x4a, 0x2c, 0x1c],
+  [0x4a, 0x2c, 0x18],
 ];
 const A6_OUTLINE: [number, number, number] = [0x3b, 0x23, 0x18];
 const A6_EYE: [number, number, number] = [0x2a, 0x18, 0x10];
@@ -121,12 +122,7 @@ function same(r: number, g: number, b: number, c: [number, number, number]) {
   return r === c[0] && g === c[1] && b === c[2];
 }
 
-function tones(hex: string): Array<[number, number, number]> {
-  const base = parseHex(hex);
-  return [shade(base, 1.28), base, shade(base, 0.62)];
-}
-
-/** Exact shirt and hair colours from the A6 grids. Glasses posts are the outline pixels in the eye box. */
+/** Exact whole-colour swap. Outline, skin, and eyes stay. Glasses posts are the baked 1px outline; turning them off clears those pixels. */
 export function tintA6(im: HTMLImageElement, look: PlayerLook): CanvasImageSource {
   const key = `a6|${im.src}|${look.hoodie}|${look.hair}|${look.glasses ? 1 : 0}`;
   const hit = recolorCache.get(key);
@@ -174,23 +170,25 @@ export function tintA6(im: HTMLImageElement, look: PlayerLook): CanvasImageSourc
       }
     }
   }
-  const shirt = tones(HOODIE_HEX[look.hoodie]);
-  const hair = tones(HAIR_HEX[look.hair]);
+  const hoodie = parseHex(HOODIE_HEX[look.hoodie]);
+  const hair = parseHex(HAIR_HEX[look.hair]);
+  const shirtLight = shade(hoodie, 1.22);
+  const shirtShade = shade(hoodie, 0.72);
+  const hairLight = shade(hair, 1.18);
+  const hairStep = shade(hair, 0.72);
+  const hairDark = shade(hair, 0.55);
   for (let i = 0; i < d.length; i += 4) {
     if (d[i + 3] < 8) continue;
     const r = d[i];
     const gv = d[i + 1];
     const b = d[i + 2];
-    for (let t = 0; t < 3; t++) {
-      if (same(r, gv, b, A6_SHIRT[t])) {
-        paint(d, i, shirt[t]);
-        break;
-      }
-      if (same(r, gv, b, A6_HAIR[t])) {
-        paint(d, i, hair[t]);
-        break;
-      }
-    }
+    if (same(r, gv, b, SHIRT_BASE)) paint(d, i, hoodie);
+    else if (same(r, gv, b, SHIRT_SHADE)) paint(d, i, shirtShade);
+    else if (same(r, gv, b, SHIRT_LIGHT)) paint(d, i, shirtLight);
+    else if (same(r, gv, b, HAIR_BASE)) paint(d, i, hair);
+    else if (same(r, gv, b, HAIR_LIGHT)) paint(d, i, hairLight);
+    else if (same(r, gv, b, HAIR_STEP)) paint(d, i, hairStep);
+    else if (HAIR_DARK.some((c0) => same(r, gv, b, c0))) paint(d, i, hairDark);
   }
   g.putImageData(img, 0, 0);
   recolorCache.set(key, c);
