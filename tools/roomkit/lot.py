@@ -200,7 +200,8 @@ for bx in (16*T, 30*T, 47*T):
 def sp(i): return ref.render(ref.build(None), ref.casts[i])
 def char(i, cx, fy):
     cv.ellipse_shadow(cx, fy-1, 6, 2, .32); cv.im.alpha_composite(sp(i), (cx-8, fy-26))
-char(0, 24*T+8, 18*T+4); char(1, 22*T+8, 17*T+10); char(2, 50*T, 11*T+8)
+if os.environ.get("LOT_CHARS", "1") != "0":
+    char(0, 24*T+8, 18*T+4); char(1, 22*T+8, 17*T+10); char(2, 50*T, 11*T+8)
 
 # hairline border
 cv.r(0, 0, W, 1, OL); cv.r(0, H-1, W, 1, OL); cv.r(0, 0, 1, H, OL); cv.r(W-1, 0, 1, H, OL)

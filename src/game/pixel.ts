@@ -71,23 +71,29 @@ function blitBody(
   playerLook?: PlayerLook,
   sitting = false,
 ) {
-  const idle = loadArt(`/art/gen/sprites/${who}_idle_32.png?v=soft8`);
+  const idleA6 = loadArt(`/art/gen/sprites/${who}_idle_32.png?v=a6`);
+  const idleOld = loadArt(`/art/gen/sprites/${who}_idle_32.png?v=soft8`);
+  const a6 = !!(idleA6 && idleA6.naturalWidth === WALK_W && idleA6.naturalHeight === WALK_H);
+  const idle = a6 ? idleA6 : idleOld;
   if (!idle || idle.naturalWidth !== WALK_W || idle.naturalHeight !== WALK_H) return false;
   pix(ctx);
   const frame = moving && !sitting ? Math.floor(phase) % 4 : 0;
-  const bob = moving && !sitting && (frame === 1 || frame === 3) ? 1 : 0;
-  const sway = !moving && Math.floor(phase / 8) % 2 === 1 ? 1 : 0;
+  const bob = !a6 && moving && !sitting && (frame === 1 || frame === 3) ? 1 : 0;
+  const sway = !a6 && !moving && Math.floor(phase / 8) % 2 === 1 ? 1 : 0;
   const dx = Math.round(x - WALK_W / 2 + sway);
   const dy = Math.round(y - WALK_H + bob);
 
   ctx.save();
-  ctx.fillStyle = "rgba(12,10,8,0.38)";
+  ctx.fillStyle = a6 ? "rgba(42,22,16,0.32)" : "rgba(12,10,8,0.38)";
   ctx.beginPath();
-  ctx.ellipse(Math.round(x), Math.round(y) - 1, sitting ? 7 : 8, sitting ? 2 : 3, 0, 0, Math.PI * 2);
+  ctx.ellipse(Math.round(x), Math.round(y) - 1, a6 ? 6 : sitting ? 7 : 8, a6 ? 2 : sitting ? 2 : 3, 0, 0, Math.PI * 2);
   ctx.fill();
   ctx.restore();
 
-  const walk = loadArt(`/art/gen/sprites/${who}_walk4.png?v=soft8`);
+  const walkA6 = loadArt(`/art/gen/sprites/${who}_walk4.png?v=a6`);
+  const walk = a6 && walkA6 && walkA6.naturalWidth === 128 && walkA6.naturalHeight === 192
+    ? walkA6
+    : loadArt(`/art/gen/sprites/${who}_walk4.png?v=soft8`);
   const sit = loadArt(`/art/gen/sprites/${who}_sit.png?v=soft8`);
   const hasWalk = !!(walk && walk.naturalWidth === 128 && walk.naturalHeight === 192);
   const hasSit = !!(sit && sit.naturalWidth === WALK_W && sit.naturalHeight === WALK_H);
@@ -96,12 +102,16 @@ function blitBody(
   let sy = 0;
   if (sitting && hasSit) {
     src = sit!;
+  } else if (a6 && hasWalk) {
+    src = walk!;
+    sx = (moving && !sitting ? frame : 0) * WALK_W;
+    sy = facing === "up" ? WALK_H * 2 : facing === "down" ? 0 : WALK_H;
   } else if (moving && hasWalk) {
     src = walk!;
     sx = frame * WALK_W;
     sy = facing === "up" ? WALK_H * 2 : facing === "down" ? 0 : WALK_H;
   }
-  if (who === "player" && playerLook) {
+  if (who === "player" && playerLook && !a6) {
     const sheet = sitting && hasSit ? sit! : moving && hasWalk ? walk! : idle;
     src = tintPlayer(sheet, playerLook);
   }
@@ -116,7 +126,7 @@ function blitBody(
   }
   ctx.restore();
 
-  const blink = !moving && facing !== "up" && phase % 8 < 0.28;
+  const blink = !a6 && !moving && facing !== "up" && phase % 8 < 0.28;
   if (blink) {
     fill(ctx, dx + 9, dy + (sitting ? 19 : 13), 14, 2, "rgba(62,40,32,0.8)");
   }
@@ -510,6 +520,12 @@ function drawCampusBuilding(
     Maint: { roof: "#4a6a72", roofD: "#24383c", wall: "#c2beb4", wallD: "#8a8680", trim: "#7a9aa0", face: "north", door: 0.5, win: "pane", cols: 6, rows: 1, rib: true },
   };
   const spec = specs[label ?? ""] ?? specs.Cafe;
+  // Control's collider is a 4-tile strip between the lake and Hall. Paint a
+  // second storey upward so the shell is a building. The solid rect stays put.
+  if (label === "Control") {
+    oy -= 48;
+    h += 48;
+  }
   const eave = Math.max(8, Math.min(h - 20, Math.floor(h * (h < 80 ? 0.22 : 0.36))));
   fill(ctx, ox + 2, oy + h - 3, w - 2, 3, "#5a4330");
   fill(ctx, ox + 3, oy + eave - 1, w - 6, h - eave, spec.wall);
@@ -543,18 +559,19 @@ function drawCampusBuilding(
   const avail = h - eave - 14;
   const winH = Math.min(32, Math.max(16, avail));
   const cols = Math.max(1, Math.min(spec.cols, Math.floor((w - 24) / 18)));
-  const rows = winH >= 28 ? 1 : Math.max(1, Math.min(spec.rows, 2));
+  const rows = label === "Control" ? 2 : winH >= 28 ? 1 : Math.max(1, Math.min(spec.rows, 2));
+  const paneH = label === "Control" ? 20 : winH;
   for (let r = 0; r < rows; r++) {
     for (let c = 0; c < cols; c++) {
       const wx = ox + 12 + c * Math.floor((w - 24) / cols);
-      const wy = oy + eave + 4 + r * (winH + 4);
-      if (wy + winH > oy + h - 8) continue;
-      fill(ctx, wx - 1, wy - 1, 12, winH + 2, `rgba(232,168,96,${glow})`);
-      fill(ctx, wx, wy, 10, winH, PAL.ink);
-      fill(ctx, wx + 1, wy + 1, 8, winH - 2, "#ffe0a0");
-      fill(ctx, wx + 5, wy + 1, 1, winH - 2, PAL.ink);
-      fill(ctx, wx + 1, wy + Math.floor(winH / 2), 8, 1, PAL.ink);
-      fill(ctx, wx - 1, wy + winH, 12, 2, PAL.wood);
+      const wy = oy + eave + 4 + r * (paneH + 4);
+      if (wy + paneH > oy + h - 8) continue;
+      fill(ctx, wx - 1, wy - 1, 12, paneH + 2, `rgba(232,168,96,${glow})`);
+      fill(ctx, wx, wy, 10, paneH, PAL.ink);
+      fill(ctx, wx + 1, wy + 1, 8, paneH - 2, "#ffe0a0");
+      fill(ctx, wx + 5, wy + 1, 1, paneH - 2, PAL.ink);
+      fill(ctx, wx + 1, wy + Math.floor(paneH / 2), 8, 1, PAL.ink);
+      fill(ctx, wx - 1, wy + paneH, 12, 2, PAL.wood);
     }
   }
   if (h > 26 && w > 22) {
@@ -603,7 +620,11 @@ export function drawPropPixel(
 ) {
   const ox = Math.floor(x);
   const oy = Math.floor(y);
-  const im = kind === "roof" || kind === "stack" ? null : loadArt(`/art/gen/props/${kind}.png?v=${kind === "boom" ? "gate2" : kind === "van" ? "tall1" : "eval1"}`);
+  const legacy = kind === "roof" || kind === "stack"
+    ? null
+    : loadArt(`/art/gen/props/${kind}.png?v=${kind === "boom" ? "gate2" : kind === "van" ? "tall1" : "eval1"}`);
+  const baked = loadArt(`/art/gen/props/${kind}.png?v=a6`);
+  const im = legacy ?? baked;
   if (im) {
     pix(ctx);
     const nw = im.naturalWidth;

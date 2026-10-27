@@ -32,6 +32,7 @@ import {
   hungSignSpot,
 } from "./pixel";
 import { glimpseSrc } from "./site";
+import { A6_ROOMS, ROOM_SHELL, ROOM_STAMPS } from "./roomArt";
 import { npcsHere, type GameState } from "./sim";
 
 const artCache = new Map<string, HTMLImageElement>();
@@ -213,10 +214,21 @@ export function drawWorld(
   g.save();
   g.translate(Math.round(bw / 2 - camX), Math.round(bh / 2 - camY));
 
-  drawTiles(g, room, s.period, camX - bw / 2, camY - bh / 2, bw, bh);
+  const shell = A6_ROOMS.has(room.id) ? img(ROOM_SHELL[room.id] ?? "") : null;
+  const usingA6 = !!(shell && shell.naturalWidth === room.w && shell.naturalHeight === room.h);
+  if (usingA6) {
+    g.drawImage(shell, 0, 0);
+    for (const st of ROOM_STAMPS[room.id] ?? []) {
+      if (st.kind !== "rug") continue;
+      const rug = img(st.src);
+      if (rug) g.drawImage(rug, st.x, st.y);
+    }
+  } else {
+    drawTiles(g, room, s.period, camX - bw / 2, camY - bh / 2, bw, bh);
+  }
 
   const outdoor = room.floorKind === "grass" || room.floorKind === "asphalt";
-  if (outdoor && (s.period === "afternoon" || s.flags.endingWalk)) {
+  if (!usingA6 && outdoor && (s.period === "afternoon" || s.flags.endingWalk)) {
     const warm = g.createLinearGradient(0, 0, 0, WALL + 48);
     const hot = s.flags.endingWalk ? 0.34 : 0.22;
     warm.addColorStop(0, `rgba(255,186,96,${hot})`);
@@ -228,17 +240,31 @@ export function drawWorld(
 
   fillEdge(g, room);
 
-  if (outdoor) windMotes(g, room.w, room.h, now, WALL);
+  if (!usingA6 && outdoor) windMotes(g, room.w, room.h, now, WALL);
 
-  for (const p of room.props) {
-    if (p.kind === "lamp") lampGlow(g, p.rect.x + p.rect.w / 2, p.rect.y + p.rect.h, now, s.period);
-    if (p.kind === "kettle") kettleGlow(g, p.rect.x + p.rect.w / 2, p.rect.y + p.rect.h, now);
+  if (!usingA6) {
+    for (const p of room.props) {
+      if (p.kind === "lamp") lampGlow(g, p.rect.x + p.rect.w / 2, p.rect.y + p.rect.h, now, s.period);
+      if (p.kind === "kettle") kettleGlow(g, p.rect.x + p.rect.w / 2, p.rect.y + p.rect.h, now);
+    }
   }
 
   const FLOOR_PROP = new Set(["rug"]);
   const WALL_PROP = new Set(["poster", "board", "prints", "dose", "crane"]);
   const drawables: { y: number; draw: () => void }[] = [];
 
+  if (usingA6) {
+    for (const st of ROOM_STAMPS[room.id] ?? []) {
+      if (st.kind === "rug") continue;
+      drawables.push({
+        y: st.foot,
+        draw: () => {
+          const im = img(st.src) ?? img(`/art/gen/props/${st.kind}.png?v=a6`);
+          if (im) g.drawImage(im, st.x, st.y);
+        },
+      });
+    }
+  } else {
   for (const p of room.props) {
     if (FLOOR_PROP.has(p.kind)) {
       drawPropPixel(g, p.kind, p.rect.x, p.rect.y, p.rect.w, p.rect.h, room.accent, now, p.label);
@@ -360,6 +386,7 @@ export function drawWorld(
       draw: () => drawPaperLog(g, s.day, dayMark(s)),
     });
   }
+  }
 
   for (const n of npcsHere(s)) {
     drawables.push({
@@ -379,6 +406,12 @@ export function drawWorld(
 
   drawables.sort((a, b) => a.y - b.y);
   for (const d of drawables) d.draw();
+  if (usingA6) {
+    g.fillStyle = "#3b2318";
+    g.fillRect(0, 0, 1, room.h);
+    g.fillRect(room.w - 1, 0, 1, room.h);
+    g.fillRect(0, room.h - 1, room.w, 1);
+  }
 
   g.restore();
 
@@ -391,7 +424,7 @@ export function drawWorld(
   const oy = Math.floor((viewH - dh) / 2);
   ctx.drawImage(off, 0, 0, bw, bh, ox, oy, dw, dh);
 
-  ctx.fillStyle = periodTint(s.period, room.floorKind !== "grass" && room.floorKind !== "asphalt");
+  ctx.fillStyle = usingA6 ? "rgba(0,0,0,0)" : periodTint(s.period, room.floorKind !== "grass" && room.floorKind !== "asphalt");
   ctx.fillRect(0, 0, viewW, viewH);
   if (s.flags.endingWalk && (room.floorKind === "grass" || room.floorKind === "asphalt")) {
     const g = ctx.createLinearGradient(0, 0, 0, viewH);

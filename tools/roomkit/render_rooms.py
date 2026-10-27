@@ -160,41 +160,39 @@ LAYOUT_CHARS = {
  'maintenance': [(0, 190, 190), (2, 280, 170)],
 }
 
-def render_room(rid):
+def render_room(rid, chars=True, which=None, border_on=True):
     R = ROOMS[rid]; W, H = R['w']*T, R['h']*T
     p = ROOM[rid]
     cv = Cv(W, H)
     floor(cv, p, 0, 48, W, H-48)
-    if rid == 'reactor':   # safety lanes around the vessel
-        cv.r(7*16, 3*16+8, 9*16+16, 3, hx('#e0c860')) if False else None
-        for ring, a in ((92, .10), (68, .12), (44, .16)):
-            cv.blend(11*16+8-ring+0, 6*16+8-ring, ring*2, ring*2, hx('#9ee8e0'), a) if False else None
     wall(cv, p, W)
     occ = [(int(pr['rect'][0]*T), int((pr['rect'][0]+pr['rect'][2])*T)) for pr in R['props'] if pr['rect'][1]*T < 40 and pr['kind'] in ('poster', 'prints', 'board', 'lamp', 'plant', 'cabinet')]
     occ += [(int(d[1][0]*T)-6, int((d[1][0]+d[1][2])*T)+6) for d in R['doors'] if d[1][1] == 0]
     dress(cv, rid, p, W, occ)
-    # window light patch on floor
     if rid in ('cafe', 'breakroom', 'engineering'):
         wx = {'cafe': 96, 'breakroom': 100, 'engineering': 200}[rid]; ww = {'cafe': 80, 'breakroom': 56, 'engineering': 60}[rid]
         for i in range(34):
             cv.blend(wx+i//2+4, 48+i*2, ww-8, 2, (255, 240, 190), .10)
     if rid == 'reactor':
-        # core glow pools (flat, stepped)
         cx, cy = int(11.5*T), int(6.5*T)
         for r_, a in ((86, .06), (64, .08), (42, .10)):
             ov = Image.new('RGBA', (W, H), (0, 0, 0, 0)); ImageDraw.Draw(ov).ellipse([cx-r_, cy-int(r_*.75), cx+r_, cy+int(r_*.75)], fill=(120, 232, 224, int(255*a)))
             cv.im.alpha_composite(ov)
-        # yellow safety lane rectangle
         cv.r(7*16, 3*16+0, 0, 0, hx('#000000'))
     draw_doors(cv, rid, p, W, H, R['doors'])
     state = dict(cab=0)
     props = sorted(R['props'], key=lambda pr: (pr['kind'] == 'rug' and -1 or 0, pr['rect'][1]+pr['rect'][3]))
-    posters_i = 0
     for i, pr in enumerate(props):
+        if which is not None and i != which:
+            if pr['kind'].startswith('cab_') and pr['kind'] != 'cab_lototo':
+                state['cab'] += 1
+            continue
         draw_prop(cv, rid, p, pr, i, state)
-    for ci, cx, fy in LAYOUT_CHARS[rid]:
-        put_char(cv, ci, cx, fy)
-    border(cv, W, H)
+    if chars:
+        for ci, cx, fy in LAYOUT_CHARS[rid]:
+            put_char(cv, ci, cx, fy)
+    if border_on:
+        border(cv, W, H)
     return cv
 
 if __name__ == '__main__':
