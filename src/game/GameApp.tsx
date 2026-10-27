@@ -52,7 +52,8 @@ import { MAP_HUD, ROOM_BLURB, roomLinks } from "./site";
 import { TeachMeta, TeachPriya, TYPE_THUMB } from "./TeachFrame";
 import { ART } from "./artFlags";
 import { PixelMenu, PixelRead } from "./PixelMenu";
-import { CastFace, PixelBadge, PixelBeat, PixelBrief } from "./IntroScreens";
+import { CastFace, PixelBadge, PixelBadgeIssued, PixelBeat, PixelBrief, PixelIris } from "./IntroScreens";
+import { IRIS_SECONDS, roleTitle } from "./security";
 import {
   abortOverlay,
   beginDay,
@@ -152,6 +153,8 @@ const PLAY_MODES: Mode[] = [
   "bowl",
   "phys",
   "load",
+  "iris",
+  "item",
   "ending",
 ];
 
@@ -264,7 +267,19 @@ export function GameApp() {
         modeRef.current = "play";
         setMode("play");
       },
-      warp: (room, x, y) => {
+      /** Starts a fresh Day 1 at the first story beat (no menu, no builder), the way a new game does after the builder. */
+      bootIntro: () => {
+        const s = stateRef.current;
+        startShift(s, "transferred");
+        finishBuilder(s, s.plant ?? DEFAULT_PLANT);
+        s.introLock = 0;
+        modeRef.current = s.mode;
+        setMode(s.mode);
+      },
+      getFlag: (k: string) => !!stateRef.current.flags[k],
+      getGoals: () => stateRef.current.goals.map((g) => `${g.done ? "x" : " "} ${g.id}`).join(","),
+      getMsgs: () => stateRef.current.messages.map((m) => m.text),
+            warp: (room, x, y) => {
         const s = stateRef.current;
         s.room = room as GameState["room"];
         s.x = x;
@@ -555,6 +570,9 @@ export function GameApp() {
         s.closePrompt ? "c" : "",
         s.day,
         s.shuffleDone ? "sh" : "",
+        Math.floor(s.irisT * 24),
+        s.flags["sec:badge"] ? "bd" : "",
+        s.flags["sec:tld"] ? "tl" : "",
         s.weekLog.length,
         s.flags.endingWalk ? "ew" : "",
         s.ended ?? "",
@@ -687,6 +705,8 @@ export function GameApp() {
             objective={s.objective}
             day={s.day}
             nearLabel={s.nearLabel}
+            badge={!!s.flags["sec:badge"]}
+            tld={!!s.flags["sec:tld"]}
           />
         )}
 
@@ -911,6 +931,22 @@ export function GameApp() {
             }}
           />
         )}
+
+        {mode === "iris" && (
+          <PixelIris
+            irisT={s.irisT}
+            seconds={IRIS_SECONDS}
+            look={look}
+            onHold={(down) => {
+              if (down) keysRef.current.add("KeyE");
+              else keysRef.current.delete("KeyE");
+              refresh();
+            }}
+            onWalkOn={() => pulse("Enter")}
+          />
+        )}
+
+        {mode === "item" && <PixelBadgeIssued look={look} role={roleTitle(s.role)} onClose={() => pulse("Enter")} />}
 
         {mode === "dialogue" && line && (
           <DialogueStage
@@ -1579,7 +1615,7 @@ function DialogueStage({
           else onContinue();
         }}
       >
-        {npc ? <PixelPortrait npc={npc} /> : null}
+        {npc ? <PixelPortrait npc={npc} /> : line.speaker === "Dee" ? <CastFace id="dee" zoom={4} live /> : line.speaker === "You" ? <CastFace id="player" zoom={4} live /> : null}
         <div className="min-w-0 flex-1">
           <p className="font-mono text-[10px] tracking-widest text-[#8a7864]">
             {time} · {room} · clock frozen
@@ -1592,7 +1628,7 @@ function DialogueStage({
               {role ? <p className="text-[11px] text-[#8a7864]">{role}</p> : null}
               {beat ? <p className="text-[11px] leading-snug text-[#6a4a32]">{beat}</p> : null}
             </div>
-            <HeartRow n={hearts} />
+            {npc ? <HeartRow n={hearts} /> : null}
           </div>
           {who ? <p className="mt-2 text-[12px] leading-relaxed text-[#6a4a32]">{who}</p> : null}
           <Chatter
@@ -2518,6 +2554,8 @@ function Hud({
   objective,
   day,
   nearLabel,
+  badge = false,
+  tld = false,
 }: {
   room: string;
   roomId: RoomId;
@@ -2530,6 +2568,8 @@ function Hud({
   objective: string;
   day: number;
   nearLabel: string;
+  badge?: boolean;
+  tld?: boolean;
 }) {
   const hud = MAP_HUD[roomId] ?? MAP_HUD.cafe;
   const [open, setOpen] = useState(true);
@@ -2562,7 +2602,15 @@ function Hud({
             )}
           </button>
         </div>
-        <div className="mt-1">{label(room)}</div>
+        <div className="mt-1 flex items-center justify-between gap-2">
+          {label(room)}
+          {badge || tld ? (
+            <span className="flex gap-0.5" data-testid="hud-sec-icons">
+              {badge ? <SecIcon slot={0} title="Badge 0417" /> : null}
+              {tld ? <SecIcon slot={1} title="Dosimeter 07" /> : null}
+            </span>
+          ) : null}
+        </div>
         {open ? (
           <>
             <div className="relative mt-1 h-8 w-16 border border-[#1a1410]" data-testid="site-plan">
@@ -2611,6 +2659,25 @@ function Hud({
         </div>
       )}
     </>
+  );
+}
+
+/** 16x16 slot from sec-icons.png (x = 4 + 22 * slot, y = 2): badge, TLD, iris, portal closed, portal open. */
+function SecIcon({ slot, title }: { slot: number; title: string }) {
+  return (
+    <span
+      title={title}
+      aria-label={title}
+      role="img"
+      style={{
+        display: "inline-block",
+        width: 16,
+        height: 16,
+        backgroundImage: "url(/art/ui/security/sec-icons.png)",
+        backgroundPosition: `${-(4 + 22 * slot)}px -2px`,
+        imageRendering: "pixelated",
+      }}
+    />
   );
 }
 
@@ -2737,6 +2804,7 @@ function collectActions(
   a.hide = edges.has("KeyH");
   a.confirm = edges.has("Space") || edges.has("Enter");
   a.heldConfirm = keys.has("Space") || keys.has("Enter");
+  a.heldInteract = keys.has("KeyE");
   a.back = edges.has("Escape");
   a.pause = edges.has("Escape");
   return a;
@@ -2779,6 +2847,10 @@ declare global {
       setKeys: (codes: string[]) => void;
       begin: () => void;
       bootPlay: () => void;
+      bootIntro: () => void;
+      getFlag: (k: string) => boolean;
+      getGoals: () => string;
+      getMsgs: () => string[];
       warp: (room: string, x: number, y: number) => void;
       setMinutes: (n: number) => void;
       setLook: (hoodie: string, hair: string, glasses: boolean) => void;

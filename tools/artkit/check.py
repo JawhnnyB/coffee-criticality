@@ -78,6 +78,66 @@ PAIRS = [
     ("intro-door.png", "reference/intro/intro-door.png"),
     ("badge.png", "reference/intro/badge.png"),
     ("brief.png", "reference/intro/brief.png"),
+    # Stage 2c, Site Access
+    ("badge-card-4x.png", "reference/security/badge-card-4x.png"),
+    ("badge-card.png", "reference/security/badge-card.png"),
+    ("badge-lanyard.png", "reference/security/badge-lanyard.png"),
+    ("corridor-signs.png", "reference/security/corridor-signs.png"),
+    ("dee_idle_32.png", "reference/security/dee_idle_32.png"),
+    ("door-plates.png", "reference/security/door-plates.png"),
+    ("engineering-mydesk-3x.png", "reference/security/engineering-mydesk-3x.png"),
+    ("engineering-mydesk.png", "reference/security/engineering-mydesk.png"),
+    ("intro-badge-2x.png", "reference/security/intro-badge-2x.png"),
+    ("intro-badge.png", "reference/security/intro-badge.png"),
+    ("intro-desk-2x.png", "reference/security/intro-desk-2x.png"),
+    ("intro-desk.png", "reference/security/intro-desk.png"),
+    ("intro-iris-2x.png", "reference/security/intro-iris-2x.png"),
+    ("intro-iris.png", "reference/security/intro-iris.png"),
+    ("intro-security-2x.png", "reference/security/intro-security-2x.png"),
+    ("intro-security.png", "reference/security/intro-security.png"),
+    ("iris-align-2x.png", "reference/security/iris-align-2x.png"),
+    ("iris-align.png", "reference/security/iris-align.png"),
+    ("iris-match-2x.png", "reference/security/iris-match-2x.png"),
+    ("iris-match.png", "reference/security/iris-match.png"),
+    ("iris-scan-2x.png", "reference/security/iris-scan-2x.png"),
+    ("iris-scan.png", "reference/security/iris-scan.png"),
+    ("portal-sprites.png", "reference/security/portal-sprites.png"),
+    ("portal-states-3x.png", "reference/security/portal-states-3x.png"),
+    ("portal-states.png", "reference/security/portal-states.png"),
+    ("portrait-dee-smile.png", "reference/security/portrait-dee-smile.png"),
+    ("portrait-dee-talk.png", "reference/security/portrait-dee-talk.png"),
+    ("scene-desk.png", "reference/security/scene-desk.png"),
+    ("scene-iris-align.png", "reference/security/scene-iris-align.png"),
+    ("scene-iris-match.png", "reference/security/scene-iris-match.png"),
+    ("scene-iris-scan.png", "reference/security/scene-iris-scan.png"),
+    ("scene-kiosk.png", "reference/security/scene-kiosk.png"),
+    ("scene-security.png", "reference/security/scene-security.png"),
+    ("sec-icons-4x.png", "reference/security/sec-icons-4x.png"),
+    ("sec-icons.png", "reference/security/sec-icons.png"),
+    ("security-3x.png", "reference/security/security-3x.png"),
+    ("security-annotated.png", "reference/security/security-annotated.png"),
+    ("security-shell.png", "reference/security/security-shell.png"),
+    ("security.png", "reference/security/security.png"),
+    ("wayfinding-3x.png", "reference/security/wayfinding-3x.png"),
+    ("wayfinding.png", "reference/security/wayfinding.png"),
+]
+
+# Shipped copies of the Site Access art must be the reference, byte for byte.
+SHIPPED = [
+    ("reference/security/portal-sprites.png", "public/art/ui/security/portal-sprites.png"),
+    ("reference/security/sec-icons.png", "public/art/ui/security/sec-icons.png"),
+    ("reference/security/badge-lanyard.png", "public/art/ui/security/badge-lanyard.png"),
+    ("reference/security/badge-card.png", "public/art/ui/security/badge-card.png"),
+    ("reference/security/dee_idle_32.png", "public/art/gen/sprites/dee_idle_32.png"),
+    ("reference/security/portrait-dee-smile.png", "public/art/ui/portraits/portrait-dee-smile.png"),
+    ("reference/security/portrait-dee-talk.png", "public/art/ui/portraits/portrait-dee-talk.png"),
+    ("reference/security/scene-security.png", "public/art/intro/scene-security.png"),
+    ("reference/security/scene-kiosk.png", "public/art/intro/scene-kiosk.png"),
+    ("reference/security/scene-desk.png", "public/art/intro/scene-desk.png"),
+    ("reference/security/scene-iris-scan.png", "public/art/intro/scene-iris.png"),
+    ("reference/security/scene-iris-align.png", "public/art/intro/scene-iris-align.png"),
+    ("reference/security/scene-iris-scan.png", "public/art/intro/scene-iris-scan.png"),
+    ("reference/security/scene-iris-match.png", "public/art/intro/scene-iris-match.png"),
 ]
 
 
@@ -97,11 +157,15 @@ def main() -> int:
     tmp = Path(tempfile.mkdtemp(prefix="artcheck-"))
     ui = tmp / "ui"
     reactors = tmp / "reactors"
+    sec = tmp / "security"
     ui.mkdir()
     reactors.mkdir()
+    sec.mkdir()
     env = os.environ.copy()
     env["UI_OUT"] = str(ui)
     env["REACTOR_OUT"] = str(reactors)
+    env["SEC_OUT"] = str(sec)
+    env["CC_REPO"] = str(ROOT)
     steps = [
         [sys.executable, str(ART / "menu.py")],
         [sys.executable, str(ART / "cab.py")],
@@ -111,12 +175,14 @@ def main() -> int:
         [sys.executable, str(ART / "scenes.py")],
         [sys.executable, str(ART / "cast.py")],
         [sys.executable, str(ART / "intro_mock.py")],
+        [sys.executable, str(ART / "security.py")],
+        [sys.executable, str(ART / "security_ui.py")],
     ]
     for cmd in steps:
         subprocess.check_call(cmd, cwd=ROOT, env=env)
     bad = 0
     for name, rel in PAIRS:
-        got = ui / name if (ui / name).exists() else reactors / name
+        got = next((d / name for d in (ui, reactors, sec) if (d / name).exists()), ui / name)
         ref = ROOT / rel
         if not got.exists() or not ref.exists():
             print(f"MISSING {name}")
@@ -128,10 +194,17 @@ def main() -> int:
             bad += 1
         else:
             print(f"ok {rel}")
+    for a, b in SHIPPED:
+        n = diff(Image.open(ROOT / a).convert("RGBA"), Image.open(ROOT / b).convert("RGBA"))
+        if n != 0:
+            print(f"DIFF shipped {b} vs {a} {n if n >= 0 else 'size'}")
+            bad += 1
+        else:
+            print(f"ok shipped {b}")
     if bad:
         print(f"art:check failed ({bad})")
         return 1
-    print(f"art:check passed ({len(PAIRS)} pngs)")
+    print(f"art:check passed ({len(PAIRS)} pngs, {len(SHIPPED)} shipped copies)")
     return 0
 
 

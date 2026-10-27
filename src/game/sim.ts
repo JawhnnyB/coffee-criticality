@@ -4,6 +4,7 @@ import {
   CAFE_SPAWN,
   INCIDENT,
   INTRO,
+  INTRO_STORY,
   NPCS,
   NPC_SCHEDULE,
   ROOMS,
@@ -14,6 +15,7 @@ import {
   periodLabel,
   residueKey,
   roleMouth,
+  SITE_BEAT,
   talkLines,
   anyHid,
   type Choice,
@@ -29,10 +31,11 @@ import {
 import { RADIUS, SPEED, WALL } from "./const";
 import { type PlantDesign, type ShuffleCell } from "./plant";
 import { DEFAULT_PLAYER_LOOK, PROP_NATIVE, type PlayerLook } from "./artSpec";
-import { INCIDENTS, occupancyOverlay, dayDef, incidentOwner, COMMUTE_SPAWN, DUSK_SPAWN, type WeekLogEntry } from "./week";
+import { INCIDENTS, occupancyOverlay, dayDef, incidentOwner, COMMUTE_SPAWN, DAY1_SPAWN, DUSK_SPAWN, type WeekLogEntry } from "./week";
 import { writeSave, wipeSave } from "./save";
 import { playCatch, playDoor, playFoot, playHide, playReport, playSit, playStand, playTalk } from "./audio";
 import { isRevealing, requestSkip } from "./chatter";
+import { DEE_DAY, IRIS_SECONDS, SEC, deeLines, flapOpen, secLegacy, secRequired } from "./security";
 import type { CabId } from "./Arcade";
 import { doorCardinal, spawnInside } from "./site";
 
@@ -68,7 +71,9 @@ export type Mode =
   | "pebble"
   | "bowl"
   | "phys"
-  | "load";
+  | "load"
+  | "iris"
+  | "item";
 
 export interface NpcLive {
   room: RoomId;
@@ -93,6 +98,8 @@ export interface Actions {
   confirm: boolean;
   /** Space or Enter is still down. Skips the typewriter; does not advance. */
   heldConfirm: boolean;
+  /** E is still down. The iris scan needs a hold. */
+  heldInteract: boolean;
   back: boolean;
   pause: boolean;
 }
@@ -167,6 +174,10 @@ export interface GameState {
   poseHold: number;
   weekLog: WeekLogEntry[];
   scores: ParlorScores;
+  /** Stage 2c. Seconds of held E on the iris screen, the lobby cooldown, and what a Site Access beat hands off to. */
+  irisT: number;
+  secCd: number;
+  beatThen: "play" | "brief" | "iris" | "item" | null;
 }
 
 export interface ParlorScores {
@@ -298,7 +309,10 @@ export function createState(): GameState {
     sitting: false,
     poseHold: 0,
     weekLog: [],
-    scores: { ...EMPTY_SCORES }
+    scores: { ...EMPTY_SCORES },
+    irisT: 0,
+    secCd: 0,
+    beatThen: null
   };
 }
 export function clamp(n: number, a: number, b: number) {
@@ -508,6 +522,7 @@ export function solidAt(x: number, y: number, s: GameState, roomId: RoomId = s.r
     if (y < 6 || y > room.h - 6) return true;
   }
   if (floorKindAt(roomId, x, y) === "water") return true;
+  if (roomId === "security" && secRequired(s) && !flapOpen(s) && overlap(x, y, 9, SEC.flap)) return true;
   for (const p of room.props) {
     if (p.block === false) continue;
     const boxes = propBoxes(p);
@@ -618,12 +633,29 @@ export function refreshObjective(s: GameState) {
     s.objective = "The week can close. K, or walk the lot at dusk.";
     return;
   }
+  if (s.day === 1 && !s.flags["sec:desk"] && !secLegacy(s)) {
+    if (!s.flags["sec:portal"]) {
+      s.objective = !s.flags["sec:checkin"]
+        ? "Site Access. Check in with Dee at the desk."
+        : !s.flags["sec:badge"]
+          ? "Badge kiosk. Look at the lens."
+          : !s.flags["sec:tld"]
+            ? "Dosimeter rack. Take number 07."
+            : "The portal. Follow the blue line.";
+    } else {
+      s.objective =
+        s.room === "engineering"
+          ? "Your desk. The nameplate is blinking."
+          : "Find your desk — Engineering, south.";
+    }
+    return;
+  }
   if (!s.flags.mabelTalked && s.day === 1) {
     s.objective = "Sit with Mabel. Don't rush the coffee.";
     return;
   }
   if (s.day === 1 && !s.flags.plantEntered) {
-    s.objective = s.room === "gate" ? "East through Plant. The floor is waiting." : "East to the lot, then east onto the floor.";
+    s.objective = s.room === "gate" ? "East through Site Access. The floor is waiting." : "East to the lot, then east onto the floor.";
     return;
   }
   if (s.day === 1 && !s.flags.holtTalked) {
@@ -675,8 +707,10 @@ export function facingOut(from: RoomId, to: RoomId) {
 export function markSeen(s: GameState, room: RoomId) {
   s.flags[`seen:${room}`] = true;
 }
+/** Rooms you can reach before Mabel. Site Access, the hall and your desk come first on Day 1; Control, the core, break and maint still wait. */
+const OPEN_BEFORE_MABEL = new Set<RoomId>(["cafe", "gate", "parlor", "security", "corridor", "engineering"]);
 export function beginTransition(s: GameState, to: RoomId, spawn: { x: number; y: number }, facing: GameState['facing']) {
-  if (to !== "cafe" && to !== "gate" && to !== "parlor" && !s.flags.mabelTalked) {
+  if (!OPEN_BEFORE_MABEL.has(to) && !s.flags.mabelTalked) {
     pushMsg(s, "Mabel's eyes follow you. Sit first. The plant will still be there.");
     return;
   }
@@ -704,9 +738,13 @@ export function applyTransition(s: GameState) {
   s.announce = ROOMS[to].name;
   s.announceT = 2.1;
   addMinutes(s, 2);
-  if (to !== "cafe" && to !== "gate" && to !== "parlor") {
+  if (to !== "cafe" && to !== "gate" && to !== "parlor" && to !== "security") {
     s.flags.plantEntered = true;
     setGoal(s, "plant");
+  }
+  if (to === "security" && secRequired(s) && !s.flags["sec:seen"]) {
+    s.flags["sec:seen"] = true;
+    startSiteBeat(s, SITE_BEAT.security, "play");
   }
   refreshObjective(s);
 }
@@ -726,7 +764,7 @@ export function travelTo(s: GameState, to: RoomId) {
     pushMsg(s, "Walk there first. The map is a memory, not a warp.");
     return;
   }
-  if (to !== "cafe" && to !== "gate" && to !== "parlor" && !s.flags.mabelTalked) {
+  if (!OPEN_BEFORE_MABEL.has(to) && !s.flags.mabelTalked) {
     pushMsg(s, "Mabel's eyes follow you. Sit first. The plant will still be there.");
     return;
   }
@@ -796,11 +834,13 @@ export function beginDay(s: GameState) {
   s.sitting = false;
   s.poseHold = 0;
   if (s.day <= 1) {
-    s.room = "cafe";
-    s.x = CAFE_SPAWN.x;
-    s.y = CAFE_SPAWN.y;
-    s.facing = CAFE_SPAWN.facing;
+    /* Stage 2c: the week starts in the lot, just west of the Hall door. The brief moves to your desk. */
+    s.room = DAY1_SPAWN.room;
+    s.x = DAY1_SPAWN.x;
+    s.y = DAY1_SPAWN.y;
+    s.facing = DAY1_SPAWN.facing;
     markSeen(s, "cafe");
+    markSeen(s, "gate");
     unstick(s);
   } else {
     s.room = COMMUTE_SPAWN.room;
@@ -811,10 +851,11 @@ export function beginDay(s: GameState) {
     markSeen(s, "gate");
     unstick(s);
   }
-  s.mode = "brief";
+  s.mode = s.day <= 1 ? "play" : "brief";
   s.introLock = 1.05;
-  s.announce = d.name;
+  s.announce = s.day <= 1 ? ROOMS[s.room].name : d.name;
   s.announceT = 2;
+  if (s.day <= 1) pushMsg(s, "Unit 1 is behind the Hall door. Dee's desk is the first stop.");
   refreshObjective(s);
 }
 export function beginEndingWalk(s: GameState) {
@@ -928,6 +969,10 @@ export function interactLabel(s: GameState, id: string, fallback: string) {
     if (s.day === 3) return "Dose sticker";
     return "Line 14";
   }
+  if (id === "dee") return s.flags["sec:checkin"] ? "Dee" : "Check in with Dee";
+  if (id === "kiosk") return s.flags["sec:badge"] ? "Badge kiosk" : s.flags["sec:checkin"] ? "Badge kiosk — look at the lens" : "Badge kiosk — see Dee first";
+  if (id === "tld") return s.flags["sec:tld"] ? "Dosimeter rack" : "Dosimeter rack — take 07";
+  if (id === "mydesk") return s.day === 1 && !s.flags["sec:desk"] ? "Your desk" : "Your desk";
   if (id === "shuffle") return s.day >= 5 ? "Fuel shuffle desk" : "Fuel desk — Friday";
   if (id === "board") {
     if (s.day === 1) return "Board A";
@@ -957,6 +1002,7 @@ export function useInteract(s: GameState) {
     openTalk(s, s.nearNpc);
     return;
   }
+  if (useSiteAccess(s)) return;
   if (s.nearId.startsWith("still-") || ROOMS[s.room].interacts.find((it) => it.id === s.nearId)?.kind === "still") {
     const it = ROOMS[s.room].interacts.find((x) => x.id === s.nearId);
     if (it?.still) {
@@ -1499,6 +1545,31 @@ export function update(s: GameState, a: Actions, dt: number) {
     return;
   }
   if (s.mode === "role") return;
+  if (s.mode === "iris") {
+    if (a.back) {
+      s.mode = "play";
+      s.irisT = 0;
+      s.x = Math.max(16, SEC.zone.x - 24);
+      s.secCd = 1;
+      return;
+    }
+    if (s.irisT >= IRIS_SECONDS) {
+      /* MATCH. WALK ON. */
+      if (s.introLock <= 0 && (a.confirm || a.interact)) finishIris(s);
+      return;
+    }
+    /* Hold E / Space. Letting go returns to ALIGN. There is no fail state: this is a teaching screen, not a skill check. */
+    s.irisT = a.heldConfirm || a.heldInteract ? Math.min(IRIS_SECONDS, s.irisT + t) : 0;
+    if (s.irisT >= IRIS_SECONDS) s.introLock = .4;
+    return;
+  }
+  if (s.mode === "item") {
+    if (s.introLock <= 0 && (a.confirm || a.interact || a.back)) {
+      s.mode = "play";
+      refreshObjective(s);
+    }
+    return;
+  }
   if (s.mode === "build" || s.mode === "shuffle" || s.mode === "maint" || s.mode === "cabs" || s.mode === "fish" || s.mode === "plot" || s.mode === "floor" || s.mode === "horde" || s.mode === "delay" || s.mode === "golf" || s.mode === "rods" || s.mode === "pebble" || s.mode === "bowl" || s.mode === "phys" || s.mode === "load") {
     if (a.back && s.mode !== "build") abortOverlay(s);
     return;
@@ -1514,13 +1585,15 @@ export function update(s: GameState, a: Actions, dt: number) {
       if (!lastLine) {
         s.introJ += 1;
         s.introLock = 1.05;
-      } else if (s.introI < INTRO.length - 1) {
+      } else if (s.introI < INTRO_STORY - 1) {
         s.introI += 1;
         s.introJ = 0;
         s.introLock = 1.05;
+      } else if (s.introI === INTRO_STORY - 1) {
+        /* The opening is over. Day 1 starts in the lot; the brief waits at your desk. */
+        beginDay(s);
       } else {
-        s.mode = "brief";
-        s.introLock = 1.05;
+        endSiteBeat(s);
       }
     }
     return;
@@ -1534,7 +1607,7 @@ export function update(s: GameState, a: Actions, dt: number) {
       s.mode = "play";
       s.announce = ROOMS[s.room].name;
       s.announceT = 2.2;
-      pushMsg(s, s.day === 1 ? "Mabel is already looking at you. Don't walk past her." : dayDef(s.day).holt);
+      pushMsg(s, s.day === 1 ? "Holt wants volume, not a speech. Mabel's kettle is back across the lot." : dayDef(s.day).holt);
       refreshObjective(s);
     }
     return;
@@ -1611,6 +1684,8 @@ export function update(s: GameState, a: Actions, dt: number) {
   movePlayer(s, a, t);
   tickNpcs(s, t);
   resolveNear(s);
+  tickSecurity(s, t);
+  if (s.mode !== "play") return;
   const key = s.room;
   s.dwell[key] = (s.dwell[key] ?? 0) + t;
   if (s.room === "control" && (s.dwell.control ?? 0) > 7 && s.flags.holtTalked) {
@@ -1657,6 +1732,130 @@ export function update(s: GameState, a: Actions, dt: number) {
   }
   refreshObjective(s);
 }
+/* ---------------------------------------------------------------- Stage 2c · Site Access */
+export function startSiteBeat(s: GameState, idx: number, then: GameState["beatThen"]) {
+  s.mode = "intro";
+  s.introI = idx;
+  s.introJ = 0;
+  s.introLock = .6;
+  s.beatThen = then;
+}
+function endSiteBeat(s: GameState) {
+  const then = s.beatThen ?? "play";
+  s.beatThen = null;
+  s.introLock = 1.05;
+  if (then === "item") {
+    s.flags["sec:badge"] = true;
+    siteGoals(s);
+    s.mode = "item";
+    s.introLock = .5;
+  } else if (then === "iris") {
+    s.irisT = 0;
+    s.mode = "iris";
+  } else if (then === "brief") {
+    s.mode = "brief";
+  } else {
+    s.mode = "play";
+  }
+  refreshObjective(s);
+}
+function siteGoals(s: GameState) {
+  if (s.flags["sec:badge"] && s.flags["sec:tld"]) setGoal(s, "badge");
+}
+function finishIris(s: GameState) {
+  s.flags["sec:portal"] = true;
+  s.flags[`sec:pass:${s.day}`] = true;
+  setGoal(s, "portal");
+  s.irisT = 0;
+  s.mode = "play";
+  pushMsg(s, "Dee: Welcome to Unit 1.");
+  refreshObjective(s);
+}
+export function openGuard(s: GameState) {
+  s.dialogue = deeLines(s.flags, s.role);
+  s.dialogueI = 0;
+  s.mode = "dialogue";
+  s.talkNpc = null;
+  s.nearNpc = null;
+  s.flags["sec:checkin"] = true;
+  refreshObjective(s);
+  playTalk();
+}
+/** E on a Site Access fixture. Returns true when it was one. */
+function useSiteAccess(s: GameState): boolean {
+  if (s.room === "security") {
+    if (s.nearId === "dee") {
+      openGuard(s);
+      return true;
+    }
+    if (s.nearId === "kiosk") {
+      if (s.flags["sec:badge"]) pushMsg(s, "Badge on. 0417. Do not lose it. You would write the report.");
+      else if (!s.flags["sec:checkin"]) pushMsg(s, "The kiosk is dead. See Dee first.");
+      else startSiteBeat(s, SITE_BEAT.badge, "item");
+      return true;
+    }
+    if (s.nearId === "tld") {
+      if (s.flags["sec:tld"]) pushMsg(s, "Dosimeter 07. Chest height. It is already adding.");
+      else {
+        s.flags["sec:tld"] = true;
+        siteGoals(s);
+        pushMsg(s, "Dosimeter 07 — chest height. It adds up what you absorb.");
+        refreshObjective(s);
+      }
+      return true;
+    }
+    if (s.nearId === "xray") {
+      pushMsg(s, "Dee: Thermos, laptop, a banana. Fine.");
+      return true;
+    }
+    if (s.nearId === "portal") {
+      portalTry(s);
+      return true;
+    }
+  }
+  if (s.room === "engineering" && s.nearId === "mydesk") {
+    if (s.day === 1 && !s.flags["sec:desk"]) {
+      s.flags["sec:desk"] = true;
+      setGoal(s, "desk");
+      startSiteBeat(s, SITE_BEAT.desk, "brief");
+    } else pushMsg(s, "Your desk. The nameplate is new. The CRT is warm.");
+    return true;
+  }
+  return false;
+}
+/** Walking into the lane without both items gets Dee's voice and a step back. With both, the iris screen. */
+function portalTry(s: GameState) {
+  if (!secRequired(s) || s.secCd > 0) return;
+  if (!s.flags["sec:badge"]) {
+    pushMsg(s, "Dee: Badge first.");
+    s.x = Math.max(16, SEC.zone.x - 24);
+    s.secCd = 1.2;
+  } else if (!s.flags["sec:tld"]) {
+    pushMsg(s, "Dee: Dosimeter. Everyone wears one.");
+    s.x = Math.max(16, SEC.zone.x - 24);
+    s.secCd = 1.2;
+  } else {
+    startSiteBeat(s, SITE_BEAT.iris, "iris");
+  }
+}
+function tickSecurity(s: GameState, dt: number) {
+  s.secCd = Math.max(0, s.secCd - dt);
+  if (s.room !== "security") return;
+  const z = SEC.zone;
+  if (!overlap(s.x, s.y, 4, z)) return;
+  if (secRequired(s)) {
+    portalTry(s);
+    return;
+  }
+  /* Days 2-5 (and Day 1 after the portal): never stop the player. One toast, one line from Dee, once a day. */
+  const key = `sec:pass:${s.day}`;
+  if (!s.flags[key]) {
+    s.flags[key] = true;
+    pushMsg(s, "Badge OK · Iris OK");
+    const line = DEE_DAY[s.day];
+    if (line) pushMsg(s, `Dee: ${line}`);
+  }
+}
 export function canCloseShift(s: GameState) {
   if (!(s.period === "afternoon" || s.minutes >= 920) && s.minutes < 980) return false;
   if (s.day === 1) return s.incidentResolved && (s.flags.academy || s.flags.trainer);
@@ -1693,6 +1892,7 @@ export function emptyActions() {
     hide: false,
     confirm: false,
     heldConfirm: false,
+    heldInteract: false,
     back: false,
     pause: false
   };

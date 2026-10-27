@@ -2,6 +2,7 @@ import { ROOMS, residueKey, type ResidueHow, type RoomId } from "./content";
 import { LOOKS, PAL, drawChibi, drawEmote, pix } from "./pixel";
 import { A6_ROOMS } from "./roomArt";
 import { ROOM_ATLAS, type AtlasStamp } from "./roomAtlas";
+import { MY_DESK, SEC, flapOpen, portalLamp, secRequired } from "./security";
 import { npcsHere, type GameState } from "./sim";
 
 const artCache = new Map<string, HTMLImageElement>();
@@ -33,6 +34,57 @@ export function preloadRoomArt(roomId?: string) {
   const ids = roomId && ROOM_ATLAS[roomId] ? [roomId] : Object.keys(ROOM_ATLAS);
   for (const id of ids) warm(ROOM_ATLAS[id].src);
   for (const who of WALKERS) warm(`/art/gen/sprites/${who}_walk4.png`);
+  warm(DEE_SRC);
+  warm(PORTAL_SRC);
+}
+
+const DEE_SRC = "/art/gen/sprites/dee_idle_32.png";
+/** iris post red/amber/green 16x34 at x=0/16/32; lane flap closed x=52, open x=62 (6x34). Prop top sits at sheet y=1. */
+const PORTAL_SRC = "/art/ui/security/portal-sprites.png";
+const LAMP_COL = { red: 0, amber: 1, green: 2 } as const;
+
+/** Day-1 guide line. 4px #3aa0c0, lit top, dark bottom, white chevrons every 28px. tools/artkit/security.py _line(). */
+function drawGuide(g: CanvasRenderingContext2D) {
+  const pts = SEC.guide;
+  for (let i = 0; i + 1 < pts.length; i++) {
+    const [x0, y0] = pts[i];
+    const [x1, y1] = pts[i + 1];
+    if (y0 === y1) {
+      const xa = Math.min(x0, x1);
+      const xb = Math.max(x0, x1);
+      g.fillStyle = "#3aa0c0";
+      g.fillRect(xa, y0 - 2, xb - xa, 4);
+      g.fillStyle = "#7ebdcb";
+      g.fillRect(xa, y0 - 2, xb - xa, 1);
+      g.fillStyle = "#367d94";
+      g.fillRect(xa, y0 + 1, xb - xa, 1);
+      const d = x1 > x0 ? 1 : -1;
+      g.fillStyle = "#f6f0d8";
+      for (let xx = xa + 14; xx < xb - 8; xx += 28) {
+        for (let k = 0; k < 3; k++) {
+          g.fillRect(xx - d * k, y0 - 1 - k, 1, 1);
+          g.fillRect(xx - d * k, y0 + k, 1, 1);
+        }
+      }
+    } else {
+      const ya = Math.min(y0, y1);
+      const yb = Math.max(y0, y1);
+      g.fillStyle = "#3aa0c0";
+      g.fillRect(x0 - 2, ya, 4, yb - ya);
+      g.fillStyle = "#7ebdcb";
+      g.fillRect(x0 - 2, ya, 1, yb - ya);
+      g.fillStyle = "#367d94";
+      g.fillRect(x0 + 1, ya, 1, yb - ya);
+      const d = y1 > y0 ? 1 : -1;
+      g.fillStyle = "#f6f0d8";
+      for (let yy = ya + 10; yy < yb - 6; yy += 28) {
+        for (let k = 0; k < 3; k++) {
+          g.fillRect(x0 - 1 - k, yy - d * k, 1, 1);
+          g.fillRect(x0 + k, yy - d * k, 1, 1);
+        }
+      }
+    }
+  }
 }
 
 function getBuf(w: number, h: number) {
@@ -126,6 +178,8 @@ export function drawWorld(
     }
   }
 
+  if (usingA6 && s.room === "security" && secRequired(s)) drawGuide(g);
+
   fillEdge(g, room);
 
   const drawables: { y: number; draw: () => void }[] = [];
@@ -148,6 +202,38 @@ export function drawWorld(
     }
   }
 
+  if (usingA6 && s.room === "security") {
+    const sheet = img(PORTAL_SRC);
+    const lamp = LAMP_COL[portalLamp(s, s.mode === "iris")];
+    const dee = img(DEE_SRC);
+    if (dee) {
+      /* Cell origin (x-16, y-64): the feet land on SEC.dee.y, the desk (foot 96) covers her legs. */
+      drawables.push({ y: SEC.dee.y, draw: () => g.drawImage(dee, SEC.dee.x - 16, SEC.dee.y - 64) });
+    }
+    if (sheet) {
+      SEC.posts.forEach((r, i) => {
+        drawables.push({ y: i === 0 ? 113 : 257, draw: () => g.drawImage(sheet, lamp * 16, 0, 16, 34, r.x, r.y - 1, 16, 34) });
+      });
+      const open = flapOpen(s);
+      drawables.push({
+        y: SEC.flap.y + SEC.flap.h,
+        draw: () => g.drawImage(sheet, open ? 62 : 52, 0, 6, 34, SEC.flap.x + 5, SEC.flap.y - 1, 6, 34),
+      });
+    }
+  }
+  if (usingA6 && s.room === "engineering" && s.day === 1 && s.flags["sec:portal"] && !s.flags["sec:desk"] && Math.floor(now * 4) % 2 === 0) {
+    const np = MY_DESK.nameplate;
+    drawables.push({
+      y: MY_DESK.rect.y + MY_DESK.rect.h + 1,
+      draw: () => {
+        g.fillStyle = "#e8b838";
+        g.fillRect(np.x - 1, np.y - 1, np.w + 2, 1);
+        g.fillRect(np.x - 1, np.y + np.h, np.w + 2, 1);
+        g.fillRect(np.x - 1, np.y, 1, np.h);
+        g.fillRect(np.x + np.w, np.y, 1, np.h);
+      },
+    });
+  }
   for (const n of npcsHere(s)) {
     drawables.push({
       y: n.y,

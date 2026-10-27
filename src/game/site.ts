@@ -13,6 +13,7 @@ const ROOF_LABEL: Record<Exclude<RoomId, "gate">, string> = {
   cafe: "Cafe",
   parlor: "Arcade",
   corridor: "Hall",
+  security: "Hall",
   control: "Control",
   engineering: "Eng",
   breakroom: "Break",
@@ -42,6 +43,8 @@ export const FOOTPRINT: Record<RoomId, Footprint> = {
   parlor: asTiles(gateProp("roof", ROOF_LABEL.parlor), true),
   gate: asTiles(gateProp("van"), false),
   corridor: asTiles(gateProp("roof", ROOF_LABEL.corridor), true),
+  /** Site Access is the front of the Hall building, not a roof of its own. */
+  security: asTiles(gateProp("roof", ROOF_LABEL.security), true),
   control: asTiles(gateProp("roof", ROOF_LABEL.control), true),
   engineering: asTiles(gateProp("roof", ROOF_LABEL.engineering), true),
   breakroom: asTiles(gateProp("roof", ROOF_LABEL.breakroom), true),
@@ -62,6 +65,11 @@ export const MAP_HUD: Record<RoomId, { x: number; y: number; label: string }> = 
   parlor: { ...centerPct(FOOTPRINT.parlor), label: "Arcade" },
   gate: { ...centerPct(FOOTPRINT.gate), label: "Lot" },
   corridor: { ...centerPct(FOOTPRINT.corridor), label: "Hall" },
+  /** Just south of the Hall roof so the two labels do not sit on each other. */
+  security: (() => {
+    const c = centerPct(FOOTPRINT.security);
+    return { x: c.x, y: Math.round((c.y + 16.5) * 10) / 10, label: "Gate" };
+  })(),
   control: { ...centerPct(FOOTPRINT.control), label: "Control" },
   engineering: { ...centerPct(FOOTPRINT.engineering), label: "Eng" },
   breakroom: { ...centerPct(FOOTPRINT.breakroom), label: "Break" },
@@ -102,8 +110,9 @@ export function spawnInside(to: RoomId, from: RoomId): { x: number; y: number } 
 export const ROOM_BLURB: Record<RoomId, string> = {
   cafe: "Mabel's counter. Sit first. East door to the lot.",
   parlor: "North wall is Unit 1. South is after-shift. Same bezel. Cafe is north.",
-  gate: "The campus lot. Lake to the north. West into the cafe, east into the hall.",
-  corridor: "The spine. Control north, engineering south, break east.",
+  gate: "The campus lot. Lake to the north. West into the cafe, east into Site Access.",
+  security: "Site Access. Badge kiosk, dosimeter rack, then the portal. West to the lot, east to the hall.",
+  corridor: "The spine. Site Access west, control north, engineering south, break east.",
   control: "Board A and the Academy terminal. South to the hall, east to the core.",
   engineering: "Priya's ΔT bench. North to the hall, east to maint.",
   breakroom: "Kettle and a pause. West to the hall, north to the core.",

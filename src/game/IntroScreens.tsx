@@ -8,14 +8,18 @@ import { isRevealing, subscribeReveal } from "./chatter";
 import type { IntroBeat, RoleId } from "./content";
 import { NPCS, ROLES } from "./content";
 import {
+  BEAT_PIP,
   BEAT_SCENE,
   BEAT_WHO,
+  GUEST_NAME,
   NW,
   NH,
   focusOy,
   paintBadge,
   paintBeat,
   paintBrief,
+  paintIris,
+  paintLanyard,
   paintWipe,
   watchImages,
 } from "./introPaint";
@@ -258,7 +262,7 @@ export function PixelBeat({
   const you = !!(beat.you || ex?.you);
   const who = BEAT_WHO[index] ?? "priya";
   const scene = BEAT_SCENE[index] ?? "core";
-  const speaker = who === "player" ? "YOU" : (NPCS[who as keyof typeof NPCS]?.name ?? who).toUpperCase();
+  const speaker = who === "player" ? "YOU" : (GUEST_NAME[who] ?? NPCS[who as keyof typeof NPCS]?.name ?? who).toUpperCase();
   const line = ex?.line ?? "";
 
   useEffect(() => {
@@ -352,7 +356,7 @@ export function PixelBeat({
       kicker: beat.kicker,
       title: beat.title,
       speaker,
-      pip: index + 1,
+      pip: BEAT_PIP[index] ?? index + 1,
     });
     paintWipe(ctx, wipe);
   }, [scene, oy, who, you, look, talking, beat.kicker, beat.title, speaker, index, wipe, tick]);
@@ -445,5 +449,108 @@ export function CastFace({ id, zoom = 4, live = false }: { id: string; zoom?: nu
       className="shrink-0 self-start"
       style={{ width: px, height: px, imageRendering: "pixelated" }}
     />
+  );
+}
+
+/** Iris screen. Hold E / Space (or press and hold the button) to scan; let go and it returns to ALIGN. */
+export function PixelIris({
+  irisT,
+  seconds,
+  look,
+  onHold,
+  onWalkOn,
+}: {
+  irisT: number;
+  seconds: number;
+  look: PlayerLook;
+  onHold: (down: boolean) => void;
+  onWalkOn: () => void;
+}) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [tick, setTick] = useState(0);
+  const state = irisT >= seconds ? "match" : irisT > 0 ? "scan" : "align";
+  useEffect(() => {
+    return watchImages(
+      ["align", "scan", "match"].map((n) => `/art/intro/scene-iris-${n}.png`).concat(["/art/ui/portraits/portrait-player-smile.png", "/art/ui/portraits/portrait-player-smile-noglasses.png"]),
+      () => setTick((n) => n + 1),
+    );
+  }, []);
+  useEffect(() => {
+    const c = canvasRef.current;
+    const ctx = c?.getContext("2d");
+    if (!c || !ctx) return;
+    paintIris(ctx, { state, progress: irisT / seconds, look });
+  }, [state, irisT, seconds, look, tick]);
+  return (
+    <Stage testId="pixel-iris">
+      {(scale) => (
+        <>
+          <canvas
+            ref={canvasRef}
+            width={NW}
+            height={NH}
+            style={{ width: scale.dw, height: scale.dh, imageRendering: "pixelated", display: "block" }}
+          />
+          <button
+            type="button"
+            data-testid="iris-hold"
+            aria-label={state === "match" ? "Walk on" : "Hold to scan"}
+            style={hit(scale.zoom, 284, 186, 80, 22)}
+            onPointerDown={(e) => {
+              e.currentTarget.setPointerCapture?.(e.pointerId);
+              if (state === "match") onWalkOn();
+              else onHold(true);
+            }}
+            onPointerUp={() => onHold(false)}
+            onPointerCancel={() => onHold(false)}
+          />
+        </>
+      )}
+    </Stage>
+  );
+}
+
+/** BADGE ISSUED. White flash for 80 ms (the photo), then the card on its lanyard with the live portrait. */
+export function PixelBadgeIssued({ look, role, onClose }: { look: PlayerLook; role: string; onClose: () => void }) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [tick, setTick] = useState(0);
+  const [flash, setFlash] = useState(true);
+  const [vh, setVh] = useState(() => (typeof window === "undefined" ? 720 : window.innerHeight));
+  useEffect(() => {
+    const t = window.setTimeout(() => setFlash(false), 80);
+    const on = () => setVh(window.innerHeight);
+    window.addEventListener("resize", on);
+    return () => {
+      window.clearTimeout(t);
+      window.removeEventListener("resize", on);
+    };
+  }, []);
+  useEffect(() => {
+    return watchImages(
+      ["/art/ui/security/badge-lanyard.png", "/art/ui/portraits/portrait-player-smile.png", "/art/ui/portraits/portrait-player-smile-noglasses.png"],
+      () => setTick((n) => n + 1),
+    );
+  }, []);
+  useEffect(() => {
+    const c = canvasRef.current;
+    const ctx = c?.getContext("2d");
+    if (!c || !ctx) return;
+    ctx.clearRect(0, 0, 112, 160);
+    paintLanyard(ctx, { look, role });
+  }, [look, role, tick]);
+  const zoom = Math.max(2, Math.min(4, Math.floor((vh * 0.56) / 160)));
+  return (
+    <div
+      className="absolute inset-0 z-50 flex flex-col items-center justify-center gap-3 bg-[#16110d]/90 px-4"
+      data-testid="badge-issued"
+      onClick={onClose}
+      role="button"
+      tabIndex={-1}
+    >
+      <p className="font-display text-xs uppercase tracking-[0.2em] text-[#e0a850]">Badge issued</p>
+      <canvas ref={canvasRef} width={112} height={160} style={{ width: 112 * zoom, height: 160 * zoom, imageRendering: "pixelated" }} />
+      <p className="font-mono text-[11px] text-[#a8937a]">That's you for the next few years. Lose it and you write a report. · Space</p>
+      {flash ? <div className="pointer-events-none absolute inset-0 bg-white" data-testid="badge-flash" /> : null}
+    </div>
   );
 }

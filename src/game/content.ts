@@ -35,6 +35,7 @@ export type RoomId =
   | "cafe"
   | "parlor"
   | "gate"
+  | "security"
   | "corridor"
   | "control"
   | "engineering"
@@ -134,7 +135,13 @@ export interface Interactable {
     | "bowl"
     | "phys"
     | "load"
-    | "scores";
+    | "scores"
+    | "guard"
+    | "badge"
+    | "tld"
+    | "xray"
+    | "portal"
+    | "desk";
   npc?: NpcId;
   still?: string;
 }
@@ -445,7 +452,52 @@ export const INTRO: IntroBeat[] = [
       { line: "The door was open before you. The board is already lit.", focus: "72% 48%", zoom: 1.14, lean: 2 },
     ],
   },
+  /* Stage 2c, Site Access. Not part of the opening: the game plays these in the lobby (see security.ts). */
+  {
+    scene: "/art/intro/scene-security.png",
+    portrait: "/art/ui/portraits/portrait-dee-talk.png",
+    kicker: "Site Access  ·  Dee",
+    title: "Nobody walks past me without a badge.",
+    body: "Site security. The plant manager waits in the same line.",
+    exchanges: [
+      { line: "Dee, not looking up. “Morning. Not you, not the plant manager. Three stops: badge, dosimeter, portal. Follow the blue line.”", focus: "50% 0%", zoom: 1.1, lean: 0 },
+    ],
+  },
+  {
+    scene: "/art/intro/scene-kiosk.png",
+    portrait: "/art/ui/portraits/portrait-dee-smile.png",
+    kicker: "Badges  ·  Dee",
+    title: "Look at the lens. Do not smile.",
+    body: "The kiosk takes one photo. It keeps it for years.",
+    exchanges: [
+      { line: "“It is a badge, not a yearbook. Your picture, your number, your dosimeter slot. Lose it and you write a report.”", focus: "50% 0%", zoom: 1.1, lean: 0 },
+    ],
+  },
+  {
+    scene: "/art/intro/scene-iris.png",
+    portrait: "/art/ui/portraits/portrait-dee-talk.png",
+    kicker: "The Portal  ·  Dee",
+    title: "Look at the light. Hold still.",
+    body: "It reads the pattern in the iris, not the colour.",
+    exchanges: [
+      { line: "“It reads the pattern in your iris, not the colour. Enroll once. After that it takes a second.”", focus: "50% 15%", zoom: 1.1, lean: 0 },
+    ],
+  },
+  {
+    scene: "/art/intro/scene-desk.png",
+    portrait: "/art/ui/portraits/portrait-priya-smile.png",
+    kicker: "Engineering  ·  Priya",
+    title: "That one is yours.",
+    body: "The nameplate is brand new. The CRT is not.",
+    exchanges: [
+      { line: "“The nameplate is brand new. The CRT is not. The drawings are honest if the people are.”", focus: "50% 23%", zoom: 1.1, lean: 0 },
+    ],
+  },
 ];
+
+/** INTRO[0 .. INTRO_STORY-1] is the opening. The rest are Site Access beats, played in the lobby and the Engineering office. */
+export const INTRO_STORY = 8;
+export const SITE_BEAT = { security: 8, badge: 9, iris: 10, desk: 11 } as const;
 
 export const INCIDENT = {
   title: "Valve 14 is talking",
@@ -1163,7 +1215,7 @@ export const ROOMS: Record<RoomId, RoomDef> = {
     windows: [],
     doors: [
       { to: "cafe", rect: t(12, 9, 1, 4), label: "Cafe" },
-      { to: "corridor", rect: t(52, 9, 1, 4), label: "Hall" },
+      { to: "security", rect: t(52, 9, 1, 4), label: "Site Access" },
     ],
     props: [
       { rect: t(2, 7, 10, 8), kind: "roof", label: "Cafe" },
@@ -1185,6 +1237,48 @@ export const ROOMS: Record<RoomId, RoomDef> = {
     ],
     interacts: [{ id: "commute", rect: t(16, 14, 6, 3), label: "The van", kind: "still", still: "gate" }],
   },
+  security: {
+    id: "security",
+    name: "Site Access",
+    w: 22 * TILE,
+    h: 16 * TILE,
+    muralH: 48,
+    art: "/art/gen/stills/glimpse_security.png?v=2c",
+    floor: "#c2c4be",
+    accent: "#3aa0c0",
+    grout: "#9a9c96",
+    tile: TILE,
+    floorKind: "stone",
+    windows: [],
+    doors: [
+      { to: "gate", rect: t(0, 6, 1, 4), label: "Lot" },
+      { to: "corridor", rect: t(21, 6, 1, 4), label: "Hall" },
+    ],
+    props: [
+      { rect: t(2, 4, 5, 2), kind: "guarddesk", label: "Security desk" },
+      { rect: t(8, 3, 2, 2), kind: "kiosk", label: "Badge kiosk" },
+      { rect: t(11, 3, 2, 2), kind: "dosirack", label: "Dosimeter rack" },
+      { rect: t(5, 10, 5, 3), kind: "xray", label: "Bag scanner" },
+      { rect: t(14, 3, 2, 4), kind: "barrier" },
+      { rect: t(14, 9, 2, 7), kind: "barrier" },
+      { rect: t(14.5, 5, 1, 2), kind: "irispost", label: "Iris scanner", block: false },
+      { rect: t(14.5, 9, 1, 2), kind: "irispost", label: "Iris scanner", block: false },
+      { rect: t(15, 7, 1, 2), kind: "laneflap", label: "Portal", block: false },
+      { rect: t(1, 11, 3, 2), kind: "bench_s" },
+      { rect: t(1, 14, 2, 2), kind: "plant", block: false },
+      { rect: t(20, 3, 2, 2), kind: "plant" },
+      { rect: t(17, 3, 2, 2), kind: "cabinet", label: "Visitor lockers" },
+      { rect: t(17, 11, 3, 2), kind: "bench_s" },
+      { rect: t(11, 13, 1, 1), kind: "trash" },
+    ],
+    interacts: [
+      { id: "dee", rect: t(2, 4, 5, 3), label: "Dee", kind: "guard" },
+      { id: "kiosk", rect: t(8, 3, 2, 3), label: "Badge kiosk", kind: "badge" },
+      { id: "tld", rect: t(11, 3, 2, 3), label: "Dosimeter rack", kind: "tld" },
+      { id: "xray", rect: t(5, 9, 5, 1), label: "Bag scanner", kind: "xray" },
+      { id: "portal", rect: t(13, 7, 3, 2), label: "Portal", kind: "portal" },
+    ],
+  },
   corridor: {
     id: "corridor",
     name: "Main corridor",
@@ -1199,14 +1293,13 @@ export const ROOMS: Record<RoomId, RoomDef> = {
     floorKind: "stone",
     windows: [{ rect: t(10, 0.4, 4, 2), still: "window_control" }],
     doors: [
-      { to: "gate", rect: t(0, 6, 1, 4), label: "Lot" },
+      { to: "security", rect: t(0, 6, 1, 4), label: "Site Access" },
       { to: "control", rect: t(10, 0, 4, 1), label: "Control" },
       { to: "engineering", rect: t(10, 15, 4, 1), label: "Eng" },
       { to: "breakroom", rect: t(23, 6, 1, 4), label: "Break" },
     ],
     props: [
       { rect: t(4, 8, 2, 2), kind: "lamp" },
-      { rect: t(4, 1, 2, 2), kind: "poster", block: false },
       { rect: t(18, 1, 2, 2), kind: "poster", block: false },
       { rect: t(18, 8, 2, 3), kind: "cabinet" },
       { rect: t(2, 12, 2, 2), kind: "plant" },
@@ -1275,8 +1368,11 @@ export const ROOMS: Record<RoomId, RoomDef> = {
       { rect: t(1, 1, 2, 2), kind: "poster", block: false },
       { rect: t(19, 4, 2, 2), kind: "plant" },
       { rect: t(8, 10, 2, 2), kind: "lamp", block: false },
+      { rect: t(10, 10, 4, 3), kind: "mydesk", label: "Your desk" },
+      { rect: t(11, 13, 2, 2), kind: "chair", block: false },
     ],
     interacts: [
+      { id: "mydesk", rect: t(10, 10, 4, 4), label: "Your desk", kind: "desk" },
       { id: "trainer", rect: t(12, 6, 4, 3), label: "ΔT bench", kind: "trainer" },
       { id: "shuffle", rect: t(4, 6, 4, 3), label: "Fuel desk", kind: "shuffle" },
       { id: "phys", rect: t(18, 10, 2, 2), label: "Pin cell", kind: "phys" },

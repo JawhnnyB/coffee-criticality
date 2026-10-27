@@ -23,6 +23,8 @@ export interface WeekLogEntry {
 
 /** Days 2–5: on the lot, east of the cafe door and west of the van, facing the hall. */
 export const COMMUTE_SPAWN = { room: "gate" as const, x: 240, y: 200, facing: "right" as const };
+/** Day 1 (Stage 2c): the lot, just west of the Hall door (which now opens into Site Access), facing it. */
+export const DAY1_SPAWN = { room: "gate" as const, x: 52 * 16 - 40, y: 11 * 16, facing: "right" as const };
 /** Friday close: the alley west of the shore, looking up at the people. Not in the row. */
 export const DUSK_SPAWN = { room: "gate" as const, x: 1072, y: 216, facing: "up" as const };
 
@@ -42,6 +44,9 @@ export const WEEK: DayDef[] = [
     incident: "valve",
     shuffle: false,
     goals: [
+      { id: "badge", label: "Get your badge and dosimeter" },
+      { id: "portal", label: "Clear the portal" },
+      { id: "desk", label: "Find your desk (Engineering)" },
       { id: "mabel", label: "Sit with Mabel" },
       { id: "meet", label: "Meet the floor" },
       { id: "study", label: "Academy or ΔT bench" },
@@ -163,8 +168,9 @@ export const INCIDENTS: Record<
 export const MAP_ROOMS: { id: string; x: number; y: number; w: number; h: number; label: string }[] = [
   { id: "cafe", x: 8, y: 72, w: 46, h: 30, label: "Cafe" },
   { id: "parlor", x: 8, y: 106, w: 46, h: 22, label: "Arcade" },
-  { id: "gate", x: 56, y: 72, w: 48, h: 30, label: "Lot" },
-  { id: "corridor", x: 108, y: 80, w: 70, h: 16, label: "Hall" },
+  { id: "gate", x: 56, y: 72, w: 36, h: 30, label: "Lot" },
+  { id: "security", x: 94, y: 80, w: 24, h: 16, label: "Gate" },
+  { id: "corridor", x: 120, y: 80, w: 58, h: 16, label: "Hall" },
   { id: "control", x: 118, y: 18, w: 50, h: 58, label: "Control" },
   { id: "reactor", x: 172, y: 18, w: 56, h: 58, label: "Reactor" },
   { id: "maintenance", x: 172, y: 100, w: 56, h: 40, label: "Maint." },
@@ -175,7 +181,8 @@ export const MAP_ROOMS: { id: string; x: number; y: number; w: number; h: number
 export const MAP_LINKS: [string, string][] = [
   ["cafe", "gate"],
   ["cafe", "parlor"],
-  ["gate", "corridor"],
+  ["gate", "security"],
+  ["security", "corridor"],
   ["corridor", "control"],
   ["corridor", "engineering"],
   ["corridor", "breakroom"],

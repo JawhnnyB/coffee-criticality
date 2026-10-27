@@ -18,7 +18,9 @@ ROOMS_DIR = ART / "rooms"
 PROP_DIR = ART / "gen" / "props"
 TILE_DIR = ART / "gen" / "tiles"
 SPRITE_DIR = ART / "gen" / "sprites"
-IDS = ["cafe", "parlor", "corridor", "control", "engineering", "breakroom", "reactor", "maintenance"]
+IDS = ["cafe", "parlor", "corridor", "control", "engineering", "breakroom", "reactor", "maintenance", "security"]
+# Drawn live by render.ts (lamp and flap states change), so they are not stamps. They stay in the drift check.
+LIVE_KINDS = {"irispost", "laneflap"}
 
 
 def diff(a, b):
@@ -52,6 +54,8 @@ def bake_rooms():
         comp = shell.copy()
         room_dir = ROOMS_DIR / rid
         room_dir.mkdir(parents=True, exist_ok=True)
+        for old in room_dir.glob("p*.png"):
+            old.unlink()
         entries = []
         for i, pr in enumerate(props):
             alone = Cv(target.size[0], target.size[1])
@@ -64,6 +68,9 @@ def bake_rooms():
                     state["cab"] += 1
             box = bbox(alone.im)
             if not box:
+                continue
+            if pr["kind"] in LIVE_KINDS:
+                comp.alpha_composite(alone.im)
                 continue
             crop = alone.im.crop(box)
             name = f"p{i}.png"
@@ -237,7 +244,7 @@ def write_ts(stamps):
     lines.append("};")
     # Enabled set grows as rooms are wired. Cafe and parlor first.
     lines.append(
-        'export const A6_ROOMS = new Set(["cafe", "parlor", "corridor", "control", "engineering", "breakroom", "reactor", "maintenance", "gate"]);'
+        'export const A6_ROOMS = new Set(["cafe", "parlor", "corridor", "control", "engineering", "breakroom", "reactor", "maintenance", "security", "gate"]);'
     )
     (ROOT / "src/game/roomArt.ts").write_text("\n".join(lines) + "\n")
 
