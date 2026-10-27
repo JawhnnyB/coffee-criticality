@@ -114,6 +114,54 @@
   background: color-mix(in oklab, var(--color-bg-elevated) 92%, transparent);
 }
 
+.pixel-panel {
+  image-rendering: pixelated;
+  border-style: solid;
+  border-width: 4px;
+  border-image-source: url("/art/gen/ui/panel.png");
+  border-image-slice: 4 fill;
+  border-image-width: 4px;
+  border-image-repeat: stretch;
+  border-radius: 0;
+  background: transparent;
+  padding: 4px 6px 5px;
+  max-width: 11rem;
+}
+.pixel-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 0;
+  padding: 3px 5px;
+  border-radius: 0;
+  border: 1px solid #3b2318;
+  background: #f3e6d0;
+  line-height: 0;
+}
+.pixel-fold {
+  border: 1px solid #3b2318;
+  background: #f3e6d0;
+  border-radius: 0;
+  padding: 1px 2px;
+  line-height: 0;
+}
+.pixel-line {
+  display: block;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+.pixel-meter {
+  width: 40px;
+  height: 4px;
+  border: 1px solid #1a1410;
+  background: #6a4a32;
+}
+.pixel-meter > span {
+  display: block;
+  height: 100%;
+  background: #c4783a;
+}
+
 .paper {
   background: #f3e6d0;
   color: #16110d;

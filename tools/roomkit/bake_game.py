@@ -145,20 +145,25 @@ def bake_sprites():
     for who in ("mabel", "elena", "tommy"):
         who_build[who] = bake_a6.build(who, grids)
     SPRITE_DIR.mkdir(parents=True, exist_ok=True)
-    # Cell is the engine's 32x64. The 24x40 drawing sits so grid row 26 (the
-    # sole) lands on the bottom row of the cell.
-    ox, oy = 4, 63 - (bake_a5.GY + 26)
+    ox, oy = 4, 28  # canvas row 35 (outline under the sole) lands on the cell bottom
     order = (("down", 0), ("right", 1), ("up", 2))
+
+    def into_cell(fr):
+        cell = Image.new("RGBA", (32, 64), (0, 0, 0, 0))
+        sx0, sy0 = max(0, -ox), max(0, -oy)
+        sx1, sy1 = min(fr.width, 32 - ox), min(fr.height, 64 - oy)
+        if sx1 > sx0 and sy1 > sy0:
+            cell.alpha_composite(fr.crop((sx0, sy0, sx1, sy1)), (ox + sx0, oy + sy0))
+        return cell
+
     for who, cyc in who_build.items():
         sheet = Image.new("RGBA", (128, 192), (0, 0, 0, 0))
         for view, row in order:
             for frame in range(4):
-                fr = Image.fromarray(cyc[view][frame])
-                sheet.alpha_composite(fr, (frame * 32 + ox, row * 64 + oy))
+                cell = into_cell(Image.fromarray(cyc[view][frame]))
+                sheet.alpha_composite(cell, (frame * 32, row * 64))
         sheet.save(SPRITE_DIR / f"{who}_walk4.png")
-        idle = Image.new("RGBA", (32, 64), (0, 0, 0, 0))
-        idle.alpha_composite(Image.fromarray(cyc["down"][1]), (ox, oy))
-        idle.save(SPRITE_DIR / f"{who}_idle_32.png")
+        into_cell(Image.fromarray(cyc["down"][1])).save(SPRITE_DIR / f"{who}_idle_32.png")
         print("sprite", who)
 
 

@@ -42,8 +42,8 @@ import { isMuted, playBed, playBlip, setMuted, unlockAudio, syncWorld, getAudioP
 import { isRevealing, requestSkip } from "./chatter";
 import { Chatter } from "./Chatter";
 import { paintPlayerPortrait } from "./paintedLook";
-import { heartCount, tintPlayer } from "./pixel";
-import { drawWorld } from "./render";
+import { heartCount, tintA6 } from "./pixel";
+import { drawWorld, glyphWidth, paintGlyphs, preloadRoomArt } from "./render";
 import { DEFAULT_PLANT, plantTitle, type PlantDesign } from "./plant";
 import { hasSave, hydrateSave, peekSave, wipeSave, writeSave } from "./save";
 import { computeKeff } from "./nuclearLab";
@@ -206,6 +206,7 @@ export function GameApp() {
 
   useEffect(() => {
     setReady(true);
+    preloadRoomArt();
     setTouch(window.matchMedia("(pointer: coarse)").matches);
     unlockAudio();
     const keys = keysRef.current;
@@ -280,6 +281,13 @@ export function GameApp() {
         s.period = n < 11 * 60 + 30 ? "morning" : n < 14 * 60 ? "midday" : "afternoon";
         s.timeLabel = `${String(Math.floor(n / 60) % 24).padStart(2, "0")}:${String(Math.floor(n % 60)).padStart(2, "0")}`;
         if (n >= 16 * 60 + 20) s.closePrompt = true;
+      },
+      setLook: (hoodie: string, hair: string, glasses: boolean) => {
+        stateRef.current.playerLook = {
+          hoodie: hoodie as PlayerLook["hoodie"],
+          hair: hair as PlayerLook["hair"],
+          glasses,
+        };
       },
       finishBuild: () => {
         const s = stateRef.current;
@@ -534,6 +542,7 @@ export function GameApp() {
         bump((n) => n + 1);
       }
       edges.clear();
+      if (s.pendingRoom) preloadRoomArt(s.pendingRoom);
       if (PLAY_MODES.includes(s.mode)) {
         paint(canvasRef.current, wrapRef.current, s, now / 1000, dt);
       }
@@ -618,7 +627,7 @@ export function GameApp() {
           <div className="pointer-events-none h-8" />
         )}
         <div className="pointer-events-auto flex items-center gap-2">
-          {BEZEL_MODES.includes(mode) ? null : <MuteToggle />}
+          {BEZEL_MODES.includes(mode) ? null : <MuteToggle pixel={mode === "play"} />}
           <AuthChip />
         </div>
       </header>
@@ -2142,19 +2151,22 @@ function AcademyStage({
   );
 }
 
-function MuteToggle() {
+function MuteToggle({ pixel = false }: { pixel?: boolean }) {
   const [mute, setMute] = useState(isMuted());
+  const toggle = () => {
+    unlockAudio();
+    setMuted(!mute);
+    setMute(!mute);
+  };
+  if (pixel) {
+    return (
+      <button type="button" data-testid="mute" className="pixel-chip" onClick={toggle}>
+        <PixelLine text={mute ? "SOUND OFF" : "SOUND ON"} color="#3b2318" scale={2} />
+      </button>
+    );
+  }
   return (
-    <button
-      type="button"
-      data-testid="mute"
-      className="btn-ghost"
-      onClick={() => {
-        unlockAudio();
-        setMuted(!mute);
-        setMute(!mute);
-      }}
-    >
+    <button type="button" data-testid="mute" className="btn-ghost" onClick={toggle}>
       {mute ? "Sound off" : "Sound on"}
     </button>
   );
@@ -2545,9 +2557,9 @@ function LookPreview({ look, big = false }: { look: PlayerLook; big?: boolean })
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
     const im = new Image();
-    im.src = "/art/gen/sprites/player_idle_32.png?v=soft8";
+    im.src = "/art/gen/sprites/player_walk4.png";
     im.onload = () => {
-      const tinted = tintPlayer(im, look);
+      const tinted = tintA6(im, look);
       ctx.imageSmoothingEnabled = false;
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.drawImage(tinted as CanvasImageSource, 0, 0, 32, 64, 0, 0, canvas.width, canvas.height);
@@ -2599,6 +2611,33 @@ function Panel({
   );
 }
 
+function PixelLine({ text, color = "#16110d", scale = 2 }: { text: string; color?: string; scale?: number }) {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const logicalW = Math.max(1, glyphWidth(text, scale));
+  const logicalH = 5 * scale;
+  useEffect(() => {
+    const c = ref.current;
+    if (!c) return;
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    c.width = Math.max(1, Math.ceil(logicalW * dpr));
+    c.height = Math.max(1, Math.ceil(logicalH * dpr));
+    const ctx = c.getContext("2d");
+    if (!ctx) return;
+    ctx.imageSmoothingEnabled = false;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, logicalW, logicalH);
+    paintGlyphs(ctx, text, 0, 0, color, scale);
+  }, [text, color, scale, logicalW, logicalH]);
+  return (
+    <canvas
+      ref={ref}
+      className="pixel-line"
+      style={{ width: logicalW, height: logicalH }}
+      aria-label={text}
+    />
+  );
+}
+
 function Hud({
   room,
   roomId,
@@ -2625,55 +2664,69 @@ function Hud({
   nearLabel: string;
 }) {
   const hud = MAP_HUD[roomId] ?? MAP_HUD.cafe;
+  const [open, setOpen] = useState(true);
   const wash =
-    period === "afternoon" ? "rgba(61,92,102,0.28)" : period === "morning" ? "rgba(196,120,58,0.16)" : "transparent";
+    period === "afternoon" ? "rgba(90,48,28,0.28)" : period === "morning" ? "rgba(243,214,170,0.22)" : "rgba(170,200,220,0.16)";
+  const when = `${time} D${day} ${dusk ? "DUSK" : periodLabel(period)}`;
+  const obj = objective.length > 24 ? `${objective.slice(0, 23)}.` : objective;
   return (
     <>
-      <div className="instrument pointer-events-none absolute bottom-16 left-3 z-10 max-w-[14rem] px-2.5 py-2 sm:left-4" data-testid="instrument">
-        <div className="flex items-baseline gap-2 font-mono text-[11px]">
-          <span className="text-base tabular leading-none text-fg">{time}</span>
-          <span className="text-muted">
-            Day {day} · {dusk ? "Dusk" : periodLabel(period)}
-          </span>
+      <div className="pixel-panel pointer-events-none absolute bottom-14 left-3 z-10" data-testid="instrument">
+        <div className="flex items-start justify-between gap-2">
+          <PixelLine text={when} color="#16110d" scale={2} />
+          <button
+            type="button"
+            className="pixel-fold pointer-events-auto"
+            data-testid="hud-fold"
+            onClick={() => setOpen((v) => !v)}
+            aria-expanded={open}
+          >
+            <PixelLine text={open ? "LESS" : "MORE"} color="#3b2318" scale={1} />
+          </button>
         </div>
-        <div className="mt-1 flex items-center gap-1.5 text-sm text-fg">
-          <img src="/art/gen/ui/pip.png?v=art101" alt="" className="h-2 w-2" style={{ imageRendering: "pixelated" }} />
-          {room}
+        <div className="mt-1">
+          <PixelLine text={room} color="#3b2318" scale={2} />
         </div>
-        <div className="relative mt-2 hidden h-[45px] w-[80px] border border-border sm:block" data-testid="site-plan">
-          <img
-            src="/art/gen/ui/site_plan.png?v=plan3"
-            alt=""
-            width={80}
-            height={45}
-            className="h-full w-full"
-            style={{ imageRendering: "pixelated" }}
-          />
-          <span className="pointer-events-none absolute inset-0" style={{ background: wash }} />
-          <span
-            className="absolute h-1.5 w-1.5 -translate-x-1/2 -translate-y-1/2 bg-warn"
-            style={{ left: `${hud.x}%`, top: `${hud.y}%` }}
-          />
-        </div>
-        <div className="mt-2 flex items-center gap-2">
-          <span className="font-display text-xs text-fg">{stage}</span>
-          <div className="h-1 w-14 overflow-hidden bg-surface" aria-hidden>
-            <div className="h-full bg-accent" style={{ width: `${Math.max(4, Math.min(100, culture))}%` }} />
-          </div>
-        </div>
-        <p className="font-display mt-1 max-w-[12.5rem] text-sm leading-snug text-muted">{objective}</p>
+        {open ? (
+          <>
+            <div className="relative mt-1 h-8 w-16 border border-[#1a1410]" data-testid="site-plan">
+              <img
+                src="/art/gen/ui/site_plan.png?v=plan3"
+                alt=""
+                width={64}
+                height={32}
+                className="h-full w-full"
+                style={{ imageRendering: "pixelated" }}
+              />
+              <span className="pointer-events-none absolute inset-0" style={{ background: wash }} />
+              <span
+                className="absolute h-1 w-1 -translate-x-1/2 -translate-y-1/2 bg-[#c4783a]"
+                style={{ left: `${hud.x}%`, top: `${hud.y}%` }}
+              />
+            </div>
+            <div className="mt-1 flex items-center gap-1">
+              <PixelLine text={stage} color="#16110d" scale={1} />
+              <div className="pixel-meter" aria-hidden>
+                <span style={{ width: `${Math.max(4, Math.min(100, culture))}%` }} />
+              </div>
+            </div>
+            <div className="mt-1">
+              <PixelLine text={obj} color="#6a4a32" scale={1} />
+            </div>
+          </>
+        ) : null}
       </div>
       {nearLabel ? (
         <div className="pointer-events-none absolute inset-x-0 bottom-3 z-20 flex justify-center px-4">
-          <p className="border border-accent bg-bg-elevated px-3 py-1.5 font-mono text-sm tracking-wide text-fg">
-            E · {nearLabel}
-          </p>
+          <div className="pixel-chip">
+            <PixelLine text={`E · ${nearLabel}`} color="#3b2318" scale={2} />
+          </div>
         </div>
       ) : null}
       {toast && (
         <div className={`pointer-events-none absolute inset-x-0 z-10 flex justify-center px-4 ${nearLabel ? "bottom-16" : "bottom-4"}`}>
-          <div className="max-w-lg border border-border bg-bg-elevated/92 px-3 py-2 text-center font-display text-sm text-fg">
-            {toast}
+          <div className="pixel-chip">
+            <PixelLine text={toast} color="#3b2318" scale={1} />
           </div>
         </div>
       )}
@@ -2848,6 +2901,7 @@ declare global {
       bootPlay: () => void;
       warp: (room: string, x: number, y: number) => void;
       setMinutes: (n: number) => void;
+      setLook: (hoodie: string, hair: string, glasses: boolean) => void;
       finishBuild: () => void;
       setDay: (n: number) => void;
       getPlant: () => unknown;

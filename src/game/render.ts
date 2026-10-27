@@ -1,38 +1,7 @@
-import { STILLS, ROOMS, residueKey, type ResidueHow, type RoomId } from "./content";
-import { TILE, WALL } from "./const";
-import { DEBUG_ART, WALK_H, WALK_W } from "./artSpec";
-import {
-  LOOKS,
-  PAL,
-  asphaltFloor,
-  curbFloor,
-  drawChibi,
-  drawEmote,
-  drawDoor,
-  drawDoorGlimpse,
-  drawPropPixel,
-  drawWindow,
-  grassFloor,
-  kettleGlow,
-  lampGlow,
-  metalFloor,
-  pix,
-  skyBand,
-  steam,
-  stoneFloor,
-  stripeFloor,
-  wallpaper,
-  waterFloor,
-  windMotes,
-  windowWash,
-  woodFloor,
-  cafePlanks,
-  controlLino,
-  engConcrete,
-  hungSignSpot,
-} from "./pixel";
-import { glimpseSrc } from "./site";
-import { A6_ROOMS, ROOM_SHELL, ROOM_STAMPS } from "./roomArt";
+import { ROOMS, residueKey, type ResidueHow, type RoomId } from "./content";
+import { LOOKS, PAL, drawChibi, drawEmote, pix } from "./pixel";
+import { A6_ROOMS } from "./roomArt";
+import { ROOM_ATLAS, type AtlasStamp } from "./roomAtlas";
 import { npcsHere, type GameState } from "./sim";
 
 const artCache = new Map<string, HTMLImageElement>();
@@ -41,7 +10,7 @@ let camY = 0;
 let lastRoom: RoomId | null = null;
 let buf: HTMLCanvasElement | null = null;
 
-function img(src: string) {
+function warm(src: string) {
   let im = artCache.get(src);
   if (!im) {
     im = new Image();
@@ -49,7 +18,21 @@ function img(src: string) {
     im.src = src;
     artCache.set(src, im);
   }
+  return im;
+}
+
+function img(src: string) {
+  const im = warm(src);
   return im.complete && im.naturalWidth > 0 ? im : null;
+}
+
+const WALKERS = ["player", "mabel", "holt", "elena", "tommy", "marcus", "priya", "jordan"];
+
+/** Start atlas and walk-sheet loads. Call when a door fade begins so the next room is ready. */
+export function preloadRoomArt(roomId?: string) {
+  const ids = roomId && ROOM_ATLAS[roomId] ? [roomId] : Object.keys(ROOM_ATLAS);
+  for (const id of ids) warm(ROOM_ATLAS[id].src);
+  for (const who of WALKERS) warm(`/art/gen/sprites/${who}_walk4.png`);
 }
 
 function getBuf(w: number, h: number) {
@@ -61,106 +44,22 @@ function getBuf(w: number, h: number) {
   return buf;
 }
 
-function floorTile(
-  ctx: CanvasRenderingContext2D,
-  kind: string,
-  x: number,
-  y: number,
-  seed: number,
-  roomId: string,
-  tx: number,
-  ty: number,
-) {
-  if (roomId === "cafe") return cafePlanks(ctx, x, y, seed);
-  if (roomId === "control") return controlLino(ctx, x, y, seed);
-  if (roomId === "engineering") return engConcrete(ctx, x, y, seed, tx, ty);
-  if (kind === "wood") woodFloor(ctx, x, y, seed);
-  else if (kind === "grass") grassFloor(ctx, x, y, seed);
-  else if (kind === "asphalt") asphaltFloor(ctx, x, y, seed);
-  else if (kind === "curb") curbFloor(ctx, x, y, seed);
-  else if (kind === "stripe") stripeFloor(ctx, x, y, seed);
-  else if (kind === "water") waterFloor(ctx, x, y, seed);
-  else if (kind === "metal") metalFloor(ctx, x, y, seed);
-  else stoneFloor(ctx, x, y, seed);
+function periodTint(period: GameState["period"]): string {
+  if (period === "morning") return "rgba(243,214,170,0.18)";
+  if (period === "midday") return "rgba(170,200,220,0.08)";
+  return "rgba(90,48,28,0.16)";
 }
 
-function drawTiles(
-  ctx: CanvasRenderingContext2D,
-  room: (typeof ROOMS)[RoomId],
-  period: GameState["period"],
-  viewX: number,
-  viewY: number,
-  viewW: number,
-  viewH: number,
-) {
-  const cols = Math.ceil(room.w / TILE);
-  const rows = Math.ceil(room.h / TILE);
-  const outdoor = room.floorKind === "grass" || room.floorKind === "asphalt";
-  if (outdoor && viewY < WALL) {
-    const sx = Math.max(0, Math.floor(viewX / TILE) * TILE);
-    const sw = Math.min(room.w - sx, Math.ceil((viewW + TILE * 2) / TILE) * TILE);
-    skyBand(ctx, sx, 0, sw, WALL, period);
-  } else if (!outdoor) {
-    wallpaper(ctx, 0, 0, room.w, WALL, room.accent, room.id === "control" || room.id === "reactor" || room.id === "maintenance");
-  }
-
-  for (const win of room.windows ?? []) {
-    drawWindow(ctx, win.rect.x, win.rect.y, win.rect.w, win.rect.h, img(STILLS[win.still]?.src ?? room.art));
-    if (period === "afternoon") {
-      ctx.strokeStyle = PAL.copper;
-      ctx.lineWidth = 1;
-      ctx.strokeRect(win.rect.x + 0.5, win.rect.y + 0.5, win.rect.w - 1, win.rect.h - 1);
-    }
-    if (!outdoor) windowWash(ctx, win.rect.x, win.rect.y, win.rect.w, win.rect.h, period);
-  }
-
-  const x0 = Math.max(0, Math.floor((viewX - TILE) / TILE));
-  const x1 = Math.min(cols, Math.ceil((viewX + viewW + TILE) / TILE));
-  const y0 = Math.max(Math.floor(WALL / TILE), Math.floor((viewY - TILE) / TILE));
-  const y1 = Math.min(rows, Math.ceil((viewY + viewH + TILE) / TILE));
-  for (let ty = y0; ty < y1; ty++) {
-    for (let tx = x0; tx < x1; tx++) {
-      const x = tx * TILE;
-      const y = ty * TILE;
-      if (y < WALL - 2 && !outdoor) continue;
-      const seed = tx * 13 + ty * 7 + room.w;
-      let kind: string = room.floorKind;
-      for (const p of room.floorPatches ?? []) {
-        if (x >= p.rect.x && x < p.rect.x + p.rect.w && y >= p.rect.y && y < p.rect.y + p.rect.h) {
-          kind = p.kind;
-          break;
-        }
-      }
-      if (room.id === "maintenance" && kind === "asphalt") kind = "stripe";
-      floorTile(ctx, kind, x, y, seed, room.id, tx, ty);
-    }
-  }
-
-  if (DEBUG_ART) {
-    ctx.strokeStyle = "rgba(243,230,208,0.18)";
-    ctx.lineWidth = 1;
-    for (let tx = 0; tx <= cols; tx++) {
-      ctx.beginPath();
-      ctx.moveTo(tx * TILE + 0.5, 0);
-      ctx.lineTo(tx * TILE + 0.5, room.h);
-      ctx.stroke();
-    }
-    for (let ty = 0; ty <= rows; ty++) {
-      ctx.beginPath();
-      ctx.moveTo(0, ty * TILE + 0.5);
-      ctx.lineTo(room.w, ty * TILE + 0.5);
-      ctx.stroke();
-    }
-    ctx.strokeStyle = "rgba(196,120,58,0.85)";
-    ctx.strokeRect(0.5, WALL - 0.5, room.w - 1, 1);
-    ctx.strokeRect(8.5, WALL + 8.5, WALK_W - 1, WALK_H - 1);
-  }
+function lampPool(ctx: CanvasRenderingContext2D, x: number, y: number, period: GameState["period"]) {
+  const a = period === "afternoon" ? 0.55 : period === "morning" ? 0.34 : 0.2;
+  ctx.fillStyle = `rgba(255,228,160,${a})`;
+  ctx.beginPath();
+  ctx.ellipse(Math.round(x), Math.round(y) + 4, 26, 9, 0, 0, Math.PI * 2);
+  ctx.fill();
 }
 
-function periodTint(period: GameState["period"], indoor: boolean): string {
-  if (period === "morning") return indoor ? "rgba(243,230,208,0.07)" : "rgba(243,230,208,0.10)";
-  if (period === "midday") return "rgba(0,0,0,0)";
-  return indoor ? "rgba(90,48,28,0.08)" : "rgba(232,168,96,0.12)";
+function blitStamp(ctx: CanvasRenderingContext2D, atlas: CanvasImageSource, st: AtlasStamp) {
+  ctx.drawImage(atlas, st.sx, st.sy, st.sw, st.sh, st.x, st.y, st.sw, st.sh);
 }
 
 export function drawWorld(
@@ -173,9 +72,8 @@ export function drawWorld(
 ) {
   pix(ctx);
   const room = ROOMS[s.room];
-  // Cover the viewport. Crop with the camera instead of floating the room in ink.
   const cover = Math.max(viewW / Math.max(1, room.w), viewH / Math.max(1, room.h));
-  const zoom = Math.max(3, Math.min(5, Math.ceil(cover)));
+  const zoom = Math.max(2, Math.min(5, Math.floor(cover)));
   const bw = Math.max(1, Math.min(room.w, Math.ceil(viewW / zoom)));
   const bh = Math.max(1, Math.min(room.h, Math.ceil(viewH / zoom)));
   const off = getBuf(bw, bh);
@@ -214,54 +112,32 @@ export function drawWorld(
   g.save();
   g.translate(Math.round(bw / 2 - camX), Math.round(bh / 2 - camY));
 
-  const shell = A6_ROOMS.has(room.id) ? img(ROOM_SHELL[room.id] ?? "") : null;
-  const usingA6 = !!(shell && shell.naturalWidth === room.w && shell.naturalHeight === room.h);
-  if (usingA6) {
-    g.drawImage(shell, 0, 0);
-    for (const st of ROOM_STAMPS[room.id] ?? []) {
+  const a6Room = A6_ROOMS.has(room.id);
+  const spec = a6Room ? ROOM_ATLAS[room.id] : undefined;
+  const atlas = spec ? img(spec.src) : null;
+  const usingA6 = !!(spec && atlas);
+  if (usingA6 && atlas && spec) {
+    g.drawImage(atlas, 0, 0, room.w, room.h, 0, 0, room.w, room.h);
+    for (const st of spec.stamps) {
       if (st.kind !== "rug") continue;
-      const rug = img(st.src);
-      if (rug) g.drawImage(rug, st.x, st.y);
+      blitStamp(g, atlas, st);
     }
-  } else {
-    drawTiles(g, room, s.period, camX - bw / 2, camY - bh / 2, bw, bh);
-  }
-
-  const outdoor = room.floorKind === "grass" || room.floorKind === "asphalt";
-  if (!usingA6 && outdoor && (s.period === "afternoon" || s.flags.endingWalk)) {
-    const warm = g.createLinearGradient(0, 0, 0, WALL + 48);
-    const hot = s.flags.endingWalk ? 0.34 : 0.22;
-    warm.addColorStop(0, `rgba(255,186,96,${hot})`);
-    warm.addColorStop(0.55, `rgba(196,120,58,${hot * 0.45})`);
-    warm.addColorStop(1, "rgba(196,120,58,0)");
-    g.fillStyle = warm;
-    g.fillRect(0, 0, room.w, WALL + 48);
+    for (const p of room.props) {
+      if (p.kind !== "lamp") continue;
+      lampPool(g, p.rect.x + p.rect.w / 2, p.rect.y + p.rect.h, s.period);
+    }
   }
 
   fillEdge(g, room);
 
-  if (!usingA6 && outdoor) windMotes(g, room.w, room.h, now, WALL);
-
-  if (!usingA6) {
-    for (const p of room.props) {
-      if (p.kind === "lamp") lampGlow(g, p.rect.x + p.rect.w / 2, p.rect.y + p.rect.h, now, s.period);
-      if (p.kind === "kettle") kettleGlow(g, p.rect.x + p.rect.w / 2, p.rect.y + p.rect.h, now);
-    }
-  }
-
-  const FLOOR_PROP = new Set(["rug"]);
-  const WALL_PROP = new Set(["poster", "board", "prints", "dose", "crane"]);
   const drawables: { y: number; draw: () => void }[] = [];
 
-  if (usingA6) {
-    for (const st of ROOM_STAMPS[room.id] ?? []) {
+  if (usingA6 && atlas && spec) {
+    for (const st of spec.stamps) {
       if (st.kind === "rug") continue;
       drawables.push({
         y: st.foot,
-        draw: () => {
-          const im = img(st.src) ?? img(`/art/gen/props/${st.kind}.png?v=a6`);
-          if (im) g.drawImage(im, st.x, st.y);
-        },
+        draw: () => blitStamp(g, atlas, st),
       });
     }
     if (s.room === "control") {
@@ -272,128 +148,6 @@ export function drawWorld(
         draw: () => drawPaperLog(g, s.day, dayMark(s)),
       });
     }
-  } else {
-  for (const p of room.props) {
-    if (FLOOR_PROP.has(p.kind)) {
-      drawPropPixel(g, p.kind, p.rect.x, p.rect.y, p.rect.w, p.rect.h, room.accent, now, p.label);
-    }
-  }
-
-  for (const p of room.props) {
-    if (!WALL_PROP.has(p.kind)) continue;
-    drawPropPixel(g, p.kind, p.rect.x, p.rect.y, p.rect.w, p.rect.h, room.accent, now, p.label);
-  }
-
-  if (s.room === "control") {
-    const board = room.props.find((p) => p.kind === "board");
-    drawBoardA(g, board?.rect ?? { x: 64, y: 16, w: 80, h: 32 }, s.day, dayMark(s), now);
-  }
-
-  for (const p of room.props) {
-    if (FLOOR_PROP.has(p.kind) || WALL_PROP.has(p.kind)) continue;
-    const foot = p.rect.y + p.rect.h;
-    // A lamp's fixture is in the air. Sort by the head, not the pole base,
-    // so the post draws behind anyone standing at the pole.
-    const py = p.kind === "lamp" ? p.rect.y + 4 : foot;
-    drawables.push({
-      y: py,
-      draw: () => {
-        drawPropPixel(g, p.kind, p.rect.x, p.rect.y, p.rect.w, p.rect.h, room.accent, now, p.label);
-        if (p.kind === "roof" && p.label) {
-          const spot = hungSignSpot(p.label, p.rect.x, p.rect.y, p.rect.w, p.rect.h);
-          const viewLeft = camX - bw / 2;
-          const viewRight = camX + bw / 2;
-          const viewTop = camY - bh / 2;
-          const viewBot = camY + bh / 2;
-          const half = (p.label.length * 4) / 2;
-          const cx = Math.max(viewLeft + 8 + half, Math.min(viewRight - 8 - half, spot.x));
-          const sy = Math.max(viewTop + 4, Math.min(viewBot - 16, spot.y));
-          g.fillStyle = PAL.wood;
-          g.fillRect(cx - half - 3, sy - 2, half * 2 + 6, 12);
-          g.fillStyle = PAL.woodDark;
-          g.fillRect(cx - 1, sy - 4, 2, 3);
-          pixText(g, p.label, cx, sy, PAL.cream, Math.max(24, p.label.length * 4 + 4));
-        }
-      },
-    });
-  }
-
-  for (const d of room.doors) {
-    const north = d.rect.y <= WALL + 8;
-    const west = d.rect.x <= 24;
-    const east = d.rect.x + d.rect.w >= room.w - 24;
-    const dx = west || east ? d.rect.x : d.rect.x;
-    const dy = north ? WALL - 20 : d.rect.y;
-    const dw = d.rect.w;
-    const dh = north ? 20 + d.rect.h : d.rect.h;
-    const open = s.pendingRoom === d.to && s.fade > 0;
-    const paint = () => {
-      drawDoorGlimpse(g, dx, dy, dw, dh, img(glimpseSrc(d.to)));
-      drawDoor(g, dx, dy, dw, dh, d.label, north, open ? Math.round(6 * Math.min(1, s.fade)) : 0);
-    };
-    if (north) paint();
-    else drawables.push({ y: d.rect.y + d.rect.h, draw: paint });
-  }
-
-  if (s.room === "cafe") {
-    const counter = room.props.find((p) => p.kind === "counter");
-    const kx = counter ? counter.rect.x + 56 : 72;
-    const ky = counter ? counter.rect.y + 8 : 78;
-    const sy = counter ? counter.rect.y + 12 : 90;
-    drawables.push({ y: sy, draw: () => steam(g, kx, ky, now, false) });
-  }
-  if (s.room === "breakroom") {
-    const kettle = room.props.find((p) => p.kind === "kettle");
-    if (kettle) {
-      drawables.push({
-        y: kettle.rect.y + kettle.rect.h,
-        draw: () => steam(g, kettle.rect.x + 8, kettle.rect.y, now, false),
-      });
-    }
-  }
-  if (s.room === "reactor") {
-    const core = room.props.find((p) => p.kind === "core");
-    if (core) {
-      drawables.push({
-        y: core.rect.y + 10,
-        draw: () => {
-          const glow = img("/art/gen/fx/core_glow.png?v=waveD");
-          if (glow) {
-            const pulse = 14 + Math.round(Math.sin(now * 3) * 2);
-            g.save();
-            g.globalAlpha = 0.62 + Math.sin(now * 3) * 0.28;
-            g.drawImage(
-              glow,
-              0,
-              0,
-              glow.naturalWidth,
-              glow.naturalHeight,
-              Math.round(core.rect.x + core.rect.w / 2 - pulse / 2),
-              Math.round(core.rect.y + 6),
-              pulse,
-              pulse,
-            );
-            g.restore();
-          }
-          steam(g, core.rect.x + core.rect.w / 2, core.rect.y + 8, now, true);
-        },
-      });
-    }
-  }
-  if (s.room === "maintenance" && s.residue.valve !== "caught") {
-    const valve = room.props.find((p) => p.kind === "valve");
-    const vx = valve ? valve.rect.x + valve.rect.w / 2 : 80;
-    const vy = valve ? valve.rect.y : 96;
-    const sy = valve ? valve.rect.y + valve.rect.h : 140;
-    drawables.push({ y: sy, draw: () => steam(g, vx, vy, now, true) });
-  }
-
-  if (s.room === "control") {
-    drawables.push({
-      y: 212,
-      draw: () => drawPaperLog(g, s.day, dayMark(s)),
-    });
-  }
   }
 
   for (const n of npcsHere(s)) {
@@ -433,17 +187,8 @@ export function drawWorld(
   const oy = Math.floor((viewH - dh) / 2);
   ctx.drawImage(off, 0, 0, bw, bh, ox, oy, dw, dh);
 
-  ctx.fillStyle = usingA6 ? "rgba(0,0,0,0)" : periodTint(s.period, room.floorKind !== "grass" && room.floorKind !== "asphalt");
+  ctx.fillStyle = periodTint(s.period);
   ctx.fillRect(0, 0, viewW, viewH);
-  if (s.flags.endingWalk && (room.floorKind === "grass" || room.floorKind === "asphalt")) {
-    const g = ctx.createLinearGradient(0, 0, 0, viewH);
-    g.addColorStop(0, "rgba(255, 176, 120, 0.55)");
-    g.addColorStop(0.28, "rgba(232, 120, 90, 0.28)");
-    g.addColorStop(0.62, "rgba(232, 168, 96, 0.12)");
-    g.addColorStop(1, "rgba(90, 40, 28, 0.08)");
-    ctx.fillStyle = g;
-    ctx.fillRect(0, 0, viewW, viewH);
-  }
 
   if (s.fade > 0 && !s.mapHop) {
     ctx.fillStyle = `rgba(22,17,13,${Math.min(1, s.fade)})`;
@@ -503,8 +248,39 @@ const GLYPH: Record<string, string[]> = {
   ":": ["000", "010", "000", "010", "000"],
   "!": ["010", "010", "010", "000", "010"],
   "=": ["000", "111", "000", "111", "000"],
+  "·": ["000", "000", "010", "000", "000"],
   " ": ["000", "000", "000", "000", "000"],
 };
+
+export function glyphWidth(text: string, scale = 2) {
+  const n = text.length;
+  if (n <= 0) return 0;
+  return n * 4 * scale - scale;
+}
+
+export function paintGlyphs(
+  ctx: CanvasRenderingContext2D,
+  text: string,
+  x: number,
+  y: number,
+  color: string,
+  scale = 2,
+) {
+  const upper = text.toUpperCase();
+  const adv = 4 * scale;
+  ctx.fillStyle = color;
+  let cx = Math.round(x);
+  const cy = Math.round(y);
+  for (const ch of upper) {
+    const g = GLYPH[ch] ?? GLYPH[" "];
+    for (let row = 0; row < 5; row++) {
+      for (let col = 0; col < 3; col++) {
+        if (g[row][col] === "1") ctx.fillRect(cx + col * scale, cy + row * scale, scale, scale);
+      }
+    }
+    cx += adv;
+  }
+}
 
 function pixText(
   ctx: CanvasRenderingContext2D,

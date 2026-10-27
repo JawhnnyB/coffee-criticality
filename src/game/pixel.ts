@@ -71,50 +71,25 @@ function blitBody(
   playerLook?: PlayerLook,
   sitting = false,
 ) {
-  const idleA6 = loadArt(`/art/gen/sprites/${who}_idle_32.png?v=a6`);
-  const idleOld = loadArt(`/art/gen/sprites/${who}_idle_32.png?v=soft8`);
-  const a6 = !!(idleA6 && idleA6.naturalWidth === WALK_W && idleA6.naturalHeight === WALK_H);
-  const idle = a6 ? idleA6 : idleOld;
-  if (!idle || idle.naturalWidth !== WALK_W || idle.naturalHeight !== WALK_H) return false;
+  const walk = loadArt(`/art/gen/sprites/${who}_walk4.png`);
+  const a6 = !!(walk && walk.naturalWidth === 128 && walk.naturalHeight === 192);
+  if (!a6) return false;
   pix(ctx);
   const frame = moving && !sitting ? Math.floor(phase) % 4 : 0;
-  const bob = !a6 && moving && !sitting && (frame === 1 || frame === 3) ? 1 : 0;
-  const sway = !a6 && !moving && Math.floor(phase / 8) % 2 === 1 ? 1 : 0;
-  const dx = Math.round(x - WALK_W / 2 + sway);
-  const dy = Math.round(y - WALK_H + bob);
+  const dx = Math.round(x - WALK_W / 2);
+  const dy = Math.round(y - WALK_H);
 
   ctx.save();
-  ctx.fillStyle = a6 ? "rgba(42,22,16,0.32)" : "rgba(12,10,8,0.38)";
+  ctx.fillStyle = "rgba(42,22,16,0.32)";
   ctx.beginPath();
-  ctx.ellipse(Math.round(x), Math.round(y) - 1, a6 ? 6 : sitting ? 7 : 8, a6 ? 2 : sitting ? 2 : 3, 0, 0, Math.PI * 2);
+  ctx.ellipse(Math.round(x), Math.round(y) - 1, 6, 2, 0, 0, Math.PI * 2);
   ctx.fill();
   ctx.restore();
 
-  const walkA6 = loadArt(`/art/gen/sprites/${who}_walk4.png?v=a6`);
-  const walk = a6 && walkA6 && walkA6.naturalWidth === 128 && walkA6.naturalHeight === 192
-    ? walkA6
-    : loadArt(`/art/gen/sprites/${who}_walk4.png?v=soft8`);
-  const sit = loadArt(`/art/gen/sprites/${who}_sit.png?v=soft8`);
-  const hasWalk = !!(walk && walk.naturalWidth === 128 && walk.naturalHeight === 192);
-  const hasSit = !!(sit && sit.naturalWidth === WALK_W && sit.naturalHeight === WALK_H);
-  let src: CanvasImageSource = idle;
-  let sx = 0;
-  let sy = 0;
-  if (sitting && hasSit) {
-    src = sit!;
-  } else if (a6 && hasWalk) {
-    src = walk!;
-    sx = (moving && !sitting ? frame : 0) * WALK_W;
-    sy = facing === "up" ? WALK_H * 2 : facing === "down" ? 0 : WALK_H;
-  } else if (moving && hasWalk) {
-    src = walk!;
-    sx = frame * WALK_W;
-    sy = facing === "up" ? WALK_H * 2 : facing === "down" ? 0 : WALK_H;
-  }
-  if (who === "player" && playerLook && !a6) {
-    const sheet = sitting && hasSit ? sit! : moving && hasWalk ? walk! : idle;
-    src = tintPlayer(sheet, playerLook);
-  }
+  let src: CanvasImageSource = walk;
+  const sx = frame * WALK_W;
+  const sy = facing === "up" ? WALK_H * 2 : facing === "down" ? 0 : WALK_H;
+  if (who === "player" && playerLook) src = tintA6(walk, playerLook);
 
   ctx.save();
   if (facing === "left") {
@@ -125,12 +100,101 @@ function blitBody(
     ctx.drawImage(src, sx, sy, WALK_W, WALK_H, dx, dy, WALK_W, WALK_H);
   }
   ctx.restore();
-
-  const blink = !a6 && !moving && facing !== "up" && phase % 8 < 0.28;
-  if (blink) {
-    fill(ctx, dx + 9, dy + (sitting ? 19 : 13), 14, 2, "rgba(62,40,32,0.8)");
-  }
   return true;
+}
+
+const A6_SHIRT: Array<[number, number, number]> = [
+  [0x98, 0xc8, 0x60],
+  [0x5a, 0x94, 0x38],
+  [0x3a, 0x68, 0x24],
+];
+const A6_HAIR: Array<[number, number, number]> = [
+  [0xc4, 0x78, 0x40],
+  [0x7a, 0x40, 0x28],
+  [0x4e, 0x28, 0x18],
+];
+const A6_OUTLINE: [number, number, number] = [0x3b, 0x23, 0x18];
+const A6_EYE: [number, number, number] = [0x2a, 0x18, 0x10];
+const A6_SKIN: [number, number, number] = [0xf5, 0xc9, 0xa0];
+
+function same(r: number, g: number, b: number, c: [number, number, number]) {
+  return r === c[0] && g === c[1] && b === c[2];
+}
+
+function tones(hex: string): Array<[number, number, number]> {
+  const base = parseHex(hex);
+  return [shade(base, 1.28), base, shade(base, 0.62)];
+}
+
+/** Exact shirt and hair colours from the A6 grids. Glasses posts are the outline pixels in the eye box. */
+export function tintA6(im: HTMLImageElement, look: PlayerLook): CanvasImageSource {
+  const key = `a6|${im.src}|${look.hoodie}|${look.hair}|${look.glasses ? 1 : 0}`;
+  const hit = recolorCache.get(key);
+  if (hit) return hit;
+  const c = document.createElement("canvas");
+  c.width = im.naturalWidth;
+  c.height = im.naturalHeight;
+  const g = c.getContext("2d");
+  if (!g) return im;
+  g.imageSmoothingEnabled = false;
+  g.drawImage(im, 0, 0);
+  const img = g.getImageData(0, 0, c.width, c.height);
+  const d = img.data;
+  const w = c.width;
+  const h = c.height;
+  if (!look.glasses) {
+    const eye = new Uint8Array(w * h);
+    for (let p = 0; p < w * h; p++) {
+      const i = p * 4;
+      if (d[i + 3] > 8 && same(d[i], d[i + 1], d[i + 2], A6_EYE)) eye[p] = 1;
+    }
+    for (let cy = 0; cy < h; cy += WALK_H) {
+      for (let cx = 0; cx < w; cx += WALK_W) {
+        let minX = 99;
+        let maxX = -1;
+        let minY = 99;
+        let maxY = -1;
+        for (let y = cy; y < cy + WALK_H && y < h; y++) {
+          for (let x = cx; x < cx + WALK_W && x < w; x++) {
+            if (!eye[y * w + x]) continue;
+            if (x < minX) minX = x;
+            if (x > maxX) maxX = x;
+            if (y < minY) minY = y;
+            if (y > maxY) maxY = y;
+          }
+        }
+        if (maxX < 0) continue;
+        for (let y = minY; y <= maxY; y++) {
+          for (let x = minX - 1; x <= maxX + 1; x++) {
+            if (x < 0 || x >= w) continue;
+            const i = (y * w + x) * 4;
+            if (d[i + 3] > 8 && same(d[i], d[i + 1], d[i + 2], A6_OUTLINE)) paint(d, i, A6_SKIN);
+          }
+        }
+      }
+    }
+  }
+  const shirt = tones(HOODIE_HEX[look.hoodie]);
+  const hair = tones(HAIR_HEX[look.hair]);
+  for (let i = 0; i < d.length; i += 4) {
+    if (d[i + 3] < 8) continue;
+    const r = d[i];
+    const gv = d[i + 1];
+    const b = d[i + 2];
+    for (let t = 0; t < 3; t++) {
+      if (same(r, gv, b, A6_SHIRT[t])) {
+        paint(d, i, shirt[t]);
+        break;
+      }
+      if (same(r, gv, b, A6_HAIR[t])) {
+        paint(d, i, hair[t]);
+        break;
+      }
+    }
+  }
+  g.putImageData(img, 0, 0);
+  recolorCache.set(key, c);
+  return c;
 }
 
 function parseHex(h: string): [number, number, number] {
@@ -620,11 +684,7 @@ export function drawPropPixel(
 ) {
   const ox = Math.floor(x);
   const oy = Math.floor(y);
-  const legacy = kind === "roof" || kind === "stack"
-    ? null
-    : loadArt(`/art/gen/props/${kind}.png?v=${kind === "boom" ? "gate2" : kind === "van" ? "tall1" : "eval1"}`);
-  const baked = loadArt(`/art/gen/props/${kind}.png?v=a6`);
-  const im = legacy ?? baked;
+  const im = loadArt(`/art/gen/props/${kind}.png`);
   if (im) {
     pix(ctx);
     const nw = im.naturalWidth;
