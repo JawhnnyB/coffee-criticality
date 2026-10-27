@@ -264,6 +264,14 @@ export function drawWorld(
         },
       });
     }
+    if (s.room === "control") {
+      const board = room.props.find((p) => p.kind === "board");
+      drawBoardA(g, board?.rect ?? { x: 64, y: 16, w: 80, h: 32 }, s.day, dayMark(s), now);
+      drawables.push({
+        y: 212,
+        draw: () => drawPaperLog(g, s.day, dayMark(s)),
+      });
+    }
   } else {
   for (const p of room.props) {
     if (FLOOR_PROP.has(p.kind)) {
