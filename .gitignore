@@ -3,3 +3,6 @@ node_modules/
 *.log
 .DS_Store
 coffee-and-criticality-web.zip
+
+__pycache__/
+*.pyc
