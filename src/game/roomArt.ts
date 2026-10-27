@@ -108,4 +108,13 @@ export const ROOM_STAMPS: Record<string, RoomStamp[]> = {
   ],
   gate: [],
 };
-export const A6_ROOMS = new Set(["cafe", "parlor", "corridor", "control", "engineering", "breakroom"]);
+export const A6_ROOMS = new Set([
+  "cafe",
+  "parlor",
+  "corridor",
+  "control",
+  "engineering",
+  "breakroom",
+  "reactor",
+  "maintenance",
+]);

@@ -182,7 +182,9 @@ def write_ts(stamps):
     lines.append("  gate: [],")
     lines.append("};")
     # Enabled set grows as rooms are wired. Cafe and parlor first.
-    lines.append('export const A6_ROOMS = new Set(["cafe", "parlor", "corridor", "control", "engineering", "breakroom"]);')
+    lines.append(
+        'export const A6_ROOMS = new Set(["cafe", "parlor", "corridor", "control", "engineering", "breakroom", "reactor", "maintenance"]);'
+    )
     (ROOT / "src/game/roomArt.ts").write_text("\n".join(lines) + "\n")
 
 
