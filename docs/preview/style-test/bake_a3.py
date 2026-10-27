@@ -553,7 +553,7 @@ def hue_report(im: np.ndarray) -> dict[str, float]:
     return dict(sorted(pct.items(), key=lambda kv: -kv[1]))
 
 
-def scene(sprites: dict[str, np.ndarray]) -> np.ndarray:
+def scene(sprites: dict[str, np.ndarray], with_player: bool = True) -> np.ndarray:
     im = np.zeros((SH, SW, 4), np.uint8)
     # Cream only on the upper wall. Teal wainscot under it.
     for y in range(0, 46):
@@ -681,11 +681,13 @@ def scene(sprites: dict[str, np.ndarray]) -> np.ndarray:
     b.plant(im, 214, 136, 1)
     oval_shadow(im, 218, 146, 6, 2)
 
-    player = sprites["player"]
-    foot = int(np.where(player[:, :, 3] > 0)[0].max())
-    px_x, py = 124, 158 - foot
-    oval_shadow(im, px_x + 14, 159, 9, 2)
-    b.stamp(im, player, px_x, py)
+    if with_player:
+        player = sprites["player"]
+        foot = int(np.where(player[:, :, 3] > 0)[0].max())
+        px_x = 124
+        py = 158 - foot
+        oval_shadow(im, px_x + 14, 159, 9, 2)
+        b.stamp(im, player, px_x, py)
     return im
 
 
