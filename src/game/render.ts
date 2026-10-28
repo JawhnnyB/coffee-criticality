@@ -1,3 +1,4 @@
+import { applyWorldPostFx, postFxOn, type Light } from "./postfx";
 import { ROOMS, residueKey, type ResidueHow, type RoomId } from "./content";
 import { LOOKS, PAL, drawChibi, drawEmote, pix } from "./pixel";
 import { A6_ROOMS } from "./roomArt";
@@ -184,6 +185,34 @@ export function drawWorld(
   const ox = Math.floor((viewW - dw) / 2);
   const oy = Math.floor((viewH - dh) / 2);
   ctx.drawImage(off, 0, 0, bw, bh, ox, oy, dw, dh);
+
+  if (postFxOn()) {
+    const tx = Math.round(bw / 2 - camX);
+    const ty = Math.round(bh / 2 - camY);
+    const toScreenX = (wx: number) => ox + (wx + tx) * zoom;
+    const toScreenY = (wy: number) => oy + (wy + ty) * zoom;
+    const lights: Light[] = [];
+    for (const p of room.props) {
+      if (p.kind !== "lamp") continue;
+      lights.push({
+        x: toScreenX(p.rect.x + p.rect.w / 2),
+        y: toScreenY(p.rect.y + p.rect.h / 2),
+        r: 70 * zoom,
+        color: "rgba(255,206,140,0.9)",
+        strength: 0.55,
+      });
+    }
+    for (const win of room.windows ?? []) {
+      lights.push({
+        x: toScreenX(win.rect.x + win.rect.w / 2),
+        y: toScreenY(win.rect.y + win.rect.h),
+        r: 90 * zoom,
+        color: "rgba(170,210,255,0.8)",
+        strength: 0.25,
+      });
+    }
+    applyWorldPostFx(ctx, { x: ox, y: oy, w: dw, h: dh }, lights);
+  }
 
   if (s.period !== "midday") {
     ctx.save();
