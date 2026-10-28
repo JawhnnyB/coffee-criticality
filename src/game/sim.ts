@@ -1158,13 +1158,22 @@ export function finishArcade(s: GameState, score: number, leftover = 0) {
   }
   pushLog(s, score >= 4 ? "peer" : "note", `Day ${s.day} · CATCH.CAB ${score}/5. ${score >= 4 ? "Eyes first." : "A lie walked."}`);
   if (score >= 4) {
-    bumpCulture(s, 6);
-    s.catches += 1;
+    // Replays do not stack: culture pays once per day, and a CATCH win never adds a catch.
+    // Catches now come only from incidents and the floor, so the ending gate needs real work.
+    const k = `cab:catch:d${s.day}`;
+    if (!s.flags[k]) {
+      s.flags[k] = true;
+      bumpCulture(s, 6);
+      pushMsg(s, "Mabel: Eyes like that belong on a live board. I'll chalk it.");
+    } else pushMsg(s, "Mabel: Same eyes, same board. Today's chalk is already up.");
     s.flags.catchMiss = false;
-    pushMsg(s, "Mabel: Eyes like that belong on a live board. I'll chalk it.");
   } else {
     s.flags.catchMiss = true;
-    bumpCulture(s, 2);
+    const mk = `cab:catch-miss:d${s.day}`;
+    if (!s.flags[mk]) {
+      s.flags[mk] = true;
+      bumpCulture(s, 2);
+    }
     pushMsg(s, "Mabel: You left a lie on the glass. Clock out and it becomes a hide.");
   }
   refreshObjective(s);
@@ -1182,6 +1191,13 @@ export function finishLeisure(s: GameState, score: number) {
   const delayRun = from === "delay";
   const physRun = from === "phys";
   const loadRun = from === "load";
+  // Culture from a cabinet pays once per day per cabinet, so replays cannot buy the ending.
+  const payOnce = (n: number) => {
+    const k = `cab:${from}:d${s.day}`;
+    if (s.flags[k]) return;
+    s.flags[k] = true;
+    bumpCulture(s, n);
+  };
   const back = s.returnMode === "eod" ? "eod" : s.returnMode === "academy" ? "academy" : "play";
   if (from === "horde") s.scores.hordeBest = Math.max(s.scores.hordeBest, score);
   if (from === "golf") {
@@ -1194,7 +1210,7 @@ export function finishLeisure(s: GameState, score: number) {
       s.scores.delayEvents = Math.max(s.scores.delayEvents, 2);
       pushLog(s, "note", `Day ${s.day} · DELAY.CAB survived two transients.`);
       pushMsg(s, "Mabel: The slope punched. You stayed on it.");
-      bumpCulture(s, 6);
+      payOnce(6);
     } else if (score === 0) {
       s.flags.delayPrompt = true;
       pushLog(s, "note", `Day ${s.day} · DELAY.CAB went $1. The delay was spent.`);
@@ -1211,12 +1227,12 @@ export function finishLeisure(s: GameState, score: number) {
       s.flags.physMcHeld = true;
       pushLog(s, "note", `Day ${s.day} · PHYS.CAB analog MC held k ± σ.`);
       pushMsg(s, "Priya: Analog k. Fission bank. σ falls with G. OpenMC stays a letter.");
-      bumpCulture(s, 6);
+      payOnce(6);
     } else if (score >= 8) {
       s.flags.physPlayed = true;
       pushLog(s, "note", `Day ${s.day} · PHYS.CAB held the pin and the hill.`);
       pushMsg(s, "Priya: A pin is not a plant. You watched why.");
-      bumpCulture(s, 6);
+      payOnce(6);
     } else if (score === 0) {
       pushMsg(s, "Priya: k ran. Same cliff as DELAY — this time it had a shape.");
     } else if (score === 1) {
@@ -1228,11 +1244,11 @@ export function finishLeisure(s: GameState, score: number) {
     if (score >= 9) {
       pushLog(s, "note", `Day ${s.day} · LOAD.CAB held five pulses. The load was the opponent.`);
       pushMsg(s, "Mabel: You saw the pulse. You placed one catch. I'll chalk it.");
-      bumpCulture(s, 6);
+      payOnce(6);
     } else if (score >= 7) {
       pushLog(s, "note", `Day ${s.day} · LOAD.CAB held the night.`);
       pushMsg(s, "Mabel: The load moved. You placed.");
-      bumpCulture(s, 4);
+      payOnce(4);
     } else {
       pushMsg(s, "Mabel: The load walked. Catch is cheaper than a search.");
     }
@@ -1243,7 +1259,10 @@ export function finishLeisure(s: GameState, score: number) {
   s.flags.arcade = true;
   setGoal(s, "arcade");
   if (back === "play") addMinutes(s, 6);
-  if (score >= 3 && !delayRun && !physRun && !loadRun) bumpCulture(s, 4);
+  if (score >= 3 && !delayRun && !physRun && !loadRun) payOnce(4);
+  // Hosts pay trust for a good score: Jordan bowls, Mabel golfs. Scores are higher-is-better.
+  if (score >= 3 && from === "bowl") bumpTrust(s, "jordan", 2);
+  if (score >= 3 && from === "golf") bumpTrust(s, "mabel", 2);
   refreshObjective(s);
 }
 export function abortOverlay(s: GameState) {

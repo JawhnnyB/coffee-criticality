@@ -1944,6 +1944,9 @@ function AcademyStage({
         )}
         {page.extra === "reactivity" && (
           <>
+            <p className="mt-3 font-mono text-xs text-good">
+              Delayed: T ≈ (β − ρ) / (λ̄ ρ), a slope. Prompt: T ≈ ℓ / ρ, a cliff. ℓ ~ 10⁻⁴ s thermal. If the count rate surprises you, stop.
+            </p>
             <AcademyQuiz
               options={[
                 { id: "pull", label: "Count rate jumped. Pull more rods to catch it.", ok: false, good: "", bad: "Prompt is a cliff. Stop." },
@@ -1951,10 +1954,22 @@ function AcademyStage({
                 { id: "wait", label: "Green board. Wait and see.", ok: false, good: "", bad: "Green boards hide expensive rooms." },
               ]}
             />
+            <AcademyQuiz
+              options={[
+                { id: "more", label: "You want more β. Higher is safer, always.", ok: false, good: "", bad: "β is a mix, not a trophy. Know where the cliff is." },
+                { id: "dollar", label: "ρ / β. One dollar is prompt-critical. We do not live there.", ok: true, good: "Dollars name the cliff. Delayed neutrons are the clock.", bad: "" },
+                { id: "switch", label: "k is a switch. Delayed is a footnote.", ok: false, good: "", bad: "k has no clock on these cards. The floor does." },
+              ]}
+            />
             <button type="button" className="btn-primary mt-4" onClick={onDelay} data-testid="play-delay">
               Play DELAY.CAB
             </button>
           </>
+        )}
+        {page.extra === "rods" && (
+          <button type="button" className="btn-primary mt-4" onClick={onRods} data-testid="play-rods">
+            Play ROD.BANK
+          </button>
         )}
         {page.extra === "six" && (
           <>
@@ -2025,30 +2040,6 @@ function AcademyStage({
               { id: "holt", label: "Holt wants volume, so keep moving.", ok: false, good: "", bad: "Holt wants times. A hide is not volume." },
             ]}
           />
-        )}
-        {page.extra === "period" && (
-          <>
-            <p className="mt-3 font-mono text-xs text-good">
-              Delayed: T ≈ (β − ρ) / (λ̄ ρ) — a slope. Prompt: T ≈ ℓ / ρ — a cliff. ℓ ~ 10⁻⁴ s thermal. If the count rate surprises you, stop.
-            </p>
-            <button type="button" className="btn-primary mt-4" onClick={onDelay}>
-              Play DELAY.CAB
-            </button>
-          </>
-        )}
-        {page.extra === "beta" && (
-          <>
-            <AcademyQuiz
-              options={[
-                { id: "more", label: "You want more β. Higher is safer, always.", ok: false, good: "", bad: "β is a mix, not a trophy. Know where the cliff is." },
-                { id: "dollar", label: "ρ / β. One dollar is prompt-critical. We do not live there.", ok: true, good: "Dollars name the cliff. Delayed neutrons are the clock.", bad: "" },
-                { id: "switch", label: "k is a switch. Delayed is a footnote.", ok: false, good: "", bad: "k has no clock on these cards. The floor does." },
-              ]}
-            />
-            <button type="button" className="btn-ghost mt-3" onClick={onRods}>
-              Play ROD.BANK
-            </button>
-          </>
         )}
         {page.extra === "types" && (
           <div className="mt-4 grid grid-cols-2 gap-2">

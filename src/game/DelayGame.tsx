@@ -4,9 +4,12 @@ import { useEffect, useRef, useState } from "react";
 import { Bezel } from "./Arcade";
 import { duckHit, playPeriodTick } from "./audio";
 
-/** Classroom Keepin U-235 thermal 6-group. Lambdas sped ~8× so a cabinet can feel them. Not a license. */
+/** Classroom Keepin U-235 thermal 6-group. Lambdas sped ~8× so a cabinet can feel them. Not a license.
+ * LAMBDA is the generation time. Smaller means power responds faster, so a $0.5 step climbs from n 1.0
+ * to about 5 in 4 s (Λ 0.055 took 1.6). The fail check at n > 28 stays; the clamp keeps one frame bounded. */
 const BETA = 0.0065;
-const LAMBDA = 0.055;
+const LAMBDA = 0.005;
+const N_MAX = 40;
 const SOURCE = 0.08;
 const GROUPS = [
   { lam: 0.0124 * 8, beta: 0.000215, color: "#c9a227", name: "1 Br-87" },
@@ -191,7 +194,7 @@ export function DelayGame({ onDone, onAbort }: { onDone: (score: number) => void
       let delayed = 0;
       for (let i = 0; i < 6; i++) delayed += GROUPS[i].lam * C[i];
       const dn = ((rho - BETA) / LAMBDA) * n + delayed + SOURCE;
-      n = Math.max(0.02, n + dn * dt);
+      n = Math.min(N_MAX, Math.max(0.02, n + dn * dt));
       for (let i = 0; i < 6; i++) {
         C[i] += ((GROUPS[i].beta / LAMBDA) * n - GROUPS[i].lam * C[i]) * dt;
         C[i] = Math.max(0, C[i]);

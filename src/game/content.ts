@@ -1036,7 +1036,8 @@ export const ACADEMY: AcademyPage[] = [
   { title: "Four barriers", still: "barriers", extra: "barriers", track: "safety", body: "Fuel ceramic. Clad. Reactor coolant pressure boundary. Containment. A catch on a tag is the cheap layer." },
   { title: "STAR — stop before the twist", still: "star", extra: "star", track: "safety", body: "Stop. Think. Act. Review. Questioning attitude is a protocol, not a personality. Stop-work is allowed." },
   { title: "Three-way communication", still: "comms", extra: "comms", track: "safety", body: "Sender speaks. Receiver repeats. Sender acknowledges. A nod is how blanks get initials." },
-  { title: "Reactivity — hold it in time", still: "reactivity", extra: "reactivity", track: "physics", body: "β is the delayed fraction. Dollars are ρ/β. $1 is prompt-critical. Play DELAY.CAB. The cards have no clock." },
+  { title: "Reactivity in three stages", still: "reactivity", extra: "reactivity", track: "physics", body: "Stage 1, the delay: about 0.65% of U-235 thermal neutrons come late, from fragments. That is β. Stage 2, the dollar: ρ($) = ρ/β, so $1 is prompt-critical, the cliff. Stage 3, the period: T is the slope. Delayed neutrons buy seconds. Past $1 the period collapses to the prompt lifetime. The cards have no clock." },
+  { title: "Control rods are a spare absorber", still: "reactor", extra: "rods", track: "physics", body: "A rod is a block of absorber you can move. Pull it out and the pellet eats fewer neutrons, so k rises. Push it in and k falls. Operators hold k near 1 with rods and boron as spare Σ_a. Rods hold power; they are not a switch that makes it. Four banks, 228 steps, a cooldown between moves. Play ROD.BANK. Teaching model — not a license." },
   { title: "Six-factor formula", still: "six", extra: "six", track: "physics", body: "k∞ = ε p f η. k_eff = k∞ · PNL. A pin is not a plant. Play PHYS.CAB — fission in the pellet, leak at the edge." },
   { title: "Monte Carlo methods", still: "export", extra: "mc", track: "physics", body: "Analog generation k. Histories, fission bank, k ± σ. 1/√G is the wait. Implicit capture is a transient, not a quiz. OpenMC stays a letter. Play analog MC in PHYS.CAB." },
   { title: "Temperature is a catch", still: "feedback", extra: "feedback", track: "physics", body: "Doppler is the pellet. MTC is the water. Two temperatures, two timescales." },
@@ -1044,8 +1045,6 @@ export const ACADEMY: AcademyPage[] = [
   { title: "LOTOTO — lock, tag, try", still: "lototo", extra: "lototo", track: "safety", body: "Lock out. Tag out. Try out. Zero energy. A leftover IN SERVICE tag is how people go home late." },
   { title: "Independent verification", still: "verify", extra: "verify", track: "safety", body: "A second set of eyes. Not a nod. Teaching only." },
   { title: "Stop when unsure", still: "conservative", extra: "conservative", track: "safety", body: "Stop-work is allowed. Faster is how occurrence reports get born." },
-  { title: "Reactor period", still: "period", extra: "period", track: "physics", body: "T is the slope. Delayed neutrons buy you the second. $1 spends them." },
-  { title: "β, dollars, the cliff", still: "delayed", extra: "beta", track: "physics", body: "β ≈ 0.0065 U-235 thermal. ρ($) = ρ/β. Prompt-critical at $1. Circulating MSR: β_eff < β." },
 ];
 
 export const ACADEMY_FUEL = ACADEMY.findIndex((p) => p.extra === "shuffle");
