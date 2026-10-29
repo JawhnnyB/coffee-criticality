@@ -38,7 +38,7 @@ import { FuelShuffle } from "./FuelShuffle";
 import { MaintGame } from "./MaintGame";
 import { isMuted, playBed, playBlip, setMuted, unlockAudio, syncWorld, getAudioProbe, bedForRoom } from "./audio";
 import { isRevealing, requestSkip } from "./chatter";
-import { Chatter } from "./Chatter";
+import { Chatter } from "./ChatterLine";
 import { heartCount } from "./pixel";
 import { drawWorld, glyphWidth, paintGlyphs, preloadRoomArt } from "./render";
 import { DEFAULT_PLANT, plantTitle, type PlantDesign } from "./plant";

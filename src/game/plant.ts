@@ -27,6 +27,16 @@ export interface PlantDesign {
   shuffleMap?: ShuffleCell[];
 }
 
+/** One source for the Builder and the Trainer. ΔT at power/flow = 1 (°C), the hold band, cold leg at flow 100. */
+export const DT_AT_UNIT: Record<PlantType, number> = { pwr: 32, bwr: 12, pebble: 475, msr: 58 };
+export const DT_BAND: Record<PlantType, { lo: number; hi: number }> = {
+  pwr: { lo: 28, hi: 36 },
+  bwr: { lo: 8, hi: 14 },
+  pebble: { lo: 450, hi: 500 },
+  msr: { lo: 40, hi: 80 },
+};
+export const T_COLD_AT_FLOW100: Record<PlantType, number> = { pwr: 292, bwr: 275, pebble: 260, msr: 620 };
+
 export const DEFAULT_PLANT: PlantDesign = {
   type: "pwr",
   powerMW: 1100,
@@ -59,7 +69,7 @@ export function withTypeDefaults(p: PlantDesign, type: PlantType): PlantDesign {
     next.coolantTempK = 900;
     next.fuelTempK = 1200;
     next.fuelDensity = 10.97;
-    next.dT = 200;
+    next.dT = DT_AT_UNIT.pebble;
     if (next.enrich < 6) next.enrich = 8.5;
   } else if (type === "msr") {
     next.coolantDensity = 1.95;

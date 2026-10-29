@@ -115,7 +115,7 @@ type Item = {
   phase?: number;
 };
 type Deco = { x: number; y: number; w: number; h: number; label: string; ink: string };
-type Board = { items: Item[]; deco: Deco[]; prompt: string; kind: Kind };
+type Board = { items: Item[]; deco: Deco[]; prompt: string; kind: Kind; clean?: boolean };
 
 function pickLie(n: number) {
   return Math.floor(Math.random() * n);
@@ -330,15 +330,36 @@ const POOL: (() => Board)[] = [
   makeBadge,
 ];
 
-function shuffleFive(): Board[] {
-  const idx = POOL.map((_, i) => i);
-  for (let i = idx.length - 1; i > 0; i--) {
+/** The board that rehearses each day's real incident. Day 5 is the fuel shuffle, so it rehearses a gauge. */
+const DAY_BOARD: Record<number, () => Board> = {
+  1: makeValve,
+  2: makeTag,
+  3: makeDose,
+  4: makeLog,
+  5: makeGauge,
+};
+
+/** Make a board with no lie: the right move is to sign it clean. Crying wolf on it costs time. */
+function cleanBoard(make: () => Board): Board {
+  const b = make();
+  for (const it of b.items) it.lie = false;
+  b.clean = true;
+  b.prompt = "Nothing is wrong here. Press SPACE to sign it clean.";
+  return b;
+}
+
+/** Today's board first (the week's lie), then four more, one of them clean. */
+function deckFor(day: number): Board[] {
+  const first = DAY_BOARD[day] ?? makeValve;
+  const rest = POOL.filter((m) => m !== first);
+  for (let i = rest.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
-    const t = idx[i];
-    idx[i] = idx[j];
-    idx[j] = t;
+    [rest[i], rest[j]] = [rest[j], rest[i]];
   }
-  return idx.slice(0, BOARDS).map((i) => POOL[i]());
+  const deck = [first(), ...rest.slice(0, BOARDS - 1).map((m) => m())];
+  const cleanAt = 1 + Math.floor(Math.random() * (BOARDS - 1));
+  deck[cleanAt] = cleanBoard(rest[cleanAt - 1]);
+  return deck;
 }
 
 function drawValve(ctx: CanvasRenderingContext2D, it: Item) {
@@ -570,7 +591,7 @@ export function Arcade({
     if (!ctx) return;
     ctx.imageSmoothingEnabled = false;
 
-    const deck = shuffleFive();
+    const deck = deckFor(day);
     let round = 0;
     let board = deck[0];
     let clock = CLOCK;
@@ -598,19 +619,12 @@ export function Arcade({
         playHuntMiss();
         return;
       }
-      if (it.lie) {
+      if (it.lie && !board.clean) {
         caught += 1;
         hitFlash = 0.22;
         clock += 1.4;
         playHuntHit();
-        round += 1;
-        if (round >= BOARDS) {
-          over = true;
-          setEnd({ caught, time: Math.max(0, clock) });
-          setPhase("end");
-          return;
-        }
-        board = deck[round];
+        advance();
       } else {
         miss += 1;
         flash = 0.32;
@@ -620,6 +634,16 @@ export function Arcade({
       }
     };
 
+    const advance = () => {
+      round += 1;
+      if (round >= BOARDS) {
+        over = true;
+        setEnd({ caught, time: Math.max(0, clock) });
+        setPhase("end");
+        return;
+      }
+      board = deck[round];
+    };
     const click = (e: MouseEvent) => hit(e.clientX, e.clientY);
     const touch = (e: TouchEvent) => {
       const t = e.touches[0] || e.changedTouches[0];
@@ -627,6 +651,14 @@ export function Arcade({
     };
     const key = (e: KeyboardEvent) => {
       if (e.code === "Escape") onAbort();
+      if (e.code === "Space" && !over && board.clean) {
+        // Signing a clean board is a catch too: you did not cry wolf and you still read it.
+        caught += 1;
+        hitFlash = 0.22;
+        clock += 1.4;
+        playHuntHit();
+        advance();
+      }
     };
     canvas.addEventListener("mousedown", click);
     canvas.addEventListener("touchend", touch, { passive: true });

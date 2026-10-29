@@ -12,6 +12,7 @@ import {
   PHYSICS_TERMS,
   TERM_ART,
   TERM_LESSONS,
+  verdictWords,
   type TermLesson,
 } from "./nuclearLab";
 
@@ -199,6 +200,11 @@ export function NuclearDesk({
       <p className="mt-2 font-mono text-[11px] text-good" data-testid="k-ladder">
         k∞ {k.kInf.toFixed(3)} · rod {k.kRod.toFixed(3)} · asm {k.kAsm.toFixed(3)} · core {k.kCore.toFixed(3)}
         <span className="ml-2 text-subtle">teaching proxy</span>
+      </p>
+
+      <p className="mt-2 text-sm leading-relaxed text-fg" data-testid="verdict">
+        <span className="teach-kicker mr-2">VERDICT</span>
+        {verdictWords(k.kCore, k.kInf)}
       </p>
 
       {!compact && (

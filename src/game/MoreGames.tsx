@@ -500,9 +500,12 @@ export function RodsGame({ onDone, onAbort }: { onDone: (score: number) => void;
   );
 }
 
+/** Pebble stats for the compare card: how many passes a pebble made, and how many reached the core. */
+type PebbleStats = { score: number; finished: number; passes: number; core: number };
+
 export function PebbleGame({ onDone, onAbort }: { onDone: (score: number) => void; onAbort: () => void }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [end, setEnd] = useState<number | null>(null);
+  const [end, setEnd] = useState<PebbleStats | null>(null);
   const endRef = useRef(false);
 
   useEffect(() => {
@@ -522,10 +525,16 @@ export function PebbleGame({ onDone, onAbort }: { onDone: (score: number) => voi
       }
     }
     const bins = [0, 2, 4, 8, 4, 2, 0];
-    type Ball = { x: number; y: number; vx: number; vy: number; live: boolean };
+    type Ball = { x: number; y: number; vx: number; vy: number; live: boolean; passes: number };
     let balls: Ball[] = [];
     let left = 7;
     let score = 0;
+    // Multi-pass: a pebble that lands in a fuel bin goes back up the loop. Each visit is a pass.
+    // It finishes in the core, leaks in an edge bin, or runs out of passes (three visits).
+    const MAX_PASSES = 3;
+    let finished = 0;
+    let totalPasses = 0;
+    let coreHits = 0;
     let last = performance.now();
     let raf = 0;
     let dropX = W / 2;
@@ -548,7 +557,7 @@ export function PebbleGame({ onDone, onAbort }: { onDone: (score: number) => voi
       if (left <= 0) return;
       if (balls.some((b) => b.live && b.y < 40)) return;
       left -= 1;
-      balls.push({ x: Math.max(24, Math.min(W - 24, dropX)), y: 18, vx: (Math.random() - 0.5) * 20, vy: 10, live: true });
+      balls.push({ x: Math.max(24, Math.min(W - 24, dropX)), y: 18, vx: (Math.random() - 0.5) * 20, vy: 10, live: true, passes: 0 });
     };
     window.addEventListener("keydown", down);
     canvas.addEventListener("mousemove", move);
@@ -590,14 +599,31 @@ export function PebbleGame({ onDone, onAbort }: { onDone: (score: number) => voi
           }
         }
         if (b.y > 158) {
-          b.live = false;
           const i = Math.max(0, Math.min(6, Math.floor(b.x / (W / 7))));
-          score += bins[i];
+          const isEdge = i === 0 || i === 6;
+          const isCore = i === 3;
+          const isFuel = !isEdge && !isCore;
+          if (isFuel && b.passes + 1 < MAX_PASSES) {
+            // Back up the loop for another pass through the core.
+            b.passes += 1;
+            totalPasses += 1;
+            b.y = 18;
+            b.x = Math.max(24, Math.min(W - 24, b.x));
+            b.vx = (Math.random() - 0.5) * 30;
+            b.vy = 10;
+          } else {
+            b.live = false;
+            b.passes += 1;
+            totalPasses += 1;
+            finished += 1;
+            if (isCore) coreHits += 1;
+            score += bins[i];
+          }
         }
       }
       if (left <= 0 && balls.every((b) => !b.live)) {
         endRef.current = true;
-        setEnd(score);
+        setEnd({ score, finished, passes: totalPasses, core: coreHits });
         return;
       }
 
@@ -628,7 +654,7 @@ export function PebbleGame({ onDone, onAbort }: { onDone: (score: number) => voi
       ctx.fillStyle = "#f3e6d0";
       ctx.fillRect(dropX - 4, 8, 8, 6);
       ctx.font = "8px monospace";
-      ctx.fillText(`TRISO  left ${left}  score ${score}  hopper gate  click to drop`, 8, 10);
+      ctx.fillText(`TRISO  left ${left}  score ${score}  passes ${totalPasses}  hopper gate  click to drop`, 8, 10);
 
       raf = requestAnimationFrame(loop);
     };
@@ -642,14 +668,27 @@ export function PebbleGame({ onDone, onAbort }: { onDone: (score: number) => voi
   }, [end, onAbort]);
 
   if (end !== null) {
+    const avg = end.finished > 0 ? end.passes / end.finished : 0;
     return (
       <Bezel>
-        <p className="font-mono text-xs tracking-widest text-good">PEBBLE.CAB  ·  TRISO  ·  teaching only</p>
-        <h2 className="font-display mt-2 text-2xl text-good">{end} in the catcher</h2>
+        <p className="font-mono text-xs tracking-widest text-good">PEBBLE.CAB  ·  TRISO  ·  COMPARE  ·  teaching only</p>
+        <h2 className="font-display mt-2 text-2xl text-good">{end.score} in the catcher</h2>
+        <div className="mt-3 grid grid-cols-2 gap-3 font-mono text-xs text-good/90">
+          <div className="border border-border p-2">
+            <div className="teach-kicker">PWR pin</div>
+            <p className="mt-1">One pass through the core. Then the pin is spent and the bundle goes to the pool.</p>
+          </div>
+          <div className="border border-border p-2">
+            <div className="teach-kicker">This pebble bed</div>
+            <p className="mt-1">
+              {avg.toFixed(1)} passes per pebble on average. {end.core} of {end.finished} finished in the core.
+            </p>
+          </div>
+        </div>
         <p className="mt-3 font-mono text-sm text-good/80">
-          A pebble is not a plant. Helium is the courier. Leakage is the bins on the edge.
+          A pebble is not a plant. Helium is the courier. The bed returns pebbles until they have seen the core enough. Leakage is the bins on the edge.
         </p>
-        <button type="button" className="btn-primary mt-5" onClick={() => onDone(Math.min(8, Math.floor(end / 4)))}>
+        <button type="button" className="btn-primary mt-5" onClick={() => onDone(Math.min(8, Math.floor(end.score / 4)))}>
           Leave hopper
         </button>
       </Bezel>
@@ -711,12 +750,18 @@ export function BowlGame({ onDone, onAbort }: { onDone: (score: number) => void;
     let score = 0;
     let last = performance.now();
     let raf = 0;
+    // Teaching proxy, not the physics: each roll is a generation. k = pins this roll knocked down
+    // divided by pins the previous roll knocked down. Above 1 the falls are multiplying.
+    let downAtFire = 0;
+    let prevFalls = 0;
+    let kLive: number | null = null;
 
     const fire = () => {
       if (rolling) return;
       charging = false;
       rolling = true;
       balls += 1;
+      downAtFire = pins.filter((p) => !p.up).length;
       bvx = Math.sin(aim) * (80 + power * 160);
       bvy = -Math.cos(aim) * (80 + power * 180);
     };
@@ -800,6 +845,9 @@ export function BowlGame({ onDone, onAbort }: { onDone: (score: number) => void;
         }
         if (by < 12 || (Math.hypot(bvx, bvy) < 8 && by < 120)) {
           const knocked = pins.filter((p) => !p.up).length;
+          const falls = Math.max(0, knocked - downAtFire);
+          kLive = prevFalls > 0 ? falls / prevFalls : null;
+          prevFalls = falls;
           if (knocked === 10 || balls >= 2) resetFrame(knocked);
           else {
             rolling = false;
@@ -815,10 +863,10 @@ export function BowlGame({ onDone, onAbort }: { onDone: (score: number) => void;
       ctx.fillStyle = "#2a221b";
       ctx.fillRect(0, 0, W, H);
       ctx.fillStyle = "#c9a227";
-      ctx.fillRect(70, 12, 180, 156);
+      ctx.fillRect(70, 30, 180, 138);
       ctx.fillStyle = "#b89040";
-      ctx.fillRect(70, 12, 8, 156);
-      ctx.fillRect(242, 12, 8, 156);
+      ctx.fillRect(70, 30, 8, 138);
+      ctx.fillRect(242, 30, 8, 138);
       for (const p of pins) {
         ctx.fillStyle = p.up ? "#f3e6d0" : "#8a7864";
         ctx.fillRect(p.x - 3, p.y - 6, 6, 10);
@@ -841,6 +889,9 @@ export function BowlGame({ onDone, onAbort }: { onDone: (score: number) => void;
       ctx.fillStyle = "#f3e6d0";
       ctx.font = "8px monospace";
       ctx.fillText(`frame ${frame + 1}/3  ball ${balls + (rolling ? 0 : 1)}  score ${score}  A/D aim  hold fire`, 8, 12);
+      const kText = kLive === null ? "k —" : `k ${kLive.toFixed(2)}`;
+      const kWord = kLive === null ? "first generation" : kLive > 1.05 ? "the falls multiply" : kLive < 0.95 ? "the falls die out" : "holding steady";
+      ctx.fillText(`${kText}  ${kWord}  (teaching proxy)`, 8, 24);
 
       raf = requestAnimationFrame(loop);
     };

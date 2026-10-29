@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { integerScale } from "./artScale";
 import { DEFAULT_PLAYER_LOOK, type HairId, type HoodieId, type PlayerLook } from "./artSpec";
-import { Chatter } from "./Chatter";
+import { Chatter } from "./ChatterLine";
 import { isRevealing, subscribeReveal } from "./chatter";
 import type { IntroBeat, RoleId } from "./content";
 import { NPCS, ROLES } from "./content";

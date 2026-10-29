@@ -10,9 +10,10 @@ const CLOCK = 32;
 
 type Tag = { x: number; y: number; w: number; h: number; lie: boolean; label: string };
 
-function layout(): Tag[] {
-  const labels = ["LOCK", "TAG", "TRY", "ISO", "LOTO", "LOTO", "TAG", "ISO", "SVC"];
-  const lie = 8;
+/** The orange IN SERVICE tag lands in a random slot each time, so the hunt is never a memorised click. */
+function layout(lie: number): Tag[] {
+  const base = ["LOCK", "TAG", "TRY", "ISO", "LOTO", "LOTO", "TAG", "ISO"];
+  const labels = [...base.slice(0, lie), "SVC", ...base.slice(lie)];
   const tags: Tag[] = [];
   for (let i = 0; i < 9; i++) {
     const c = i % 3;
@@ -23,7 +24,7 @@ function layout(): Tag[] {
       w: 86,
       h: 40,
       lie: i === lie,
-      label: i === lie ? "SVC" : labels[i],
+      label: labels[i],
     });
   }
   return tags;
@@ -38,6 +39,7 @@ export function MaintGame({
   onAbort: () => void;
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [lieAt] = useState(() => Math.floor(Math.random() * 9));
   const [phase, setPhase] = useState<"brief" | "play" | "end">("brief");
   const [end, setEnd] = useState<{ ok: boolean; time: number } | null>(null);
 
@@ -49,7 +51,7 @@ export function MaintGame({
     if (!ctx) return;
     ctx.imageSmoothingEnabled = false;
 
-    const tags = layout();
+    const tags = layout(lieAt);
     let clock = CLOCK;
     let flash = 0;
     let hitFlash = 0;
@@ -170,7 +172,7 @@ export function MaintGame({
       canvas.removeEventListener("touchend", touch);
       window.removeEventListener("keydown", key);
     };
-  }, [phase, onAbort]);
+  }, [phase, onAbort, lieAt]);
 
   if (phase === "brief") {
     return (

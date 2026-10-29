@@ -3,117 +3,35 @@
 import { useEffect, useRef, useState } from "react";
 import { Bezel } from "./Arcade";
 import { playBlip, playCatch, playHuntMiss } from "./audio";
+import {
+  CH,
+  CW,
+  H,
+  OX,
+  OY,
+  W,
+  type Action,
+  type Cell,
+  type End,
+  type Line,
+  type Snap,
+  TURNS,
+  IDLE,
+  N,
+  clone,
+  fresh,
+  forecast,
+  lineName,
+  makePulses,
+  onLine,
+  powerOf,
+  resolve,
+  HOT,
+} from "./loadRules";
 
 /** LOAD.CAB — the load is the opponent. Perfect-info, one action, then it moves.
  *  PWR rods from above (a row or a column). Xenon follows power. A leak at the edge is PNL.
  *  Teaching model — not a license. Not a quiz. */
-
-const N = 4;
-const TURNS = 5;
-const W = 320;
-const H = 180;
-const OX = 56;
-const OY = 34;
-const CW = 52;
-const CH = 32;
-const HOT = 4;
-
-type Axis = "row" | "col";
-type Line = { axis: Axis; i: number };
-type Cell = { p: number; xe: number; leak: number };
-type Action = { kind: "rod"; line: Line } | { kind: "catch"; r: number; c: number };
-type End = { ok: boolean; score: number; line: string };
-
-const PULSE: Line[] = [
-  { axis: "row", i: 1 },
-  { axis: "col", i: 2 },
-  { axis: "row", i: 0 },
-  { axis: "col", i: 1 },
-  { axis: "row", i: 2 },
-];
-
-function fresh(): Cell[] {
-  const cells: Cell[] = [];
-  for (let i = 0; i < N * N; i++) cells.push({ p: 0, xe: 0, leak: 0 });
-  cells[1 * N + 1].p = 1;
-  cells[2 * N + 2].p = 1;
-  cells[0 * N + 3].leak = 1;
-  return cells;
-}
-
-function onLine(r: number, c: number, line: Line) {
-  return line.axis === "row" ? r === line.i : c === line.i;
-}
-
-function clone(cells: Cell[]) {
-  return cells.map((c) => ({ ...c }));
-}
-
-function resolve(cells: Cell[], pulse: Line, act: Action, turn: number): { cells: Cell[]; fail: string | null; caught: boolean } {
-  const next = clone(cells);
-  let fail: string | null = null;
-  let caught = false;
-  const rod = act.kind === "rod" ? act.line : null;
-  if (act.kind === "catch") {
-    const cell = next[act.r * N + act.c];
-    if (cell.leak > 0) {
-      cell.leak = 0;
-      caught = true;
-    }
-  }
-
-  for (let r = 0; r < N; r++) {
-    for (let c = 0; c < N; c++) {
-      const cell = next[r * N + c];
-      if (cell.xe > 0) {
-        cell.p = Math.max(0, cell.p - 1);
-        cell.xe -= 1;
-      }
-      if (rod && onLine(r, c, rod)) cell.p = Math.max(0, cell.p - 1);
-      if (onLine(r, c, pulse) && !(rod && onLine(r, c, rod))) cell.p += 1;
-      if (cell.p >= 2) cell.xe = Math.min(2, cell.xe + 1);
-      if (cell.p >= HOT) fail = "HOT. One assembly through the fat of the curve. Holt: volume, not a speech.";
-    }
-  }
-
-  for (let r = 0; r < N; r++) {
-    for (let c = 0; c < N; c++) {
-      const cell = next[r * N + c];
-      if (cell.leak <= 0) continue;
-      cell.leak += 1;
-      if (cell.leak < 3) continue;
-      const edge = r === 0 || c === 0 || r === N - 1 || c === N - 1;
-      if (edge) {
-        cell.leak = 0;
-        fail = fail ?? "Leak walked off the board. PNL. Catch is cheaper than a search.";
-      } else {
-        cell.leak = 0;
-        const nr = r < 2 ? r - 1 : r + 1;
-        const rr = Math.max(0, Math.min(N - 1, nr));
-        next[rr * N + c].leak = Math.max(next[rr * N + c].leak, 2);
-      }
-    }
-  }
-
-  if (turn === 1 || turn === 3) {
-    const spots = [
-      [0, 0],
-      [0, 3],
-      [3, 0],
-      [3, 3],
-      [0, 1],
-      [3, 2],
-    ];
-    const [sr, sc] = spots[turn % spots.length];
-    if (next[sr * N + sc].leak === 0) next[sr * N + sc].leak = 1;
-  }
-
-  return { cells: next, fail, caught };
-}
-
-function powerOf(cells: Cell[]) {
-  return cells.reduce((a, c) => a + c.p, 0);
-}
 
 export function LoadGame({ onDone, onAbort }: { onDone: (score: number) => void; onAbort: () => void }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -121,6 +39,8 @@ export function LoadGame({ onDone, onAbort }: { onDone: (score: number) => void;
   const [end, setEnd] = useState<End | null>(null);
   const [hud, setHud] = useState("turn 1 / 5");
   const endRef = useRef(false);
+  const undoRef = useRef(1);
+  const failRef = useRef<string | null>(null);
 
   useEffect(() => {
     if (phase !== "play") return;
@@ -130,9 +50,12 @@ export function LoadGame({ onDone, onAbort }: { onDone: (score: number) => void;
     if (!ctx) return;
     ctx.imageSmoothingEnabled = false;
 
+    const PULSE = makePulses();
     let cells = fresh();
     let turn = 0;
     let telegraph = PULSE[0];
+    let snap: Snap | null = null;
+    undoRef.current = 1;
     let hover: { kind: "row" | "col" | "cell"; a: number; b?: number } | null = null;
     let flash = 0;
     let lastAct: Action | null = null;
@@ -216,8 +139,16 @@ export function LoadGame({ onDone, onAbort }: { onDone: (score: number) => void;
         ctx.fillStyle = `rgba(201,162,39,${Math.min(0.35, flash)})`;
         ctx.fillRect(OX, OY, N * CW, N * CH);
       }
+      const f = forecast(cells, PULSE, turn);
+      ctx.fillStyle = f.fail ? "#b85c4a" : "#6b8f71";
+      ctx.fillText(`idle 2 turns: ${f.fail ? "FAILS" : "holds"} · xenon ${f.xe}`, 8, H - 20);
       ctx.fillStyle = "#8a7864";
-      ctx.fillText("letter/number = rod that line   click L = catch   one action", 8, H - 8);
+      if (failRef.current) {
+        ctx.fillStyle = "#c9a227";
+        ctx.fillText(`Z undo (${undoRef.current} left) · Enter accept the fail`, 8, H - 8);
+      } else {
+        ctx.fillText(`1–4 row · A–D col · click L catch · Z undo (${undoRef.current} left)`, 8, H - 8);
+      }
     };
 
     const hit = (mx: number, my: number): Action | null => {
@@ -276,6 +207,7 @@ export function LoadGame({ onDone, onAbort }: { onDone: (score: number) => void;
         playHuntMiss();
         return;
       }
+      snap = { cells: clone(cells), turn, caughtN, lastAct };
       lastAct = act;
       const out = resolve(cells, telegraph, act, turn);
       cells = out.cells;
@@ -286,8 +218,9 @@ export function LoadGame({ onDone, onAbort }: { onDone: (score: number) => void;
       flash = 0.45;
       resolving = 0.35;
       if (out.fail) {
+        // Hold the fail on screen: one undo can take it back, Enter accepts it.
         endRef.current = true;
-        setEnd({ ok: false, score: Math.max(1, turn), line: out.fail });
+        failRef.current = out.fail;
         return;
       }
       turn += 1;
@@ -305,8 +238,38 @@ export function LoadGame({ onDone, onAbort }: { onDone: (score: number) => void;
       setHud(`turn ${turn + 1} / ${TURNS} · catch ${caughtN}`);
     };
 
+    const undo = () => {
+      if (undoRef.current <= 0 || !snap) return;
+      cells = snap.cells;
+      turn = snap.turn;
+      caughtN = snap.caughtN;
+      lastAct = snap.lastAct;
+      telegraph = PULSE[turn];
+      undoRef.current -= 1;
+      snap = null;
+      resolving = 0;
+      flash = 0;
+      if (failRef.current) {
+        failRef.current = null;
+        endRef.current = false;
+      }
+      setHud(`turn ${turn + 1} / ${TURNS} · catch ${caughtN} · undone`);
+    };
+    const accept = () => {
+      const line = failRef.current;
+      if (!line) return;
+      failRef.current = null;
+      endRef.current = true;
+      setEnd({ ok: false, score: Math.max(1, turn), line });
+    };
     const down = (e: KeyboardEvent) => {
       if (e.code === "Escape") onAbort();
+      if (e.code === "KeyZ" || e.code === "Backspace") {
+        e.preventDefault();
+        undo();
+        return;
+      }
+      if (e.code === "Enter") accept();
       const row = ["Digit1", "Digit2", "Digit3", "Digit4"].indexOf(e.code);
       const col = ["KeyA", "KeyB", "KeyC", "KeyD"].indexOf(e.code);
       if (row >= 0) playAct({ kind: "rod", line: { axis: "row", i: row } });
@@ -336,7 +299,7 @@ export function LoadGame({ onDone, onAbort }: { onDone: (score: number) => void;
     canvas.addEventListener("touchstart", touch, { passive: true });
 
     const loop = (now: number) => {
-      if (endRef.current && resolving <= 0) {
+      if (endRef.current && resolving <= 0 && !failRef.current) {
         paint();
         return;
       }
@@ -348,7 +311,7 @@ export function LoadGame({ onDone, onAbort }: { onDone: (score: number) => void;
       raf = requestAnimationFrame(loop);
     };
     paint();
-    setHud("turn 1 / 5 · pulse on ROW 2");
+    setHud(`turn 1 / 5 · pulse on ${lineName(PULSE[0])}`);
     raf = requestAnimationFrame(loop);
     return () => {
       cancelAnimationFrame(raf);

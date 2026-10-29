@@ -2,7 +2,7 @@
 
 import { useEffect, useState, type ReactNode } from "react";
 import { ART } from "./artFlags";
-import { Chatter } from "./Chatter";
+import { Chatter } from "./ChatterLine";
 import { isRevealing, subscribeReveal } from "./chatter";
 
 /** Shared teaching chrome for Priya's designer and Academy. Visual only. */

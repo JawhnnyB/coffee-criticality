@@ -1266,6 +1266,11 @@ export function finishLeisure(s: GameState, score: number) {
   refreshObjective(s);
 }
 export function abortOverlay(s: GameState) {
+  // Leaving the Day-2 hunt counts as a miss. Skipping LOTOTO must cost something.
+  if (s.mode === "maint" && s.day === 2 && !s.maintDone) {
+    finishMaint(s, 0);
+    return;
+  }
   if (
     s.mode === "play" ||
     s.mode === "menu" ||
@@ -1354,6 +1359,13 @@ export function finishMaint(s: GameState, score: number) {
     pushLog(s, "report", "Day 2 · LOTOTO hunt. The orange tag did not belong.");
   }
   pushMsg(s, score >= 1 ? "Tommy: That's a lockout. The pump can stay quiet." : "Tommy: Look again. IN SERVICE does not hang here.");
+  if (score < 1 && s.day === 2 && !s.incidentResolved) {
+    // Day 2 consequence: a missed or abandoned hunt leaves the tag up, so the lockout incident opens now.
+    s.flags.lototoMissed = true;
+    s.incidentOpen = true;
+    s.mode = "incident";
+    pushMsg(s, "Tommy: IN SERVICE is still hung on a dead pump. Your board. Your call.");
+  }
   refreshObjective(s);
 }
 export function resolveIncident(s: GameState, how: "report" | "peer" | "hide") {
@@ -1661,12 +1673,20 @@ export function update(s: GameState, a: Actions, dt: number) {
       }
     }
     if (s.nearNpc || s.nearId) {
-      s.catches += 1;
-      bumpCulture(s, 4);
-      if (s.nearNpc) bumpTrust(s, s.nearNpc, 6);
-      s.shake = .1;
-      addMinutes(s, 4);
-      pushMsg(s, "Peer-check. Two sets of eyes. You both look away a little after, because it mattered.");
+      // One peer-check per person (or prop) per day. Repeating it on the same target is not new eyes.
+      const target = s.nearNpc ?? s.nearId ?? "";
+      const peerKey = `peer:${target}:d${s.day}`;
+      if (s.flags[peerKey]) {
+        pushMsg(s, "Peer-check. You already looked at this one today. Eyes need a different target or a new day.");
+      } else {
+        s.flags[peerKey] = true;
+        s.catches += 1;
+        bumpCulture(s, 4);
+        if (s.nearNpc) bumpTrust(s, s.nearNpc, 6);
+        s.shake = .1;
+        addMinutes(s, 4);
+        pushMsg(s, "Peer-check. Two sets of eyes. You both look away a little after, because it mattered.");
+      }
     } else pushMsg(s, "Stand near a person or a board to peer-check.");
   }
   if (a.report && !s.incidentResolved && (s.nearId === "shift-log" || s.nearId === "valve" || s.nearId === "board" || s.nearId === "dose")) {

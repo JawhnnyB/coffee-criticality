@@ -530,3 +530,14 @@ export function kAt(p: PlantDesign, scale: DesignScale) {
 }
 
 export { generateOpenMCPython, downloadOpenMC } from "./openmcExport";
+
+/** The desk's sentence for a sign-off. Core k decides; the leakage line says what the edge takes. */
+export function verdictWords(kCore: number, kInf: number): string {
+  const leak = kInf > 0 ? Math.max(0, 1 - kCore / kInf) : 0;
+  const leakLine = ` The edge takes about ${Math.round(leak * 100)}% of the crowd.`;
+  if (kCore > 1.05) return `Runs away. k is ${kCore.toFixed(3)}, so the core would keep climbing. Do not sign.` + leakLine;
+  if (kCore > 1.005) return `Creeping up. k is ${kCore.toFixed(3)}, so the crowd grows. Pull a little rod or give back a little enrichment before you sign.` + leakLine;
+  if (kCore >= 0.995) return `Holds. k is ${kCore.toFixed(3)}, so the crowd stays the same and power can sit still.` + leakLine;
+  if (kCore >= 0.95) return `Creeping down. k is ${kCore.toFixed(3)}, so the crowd shrinks. Raise enrichment or pull rods.` + leakLine;
+  return `Dies out. k is ${kCore.toFixed(3)}, so there is nothing to hold. Do not sign.` + leakLine;
+}

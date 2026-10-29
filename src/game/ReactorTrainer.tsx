@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, type ReactNode } from "react";
+import { DT_AT_UNIT, DT_BAND, T_COLD_AT_FLOW100 } from "./plant";
 
 type Plant = "pwr" | "bwr" | "pebble" | "msr";
 
@@ -12,25 +13,21 @@ const PLANTS: { id: Plant; title: string; note: string }[] = [
 ];
 
 const BAND: Record<Plant, { lo: number; hi: number; hold: number }> = {
-  pwr: { lo: 28, hi: 36, hold: 8 },
-  bwr: { lo: 8, hi: 14, hold: 8 },
-  pebble: { lo: 160, hi: 260, hold: 8 },
-  msr: { lo: 40, hi: 80, hold: 8 },
+  pwr: { ...DT_BAND.pwr, hold: 8 },
+  bwr: { ...DT_BAND.bwr, hold: 8 },
+  pebble: { ...DT_BAND.pebble, hold: 8 },
+  msr: { ...DT_BAND.msr, hold: 8 },
 };
 
+/** Same ΔT as the Builder's plant.ts defaults: power/flow scales the one per-type unit. */
 function scaleDt(plant: Plant, power: number, flow: number) {
   const f = Math.max(40, flow);
-  if (plant === "bwr") return (power / f) * 12;
-  if (plant === "pebble") return (power / f) * 220;
-  if (plant === "msr") return (power / f) * 58;
-  return (power / f) * 32;
+  return (power / f) * DT_AT_UNIT[plant];
 }
 
 function tColdOf(plant: Plant, flow: number) {
-  if (plant === "bwr") return 275 - (flow - 100) * 0.03;
-  if (plant === "pebble") return 530 - (flow - 100) * 0.2;
-  if (plant === "msr") return 620 - (flow - 100) * 0.1;
-  return 292 - (flow - 100) * 0.05;
+  const slope = plant === "bwr" ? 0.03 : plant === "pebble" ? 0.2 : plant === "msr" ? 0.1 : 0.05;
+  return T_COLD_AT_FLOW100[plant] - (flow - 100) * slope;
 }
 
 export function ReactorTrainer({
