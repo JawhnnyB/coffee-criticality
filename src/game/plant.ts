@@ -37,6 +37,43 @@ export const DT_BAND: Record<PlantType, { lo: number; hi: number }> = {
 };
 export const T_COLD_AT_FLOW100: Record<PlantType, number> = { pwr: 292, bwr: 275, pebble: 260, msr: 620 };
 
+/** Teaching proxy: how far the fuel runs above the coolant at full power, in °C. Not a measurement. */
+export const T_FUEL_RISE_AT_FULL: Record<PlantType, number> = { pwr: 600, bwr: 550, pebble: 900, msr: 250 };
+/** Teaching proxy: cold-leg temperature change per flow point away from 100%. */
+export const T_COLD_SLOPE: Record<PlantType, number> = { pwr: 0.05, bwr: 0.03, pebble: 0.2, msr: 0.1 };
+
+export interface RunPoint {
+  /** Share of design power, 0–100. */
+  powerPct: number;
+  /** Share of design flow. Scaled with a floor of 40 when computing ΔT. */
+  flowPct: number;
+}
+
+export interface ThermalState {
+  dT: number;
+  tCold: number;
+  tHot: number;
+  tFuel: number;
+  inBand: boolean;
+}
+
+/**
+ * The one thermal model for the trainer, the control room, CORE CAM, and Results.
+ * Teaching proxy: ΔT scales with power over flow; the fuel sits above the hot leg by a
+ * per-type rise that grows with power. Not a license, not a design basis.
+ */
+export function thermalState(plant: PlantType | PlantDesign, run: RunPoint): ThermalState {
+  const type: PlantType = typeof plant === "string" ? plant : plant.type;
+  const power = Math.max(0, run.powerPct);
+  const flow = run.flowPct;
+  const dT = (power / Math.max(40, flow)) * DT_AT_UNIT[type];
+  const tCold = T_COLD_AT_FLOW100[type] - (flow - 100) * T_COLD_SLOPE[type];
+  const tHot = tCold + dT;
+  const tFuel = tHot + T_FUEL_RISE_AT_FULL[type] * (power / 100);
+  const band = DT_BAND[type];
+  return { dT, tCold, tHot, tFuel, inBand: dT >= band.lo && dT <= band.hi };
+}
+
 export const DEFAULT_PLANT: PlantDesign = {
   type: "pwr",
   powerMW: 1100,
