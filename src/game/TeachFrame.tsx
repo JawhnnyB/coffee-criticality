@@ -14,7 +14,7 @@ export function TeachPriya({ line, size = 96 }: { line: string; size?: 64 | 96 |
   const [talk, setTalk] = useState(isRevealing);
   useEffect(() => subscribeReveal(setTalk), []);
   if (ART.menu) {
-    const zoom = 6;
+    const zoom = 3;
     return (
       <div className="teach-paper flex flex-wrap items-start gap-3">
         <img
@@ -25,13 +25,13 @@ export function TeachPriya({ line, size = 96 }: { line: string; size?: 64 | 96 |
           className="shrink-0"
           style={{ width: 48 * zoom, height: 48 * zoom, imageRendering: "pixelated" }}
         />
-        <Chatter key={line} text={line} voice="priya" className="teach-body cc-prose min-w-0 flex-1" />
+        <Chatter key={line} text={line} voice="priya" className="teach-body cc-prose min-w-[16rem] flex-1" />
       </div>
     );
   }
   const px = size === 64 ? "h-16 w-16" : size === 128 ? "h-32 w-32" : "h-24 w-24";
   return (
-    <div className="teach-paper flex gap-3">
+    <div className="teach-paper flex flex-wrap gap-3">
       <img
         src={talk ? "/art/ui/priya-talk.png" : "/art/ui/priya-48.png"}
         alt="Dr. Priya Sharma"
@@ -40,7 +40,7 @@ export function TeachPriya({ line, size = 96 }: { line: string; size?: 64 | 96 |
         className={`${px} shrink-0 object-cover`}
         style={{ imageRendering: "pixelated" }}
       />
-      <p className="teach-body min-w-0">{line}</p>
+      <p className="teach-body min-w-[16rem] flex-1">{line}</p>
     </div>
   );
 }

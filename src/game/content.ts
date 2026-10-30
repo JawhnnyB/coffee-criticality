@@ -242,7 +242,7 @@ export const NPCS: Record<NpcId, NpcDef> = {
     startTrust: 22,
     note: "Youngest senior once. Hates being wrong in public.",
     portrait: { src: "/art/ui/portraits/portrait-marcus-smile.png", pos: "center" },
-    meet: "Two instruments. I was the youngest senior on this floor. That is not a compliment.",
+    meet: "I was the youngest senior on this floor. Don't take that as a compliment.",
   },
   priya: {
     id: "priya",
@@ -343,9 +343,9 @@ export const INTRO: IntroBeat[] = [
     body: "Teaching model — not a license. Heat still has to leave.",
     exchanges: [
       { you: true, line: "I signed Unit 1 on the sheet. I have not stood at the tank.", focus: "42% 78%", zoom: 1.14, lean: -2 },
-      { line: "Priya, not looking up. “I will not sign a peak I cannot walk. You already did.”", focus: "22% 68%", zoom: 1.22, lean: 0 },
+      { line: "“I don't sign a peak I can't walk. You already signed this one, so we walk it.”", focus: "22% 68%", zoom: 1.22, lean: 0 },
       { you: true, line: "Then walk me to the rail. I want the heat, not the plot.", focus: "74% 28%", zoom: 1.08, lean: 3 },
-      { line: "She turns the sheet a quarter. “The stack is dark from here. Stand next to it. The heat still has to leave.”", focus: "50% 62%", zoom: 1.16, lean: 1 },
+      { line: "“The stack looks dark from here. Stand next to it and feel how much heat still has to leave.”", focus: "50% 62%", zoom: 1.16, lean: 1 },
     ],
   },
   {
@@ -355,11 +355,11 @@ export const INTRO: IntroBeat[] = [
     title: "The kettle is still on from the night shift.",
     body: "Retired floor manager. The cafe is the last board she touches.",
     exchanges: [
-      { line: "“Sit. Two-to-ten left this chair warm. I'm Mabel. I ran this floor twenty years.”", focus: "36% 48%", zoom: 1.06, lean: 0 },
+      { line: "“Sit. The two-to-ten left that chair warm. I'm Mabel. I ran this floor for twenty years.”", focus: "36% 48%", zoom: 1.06, lean: 0 },
       { you: true, line: "You're not on the board. Why is the kettle still yours?", focus: "58% 72%", zoom: 1.1, lean: 1 },
-      { line: "The cup meets the tile. “I don't ask the board. I watch who won't sit.”", focus: "48% 40%", zoom: 1.2, lean: 2, prop: "cup" },
+      { line: "“Somebody has to pour before anyone asks for anything. It gives people a minute before they have to say something true.”", focus: "48% 40%", zoom: 1.2, lean: 2, prop: "cup" },
       { you: true, line: "Then I'll sit. Tell me who wouldn't.", focus: "22% 55%", zoom: 1.08, lean: -1 },
-      { line: "“The ones with a catch in their pocket. The kettle is the last board I still touch.”", focus: "18% 32%", zoom: 1.12, lean: -2 },
+      { line: "“The ones with a catch in their pocket. They stand by the door and wait for someone else to say it first.”", focus: "18% 32%", zoom: 1.12, lean: -2 },
     ],
   },
   {
@@ -369,11 +369,11 @@ export const INTRO: IntroBeat[] = [
     title: "Child seat first.",
     body: "Shift supervisor. The van was cold. The seat was not empty.",
     exchanges: [
-      { line: "Elena, van door open. A nod. “Two sets of eyes. Or it isn't a catch.”", focus: "32% 64%", zoom: 1.1, lean: 2 },
+      { line: "“Two sets of eyes, or it isn't a catch. The van's been open since before dawn.”", focus: "32% 64%", zoom: 1.1, lean: 2 },
       { you: true, line: "The child seat is still in the back. You didn't take it out.", focus: "70% 58%", zoom: 1.16, lean: -1 },
-      { line: "She looks at the child seat, not at you. “Cold.”", focus: "46% 46%", zoom: 1.24, lean: -3 },
+      { line: "“No. Some mornings, leaving one thing where it is, is the whole job.”", focus: "46% 46%", zoom: 1.24, lean: -3 },
       { you: true, line: "You came from home. Then the gate.", focus: "78% 34%", zoom: 1.06, lean: 0 },
-      { line: "“Child seat first. Then I was here. Stand where I can see your hands.”", focus: "28% 70%", zoom: 1.12, lean: 1 },
+      { line: "“Child seat first, then here. Stand where I can see your hands, and we'll get along.”", focus: "28% 70%", zoom: 1.12, lean: 1 },
     ],
   },
   {
@@ -383,11 +383,11 @@ export const INTRO: IntroBeat[] = [
     title: "Finish the sentence.",
     body: "Maintenance. Pump two. The tag is the rest of the sentence.",
     exchanges: [
-      { line: "Tommy taps the lock. “Pump two. Say LOTOTO out loud.”", focus: "72% 42%", zoom: 1.16, lean: 1, prop: "lock" },
+      { line: "“Pump two. Say LOTOTO out loud before you touch anything.”", focus: "72% 42%", zoom: 1.16, lean: 1, prop: "lock" },
       { you: true, line: "Lock. Tag. Try. The IN SERVICE card is still on the flange.", focus: "28% 50%", zoom: 1.08, lean: -1 },
-      { line: "The tag turns on its ring. “Then pump two still thinks your hands are on it.”", focus: "64% 58%", zoom: 1.22, lean: -1 },
+      { line: "“Then pump two still thinks your hands are on it. Finish the sentence and it stops thinking that.”", focus: "64% 58%", zoom: 1.22, lean: -1 },
       { you: true, line: "I won't touch it until that sentence is finished.", focus: "18% 48%", zoom: 1.05, lean: 0 },
-      { line: "“Good. Boring on purpose. That's how I keep a hand.”", focus: "80% 36%", zoom: 1.1, lean: 2 },
+      { line: "“Good. Boring is how I keep my hands. Most people hate boring until it saves them.”", focus: "80% 36%", zoom: 1.1, lean: 2 },
     ],
   },
   {
@@ -395,13 +395,13 @@ export const INTRO: IntroBeat[] = [
     portrait: "/art/ui/portraits/portrait-marcus-talk.png",
     kicker: "The bench  ·  Marcus",
     title: "Two instruments.",
-    body: "Senior engineer. Youngest on this floor, once. He was wrong out loud.",
+    body: "Senior engineer. Youngest on this floor, once. He was wrong out loud, and he remembers it.",
     exchanges: [
-      { line: "Marcus does not turn. “Left gauge. I trust the one under my hand.”", focus: "36% 38%", zoom: 1.14, lean: 0 },
+      { line: "“Left gauge. I trust the one under my hand more than the one on the wall.”", focus: "36% 38%", zoom: 1.14, lean: 0 },
       { you: true, line: "The one on the wall doesn't agree with it.", focus: "62% 42%", zoom: 1.08, lean: -1 },
-      { line: "The pencil finds the grid. “I was wrong on this floor once. Out loud. Youngest senior.”", focus: "72% 68%", zoom: 1.18, lean: 2, prop: "pencil" },
+      { line: "“I was the youngest senior on this floor. I was wrong out loud once, and it took a year to stop flinching.”", focus: "72% 68%", zoom: 1.18, lean: 2, prop: "pencil" },
       { you: true, line: "So I say the number before I defend it.", focus: "40% 30%", zoom: 1.08, lean: -2 },
-      { line: "“That is not a compliment. If the two argue, do not pick the polite one.”", focus: "24% 55%", zoom: 1.12, lean: 1 },
+      { line: "“Don't take that as a compliment. If the two gauges argue, don't pick the polite one.”", focus: "24% 55%", zoom: 1.12, lean: 1 },
     ],
   },
   {
@@ -411,11 +411,11 @@ export const INTRO: IntroBeat[] = [
     title: "Three tiles off the hide.",
     body: "Floor tech. He remembers who kept the catch.",
     exchanges: [
-      { line: "Jordan watches the door, not you. “Say the catch out here. Not in your pocket.”", focus: "58% 42%", zoom: 1.1, lean: 3 },
+      { line: "“Say the catch out here. One in your pocket doesn't count for anything.”", focus: "58% 42%", zoom: 1.1, lean: 3 },
       { you: true, line: "Three tiles off the hide. Is that still where we say it?", focus: "16% 40%", zoom: 1.12, lean: -2 },
-      { line: "“That was the deal. I remember who kept the win. Same row as me.”", focus: "40% 62%", zoom: 1.14, lean: 1 },
+      { line: "“Same place as always. I remember who said the win out loud. Not who shouted loudest.”", focus: "40% 62%", zoom: 1.14, lean: 1 },
       { you: true, line: "If I hide it, you won't sit next to me.", focus: "84% 38%", zoom: 1.06, lean: 1 },
-      { line: "He does not look at the chair. “Distance. Bowl after shift only if the catch is already said.”", focus: "22% 48%", zoom: 1.08, lean: -1 },
+      { line: "“I'll sit by you. I won't sit by a hide. Bowl after shift, once the catch is already said.”", focus: "22% 48%", zoom: 1.08, lean: -1 },
     ],
   },
   {
@@ -423,13 +423,13 @@ export const INTRO: IntroBeat[] = [
     portrait: "/art/ui/portraits/portrait-holt-talk.png",
     kicker: "The board  ·  Holt",
     title: "Unit 1 is holding. You are not a hero today.",
-    body: "Director. He funds the review. He does not fund the speech.",
+    body: "Director. He funds the review. He doesn't fund speeches.",
     exchanges: [
-      { line: "The lights are already up. He doesn't turn. “Unit 1 is already lit.”", focus: "34% 72%", zoom: 1.1, lean: 0 },
+      { line: "“Unit 1 is already lit. You don't have to tell me it's holding.”", focus: "34% 72%", zoom: 1.1, lean: 0 },
       { you: true, line: "I'm not here to be the hero of the board.", focus: "64% 70%", zoom: 1.16, lean: -2 },
-      { line: "“Then don't give me a speech. A catch I can fund.”", focus: "48% 40%", zoom: 1.2, lean: 1 },
+      { line: "“Good. Speeches cost me a review. A catch I can fund.”", focus: "48% 40%", zoom: 1.2, lean: 1 },
       { you: true, line: "I'll stand next to the line before I ask you to read it.", focus: "82% 28%", zoom: 1.06, lean: 1 },
-      { line: "His hand stays off the log. “I'll read the line you stood next to. Not the one you performed.”", focus: "30% 55%", zoom: 1.1, lean: -1 },
+      { line: "“Then I'll read the line you stood next to. Not the one you performed for me.”", focus: "30% 55%", zoom: 1.1, lean: -1 },
     ],
   },
   {
