@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import { DT_AT_UNIT, DT_BAND, T_COLD_AT_FLOW100 } from "./plant";
+import { DT_BAND, thermalState } from "./plant";
 
 type Plant = "pwr" | "bwr" | "pebble" | "msr";
 
@@ -18,17 +18,6 @@ const BAND: Record<Plant, { lo: number; hi: number; hold: number }> = {
   pebble: { ...DT_BAND.pebble, hold: 8 },
   msr: { ...DT_BAND.msr, hold: 8 },
 };
-
-/** Same ΔT as the Builder's plant.ts defaults: power/flow scales the one per-type unit. */
-function scaleDt(plant: Plant, power: number, flow: number) {
-  const f = Math.max(40, flow);
-  return (power / f) * DT_AT_UNIT[plant];
-}
-
-function tColdOf(plant: Plant, flow: number) {
-  const slope = plant === "bwr" ? 0.03 : plant === "pebble" ? 0.2 : plant === "msr" ? 0.1 : 0.05;
-  return T_COLD_AT_FLOW100[plant] - (flow - 100) * slope;
-}
 
 export function ReactorTrainer({
   onPass,
@@ -63,8 +52,9 @@ export function ReactorTrainer({
         const target = rodsRef.current;
         const next = p + (target - p) * dt * 0.45;
         const band = BAND[plant];
-        const dNow = scaleDt(plant, next, flowRef.current);
-        const tHot = tColdOf(plant, flowRef.current) + dNow;
+        const ts = thermalState(plant, { powerPct: next, flowPct: flowRef.current });
+        const dNow = ts.dT;
+        const tHot = ts.tHot;
         const scramHot = plant === "pwr" ? 332 : plant === "bwr" ? 300 : plant === "pebble" ? 950 : 750;
         if (dNow > band.hi * 1.45 || tHot > scramHot || next > 114) {
           setScram(true);
@@ -119,9 +109,8 @@ export function ReactorTrainer({
     );
   }
 
-  const dT = scaleDt(plant, power, flow);
-  const tCold = tColdOf(plant, flow);
-  const tHot = tCold + dT;
+  const ts = thermalState(plant, { powerPct: power, flowPct: flow });
+  const { dT, tCold, tHot } = ts;
   const band = BAND[plant];
   const inBand = dT >= band.lo && dT <= band.hi && !scram;
 
