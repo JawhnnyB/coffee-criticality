@@ -226,11 +226,11 @@ function lineBox(zoom: number, y: number): CSSProperties {
     position: "absolute",
     left: 78 * zoom,
     top: y * zoom,
-    width: 230 * zoom,
+    width: 282 * zoom,
     margin: 0,
     pointerEvents: "none",
-    ["--intro-fs" as string]: `${8 * zoom}px`,
-    ["--intro-lh" as string]: `${9 * zoom}px`,
+    ["--intro-fs" as string]: `${10 * zoom}px`,
+    ["--intro-lh" as string]: `${11 * zoom}px`,
   };
 }
 
