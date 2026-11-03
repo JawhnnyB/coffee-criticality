@@ -70,23 +70,76 @@ If a feature seems to need one of these changed, stop. Write it as an open quest
 
 **Academy calculus:** do not write any calculus content. Show a locked card: "Not in this build."
 
-## 5. Open decisions the owner has not made yet
+## 5. Open decisions: options, and who decides
 
-Write each as an open question in the PR, with the default. Do not block on them.
+You choose. For each item below, pick one option (or propose one that meets the frozen rules and stop-lines), and write the choice and your reason in the PR under a heading called "Decisions." Keep every choice easy to reverse: one constant, one file, or one config entry. Nothing here is final until the owner merges.
 
-1. Which history is canonical (section 2). Default: `origin/main`.
-2. Region placeholders. Start with one verified US Census division, and use placeholder town and paper names (default: Harrow Bend and The Harrow Bend Ledger). The owner checks names against real places before merge.
-3. Music. The spec wants a manifest of at least four tracks, one per season, that are original or public domain. Default: procedural tracks until the owner supplies files. The music player must duck the procedural bed.
-4. Background radiation values. Default: every region is `"pending"`. Only cite a source you can name and link (UNSCEAR, NCRP Report 160), and verify the report number and figures first.
-5. NRC section titles and links. Default: "verify before publish." Build the index from the starter list in spec section 9. Do not write titles from memory.
-6. News feeds. Default: World Nuclear News, the NRC news feed, and ANS Nuclear Newswire, each dropped if its feed is missing, non-public, or forbids reuse.
-7. Whether "Show all apps" in Settings is off for players (default: off).
+**Decision rights**
+
+- **Grok decides:** the order of work inside a milestone, file layout, UI layout, the copy of fictional text, the placeholder names (from the options below), test design, default settings, and which dialogue variants to write.
+- **Owner decides, Grok recommends:** which git history is canonical (section 2), any merge into `main`, any real-world value or source, any change to a frozen number, and any name the owner checks against real places.
+- **When unsure, take the option with the smaller blast radius** and say so in the PR.
+
+**Items**
+
+1. **Git history (owner decides).**
+   - A. Base on `origin/main`. Keep the two local-only commits on their own branch for later comparison. *Handoff recommends this.*
+   - B. Carry the shore changes from `962feac` and `70767f1` onto `origin/main` by hand, after comparing `sim.ts` and `week.ts`.
+   - Not available: making local `main` canonical by force-pushing. The rules forbid it.
+
+2. **First region.** Choose one of the nine Census divisions that has a verified background value. Only those can appear in setup. Today none are verified, so this may wait on item 5.
+   - A. New England, B. Mid-Atlantic, C. East North Central, D. West North Central, E. South Atlantic, F. East South Central, G. West South Central, H. Mountain, I. Pacific.
+   - If no division can be verified, pick one for the news flavor anyway, and leave its radiation value "pending."
+
+3. **Placeholder town and paper.**
+   - A. Harrow Bend, The Harrow Bend Ledger, Harrow Bend Light & Power (from the spec).
+   - B. Your own set, with each name checked against a list of real places and companies before the PR.
+   - Either way, the owner checks the names.
+
+4. **Music source.** The spec needs at least four tracks, one per season.
+   - A. Procedural tracks written in code (no licensing questions). *Recommended for now.*
+   - B. Original note-data tracks, rendered with Web Audio. Still procedural, but more musical.
+   - C. Owner-supplied audio files, with a manifest.
+   - D. Public domain recordings, each with its source and license in the manifest.
+   - Whatever you choose, the player must duck the procedural bed while music plays.
+
+5. **Background radiation values.**
+   - A. Leave every region `"pending"`. Nothing shows a number. *Safe default.*
+   - B. Verify one value by reading UNSCEAR or NCRP Report 160 yourself, then mark it `"verified"` with its link and year.
+   - C. Show a range only, when a source gives one.
+   - You may do B only if you can read the source. If you cannot, it stays pending.
+
+6. **NRC index.**
+   - A. Build all about 12 entries from the spec's starter list, each marked "verify before publish."
+   - B. Build the 5 entries you find easiest to check, and list the rest as "not yet indexed."
+   - C. Ship only the link to eCFR Title 10, with no index yet.
+   - Do not write section titles from memory.
+
+7. **News feeds.**
+   - A. Build `scripts/fetch-news.mjs` for all three feeds. Drop any that fail the rules in spec section 10.
+   - B. Start with one feed.
+   - C. Ship only the committed fallback file, with no fetch script yet.
+   - Record any dropped feed in the PR.
+
+8. **"Show all apps" in Settings.**
+   - A. Off for players. On only in development builds (check Vite's mode). *Recommended.*
+   - B. Off everywhere, with a hidden test hook instead.
+
+9. **Starting path for M1.** Pick one and say why in the first PR.
+   - A. The spec's order: shared run, then save version 2, then the desktop, then setup, then apps.
+   - B. Desktop shell with placeholder apps first, so the work is visible early, then the shared run, then save version 2.
+   - C. Save version 2 first, since every later step writes new fields to the save.
+   - The shared run and save fields are shared dependencies, so whichever you pick, do not skip either one.
+
+10. **Dialogue variants for region and stance** (spec section 4.2). Choose which characters get a variant line. Each new spoken line must pass `scripts/first-meeting-lines.test.mjs`. Extend that test if your new lines need a new rule, and say so in the PR.
 
 ## 6. The process: what to do, in order
 
 Work one milestone at a time, one branch and one PR each. Do not start a milestone until the previous one's Definition of Done passes. Never push to `main`. Never force-push. Never rewrite history.
 
 ### Step 0. Set up without touching anyone's history (about an hour)
+
+Before any code, choose your starting path (section 5, item 9) and write it in the first PR. Then:
 
 1. `git fetch origin`. Create a branch from `origin/main`, or from `feature/first-meeting-readability` if you need the thermal and dialogue changes.
 2. Run `npm install`, then `npm run typecheck`, then `npm test`. Note the failures that already exist. The spec says there are 8 og/platform failures on `main`, and `cabinet-rewards` also fails for the missing package. Do not add new ones.
