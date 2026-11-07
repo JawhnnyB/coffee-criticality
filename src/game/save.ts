@@ -5,7 +5,7 @@
  */
 import { ROOMS, emptyResidue, type NpcId, type Residue, type RoleId, type RoomId } from "./content";
 import type { PlantDesign } from "./plant";
-import { DEFAULT_PLANT } from "./plant";
+import { DEFAULT_PLANT, emptyRun } from "./plant";
 import { DEFAULT_PLAYER_LOOK, type PlayerLook } from "./artSpec";
 import type { GameState, Mode, ParlorScores } from "./sim";
 import type { WeekLogEntry } from "./week";
@@ -190,6 +190,9 @@ export function hydrateSave(s: GameState): boolean {
   s.culture = Number.isFinite(data.culture) ? data.culture : 0;
   s.trust = { ...s.trust, ...data.trust };
   s.flags = { ...data.flags };
+  // Save v1 does not store the run. A leftover seed flag would block a fresh seed and point at an empty run.
+  delete s.flags["run:seeded"];
+  s.run = emptyRun();
   s.plant = data.plant;
   s.catches = data.catches;
   s.hides = data.hides;

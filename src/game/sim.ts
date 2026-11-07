@@ -27,13 +27,14 @@ import {
   type RoomId,
 } from "./content";
 import { RADIUS, SPEED, WALL } from "./const";
-import { type PlantDesign, type ShuffleCell } from "./plant";
+import { emptyRun, pushSample, seedRun, shouldSample, thermalState, type PlantDesign, type RunState, type ShuffleCell } from "./plant";
 import { DEFAULT_PLAYER_LOOK, PROP_NATIVE, type PlayerLook } from "./artSpec";
 import { INCIDENTS, occupancyOverlay, dayDef, incidentOwner, COMMUTE_SPAWN, DUSK_SPAWN, type WeekLogEntry } from "./week";
 import { writeSave, wipeSave } from "./save";
 import { playCatch, playDoor, playFoot, playHide, playReport, playSit, playStand, playTalk } from "./audio";
 import { isRevealing, requestSkip } from "./chatter";
 import type { CabId } from "./Arcade";
+import { kAt } from "./nuclearLab";
 import { doorCardinal, spawnInside } from "./site";
 
 export type Mode =
@@ -157,6 +158,8 @@ export interface GameState {
   stillsSeen: number;
   closePrompt: boolean;
   plant: PlantDesign | null;
+  /** Shared operating point. Seeded from `plant` the first time the bench opens. Not saved in v1. */
+  run: RunState;
   academyDone: boolean[];
   shuffleDone: boolean;
   maintDone: boolean;
@@ -289,6 +292,7 @@ export function createState(): GameState {
     stillsSeen: 0,
     closePrompt: false,
     plant: null,
+    run: emptyRun(),
     academyDone: ACADEMY.map(() => false),
     shuffleDone: false,
     maintDone: false,
@@ -572,6 +576,42 @@ export function bumpCulture(s: GameState, n: number) {
 export function bumpTrust(s: GameState, id: NpcId, n: number) {
   s.trust[id] = clamp(s.trust[id] + n, -100, 100);
 }
+
+/** First open of the bench copies the design. Later opens keep the rods where the player left them. */
+export function ensureRun(s: GameState) {
+  if (!s.run) s.run = emptyRun();
+  if (s.flags["run:seeded"] || !s.plant) return;
+  const seeded = seedRun(s.plant);
+  s.run.powerPct = seeded.powerPct;
+  s.run.flowPct = seeded.flowPct;
+  s.run.rodsWithdrawnPct = seeded.rodsWithdrawnPct;
+  s.run.scram = false;
+  s.flags["run:seeded"] = true;
+}
+
+function recordRun(s: GameState, t: number, open: boolean) {
+  if (!s.plant || !s.flags["run:seeded"] || !s.run) return;
+  if (!shouldSample(s.run.history, t, open)) return;
+  const ts = thermalState(s.plant, { powerPct: s.run.powerPct, flowPct: s.run.flowPct });
+  pushSample(s.run, {
+    t,
+    dT: ts.dT,
+    inBand: ts.inBand && !s.run.scram,
+    k: kAt(s.plant, s.plant.scale),
+  });
+}
+
+/** While the bench is open. `openMinutes` is time on the bench, not a second shift clock. */
+export function noteControlMinute(s: GameState, openMinutes: number) {
+  recordRun(s, s.minutes + openMinutes, true);
+}
+
+/** While the bench is closed. One point per in-game hour. */
+export function noteRunHour(s: GameState) {
+  if (s.mode === "reactor") return;
+  recordRun(s, s.minutes, false);
+}
+
 var DAY_CAP = 1008;
 export function addMinutes(s: GameState, n: number) {
   if (n <= 0) return;
@@ -592,6 +632,7 @@ export function addMinutes(s: GameState, n: number) {
     pushMsg(s, "The floor is dimming. The shift is closing whether you like the handwriting or not.");
     finishDay(s);
   }
+  noteRunHour(s);
 }
 export function refreshObjective(s: GameState) {
   const d = dayDef(s.day);
@@ -1056,6 +1097,7 @@ export function useInteract(s: GameState) {
     return;
   }
   if (s.nearId === "trainer") {
+    ensureRun(s);
     s.returnMode = "play";
     s.mode = "reactor";
     return;

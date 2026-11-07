@@ -73,3 +73,33 @@ test("the flow floor keeps ΔT finite at very low flow", () => {
   assert.ok(Number.isFinite(t.dT));
   assert.equal(t.dT, M.thermalState("pwr", { powerPct: 50, flowPct: 40 }).dT);
 });
+
+test("the shared run seeds from the design, not the 62% drill", () => {
+  const run = M.seedRun(M.DEFAULT_PLANT);
+  assert.equal(run.powerPct, 100);
+  assert.equal(run.flowPct, M.DEFAULT_PLANT.flow);
+  assert.equal(run.rodsWithdrawnPct, 100);
+  assert.equal(run.scram, false);
+  assert.deepEqual(run.history, []);
+  const custom = M.seedRun({ ...M.DEFAULT_PLANT, flow: 80 });
+  assert.equal(custom.flowPct, 80);
+});
+
+test("history is per minute while open and per hour while closed, and it caps", () => {
+  const run = M.seedRun(M.DEFAULT_PLANT);
+  assert.equal(M.shouldSample(run.history, 412, true), true);
+  M.pushSample(run, { t: 412, dT: 32, inBand: true, k: 1 });
+  assert.equal(M.shouldSample(run.history, 412.4, true), false);
+  assert.equal(M.shouldSample(run.history, 413, true), true);
+  assert.equal(M.shouldSample(run.history, 419, false), false);
+  assert.equal(M.shouldSample(run.history, 420, false), true);
+  for (let i = 0; i < M.RUN_HISTORY_CAP + 10; i++) {
+    M.pushSample(run, { t: 500 + i, dT: 1, inBand: false, k: 1 });
+  }
+  assert.equal(run.history.length, M.RUN_HISTORY_CAP);
+  assert.equal(run.history[0].t, 500 + 10);
+});
+
+test("fuel mass stays pending until someone cites an inventory", () => {
+  for (const type of TYPES) assert.equal(M.TEACHING.fuelMassKg[type], null);
+});

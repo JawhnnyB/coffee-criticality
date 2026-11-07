@@ -62,6 +62,7 @@ import {
   createState,
   dayIncident,
   emptyActions,
+  ensureRun,
   finishArcade,
   finishBuilder,
   finishDay,
@@ -70,6 +71,7 @@ import {
   finishShuffle,
   finishTrainer,
   nextDay,
+  noteControlMinute,
   npcsHere,
   openAcademy,
   openArcade,
@@ -482,6 +484,15 @@ export function GameApp() {
         modeRef.current = s.mode;
         setMode(s.mode);
       },
+      openBench: () => {
+        const s = stateRef.current;
+        ensureRun(s);
+        s.returnMode = "play";
+        s.mode = "reactor";
+        modeRef.current = "reactor";
+        setMode("reactor");
+      },
+      getRun: () => ({ ...stateRef.current.run, history: stateRef.current.run.history.length }),
       getEnded: () => stateRef.current.ended,
       getTimeLabel: () => stateRef.current.timeLabel,
       getClosePrompt: () => stateRef.current.closePrompt,
@@ -1147,7 +1158,16 @@ export function GameApp() {
 
         {mode === "reactor" && (
           <ReactorTrainer
-            site={s.plant?.type ?? "pwr"}
+            design={s.plant}
+            run={(ensureRun(s), s.run)}
+            writeRun={(patch) => {
+              const r = stateRef.current.run;
+              if (patch.powerPct != null) r.powerPct = patch.powerPct;
+              if (patch.flowPct != null) r.flowPct = patch.flowPct;
+              if (patch.rodsWithdrawnPct != null) r.rodsWithdrawnPct = patch.rodsWithdrawnPct;
+              if (patch.scram != null) r.scram = patch.scram;
+            }}
+            onMinute={(openMinutes) => noteControlMinute(stateRef.current, openMinutes)}
             onPass={() => {
               finishTrainer(s);
               applyMode(s.mode);
@@ -2810,6 +2830,8 @@ declare global {
       getWeekLog: () => { day: number; kind: string; text: string }[];
       getNpcs: () => string[];
       openCab: (id: string) => void;
+      openBench: () => void;
+      getRun: () => { powerPct: number; flowPct: number; rodsWithdrawnPct: number; scram: boolean; history: number };
       getEnded: () => "a" | "c" | null;
       getTimeLabel: () => string;
       getClosePrompt: () => boolean;

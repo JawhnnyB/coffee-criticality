@@ -1,53 +1,78 @@
 "use client";
 
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import { DT_BAND, thermalState } from "./plant";
+import { DT_BAND, thermalState, type PlantDesign, type PlantType, type RunState } from "./plant";
 
-type Plant = "pwr" | "bwr" | "pebble" | "msr";
-
-const PLANTS: { id: Plant; title: string; note: string }[] = [
+const PLANTS: { id: PlantType; title: string; note: string }[] = [
   { id: "pwr", title: "PWR — this site", note: "Pressurized primary. Steam generators. Rods from above. Heat leaves with flow." },
   { id: "bwr", title: "BWR — comparison", note: "Boils in the vessel. Steam to the turbine. Rods from below." },
   { id: "pebble", title: "Pebble / TRISO", note: "Helium courier. Packed pebbles. Graphite reflector. Teaching only." },
   { id: "msr", title: "MSR / salt", note: "Fuel is the salt. Graphite channels. Freeze plug. Near-atm. Teaching only." },
 ];
 
-const BAND: Record<Plant, { lo: number; hi: number; hold: number }> = {
+const BAND: Record<PlantType, { lo: number; hi: number; hold: number }> = {
   pwr: { ...DT_BAND.pwr, hold: 8 },
   bwr: { ...DT_BAND.bwr, hold: 8 },
   pebble: { ...DT_BAND.pebble, hold: 8 },
   msr: { ...DT_BAND.msr, hold: 8 },
 };
 
+/**
+ * The bench runs `design`, the plant from the Builder. The old type picker is gone
+ * from this view on purpose. Compare shows the other three types and does not switch the run.
+ */
 export function ReactorTrainer({
   onPass,
   onAbort,
-  site = "pwr",
+  design,
+  run,
+  writeRun,
+  onMinute,
 }: {
   onPass: () => void;
   onAbort: () => void;
-  site?: Plant;
+  design: PlantDesign | null;
+  run: RunState;
+  writeRun: (patch: Partial<Pick<RunState, "powerPct" | "flowPct" | "rodsWithdrawnPct" | "scram">>) => void;
+  onMinute: (openMinutes: number) => void;
 }) {
-  const [plant, setPlant] = useState<Plant | null>(site);
-  const [rods, setRods] = useState(62);
-  const [flow, setFlow] = useState(100);
-  const [power, setPower] = useState(62);
+  const plant = design?.type ?? null;
+  const [rods, setRods] = useState(run.rodsWithdrawnPct);
+  const [flow, setFlow] = useState(run.flowPct);
+  const [power, setPower] = useState(run.powerPct);
   const [hold, setHold] = useState(0);
-  const [scram, setScram] = useState(false);
+  const [scram, setScram] = useState(run.scram);
   const [passed, setPassed] = useState(false);
-  const [msg, setMsg] = useState("Match flow to power. Hold the ΔT band. Teaching only.");
+  const [compare, setCompare] = useState(false);
+  const [msg, setMsg] = useState(
+    design
+      ? "This is the plant you designed. Match flow to power. Hold the ΔT band. Teaching only."
+      : "The bench runs the reactor you design. Finish the builder first.",
+  );
   const rodsRef = useRef(rods);
   const flowRef = useRef(flow);
+  const writeRef = useRef(writeRun);
+  const minuteRef = useRef(onMinute);
   rodsRef.current = rods;
   flowRef.current = flow;
+  writeRef.current = writeRun;
+  minuteRef.current = onMinute;
 
   useEffect(() => {
     if (!plant || passed || scram) return;
     let last = performance.now();
+    let acc = 0;
+    let lastMin = -1;
     let raf = 0;
     const loop = (now: number) => {
       const dt = Math.min(0.05, (now - last) / 1000);
       last = now;
+      acc += dt;
+      const openMin = Math.floor(acc * 0.05);
+      if (openMin !== lastMin) {
+        lastMin = openMin;
+        minuteRef.current(openMin);
+      }
       setPower((p) => {
         const target = rodsRef.current;
         const next = p + (target - p) * dt * 0.45;
@@ -58,9 +83,11 @@ export function ReactorTrainer({
         const scramHot = plant === "pwr" ? 332 : plant === "bwr" ? 300 : plant === "pebble" ? 950 : 750;
         if (dNow > band.hi * 1.45 || tHot > scramHot || next > 114) {
           setScram(true);
+          writeRef.current({ scram: true, powerPct: next });
           setMsg("Scram. Teaching model — you get the bench again. Heat still had to leave.");
           return next;
         }
+        writeRef.current({ powerPct: next });
         if (dNow >= band.lo && dNow <= band.hi) {
           setHold((h) => {
             const n = h + dt;
@@ -81,27 +108,14 @@ export function ReactorTrainer({
     return () => cancelAnimationFrame(raf);
   }, [plant, passed, scram]);
 
-  if (!plant) {
+  if (!design || !plant) {
     return (
       <Term>
         <p className="font-mono text-xs tracking-widest text-good">DT.BENCH  TEACHING.ONLY</p>
-        <h2 className="font-mono mt-2 text-2xl text-good">Pick a plant to hold</h2>
+        <h2 className="font-mono mt-2 text-2xl text-good">No plant yet</h2>
         <p className="mt-3 max-w-md font-mono text-sm leading-relaxed text-good/80">
-          This site is a PWR. The others are comparison models. Same law: heat leaves with the courier. Not a license.
+          This bench runs the reactor you design. It does not keep a separate toy plant. Finish the builder, then come back.
         </p>
-        <div className="mt-6 flex w-full flex-col gap-2">
-          {PLANTS.map((p) => (
-            <button
-              key={p.id}
-              type="button"
-              className="border border-good/40 bg-transparent px-4 py-3 text-left font-mono text-good hover:bg-good/10"
-              onClick={() => setPlant(p.id)}
-            >
-              <div>{p.title}</div>
-              <div className="mt-1 text-xs text-good/70">{p.note}</div>
-            </button>
-          ))}
-        </div>
         <button type="button" className="btn-ghost mt-5" onClick={onAbort}>
           Leave bench
         </button>
@@ -140,8 +154,8 @@ export function ReactorTrainer({
           <h2 className="font-mono mt-1 text-xl text-good">Hold the band</h2>
         </div>
         <div className="flex gap-2">
-          <button type="button" className="btn-ghost" onClick={() => setPlant(null)}>
-            Compare
+          <button type="button" className="btn-ghost" onClick={() => setCompare((v) => !v)}>
+            {compare ? "Your plant" : "Compare"}
           </button>
           <button type="button" className="btn-ghost" onClick={onAbort}>
             Leave
@@ -159,6 +173,7 @@ export function ReactorTrainer({
       <p className="mt-2 font-mono text-xs text-subtle">
         Q = ṁ × cp × ΔT · {band.lo}–{band.hi} °C · hold {Math.min(band.hold, hold).toFixed(1)} / {band.hold} s
       </p>
+      {compare && <CompareCard yours={plant} />}
       <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-surface">
         <div className="h-full bg-accent" style={{ width: `${Math.min(100, (hold / band.hold) * 100)}%` }} />
       </div>
@@ -172,6 +187,7 @@ export function ReactorTrainer({
             setRods(40);
             setFlow(100);
             setHold(0);
+            writeRun({ scram: false, powerPct: 40, rodsWithdrawnPct: 40, flowPct: 100 });
             setMsg("Reset. Slower on the rods. Match the pump.");
           }}
         >
@@ -186,7 +202,11 @@ export function ReactorTrainer({
               min={20}
               max={100}
               value={rods}
-              onChange={(e) => setRods(Number(e.target.value))}
+              onChange={(e) => {
+                const n = Number(e.target.value);
+                setRods(n);
+                writeRun({ rodsWithdrawnPct: n });
+              }}
               className="mt-1 w-full"
             />
           </label>
@@ -197,13 +217,45 @@ export function ReactorTrainer({
               min={50}
               max={120}
               value={flow}
-              onChange={(e) => setFlow(Number(e.target.value))}
+              onChange={(e) => {
+                const n = Number(e.target.value);
+                setFlow(n);
+                writeRun({ flowPct: n });
+              }}
               className="mt-1 w-full"
             />
           </label>
         </div>
       )}
     </Term>
+  );
+}
+
+function CompareCard({ yours }: { yours: PlantType }) {
+  return (
+    <div className="mt-3 border border-good/30 p-3">
+      <p className="font-mono text-xs tracking-widest text-good">COMPARE · DEFAULTS</p>
+      <p className="mt-1 font-mono text-xs text-good/70">
+        Full power, full flow, for each type. This does not change the plant you are running.
+      </p>
+      <div className="mt-3 grid grid-cols-2 gap-2">
+        {PLANTS.map((p) => {
+          const ts = thermalState(p.id, { powerPct: 100, flowPct: 100 });
+          return (
+            <div key={p.id} className="border border-good/20 px-2 py-2 font-mono text-xs text-good/80">
+              <div>
+                {p.title}
+                {p.id === yours ? " · yours" : ""}
+              </div>
+              <div className="mt-1">ΔT {ts.dT.toFixed(0)} °C</div>
+              <div className="text-good/60">
+                {ts.tCold.toFixed(0)} → {ts.tHot.toFixed(0)} °C
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
   );
 }
 
@@ -226,7 +278,7 @@ function Stat({ k, v, warn }: { k: string; v: string; warn?: boolean }) {
   );
 }
 
-function Schematic({ plant, dT, inBand }: { plant: Plant; dT: number; inBand: boolean }) {
+function Schematic({ plant, dT, inBand }: { plant: PlantType; dT: number; inBand: boolean }) {
   const glow = inBand ? "#6b8f71" : "#c4783a";
   return (
     <svg viewBox="0 0 560 200" className="mt-4 w-full" aria-hidden>

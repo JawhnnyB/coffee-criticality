@@ -39,8 +39,73 @@ export const T_COLD_AT_FLOW100: Record<PlantType, number> = { pwr: 292, bwr: 275
 
 /** Teaching proxy: how far the fuel runs above the coolant at full power, in °C. Not a measurement. */
 export const T_FUEL_RISE_AT_FULL: Record<PlantType, number> = { pwr: 600, bwr: 550, pebble: 900, msr: 250 };
-/** Teaching proxy: cold-leg temperature change per flow point away from 100%. */
+/** Teaching proxy: cold-leg temperature change per flow point away from 100%. Not a measurement. */
 export const T_COLD_SLOPE: Record<PlantType, number> = { pwr: 0.05, bwr: 0.03, pebble: 0.2, msr: 0.1 };
+
+/**
+ * Every teaching proxy in one place. None of these is a measurement.
+ * fuelMassKg stays empty until someone cites an inventory. Do not invent a kilogram.
+ */
+export const TEACHING = {
+  /** °C the fuel sits above the hot leg at full power. thermalState grows it with power. */
+  fuelRiseAtFullC: T_FUEL_RISE_AT_FULL,
+  /** °C on the cold leg per flow point away from 100. */
+  coldSlopePerFlow: T_COLD_SLOPE,
+  /** kg of fuel for the burnup proxy. Null means "pending", not zero. */
+  fuelMassKg: { pwr: null, bwr: null, pebble: null, msr: null } as Record<PlantType, number | null>,
+};
+
+export const RUN_HISTORY_CAP = 600;
+
+export interface RunSample {
+  t: number;
+  dT: number;
+  inBand: boolean;
+  k: number;
+}
+
+/** The shared run. Only Reactor Control writes power, flow, rods, and scram. */
+export interface RunState {
+  powerPct: number;
+  flowPct: number;
+  rodsWithdrawnPct: number;
+  scram: boolean;
+  history: RunSample[];
+}
+
+export function emptyRun(): RunState {
+  return { powerPct: 0, flowPct: 0, rodsWithdrawnPct: 0, scram: false, history: [] };
+}
+
+/**
+ * Operating point of the designed plant: full design power, the design's own flow.
+ * Not the trainer's old 62% drill preset.
+ */
+export function seedRun(plant: PlantDesign): RunState {
+  const powerPct = 100;
+  const flowPct = plant.flow;
+  return {
+    powerPct,
+    flowPct,
+    rodsWithdrawnPct: powerPct,
+    scram: false,
+    history: [],
+  };
+}
+
+/** Open control room: one sample per in-game minute. Otherwise: one per in-game hour. */
+export function shouldSample(history: RunSample[], t: number, open: boolean): boolean {
+  const last = history[history.length - 1];
+  if (!last) return true;
+  if (open) return Math.floor(t) !== Math.floor(last.t);
+  return Math.floor(t / 60) !== Math.floor(last.t / 60);
+}
+
+export function pushSample(run: RunState, sample: RunSample) {
+  run.history.push(sample);
+  const extra = run.history.length - RUN_HISTORY_CAP;
+  if (extra > 0) run.history.splice(0, extra);
+}
 
 export interface RunPoint {
   /** Share of design power, 0–100. */
