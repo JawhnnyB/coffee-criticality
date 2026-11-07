@@ -609,6 +609,7 @@ export function GameApp() {
   }, [mode]);
 
   const s = stateRef.current;
+  if (mode === "reactor") ensureRun(s);
   const stage = cultureStage(s.culture);
   const playing = PLAY_MODES.includes(mode);
   const line = s.dialogue[s.dialogueI] as Line | undefined;
@@ -1159,7 +1160,7 @@ export function GameApp() {
         {mode === "reactor" && (
           <ReactorTrainer
             design={s.plant}
-            run={(ensureRun(s), s.run)}
+            run={s.run}
             writeRun={(patch) => {
               const r = stateRef.current.run;
               if (patch.powerPct != null) r.powerPct = patch.powerPct;
