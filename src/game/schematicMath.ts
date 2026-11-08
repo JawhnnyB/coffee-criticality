@@ -4,6 +4,11 @@
  * The seven temperature bands run cold to hot.
  */
 export const BANDS = ["#3a78c0", "#4aa0c8", "#7ac0b8", "#e8d070", "#e8963a", "#d4552e", "#a82a3a"] as const;
+/**
+ * Colour-safe marks: one ink or cream tick per band, so the bands read without hue.
+ * Same seven bands, no new colours. Index is the band (0 cold, 6 hot). Chosen for contrast on each band.
+ */
+export const BAND_TICK = ["#f3e6d0", "#16110d", "#16110d", "#16110d", "#16110d", "#16110d", "#f3e6d0"] as const;
 export const NATIVE_W = 160;
 export const NATIVE_H = 80;
 

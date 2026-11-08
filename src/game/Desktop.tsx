@@ -38,7 +38,7 @@ import {
 } from "./deskWindows";
 import { particleCount, makePool, stepPool, type Particle } from "./particles";
 import { AppBody, APP_ICON_TONE, type AppCtx } from "./ParlorApps";
-import type { DesktopSave, GameState, Mode } from "./sim";
+import type { DesktopSave, GameState, Mode, ResultsSave } from "./sim";
 import type { PlantDesign } from "./plant";
 
 /** Titles for sim overlays that have no registry entry. */
@@ -63,6 +63,7 @@ export interface DesktopProps {
   onSaveShift: () => void;
   onPatch: (patch: Partial<DesktopSave>) => void;
   onDesign: (plant: PlantDesign) => void;
+  onResults: (patch: Partial<ResultsSave>) => void;
 }
 
 function useSize(ref: RefObject<HTMLDivElement | null>) {
@@ -80,7 +81,7 @@ function useSize(ref: RefObject<HTMLDivElement | null>) {
 }
 
 export function Desktop(props: DesktopProps) {
-  const { shown, s, simMode, simContent, onLaunchSim, onAbortSim, onLeave, onMenu, onStartShift, onSaveShift, onPatch, onDesign } = props;
+  const { shown, s, simMode, simContent, onLaunchSim, onAbortSim, onLeave, onMenu, onStartShift, onSaveShift, onPatch, onDesign, onResults } = props;
   const rootRef = useRef<HTMLDivElement>(null);
   const size = useSize(rootRef);
   const [wins, setWins] = useState<WinState[]>([]);
@@ -101,7 +102,7 @@ export function Desktop(props: DesktopProps) {
   const simW = Math.max(MIN_W, Math.min(960, size.w - 24));
   const simH = Math.max(MIN_H, Math.min(640, size.h - TASKBAR_H - 24));
 
-  const ctx: AppCtx = { s, refresh: () => undefined, onPatch, visible: apps, onDesign };
+  const ctx: AppCtx = { s, refresh: () => undefined, onPatch, visible: apps, onDesign, onResults };
 
   // Latest values for the window key listener, which is bound once.
   const live = useRef({ wins, startOpen, phone, phoneApp, simMode, hasShift, shown, onLeave, onAbortSim });
