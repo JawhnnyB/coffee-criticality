@@ -1,0 +1,120 @@
+{
+  "version": 1,
+  "savedAt": 1794109676932,
+  "mode": "play",
+  "role": "transferred",
+  "playerName": "Alex",
+  "playerLook": {
+    "hoodie": "copper",
+    "hair": "brown",
+    "glasses": true
+  },
+  "day": 2,
+  "minutes": 600,
+  "room": "cafe",
+  "x": 152,
+  "y": 220,
+  "facing": "up",
+  "culture": 28,
+  "trust": {
+    "mabel": 4,
+    "holt": 28,
+    "elena": 32,
+    "tommy": 34,
+    "marcus": 22,
+    "priya": 36,
+    "jordan": 30
+  },
+  "flags": {
+    "seen:cafe": true,
+    "hid": true
+  },
+  "plant": {},
+  "catches": 0,
+  "hides": 1,
+  "reports": 0,
+  "academyDone": [
+    true,
+    false,
+    true,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false
+  ],
+  "shuffleDone": false,
+  "maintDone": false,
+  "ended": null,
+  "incidentResolved": false,
+  "residue": {
+    "valve": "hid",
+    "tag": "open",
+    "dose": "open",
+    "log": "open"
+  },
+  "closePrompt": false,
+  "fq": 0,
+  "stillsSeen": 0,
+  "goals": [
+    {
+      "id": "mabel",
+      "label": "Sit with Mabel",
+      "done": false
+    },
+    {
+      "id": "arcade",
+      "label": "Catch cabinet (optional)",
+      "done": false
+    },
+    {
+      "id": "plant",
+      "label": "Walk onto the floor",
+      "done": false
+    },
+    {
+      "id": "study",
+      "label": "Academy or ΔT bench",
+      "done": false
+    },
+    {
+      "id": "see",
+      "label": "Notice the mismatch",
+      "done": false
+    },
+    {
+      "id": "truth",
+      "label": "Handle valve 14 (R / P / H)",
+      "done": false
+    },
+    {
+      "id": "holt2",
+      "label": "Afternoon check-in with Holt",
+      "done": false
+    }
+  ],
+  "weekLog": [],
+  "scores": {
+    "catchBest": 0,
+    "catchTime": 0,
+    "hordeBest": 0,
+    "golfBest": 0,
+    "delayEvents": 0,
+    "physBest": 0,
+    "loadBest": 0
+  }
+}
