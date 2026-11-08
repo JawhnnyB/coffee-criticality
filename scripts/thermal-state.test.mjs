@@ -74,15 +74,17 @@ test("the flow floor keeps ΔT finite at very low flow", () => {
   assert.equal(t.dT, M.thermalState("pwr", { powerPct: 50, flowPct: 40 }).dT);
 });
 
-test("the shared run seeds from the design, not the 62% drill", () => {
+test("the shared run seeds at the 62% drill, and flow still comes from the design", () => {
   const run = M.seedRun(M.DEFAULT_PLANT);
-  assert.equal(run.powerPct, 100);
+  assert.equal(run.powerPct, 62);
   assert.equal(run.flowPct, M.DEFAULT_PLANT.flow);
-  assert.equal(run.rodsWithdrawnPct, 100);
+  assert.equal(run.rodsWithdrawnPct, 62);
   assert.equal(run.scram, false);
   assert.deepEqual(run.history, []);
   const custom = M.seedRun({ ...M.DEFAULT_PLANT, flow: 80 });
+  assert.equal(custom.powerPct, 62);
   assert.equal(custom.flowPct, 80);
+  assert.equal(custom.rodsWithdrawnPct, 62);
 });
 
 test("history is per minute while open and per hour while closed, and it caps", () => {

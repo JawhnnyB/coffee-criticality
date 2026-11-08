@@ -23,6 +23,8 @@ Corrected after review by G (`reviews/PR-6.md`, request-changes). The first vers
 
 5. **The bench starts at 100% power**, already inside the ΔT band. The old drill started at 62%. This is a gameplay question. The owner decides.
 
+**Decided:** 62%. Power and rods open at 62%. Flow stays the plant's own. The PWR bench then reads ΔT 19.8 °C, short of the 28–36 °C band, and the player has to bring it in.
+
 ## Checked and not a finding
 
 - **Label font.** The labels are the pixel font, not a smoothed system font. Computed `font-family` is `CCPixel3x5, monospace`, `font-size` 12px, `-webkit-font-smoothing: none`, on both viewports. The earlier claim that the text was smoothed was wrong.
