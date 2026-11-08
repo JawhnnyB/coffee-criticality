@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
-import { integerScale } from "./artScale";
+import { PHONE_VIEW_W, integerScale } from "./artScale";
 import { DEFAULT_PLAYER_LOOK, type HairId, type HoodieId, type PlayerLook } from "./artSpec";
 import { Chatter } from "./ChatterLine";
 import { isRevealing, subscribeReveal } from "./chatter";
@@ -228,7 +228,8 @@ function lineBox(zoom: number, y: number): CSSProperties {
   return {
     position: "absolute",
     left: 78 * zoom,
-    top: (phone ? y - 8 : y) * zoom,
+    // On a phone the name leads the speech, so the box starts higher: three lines fit above the panel's bottom edge.
+    top: (phone ? y - 12 : y) * zoom,
     width: 282 * zoom,
     margin: 0,
     pointerEvents: "none",
@@ -356,11 +357,12 @@ export function PixelBeat({
       mouth: talking ? "talk" : "smile",
       kicker: beat.kicker,
       title: beat.title,
-      speaker,
       pip: index + 1,
+      // Phones tap to continue, so the SPACE hint is dropped there; it would sit under the longer speech lines.
+      hint: window.innerWidth >= PHONE_VIEW_W,
     });
     paintWipe(ctx, wipe);
-  }, [scene, oy, who, you, look, talking, beat.kicker, beat.title, speaker, index, wipe, tick]);
+  }, [scene, oy, who, you, look, talking, beat.kicker, beat.title, index, wipe, tick]);
 
   return (
     <Stage testId="pixel-beat">
@@ -373,7 +375,8 @@ export function PixelBeat({
             style={{ width: scale.dw, height: scale.dh, imageRendering: "pixelated", display: "block" }}
           />
           <div className="intro-line" style={lineBox(scale.zoom, 174)}>
-            <Chatter key={index + ":" + exchange + ":" + line} text={line} voice={you ? "player" : who} className="intro-line" />
+            {/* The speaker's name leads the speech line: same element, same size (12 px minimum), same colour and background. */}
+            <Chatter key={index + ":" + exchange + ":" + line} text={`${speaker}: ${line}`} voice={you ? "player" : who} className="intro-line" />
           </div>
           <button type="button" aria-label="Continue" data-testid="intro-continue" style={hit(scale.zoom, 0, 0, NW, NH)} onClick={onContinue} />
         </>
