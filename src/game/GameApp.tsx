@@ -605,8 +605,10 @@ export function GameApp() {
     };
   }, []);
 
+  // The pixel title is drawn in both "splash" and "menu" (see the PixelMenu render below), so the
+  // saved flag must be read in both. Reading it only in "menu" left Continue dead on a fresh load.
   useEffect(() => {
-    if (mode === "menu") setSaved(hasSave());
+    if (mode === "splash" || mode === "menu") setSaved(hasSave());
   }, [mode]);
 
   const s = stateRef.current;
