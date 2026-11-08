@@ -136,7 +136,7 @@ export function ReactorTrainer({
         <p className="mt-3 max-w-md text-center font-mono text-sm leading-relaxed text-good/80">
           Q = m * cp * dT. You matched flow to power. Teaching model only — not a real core, not a license.
         </p>
-        <Schematic plant={plant} dT={dT} inBand tHot={tHot} tCold={tCold} />
+        <Schematic plant={plant} tHot={tHot} tCold={tCold} />
         <button type="button" className="btn-primary mt-6" onClick={onPass}>
           Thank Priya later
         </button>
@@ -162,7 +162,7 @@ export function ReactorTrainer({
           </button>
         </div>
       </div>
-      <Schematic plant={plant} dT={dT} inBand={inBand} tHot={tHot} tCold={tCold} />
+      <Schematic plant={plant} tHot={tHot} tCold={tCold} />
       <p className="mt-2 text-sm text-muted">{msg}</p>
       <div className="mt-4 grid grid-cols-2 gap-2 text-sm sm:grid-cols-4">
         <Stat k="Power" v={`${power.toFixed(0)} %`} />
@@ -281,60 +281,7 @@ function Stat({ k, v, warn }: { k: string; v: string; warn?: boolean }) {
   );
 }
 
-function Schematic({ plant, dT, inBand, tHot, tCold }: { plant: PlantType; dT: number; inBand: boolean; tHot: number; tCold: number }) {
-  const glow = inBand ? "#6b8f71" : "#c4783a";
-  if (plant === "pwr") return <PixelSchematic tHot={tHot} tCold={tCold} />;
-  return (
-    <svg viewBox="0 0 560 200" className="mt-4 w-full" aria-hidden>
-      <rect x="0" y="0" width="560" height="200" fill="#1a1410" rx="8" />
-      {plant === "bwr" && (
-        <>
-          <ellipse cx="200" cy="110" rx="58" ry="80" fill="#2a3238" stroke={glow} strokeWidth="3" />
-          <rect x="160" y="38" width="80" height="18" fill="#d6e0e6" opacity="0.5" />
-          {[0, 1, 2, 3, 4].map((n) => (
-            <rect key={n} x={170 + n * 12} y="168" width="6" height="22" fill="#6b8f71" />
-          ))}
-          <rect x="340" y="28" width="90" height="50" rx="6" fill="#2a261e" stroke="#c4783a" strokeWidth="2" />
-          <path d="M200 30 H385" fill="none" stroke="#8a7864" strokeWidth="6" />
-          <text x="200" y="114" textAnchor="middle" fill="#f3e6d0" fontSize="11">vessel</text>
-          <text x="385" y="58" textAnchor="middle" fill="#f3e6d0" fontSize="11">turbine</text>
-          <text x="200" y="188" textAnchor="middle" fill="#6b8f71" fontSize="9">rods from below</text>
-        </>
-      )}
-      {plant === "pebble" && (
-        <>
-          <circle cx="200" cy="108" r="74" fill="#2a261e" stroke={glow} strokeWidth="3" />
-          <circle cx="200" cy="108" r="52" fill="#1c2a2c" stroke="#3d5c66" strokeWidth="2" />
-          {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map((n) => (
-            <circle key={n} cx={176 + (n % 4) * 16} cy={84 + Math.floor(n / 4) * 18} r="6" fill="#c4783a" />
-          ))}
-          <path d="M200 20 V34" fill="none" stroke="#7a8f9a" strokeWidth="6" />
-          <path d="M200 160 V188 H320" fill="none" stroke="#c4783a" strokeWidth="6" />
-          <text x="200" y="30" textAnchor="middle" fill="#7a8f9a" fontSize="10">He in</text>
-          <text x="360" y="188" fill="#c4783a" fontSize="10">He out</text>
-        </>
-      )}
-      {plant === "msr" && (
-        <>
-          <rect x="80" y="36" width="140" height="110" rx="8" fill="#2a261e" stroke={glow} strokeWidth="3" />
-          {[0, 1, 2, 3, 4].map((i) =>
-            [0, 1, 2, 3].map((j) => (
-              <circle key={`${i}-${j}`} cx={100 + i * 22} cy={56 + j * 22} r="6" fill="#c9a227" />
-            )),
-          )}
-          <rect x="260" y="48" width="70" height="70" rx="6" fill="#1c2a2c" stroke="#7a8f9a" strokeWidth="2" />
-          <circle cx="400" cy="140" r="24" fill="#1c2a2c" stroke="#c9a227" strokeWidth="2" />
-          <rect x="120" y="146" width="28" height="10" fill="#c9a227" />
-          <ellipse cx="134" cy="176" rx="36" ry="16" fill="#2a261e" stroke="#c4783a" strokeWidth="2" />
-          <path d="M220 70 H260 M330 70 H400 M400 116 V70" fill="none" stroke="#c9a227" strokeWidth="5" />
-          <text x="150" y="30" textAnchor="middle" fill="#f3e6d0" fontSize="10">graphite + salt</text>
-          <text x="294" y="88" textAnchor="middle" fill="#f3e6d0" fontSize="10">HX</text>
-          <text x="134" y="180" textAnchor="middle" fill="#c4783a" fontSize="9">drain</text>
-        </>
-      )}
-      <text x="28" y="24" fill="#b5a48c" fontSize="11">
-        ΔT {dT.toFixed(1)} °C
-      </text>
-    </svg>
-  );
+/** One pixel drawing for every plant type: the same grid, labels, footer and colour bar. */
+function Schematic({ plant, tHot, tCold }: { plant: PlantType; tHot: number; tCold: number }) {
+  return <PixelSchematic plant={plant} tHot={tHot} tCold={tCold} />;
 }
