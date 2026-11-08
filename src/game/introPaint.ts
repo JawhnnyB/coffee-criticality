@@ -1,6 +1,6 @@
 /** 384×216 intro chrome. Glyphs match tools/artkit/intro_mock.py. Spoken lines are not drawn here. */
 import type { HairId, HoodieId, PlayerLook } from "./artSpec";
-import { fillRect, nameChip, panel, pixelButton, text3, text5 } from "./pxFont";
+import { fillRect, nameChip, panel, pixelButton, text3, text5, textW3 } from "./pxFont";
 
 export const NW = 384;
 export const NH = 216;
@@ -65,8 +65,12 @@ const HAIR: Record<HairId, RGB[]> = {
 
 const COPPER = HOOD.copper;
 
-export const BEAT_SCENE = ["core", "cafe", "lot", "wing", "bench", "break", "control", "threshold"] as const;
-export const BEAT_WHO = ["priya", "mabel", "elena", "tommy", "marcus", "jordan", "holt", "player"] as const;
+export const BEAT_SCENE = ["core", "cafe", "lot", "wing", "bench", "break", "control", "threshold", "security", "kiosk", "iris", "desk"] as const;
+export const BEAT_WHO = ["priya", "mabel", "elena", "tommy", "marcus", "jordan", "holt", "player", "dee", "dee", "dee", "priya"] as const;
+/** Site Access beats sit on the same 8-pip bar as the opening: lobby 5, kiosk 5, portal 6, desk 7. */
+export const BEAT_PIP: Record<number, number> = { 8: 5, 9: 5, 10: 6, 11: 7 };
+/** Speakers that are not in NPCS. Dee is a fixture, not a trust-meter NPC. */
+export const GUEST_NAME: Record<string, string> = { dee: "OFFICER DEE OKAFOR" };
 
 const images = new Map<string, HTMLImageElement>();
 const swaps = new Map<string, HTMLCanvasElement>();
@@ -397,4 +401,63 @@ export function paintWipe(ctx: CanvasRenderingContext2D, step: number) {
   for (let y = 0; y < NH; y++) {
     if (y % 4 < step) ctx.fillRect(0, y, NW, 1);
   }
+}
+
+/** Greedy word wrap at n characters, as Python's textwrap.wrap does in tools/artkit/builder_mock.py. */
+function wrapChars(text: string, n: number): string[] {
+  const out: string[] = [];
+  let cur = "";
+  for (const w of text.split(/\s+/).filter(Boolean)) {
+    if (!cur) cur = w;
+    else if (cur.length + 1 + w.length <= n) cur += " " + w;
+    else {
+      out.push(cur);
+      cur = w;
+    }
+  }
+  if (cur) out.push(cur);
+  return out;
+}
+
+export type IrisState = "align" | "scan" | "match";
+
+/** Iris screen, 384x216. Matches reference/security/iris-*.png; the progress bar (23 segments, 8px pitch) is live. */
+export function paintIris(
+  ctx: CanvasRenderingContext2D,
+  o: { state: IrisState; progress: number; look: PlayerLook },
+) {
+  ctx.imageSmoothingEnabled = false;
+  ground(ctx);
+  topbar(ctx, "UNIT 1 - SITE ACCESS - IRIS");
+  sceneWindow(ctx, `iris-${o.state}`, 8, 32, 15, 320, 128);
+  panel(ctx, 16, 150, 352, 58);
+  blitPortrait(ctx, playerPortrait(o.look, "smile"), 22, 156);
+  const [head, sub] = {
+    align: ["ALIGN YOUR EYE", "MOVE UNTIL THE CROSS SITS ON THE PUPIL."],
+    scan: ["HOLD STILL", "IT MAPS THE PATTERN IN YOUR IRIS, NOT THE COLOUR."],
+    match: ["MATCH", "PORTAL OPEN. WALK THROUGH."],
+  }[o.state];
+  text5(ctx, 78, 157, head, "#8a4a2a", 1);
+  text3(ctx, 78, 168, o.state !== "match" ? "IRIS ENROLLMENT - FIRST DAY ONLY" : "ENROLLED. NEXT TIME IT TAKES ONE SECOND.", "#c4783a");
+  wrapChars(sub, 66).forEach((ln, i) => text3(ctx, 78, 177 + i * 7, ln, "#3b2318"));
+  const x0 = 78;
+  const y0 = 193;
+  fillRect(ctx, x0, y0, 192, 7, "#3b2318");
+  const lit = o.state === "match" ? 23 : Math.floor(23 * Math.max(0, Math.min(1, o.progress)));
+  for (let i = 0; i < 23; i++) {
+    fillRect(ctx, x0 + 1 + i * 8, y0 + 1, 7, 5, i < lit ? (o.state === "match" ? "#6cc060" : "#e8b838") : "#3a2a1e");
+  }
+  pixelButton(ctx, 292, 190, 64, 14, o.state !== "match" ? "HOLD E" : "WALK ON", o.state === "match");
+}
+
+/** The lanyard card, 112x160. The portrait and the role lines are live; the frame, barcode and ID are baked. */
+export function paintLanyard(ctx: CanvasRenderingContext2D, o: { look: PlayerLook; role: string }) {
+  ctx.imageSmoothingEnabled = false;
+  const base = needImage("/art/ui/security/badge-lanyard.png");
+  if (base) ctx.drawImage(base, 0, 0);
+  const face = playerPortrait(o.look, "smile");
+  if (face) ctx.drawImage(face, 32, 59);
+  fillRect(ctx, 16, 121, 80, 15, "#f6f0e0");
+  const lines = o.role.toUpperCase().includes(" ") ? [o.role.toUpperCase().split(" ")[0], o.role.toUpperCase().split(" ").slice(1).join(" ")] : [o.role.toUpperCase()];
+  lines.forEach((ln, i) => text3(ctx, 56 - ((textW3(ln) / 2) | 0), 122 + i * 7, ln, "#5a4030"));
 }

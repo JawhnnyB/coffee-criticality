@@ -35,6 +35,9 @@ const OVERLAY: Mode[] = [
   "bowl",
   "phys",
   "load",
+  // Stage 2c: the iris hold and the item pickup are overlays too; a save never resumes mid-scan.
+  "iris",
+  "item",
 ];
 
 export interface SaveV1 {

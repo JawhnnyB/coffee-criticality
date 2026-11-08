@@ -3,6 +3,7 @@ import sys, os, math
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from kit import *
 import ref
+import security_kit as sk   # Site Access: registers its props and palette on import
 
 ROOMS = parse_rooms(os.environ.get('CONTENT_TS','src/game/content.ts'))
 OUT = os.environ.get('ROOMS_OUT','docs/preview/rooms')
@@ -52,6 +53,9 @@ def dress(cv, rid, p, W, occ):
         for x in (28, 124, 220, 300): board(x)
         for x in (100, 196, 268, 364): sconce(x)
         if ok(4, 14): cv.ob(4, 8, 10, 18, hx('#c04a38')); cv.r(6, 10, 6, 5, hx('#2a1610'))
+        sk.corridor_plate(cv)   # wayfinding plate, 80x42 at (24,3); replaces the board at x=28
+    elif rid == 'security':
+        sk.dress_sec(cv, W)
     elif rid == 'control':
         for cx in (80, 106, 132): gauge(cx)
         if ok(280, 40): cv.circle(300, 16, 10, hx('#f6e2c4')); cv.circle(300, 16, 8, hx('#fff8e4')); cv.r(300, 10, 1, 7, OL); cv.r(300, 16, 5, 1, OL)
@@ -158,6 +162,7 @@ LAYOUT_CHARS = {
  'breakroom':   [(0, 140, 150), (3, 70, 190)],
  'reactor':     [(0, 60, 130), (1, 260, 195)],
  'maintenance': [(0, 190, 190), (2, 280, 170)],
+ 'security':    [(1, 120, 196), (3, 205, 146)],
 }
 
 def render_room(rid, chars=True, which=None, border_on=True):
@@ -179,6 +184,8 @@ def render_room(rid, chars=True, which=None, border_on=True):
             ov = Image.new('RGBA', (W, H), (0, 0, 0, 0)); ImageDraw.Draw(ov).ellipse([cx-r_, cy-int(r_*.75), cx+r_, cy+int(r_*.75)], fill=(120, 232, 224, int(255*a)))
             cv.im.alpha_composite(ov)
         cv.r(7*16, 3*16+0, 0, 0, hx('#000000'))
+    if rid == 'security':
+        sk.under(cv, W, H)
     draw_doors(cv, rid, p, W, H, R['doors'])
     state = dict(cab=0)
     props = sorted(R['props'], key=lambda pr: (pr['kind'] == 'rug' and -1 or 0, pr['rect'][1]+pr['rect'][3]))
