@@ -1,20 +1,38 @@
 # Reactor bench: style audit against STYLE-STANDARD
 
-Audited 2026-11-07 on `origin/main` at `4ae6277`, screenshots `review-bench-wide.png` and `review-bench-phone.png`. Each finding names the rule it breaks in `tools/artkit/STYLE-STANDARD.md`. Nothing here is fixed yet. These are the items for the next style PR.
+Audited on `origin/main` at `4ae6277`, 1100×720 and 390×844. Screenshots are committed in `docs/audit/`. Measurements were taken in the browser (computed styles and bounding boxes), not estimated from the screenshots.
+
+Corrected after review by G (`reviews/PR-6.md`, request-changes). The first version had three wrong items: the label font, the label size, and a clipped Compare card. Those are now under "Checked and not a finding."
 
 ## Breaks the standard
 
-1. **Sliders use the browser's default blue** (rods, flow). Breaks §2.3 (palette only) and §3 (UI kit). Fix: palette track and thumb, with the cream and copper tokens.
-2. **Text is not the pixel font.** Labels and readouts are smoothed, anti-aliased small text. Breaks §1 (one 5×7 pixel font) and §2.7. Fix: use the bundled pixel font at integer sizes, with `image-rendering: pixelated` for any drawn text.
-3. **The reactor drawing is smooth vector shapes** (an ellipse core, rounded tanks, anti-aliased pipes). Breaks §2.1 (outline on every object), §2.4 (native size, integer scale), and §5.1 (hard pixel edges). Fix: redraw as a native pixel schematic, the way the builder mock is drawn.
+1. **Slider colours are the browser default.** Both range inputs report `accent-color: auto`. Breaks §2.3 (palette only) and §3 (UI kit). Fix: palette track and thumb, using the cream and copper tokens. Source: `src/game/ReactorTrainer.tsx`, the two range inputs.
+
+2. **The schematic's text is too small to read.** The labels inside the reactor drawing are SVG text at 9 user units for `core` and `SG`, and 8 for `pump`. On the rendered page that is 9 px tall at 1100 wide and about 5 px tall at 390 wide. The drawing is also scaled fractionally, which §2.4 and §5.1 forbid. Fix: draw the schematic at native pixel size and integer scale, with its labels in the pixel font at a readable native size. Breaks §2.4 and §5.1. Evidence: `docs/audit/bench-phone-390x844.png`.
+
+3. **The reactor drawing is smooth vector shapes.** An ellipse core, rounded tanks, anti-aliased pipes. Breaks §2.1 (outline on every object), §2.4 (native size, integer scale), and §5.1 (hard pixel edges). Fix: redraw as a native pixel schematic, the way the builder mock is drawn. Source: the `<svg>` in `ReactorTrainer.tsx`.
+
 4. **The schematic lacks the required parts of the drawing convention.** Breaks §4 and §5.5:
-   - no temperature colour bar with the seven fixed bands and a printed scale;
+   - no seven-band temperature colour bar with a printed scale;
    - no flow arrows on every pipe;
-   - no pressure label, and no hot and cold temperature labels;
+   - no pressure label on the drawing;
    - no "Simplified teaching drawing — not a license." footer.
-5. **Phone labels are about 9 px.** Too small to read at 1×, which §5.2 tests. Fix: a larger minimum at narrow widths.
-6. **The Compare card runs past the bottom of the 1100×720 frame.** The bottom row is cut off. Breaks §5.2 (no overlap or clipping). Fix: its own scroll area, or a shorter layout.
+   The hot and cold temperatures are in the stat row under the drawing, not on the pipes.
 
-## Not a style issue, but found in the same review
+## Not a style finding, owner decision
 
-7. **The bench starts at 100% power**, already inside the ΔT band. The old drill started at 62%. This is a gameplay question, not a style one. The owner decides (see the review notes).
+5. **The bench starts at 100% power**, already inside the ΔT band. The old drill started at 62%. This is a gameplay question. The owner decides.
+
+## Checked and not a finding
+
+- **Label font.** The labels are the pixel font, not a smoothed system font. Computed `font-family` is `CCPixel3x5, monospace`, `font-size` 12px, `-webkit-font-smoothing: none`, on both viewports. The earlier claim that the text was smoothed was wrong.
+- **Label size.** The HTML labels are 12px at 390×844. The problem is only the SVG text in finding 2.
+- **Compare card.** At 1100×720 the overlay scrolls: its content is 987px tall in a 720px viewport. All four plants and both sliders are reachable, and nothing is clipped. Scrolling is a layout choice, not a §5.2 violation (§5.2 is about overlap).
+- **Test failures.** The 9-versus-10 difference from G's run is `scripts/teaching-lab.test.mjs`. It calls `npx esbuild`, which cannot reach the network from my sandbox. It is an environment failure, not a regression. It passes where `npx` can reach the registry.
+
+## Evidence
+
+- `docs/audit/bench-wide-1100x720.png`
+- `docs/audit/bench-phone-390x844.png`
+- `docs/audit/compare-wide-1100x720.png`
+- `docs/audit/play-wide-1100x720.png`

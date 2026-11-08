@@ -4,11 +4,11 @@
 
 ## Decisions
 
-<!-- Each choice you made, with its reason. Use the options in docs/GROK_HANDOFF.md section 5 where they apply. -->
+<!-- Each choice you made, with its reason. Name the option you chose where the handoff gave options. -->
 
 ## Frozen numbers
 
-- [ ] Ending formula, culture and trust values, DELAY `LAMBDA`/`N_MAX`, tuned mini-game numbers, `flags.hid`, residue rules: unchanged (or the owner approved the change, linked here).
+- [ ] Every item in the frozen list in `docs/REVIEW.md` is unchanged, or the owner approved the change, linked here.
 
 ## Tests
 

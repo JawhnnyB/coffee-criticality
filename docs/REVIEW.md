@@ -8,10 +8,21 @@ Every change reaches `main` through a pull request that the owner (`@JawhnnyB`, 
 
 Grok, Claude, and any other contributor open a **draft** PR first, then mark it ready when the checklist in `.github/pull_request_template.md` is complete.
 
+## The frozen list
+
+These values and rules do not change in any PR without the owner's approval. This list is self-contained, so a reviewer can check a diff without any other file.
+
+- The ending formula: `hides < 3 && reports + catches > hides && culture >= 28`.
+- The culture and trust values in `bumpCulture` and `bumpTrust`.
+- DELAY `LAMBDA` and `N_MAX`.
+- The tuned numbers in LOAD, ROD.BANK, PHYS.CAB, CATCH, and LOTOTO.
+- `flags.hid`: "hid at least once." Do not reuse it.
+- Residue: a hide leaves the lie up, and `beginDay` must not clear residue.
+
 ## What a reviewer checks
 
 1. **Scope.** The PR does what its description says, and nothing else. Stacked PRs name the one that must merge first.
-2. **Frozen numbers.** Compare the diff against the list in `docs/GROK_HANDOFF.md` section 4. Any change needs owner approval, linked in the PR.
+2. **Frozen numbers.** Compare the diff against the frozen list above. Any change needs owner approval, linked in the PR.
 3. **Tests.** Run `npm test` on the branch and on `main`. The two failure lists must match, except for tests the PR adds or fixes.
 4. **Visuals.** Screenshots at 1100×720 and 390×844, checked against `tools/artkit/STYLE-STANDARD.md` section 5. Art changes also run `npm run art:check`.
 5. **Decisions.** Each choice is recorded with its reason, and the choice is easy to reverse.
