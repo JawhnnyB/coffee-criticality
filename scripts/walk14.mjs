@@ -44,7 +44,7 @@ async function run(w, h) {
     if (m.type() === "error") errs.push("console: " + m.text());
   });
   await p.goto(BASE);
-  await p.waitForTimeout(1500);
+  await p.waitForFunction(() => window.__controlsTest && typeof window.__controlsTest.wipe === "function", { timeout: 15000 });
   const phone = w < 720;
   const T = (fn, ...a) => p.evaluate(([f, args]) => window.__controlsTest[f](...args), [fn, a]);
   const wait = (ms = 300) => p.waitForTimeout(ms);
