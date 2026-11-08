@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { DT_BAND, thermalState, type PlantDesign, type PlantType, type RunState } from "./plant";
+import { PixelSchematic } from "./PixelSchematic";
 
 const PLANTS: { id: PlantType; title: string; note: string }[] = [
   { id: "pwr", title: "PWR — this site", note: "Pressurized primary. Steam generators. Rods from above. Heat leaves with flow." },
@@ -136,7 +137,7 @@ export function ReactorTrainer({
         <p className="mt-3 max-w-md text-center font-mono text-sm leading-relaxed text-good/80">
           Q = m * cp * dT. You matched flow to power. Teaching model only — not a real core, not a license.
         </p>
-        <Schematic plant={plant} dT={dT} inBand />
+        <Schematic plant={plant} dT={dT} inBand tHot={tHot} tCold={tCold} />
         <button type="button" className="btn-primary mt-6" onClick={onPass}>
           Thank Priya later
         </button>
@@ -162,7 +163,7 @@ export function ReactorTrainer({
           </button>
         </div>
       </div>
-      <Schematic plant={plant} dT={dT} inBand={inBand} />
+      <Schematic plant={plant} dT={dT} inBand={inBand} tHot={tHot} tCold={tCold} />
       <p className="mt-2 text-sm text-muted">{msg}</p>
       <div className="mt-4 grid grid-cols-2 gap-2 text-sm sm:grid-cols-4">
         <Stat k="Power" v={`${power.toFixed(0)} %`} />
@@ -278,8 +279,9 @@ function Stat({ k, v, warn }: { k: string; v: string; warn?: boolean }) {
   );
 }
 
-function Schematic({ plant, dT, inBand }: { plant: PlantType; dT: number; inBand: boolean }) {
+function Schematic({ plant, dT, inBand, tHot, tCold }: { plant: PlantType; dT: number; inBand: boolean; tHot: number; tCold: number }) {
   const glow = inBand ? "#6b8f71" : "#c4783a";
+  if (plant === "pwr") return <PixelSchematic tHot={tHot} tCold={tCold} />;
   return (
     <svg viewBox="0 0 560 200" className="mt-4 w-full" aria-hidden>
       <rect x="0" y="0" width="560" height="200" fill="#1a1410" rx="8" />
