@@ -8,7 +8,7 @@ Corrected after review by G (`reviews/PR-6.md`, request-changes). The first vers
 
 1. **Slider colours are the browser default.** Both range inputs report `accent-color: auto`. Breaks §2.3 (palette only) and §3 (UI kit). Fix: palette track and thumb, using the cream and copper tokens. Source: `src/game/ReactorTrainer.tsx`, the two range inputs.
 
-2. **The schematic's text is too small to read.** The labels inside the reactor drawing are SVG text at 9 user units for `core` and `SG`, and 8 for `pump`. On the rendered page that is 9 px tall at 1100 wide and about 5 px tall at 390 wide. The drawing is also scaled fractionally, which §2.4 and §5.1 forbid. Fix: draw the schematic at native pixel size and integer scale, with its labels in the pixel font at a readable native size. Breaks §2.4 and §5.1. Evidence: `docs/audit/bench-phone-390x844.png`.
+2. **The schematic's text is too small to read.** The labels inside the reactor drawing are SVG text. Measured bounding boxes: `core` and `SG` are 9 px tall and `pump` 8 px at 1100 wide, and 5, 5, and 4 px at 390 wide. The drawing is also scaled fractionally, which §2.4 and §5.1 forbid. Fix: draw the schematic at native pixel size and integer scale, with its labels in the pixel font at a readable native size. Breaks §2.4 and §5.1. Evidence: `docs/audit/bench-phone-390x844.png`.
 
 3. **The reactor drawing is smooth vector shapes.** An ellipse core, rounded tanks, anti-aliased pipes. Breaks §2.1 (outline on every object), §2.4 (native size, integer scale), and §5.1 (hard pixel edges). Fix: redraw as a native pixel schematic, the way the builder mock is drawn. Source: the `<svg>` in `ReactorTrainer.tsx`.
 
