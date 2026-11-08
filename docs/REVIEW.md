@@ -8,6 +8,10 @@ Every change reaches `main` through a pull request that the owner (`@JawhnnyB`, 
 
 Grok, Claude, and any other contributor open a **draft** PR first, then mark it ready when the checklist in `.github/pull_request_template.md` is complete.
 
+## Cross-review between the two AIs
+
+Every change is authored by one AI (G for Grok, C for Claude) and reviewed by the other. The rules and the gate are in `docs/CROSS-REVIEW.md`. The review record lives at `reviews/PR-<number>.md`. The owner still decides what reaches `main`.
+
 ## What a reviewer checks
 
 1. **Scope.** The PR does what its description says, and nothing else. Stacked PRs name the one that must merge first.
