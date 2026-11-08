@@ -201,6 +201,7 @@ export function GameApp() {
   const refresh = () => bump((n) => n + 1);
 
   const applyMode = (next: Mode) => {
+    if (next === "reactor") ensureRun(stateRef.current);
     stateRef.current.mode = next;
     modeRef.current = next;
     setMode(next);
@@ -609,7 +610,6 @@ export function GameApp() {
   }, [mode]);
 
   const s = stateRef.current;
-  if (mode === "reactor") ensureRun(s);
   const stage = cultureStage(s.culture);
   const playing = PLAY_MODES.includes(mode);
   const line = s.dialogue[s.dialogueI] as Line | undefined;
