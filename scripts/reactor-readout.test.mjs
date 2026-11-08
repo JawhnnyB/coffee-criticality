@@ -84,13 +84,12 @@ test("burnup stays pending, and the daily row does not invent a mass", () => {
   assert.match(R.BURNUP_PENDING, /Pending verification/);
 });
 
-test("the colour-safe ramp is seven lightness steps, not the hue bands", () => {
-  assert.equal(M.SAFE_BANDS.length, 7);
-  assert.notDeepEqual([...M.SAFE_BANDS], [...M.BANDS]);
-  const cool = M.bandColor(290, 285, 350, true);
-  const hot = M.bandColor(345, 285, 350, true);
-  assert.notEqual(cool, hot);
-  assert.ok(M.SAFE_BANDS.includes(cool) && M.SAFE_BANDS.includes(hot));
+test("colour-safe marks use the listed palette, one per band, and no grey ramp", () => {
+  const listed = new Set(["#f3e6d0", "#16110d"]);
+  assert.equal(M.BAND_TICK.length, 7);
+  for (const c of M.BAND_TICK) assert.ok(listed.has(c), `${c} is a listed token`);
+  for (const c of M.BANDS) assert.ok(/^#[0-9a-f]{6}$/.test(c));
+  assert.equal(M.SAFE_BANDS, undefined, "the grey ramp is gone");
 });
 
 test("band time is the last day, after the clock resets", () => {

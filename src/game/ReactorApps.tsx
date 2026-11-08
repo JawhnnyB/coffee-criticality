@@ -2,27 +2,33 @@
 
 import { useEffect, useRef, useState } from "react";
 import { PAL } from "./palette";
+import { CAM_H, CAM_W, COL, camScale, drawCamScene } from "./camDraw";
 import { DEFAULT_PLANT, plantTitle, type PlantDesign } from "./plant";
 import { computeKeff } from "./nuclearLab";
 import { fluxOf, passes, startMap, type Burn } from "./shuffleModel";
 import {
   BURNUP_PENDING,
+  bubbleCount,
+  bubbleSpeed,
   camFrame,
   cellCount,
   coreHealth,
   easeScram,
   glowColor,
+  glowMoved,
   inBandFraction,
   lookLine,
   particleCount,
+  stepBubbles,
   stepFlow,
-  type CamFrame,
   type FlowDot,
   type Health,
 } from "./reactorReadout";
 import type { GameState, ResultsSave } from "./sim";
 
 const FIELD = { fontFamily: "CCPixel3x5, monospace", color: PAL.ink } as const;
+/** Wood token. Contrast on cream is well above 4.5:1. */
+const CAPTION = COL.wood;
 
 function healthOf(s: GameState, plant: PlantDesign): Health {
   const k = computeKeff(plant).kCore;
@@ -40,8 +46,21 @@ export function CoreCamApp({ s }: { s: GameState }) {
   const frame = camFrame(plant, s.run);
   const health = healthOf(s, plant);
   const ref = useRef<HTMLCanvasElement>(null);
-  const live = useRef({ plant, run: s.run, reduced: s.desktop.reducedMotion, health: health.score });
-  live.current = { plant, run: s.run, reduced: s.desktop.reducedMotion, health: health.score };
+  const wrap = useRef<HTMLDivElement>(null);
+  const [scale, setScale] = useState(2);
+  const live = useRef({ plant, run: s.run, reduced: s.desktop.reducedMotion });
+  live.current = { plant, run: s.run, reduced: s.desktop.reducedMotion };
+
+  // Integer scale, centred by the flex wrapper. Resize only changes the scale, never the grid.
+  useEffect(() => {
+    const el = wrap.current;
+    if (!el) return;
+    setScale(camScale(el.clientWidth));
+    if (typeof ResizeObserver === "undefined") return;
+    const ro = new ResizeObserver(() => setScale(camScale(el.clientWidth)));
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
 
   useEffect(() => {
     const c = ref.current;
@@ -53,23 +72,40 @@ export function CoreCamApp({ s }: { s: GameState }) {
     let shown = 0;
     let seen = false;
     const dots: FlowDot[] = [];
+    const bubbles: FlowDot[] = [];
     const tick = (now: number) => {
       if (!alive) return;
       const dt = Math.min(0.05, (now - last) / 1000);
       last = now;
+      // Skip drawing while the window is minimized (the canvas is not laid out).
       if (c.offsetParent !== null) {
         const cur = live.current;
         factor = easeScram(factor, !!cur.run.scram, dt);
         const shot = camFrame(cur.plant, cur.run, factor);
-        const next = shot.glow;
-        if (!seen || !cur.reduced || Math.abs(next - shown) / Math.max(shown, 0.05) > 0.05) {
-          shown = next;
+        // Glow moves only when it changes by more than 5 %, and never under reduced motion unless it changes that much.
+        if (glowMoved(shot.glow, shown, cur.reduced, !seen)) {
+          shown = shot.glow;
           seen = true;
         }
         const stop = cur.reduced || shot.scram;
-        const count = particleCount(shot.count, stop);
-        stepFlow(dots, count, shot.speed, cur.plant.type, dt, stop);
-        drawCam(g, cur.plant, shot, cellCount(cur.plant.scale, cur.plant.sizeClass, cur.plant.fullCore), dots, shown, cur.health);
+        stepFlow(dots, particleCount(shot.count, stop), shot.speed, cur.plant.type, dt, stop);
+        const isBwr = cur.plant.type === "bwr";
+        stepBubbles(
+          bubbles,
+          isBwr ? bubbleCount(shot.voidFrac, cur.reduced || shot.scram) : 0,
+          bubbleSpeed(shot.voidFrac),
+          dt,
+          stop,
+        );
+        drawCamScene(g, {
+          type: cur.plant.type,
+          kind: cur.plant.scale === "rod" ? "rod" : cur.plant.scale === "assembly" ? "assembly" : "core",
+          cells: cellCount(cur.plant.scale, cur.plant.sizeClass, cur.plant.fullCore),
+          glow: glowColor(shown),
+          edge: shot.scram ? COL.steel : shot.band === "in" ? COL.gold : shot.band === "low" ? COL.steel : COL.copper,
+          dots,
+          bubbles,
+        });
       }
       requestAnimationFrame(tick);
     };
@@ -91,17 +127,25 @@ export function CoreCamApp({ s }: { s: GameState }) {
   return (
     <div className="p-3" style={FIELD} data-testid="app-cam">
       <p style={{ margin: 0, fontSize: 14 }}>{plantTitle(plant)}</p>
-      <p style={{ margin: "4px 0 8px", fontSize: 12, color: "#5c4636" }}>
+      <p style={{ margin: "4px 0 8px", fontSize: 12, color: CAPTION }}>
         Teaching view. Glow shows fuel activity and core temperature. Not a measurement.
       </p>
       {missing ? <p style={{ fontSize: 12 }}>Using the default design.</p> : null}
-      <canvas
-        ref={ref}
-        width={160}
-        height={96}
-        aria-hidden
-        style={{ width: 320, height: 192, imageRendering: "pixelated", background: "#1c1410", display: "block" }}
-      />
+      <div ref={wrap} style={{ display: "flex", justifyContent: "center" }}>
+        <canvas
+          ref={ref}
+          width={CAM_W}
+          height={CAM_H}
+          aria-hidden
+          style={{
+            width: CAM_W * scale,
+            height: CAM_H * scale,
+            imageRendering: "pixelated",
+            background: COL.screen,
+            display: "block",
+          }}
+        />
+      </div>
       <p style={{ fontSize: 12, marginTop: 6 }}>
         Classroom proxy k {computeKeff(plant).kCore.toFixed(3)}. Core health {health.score}.
         {plant.type === "bwr" ? ` Boiling proxy ${frame.voidFrac.toFixed(2)}.` : ""}
@@ -112,106 +156,6 @@ export function CoreCamApp({ s }: { s: GameState }) {
       ) : null}
     </div>
   );
-}
-
-function drawCam(
-  g: CanvasRenderingContext2D,
-  plant: PlantDesign,
-  frame: CamFrame,
-  cells: number,
-  dots: readonly FlowDot[],
-  glowValue: number,
-  health: number,
-) {
-  g.imageSmoothingEnabled = false;
-  g.fillStyle = "#1c1410";
-  g.fillRect(0, 0, 160, 96);
-  const edge = frame.scram ? "#3d5c66" : frame.band === "in" ? "#c9a227" : frame.band === "low" ? "#3d5c66" : "#c4783a";
-  g.fillStyle = edge;
-  g.fillRect(8, 8, 144, 80);
-  g.fillStyle = "#2a241c";
-  g.fillRect(10, 10, 140, 76);
-  const glow = glowColor(glowValue);
-  if (plant.scale === "rod") drawRod(g, glow);
-  else if (plant.type === "pebble") drawPebbles(g, cells, glow);
-  else drawLattice(g, plant, cells, glow);
-  if (plant.type === "pwr" || plant.type === "msr") drawChevrons(g);
-  if (plant.type === "bwr") {
-    g.fillStyle = "#f4ecd8";
-    const bubbles = Math.round(frame.voidFrac * 8);
-    for (let i = 0; i < bubbles; i++) g.fillRect(22 + i * 8, 22 + (i % 3) * 6, 2, 2);
-  }
-  g.fillStyle = "#f3e6d0";
-  for (const p of dots) g.fillRect(p.x, p.y, 1, 1);
-  g.fillStyle = "#f3e6d0";
-  g.font = "8px monospace";
-  g.fillText(String(health), 126, 18);
-}
-
-function drawRod(g: CanvasRenderingContext2D, glow: string) {
-  g.fillStyle = "#4e5560";
-  g.fillRect(68, 18, 24, 60);
-  g.fillStyle = "#1c1410";
-  g.fillRect(70, 20, 20, 56);
-  g.fillStyle = glow;
-  for (let i = 0; i < 7; i++) g.fillRect(72, 22 + i * 8, 16, 6);
-  g.fillStyle = "#2a241c";
-  g.fillRect(79, 22, 2, 52);
-}
-
-function drawLattice(g: CanvasRenderingContext2D, plant: PlantDesign, cells: number, glow: string) {
-  const cols = Math.ceil(Math.sqrt(cells));
-  const rows = Math.ceil(cells / cols);
-  const cw = Math.floor(120 / cols);
-  const ch = Math.floor(60 / rows);
-  for (let i = 0; i < cells; i++) {
-    const x = 18 + (i % cols) * cw;
-    const y = 16 + Math.floor(i / cols) * ch;
-    const w = Math.max(2, cw - 2);
-    const h = Math.max(2, ch - 2);
-    if (plant.type === "msr") {
-      g.fillStyle = "#4e5560";
-      g.fillRect(x, y, w, h);
-      g.fillStyle = glow;
-      g.fillRect(x + 1, y + 1, Math.max(1, w - 2), Math.max(1, h - 2));
-    } else {
-      g.fillStyle = "#4e5560";
-      g.fillRect(x, y, w, h);
-      g.fillStyle = "#1c1410";
-      g.fillRect(x + 1, y + 1, Math.max(1, w - 2), Math.max(1, h - 2));
-      g.fillStyle = glow;
-      g.fillRect(x + 2, y + 1, Math.max(1, w - 4), Math.max(1, h - 2));
-    }
-  }
-}
-
-function drawPebbles(g: CanvasRenderingContext2D, cells: number, glow: string) {
-  const cols = Math.ceil(Math.sqrt(cells));
-  const rows = Math.ceil(cells / cols);
-  const cw = Math.floor(120 / cols);
-  const ch = Math.floor(60 / rows);
-  for (let i = 0; i < cells; i++) {
-    const x = 20 + (i % cols) * cw;
-    const y = 18 + Math.floor(i / cols) * ch;
-    const r = Math.max(1, Math.floor(Math.min(cw, ch) / 2) - 1);
-    g.fillStyle = glow;
-    g.fillRect(x, y, r, r);
-    g.fillStyle = "#3d5c66";
-    g.fillRect(x + r, y, 1, 1);
-  }
-}
-
-/** Down the outside, up the middle. The dots carry the motion. */
-function drawChevrons(g: CanvasRenderingContext2D) {
-  g.fillStyle = "#8a8070";
-  g.fillRect(14, 28, 2, 2);
-  g.fillRect(13, 30, 4, 1);
-  g.fillRect(14, 48, 2, 2);
-  g.fillRect(13, 50, 4, 1);
-  g.fillRect(78, 58, 2, 2);
-  g.fillRect(77, 56, 4, 1);
-  g.fillRect(78, 40, 2, 2);
-  g.fillRect(77, 38, 4, 1);
 }
 
 export function ResultsApp({ s }: { s: GameState }) {
@@ -268,23 +212,23 @@ export function ResultsApp({ s }: { s: GameState }) {
 function Trend({ rows }: { rows: { day: number; coreHealth: number; incidentCount: number }[] }) {
   if (rows.length === 0) return null;
   const w = 280;
-  const h = 78;
+  const h = 96;
   const pts = rows.map((r, i) => {
     const x = rows.length === 1 ? w / 2 : 20 + (i * (w - 40)) / (rows.length - 1);
-    const y = 14 + (1 - r.coreHealth / 100) * 42;
+    const y = 22 + (1 - r.coreHealth / 100) * 46;
     return { x, y, r };
   });
   const line = pts.map((p) => `${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(" ");
   return (
     <svg width={w} height={h} role="img" aria-label="Core health by day. Numbers sit on the points. The table repeats them." data-testid="results-trend">
-      <polyline fill="none" stroke="#c9a227" strokeWidth="1.5" points={line} />
+      <polyline fill="none" stroke={COL.gold} strokeWidth="1.5" points={line} />
       {pts.map((p) => (
         <g key={p.r.day}>
-          <circle cx={p.x} cy={p.y} r="2" fill="#f3e6d0" />
-          <text x={p.x} y={p.y - 4} fontSize="8" textAnchor="middle" fill="#16110d">
+          <circle cx={p.x} cy={p.y} r="2" fill={COL.cream} />
+          <text x={p.x} y={p.y - 5} fontSize="12" textAnchor="middle" fill={COL.ink}>
             {p.r.coreHealth}
           </text>
-          <text x={p.x} y={h - 2} fontSize="8" textAnchor="middle" fill="#5c4636">
+          <text x={p.x} y={h - 2} fontSize="12" textAnchor="middle" fill={CAPTION}>
             {p.r.day}
             {p.r.incidentCount > 0 ? " i" : ""}
           </text>
@@ -343,7 +287,7 @@ export function CoreMapApp({ s, onResults }: { s: GameState; onResults: (patch: 
               height: 28,
               background: pick === i ? "#c4783a" : cell === 0 ? "#f3e6d0" : cell === 1 ? "#c9a227" : "#6a4a32",
               color: "#16110d",
-              border: "1px solid #3b2318",
+              border: `1px solid ${COL.ink}`,
               fontFamily: "inherit",
               fontSize: 12,
             }}

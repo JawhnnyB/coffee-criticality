@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 import {
   BANDS,
-  SAFE_BANDS,
+  BAND_TICK,
   BWR_SHAPES,
   DRAWINGS,
   MSR_SHAPES,
@@ -87,16 +87,16 @@ function pixelCircle(g: CanvasRenderingContext2D, cx: number, cy: number, r: num
   }
 }
 
-/** Colour bar: seven 6 px bands, hot at the top, outlined. */
+/** Colour bar: seven 6 px bands, hot at the top, outlined. Colour-safe adds one tick per band (see BAND_TICK). */
 function scaleBar(g: CanvasRenderingContext2D, r: Rect, safe: boolean) {
-  const palette = safe ? SAFE_BANDS : BANDS;
   const h = r.h / 7;
   for (let i = 0; i < 7; i++) {
-    g.fillStyle = palette[6 - i];
+    const band = 6 - i;
+    g.fillStyle = BANDS[band];
     g.fillRect(r.x, r.y + i * h, r.w, h);
     if (safe) {
-      g.fillStyle = i < 3 ? "#f3e6d0" : "#16110d";
-      for (let n = 0; n < i + 1 && n < 4; n++) g.fillRect(r.x + 1, r.y + i * h + 1 + n, 2, 1);
+      g.fillStyle = BAND_TICK[band];
+      for (let n = 0; n < Math.min(4, band + 1); n++) g.fillRect(r.x + 1, r.y + i * h + 1 + n, 2, 1);
     }
   }
   g.fillStyle = OUTLINE;
@@ -216,8 +216,8 @@ export function drawPlant(plant: PlantKey, g: CanvasRenderingContext2D, tHot: nu
   g.fillStyle = BG;
   g.fillRect(0, 0, NATIVE_W, NATIVE_H);
   const s = SCALES[plant];
-  const hot = bandColor(tHot, s.lo, s.hi, safe);
-  const cold = bandColor(tCold, s.lo, s.hi, safe);
+  const hot = bandColor(tHot, s.lo, s.hi);
+  const cold = bandColor(tCold, s.lo, s.hi);
   if (plant === "pwr") drawPwr(g, hot, cold);
   else if (plant === "bwr") drawBwr(g, hot, cold);
   else if (plant === "pebble") drawPebble(g, hot, cold);

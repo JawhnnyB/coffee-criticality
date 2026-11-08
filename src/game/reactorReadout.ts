@@ -275,3 +275,49 @@ export function stepFlow(
     }
   }
 }
+
+/** BWR steam bubbles. Count follows the boiling proxy. Reduced motion draws none. */
+export const BUBBLE_MAX = 14;
+
+export function bubbleCount(voidFrac: number, reduced: boolean): number {
+  if (reduced) return 0;
+  return Math.round(clamp01(voidFrac) * BUBBLE_MAX);
+}
+
+/** Native pixels per second. Faster boiling, faster rise. */
+export function bubbleSpeed(voidFrac: number): number {
+  return 6 + 24 * clamp01(voidFrac);
+}
+
+/** Moves the bubble pool up the boiling channels. Scram or a zero count clears it. */
+export function stepBubbles(
+  bubbles: FlowDot[],
+  count: number,
+  speed: number,
+  dt: number,
+  stop: boolean,
+): void {
+  if (stop || count <= 0) {
+    bubbles.length = 0;
+    return;
+  }
+  while (bubbles.length < count) {
+    const i = bubbles.length;
+    bubbles.push({ x: 30 + ((i * 23) % 100), y: 74 - ((i * 11) % 56), lane: 0 });
+  }
+  if (bubbles.length > count) bubbles.length = count;
+  const v = speed * dt;
+  for (const b of bubbles) {
+    b.y -= v;
+    if (b.y < 16) b.y = 74;
+  }
+}
+
+/**
+ * Whether the drawn glow should move. Normal motion: always. Reduced motion: only past a 5 % change.
+ * The first frame always draws.
+ */
+export function glowMoved(next: number, shown: number, reduced: boolean, first: boolean): boolean {
+  if (first || !reduced) return true;
+  return Math.abs(next - shown) / Math.max(shown, 0.05) > 0.05;
+}

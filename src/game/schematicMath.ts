@@ -4,8 +4,11 @@
  * The seven temperature bands run cold to hot.
  */
 export const BANDS = ["#3a78c0", "#4aa0c8", "#7ac0b8", "#e8d070", "#e8963a", "#d4552e", "#a82a3a"] as const;
-/** Lightness ramp for the colour-safe setting. Same seven bands. Not a hue code. */
-export const SAFE_BANDS = ["#2a241c", "#3e382c", "#5c5344", "#7a6e5c", "#a89880", "#d2c4ae", "#f3e6d0"] as const;
+/**
+ * Colour-safe marks: one ink or cream tick per band, so the bands read without hue.
+ * Same seven bands, no new colours. Index is the band (0 cold, 6 hot). Chosen for contrast on each band.
+ */
+export const BAND_TICK = ["#f3e6d0", "#16110d", "#16110d", "#16110d", "#16110d", "#16110d", "#f3e6d0"] as const;
 export const NATIVE_W = 160;
 export const NATIVE_H = 80;
 
@@ -55,9 +58,8 @@ export function bandIndex(t: number, lo: number = PWR_SCALE.lo, hi: number = PWR
   return Math.max(0, Math.min(6, Math.floor(((t - lo) / (hi - lo)) * 7)));
 }
 
-export function bandColor(t: number, lo: number = PWR_SCALE.lo, hi: number = PWR_SCALE.hi, safe = false): string {
-  const palette = safe ? SAFE_BANDS : BANDS;
-  return palette[bandIndex(t, lo, hi)];
+export function bandColor(t: number, lo: number = PWR_SCALE.lo, hi: number = PWR_SCALE.hi): string {
+  return BANDS[bandIndex(t, lo, hi)];
 }
 
 /** Layout box used by the checks, in native pixels: 4 px advance per character (3 px glyph + 1 px gap), 6 px tall. */
