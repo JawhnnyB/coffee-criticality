@@ -41,15 +41,17 @@ Every change is authored by one AI (G for Grok, C for Claude) and reviewed by th
 - A real place, company, or person in player-visible text.
 - Any push to `main` that did not come through a reviewed PR.
 
-## Current state, and the open decision
+## Current state: branch protection (decided)
 
-GitHub branch protection is **not** set on `main` (checked 2026-11-07). That means the rule above is enforced by convention only. Options for the owner:
+GitHub branch protection is **not** set on `main`. The owner decided on **option C: stay with convention** (decided 2026-11-08). The rule above is enforced by convention only, and nothing in this repository changes branch settings.
 
-- **A. Protect `main`, require one approval, allow the owner to bypass.** Keeps your own quick fixes possible.
-- **B. Protect `main`, require one approval, no bypass.** Strictest. Your own pushes also need a PR.
-- **C. Stay with convention.** Relies on everyone following this document.
+The options considered were:
 
-Recommendation: **A**. It stops accidental pushes without locking you out. Nothing here changes repository settings until you choose.
+- **A. Protect `main`, require one approval, allow the owner to bypass.**
+- **B. Protect `main`, require one approval, no bypass.**
+- **C. Stay with convention.** Chosen.
+
+Because enforcement is convention only, the "When a change is already on main" section and the gate in `docs/CROSS-REVIEW.md` carry the weight. Any change to branch settings is the owner's decision and gets its own record here.
 
 ## When a change is already on main
 
