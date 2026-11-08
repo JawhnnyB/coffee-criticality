@@ -52,6 +52,17 @@ test("core health is 100 when every part is full, and drops by the weight when o
   assert.equal(incident.score, 80);
 });
 
+test("a part just under full prints 99.7, not 100, and the walk inputs still score 60", () => {
+  assert.equal(R.kScore(0.978).toFixed(6), "0.997959");
+  assert.equal(R.partPercent(R.kScore(0.978)), "99.7");
+  assert.equal(R.partPercent(1), "100");
+  assert.equal(R.partPercent(0), "0.0");
+  assert.equal(R.partPercent(0.5), "50.0");
+  const walk = R.coreHealth({ inBandFrac: 0, incidentOpen: false, residue, k: 0.978 });
+  assert.equal(walk.score, 60);
+  assert.equal(R.partPercent(walk.parts.find((p) => p.id === "k").value), "99.7");
+});
+
 test("a hide lowers the residue part, and a catch does not", () => {
   const hid = R.coreHealth({ inBandFrac: 1, incidentOpen: false, residue: { ...residue, valve: "hid" }, k: 1 });
   const caught = R.coreHealth({ inBandFrac: 1, incidentOpen: false, residue: { ...residue, valve: "caught" }, k: 1 });

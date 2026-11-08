@@ -18,6 +18,7 @@ import {
   glowMoved,
   inBandFraction,
   lookLine,
+  partPercent,
   particleCount,
   stepBubbles,
   stepFlow,
@@ -172,12 +173,13 @@ export function ResultsApp({ s }: { s: GameState }) {
             <tr key={p.id}>
               <td style={{ paddingRight: 12 }}>{p.label}</td>
               <td>{Math.round(p.weight * 100)}%</td>
-              <td style={{ paddingLeft: 12 }}>{Math.round(p.value * 100)}</td>
+              <td style={{ paddingLeft: 12 }}>{partPercent(p.value)}</td>
             </tr>
           ))}
         </tbody>
       </table>
-      <p style={{ fontSize: 12, marginTop: 8 }}>{lookLine(s.setup.stance, health.parts)}</p>
+      <p style={{ fontSize: 12, marginTop: 8, marginBottom: 0 }}>What to look at</p>
+      <p style={{ fontSize: 12, marginTop: 4 }}>{lookLine(s.setup.stance, health.parts)}</p>
       <p style={{ fontSize: 12 }}>{BURNUP_PENDING}</p>
       <p style={{ fontSize: 12 }}>1 in-game day = 1 real day. Time-compressed burnup stays off until a fuel mass is cited.</p>
       <Trend rows={rows} />

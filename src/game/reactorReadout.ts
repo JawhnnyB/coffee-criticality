@@ -73,6 +73,16 @@ export function lastDaySlice<T extends { t: number }>(history: readonly T[]): re
   return history.slice(start);
 }
 
+/**
+ * A part as printed in Results. Only a full part (1) prints 100. Anything else is truncated toward zero
+ * to one decimal, so a part just under full never reads as full: kScore(0.978) is 0.997959 and prints 99.7.
+ */
+export function partPercent(value: number): string {
+  if (value === 1) return "100";
+  const tenths = Math.trunc(value * 1000 + 1e-9) / 10;
+  return tenths.toFixed(1);
+}
+
 export function coreHealth(input: {
   inBandFrac: number;
   incidentOpen: boolean;
