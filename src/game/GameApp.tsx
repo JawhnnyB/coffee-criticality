@@ -36,6 +36,8 @@ import { ReactorTrainer } from "./ReactorTrainer";
 import { ReactorBuilder } from "./ReactorBuilder";
 import { FuelShuffle } from "./FuelShuffle";
 import { MaintGame } from "./MaintGame";
+import { Desktop } from "./Desktop";
+import { BootLog, SetupScreen } from "./ParlorApps";
 import { isMuted, playBed, playBlip, setMuted, unlockAudio, syncWorld, getAudioProbe, bedForRoom } from "./audio";
 import { isRevealing, requestSkip } from "./chatter";
 import { Chatter } from "./ChatterLine";
@@ -71,6 +73,12 @@ import {
   finishShuffle,
   finishTrainer,
   nextDay,
+  applySetup,
+  launchFromDesk,
+  leaveDesktop,
+  openDesktop,
+  resetShift,
+  saveDesign,
   noteControlMinute,
   npcsHere,
   openAcademy,
@@ -112,6 +120,28 @@ const GAME_CODES = new Set([
   "Enter",
   "Escape",
 ]);
+
+/** Sim modes a desktop window can host. The same overlay runs in a window (from the desktop) or full screen (from the world). */
+const DESK_HOSTS: Mode[] = [
+  "reactor",
+  "academy",
+  "shuffle",
+  "arcade",
+  "fish",
+  "plot",
+  "horde",
+  "delay",
+  "golf",
+  "rods",
+  "pebble",
+  "bowl",
+  "phys",
+  "load",
+  "maint",
+];
+
+/** Where a new week goes after the wipe question: the setup screen, a new shift from the desktop, or the desktop. */
+type WipeNext = "setup" | "role" | "desk";
 
 const BEZEL_MODES: Mode[] = [
   "arcade",
@@ -196,6 +226,8 @@ export function GameApp() {
   const [touch, setTouch] = useState(false);
   const [saved, setSaved] = useState(false);
   const [askWipe, setAskWipe] = useState(false);
+  const [wipeNext, setWipeNext] = useState<WipeNext>("setup");
+  const [booted, setBooted] = useState(false);
   const [look, setLook] = useState<PlayerLook>(DEFAULT_PLAYER_LOOK);
   const [, bump] = useState(0);
   const refresh = () => bump((n) => n + 1);
@@ -308,6 +340,20 @@ export function GameApp() {
         setMode(s.mode);
       },
       getPlant: () => stateRef.current.plant,
+      openDesk: () => {
+        const s = stateRef.current;
+        openDesktop(s);
+        applyMode("desktop");
+      },
+      deskLaunch: (mode: string) => {
+        const s = stateRef.current;
+        launchFromDesk(s, mode as Mode);
+        applyMode(s.mode);
+      },
+      getDesk: () => ({ ...stateRef.current.desktop }),
+      getSetup: () => ({ ...stateRef.current.setup }),
+      getDeskHost: () => stateRef.current.deskHost,
+      getRole: () => stateRef.current.role,
       save: () => writeSave(stateRef.current, true),
       load: () => {
         const ok = hydrateSave(stateRef.current);
@@ -579,7 +625,8 @@ export function GameApp() {
       }
       edges.clear();
       if (s.pendingRoom) preloadRoomArt(s.pendingRoom);
-      if (PLAY_MODES.includes(s.mode)) {
+      // A hosted overlay draws in its desktop window; the world behind the desktop is not painted.
+      if (PLAY_MODES.includes(s.mode) && !(s.deskHost && s.mode !== "play")) {
         paint(canvasRef.current, wrapRef.current, s, now / 1000, dt);
       }
       const veil = veilRef.current;
@@ -637,13 +684,33 @@ export function GameApp() {
     refresh();
   };
 
-  const beginNewWeek = () => {
+  /** A new week discards the saved shift. The setup and the desktop settings stay. */
+  const beginNewWeek = (next: WipeNext) => {
     wipeSave();
+    resetShift(s);
     setSaved(false);
     setAskWipe(false);
     unlockAudio();
     playBlip("ok");
     playBed("menu");
+    if (next === "setup") {
+      applyMode("setup");
+    } else if (next === "role") {
+      applyMode("role");
+    } else {
+      openDesktop(s);
+      applyMode("desktop");
+    }
+    refresh();
+  };
+
+  /** Start shift from the desktop. A running shift asks first, the same way Begin does. */
+  const startShiftFromDesk = () => {
+    if (s.role) {
+      setWipeNext("role");
+      setAskWipe(true);
+      return;
+    }
     applyMode("role");
     refresh();
   };
@@ -653,322 +720,11 @@ export function GameApp() {
     refresh();
   };
 
-  return (
-    <div className={"relative flex h-svh min-h-[100dvh] flex-col overflow-hidden bg-bg text-fg" + (ART.hud || ART.menu ? " art-on" : "")}>
-      <header className="pointer-events-none absolute inset-x-0 top-0 z-40 flex items-start justify-between gap-3 p-3 sm:p-4">
-        {!playing && mode !== "splash" && mode !== "brief" && mode !== "intro" && mode !== "role" && !(ART.menu && mode === "menu") ? (
-          <div className="pointer-events-auto max-w-[58%] border border-border bg-bg-elevated px-3 py-2">
-            <p className="font-display text-[11px] uppercase tracking-[0.16em] text-muted">{SITE}</p>
-            <p className="font-display text-lg leading-none text-fg">{TITLE}</p>
-          </div>
-        ) : (
-          <div className="pointer-events-none h-8" />
-        )}
-        <div className="pointer-events-auto flex items-center gap-2">
-          {BEZEL_MODES.includes(mode) ||
-          (ART.menu && (mode === "menu" || mode === "splash" || mode === "role" || mode === "intro" || mode === "brief")) ? null : (
-            <MuteToggle />
-          )}
-          <AuthChip />
-        </div>
-      </header>
-
-      <div ref={wrapRef} className="relative min-h-0 flex-1">
-        {!playing && !(ART.menu && (mode === "role" || mode === "intro" || mode === "brief")) && (
-          <MenuBackdrop />
-        )}
-
-        <canvas
-          ref={canvasRef}
-          className={
-            "pixel-canvas absolute inset-0 h-full w-full touch-none " + (playing ? "" : "pointer-events-none opacity-0")
-          }
-          style={{ touchAction: "none", imageRendering: "pixelated" }}
-        />
-
-        {!ready && <div className="absolute inset-0 z-50 bg-bg" />}
-
-        {mode === "play" && (
-          <Hud
-            room={ROOMS[s.room].name}
-            roomId={s.room}
-            culture={s.culture}
-            stage={stage}
-            time={s.timeLabel}
-            period={s.period}
-            dusk={!!s.flags.endingWalk}
-            toast={s.toastT > 0 ? s.toast : ""}
-            objective={s.objective}
-            day={s.day}
-            nearLabel={s.nearLabel}
-          />
-        )}
-
-        {mode === "play" && s.announceT > 0.15 && (
-          <div className="pointer-events-none absolute inset-x-0 top-[22%] z-20 text-center">
-            <p className={ART.hud ? "cc-title" : "font-display text-xl text-fg sm:text-2xl"}>{s.announce}</p>
-          </div>
-        )}
-
-        {ART.menu && (mode === "splash" || mode === "menu") && (
-          <PixelMenu
-            saved={saved}
-            onBegin={() => {
-              if (saved) {
-                setAskWipe(true);
-                return;
-              }
-              beginNewWeek();
-            }}
-            onContinue={() => {
-              if (!hydrateSave(s)) {
-                setSaved(false);
-                return;
-              }
-              unlockAudio();
-              playBlip("ok");
-              const next = "play";
-              s.mode = next;
-              playBed(bedForRoom(s.room, "play"));
-              applyMode(next);
-              refresh();
-            }}
-            onHow={() => goMenu("how")}
-            onCredits={() => goMenu("credits")}
-          />
-        )}
-
-        {!ART.menu && mode === "splash" && (
-          <Panel onActivate={() => goMenu("menu")} hint="Click anywhere · Enter">
-            <p className="font-display text-xs uppercase tracking-[0.2em] text-muted">Lake Master</p>
-            <h1 className="font-display mt-2 max-w-xl text-4xl leading-[1.05] text-fg sm:text-5xl">{TITLE}</h1>
-            <p className="mt-3 max-w-md text-base leading-relaxed text-muted">{TAGLINE}</p>
-            <p className="mt-2 max-w-md text-sm leading-relaxed text-subtle">{THESIS}</p>
-            <button
-              type="button"
-              className="btn-primary mt-6"
-              onClick={(e) => {
-                e.stopPropagation();
-                goMenu("menu");
-              }}
-              onPointerDown={(e) => {
-                e.stopPropagation();
-                goMenu("menu");
-              }}
-            >
-              Begin
-            </button>
-          </Panel>
-        )}
-
-        {!ART.menu && mode === "menu" && (
-          <Panel>
-            <h1 className="font-display text-3xl text-fg sm:text-4xl">{TITLE}</h1>
-            <p className="mt-2 max-w-md text-sm leading-relaxed text-muted">
-              Design Unit 1 with Priya. Then walk {SITE} for a week. Catch errors. Do not hide them.
-            </p>
-            <div className="mt-6 flex w-full max-w-xs flex-col gap-2">
-              {saved ? (
-                <button
-                  type="button"
-                  className={peekSave()?.ended ? "btn-ghost" : "btn-primary"}
-                  data-testid="continue-shift"
-                  onClick={() => {
-                    if (!hydrateSave(s)) {
-                      setSaved(false);
-                      return;
-                    }
-                    unlockAudio();
-                    playBlip("ok");
-                    const next = s.mode === "splash" || s.mode === "menu" ? "play" : s.mode;
-                    s.mode = next;
-                    if (next === "play") playBed(bedForRoom(s.room, "play"));
-                    else playBed("menu");
-                    applyMode(next);
-                    refresh();
-                  }}
-                >
-                  {peekSave()?.ended ? `Review week · Day ${peekSave()?.day ?? 1}` : `Continue · Day ${peekSave()?.day ?? 1}`}
-                </button>
-              ) : null}
-              <button
-                type="button"
-                className={saved && !peekSave()?.ended ? "btn-ghost" : "btn-primary"}
-                data-testid="new-shift"
-                onClick={() => {
-                  if (saved) {
-                    setAskWipe(true);
-                    return;
-                  }
-                  beginNewWeek();
-                }}
-              >
-                New shift
-              </button>
-              <button type="button" className="btn-ghost" onClick={() => goMenu("how")} onPointerDown={() => goMenu("how")}>
-                How to play
-              </button>
-              <button type="button" className="btn-ghost" onClick={() => goMenu("credits")} onPointerDown={() => goMenu("credits")}>
-                Thesis / credits
-              </button>
-              <MuteToggle />
-            </div>
-          </Panel>
-        )}
-
-        {mode === "how" && ART.menu && (
-          <PixelRead title="HOW TO PLAY" onBack={() => goMenu("menu")}>
-            <ul>
-              <li>New shift starts at the academic designer. You build the core you will walk. It discards a saved week.</li>
-              <li>WASD or the stick to walk. A is left, D is right. The clock pauses while you talk, study, or play.</li>
-              <li>E is the near prompt. P peer-checks. R reports. H hides. Three hides close the week as unfinished power.</li>
-              <li>ESC pauses for the plant map, hearts, Academy, and the arcade. K closes the shift.</li>
-              <li>Teaching model only. Not a real plant. Not a license.</li>
-            </ul>
-          </PixelRead>
-        )}
-        {mode === "how" && !ART.menu && (
-          <Panel>
-            <h2 className="font-display text-2xl">How to play</h2>
-            <ul className="mt-4 max-w-md space-y-2 text-sm leading-relaxed text-muted">
-              <li>New shift starts at the academic designer — you build the core you will walk. It discards a saved week.</li>
-              <li>WASD or stick — walk. A is left, D is right. Clock pauses while you talk, study, or play.</li>
-              <li>E — the near prompt (Talk / Academy / Hang tag / Shuffle / Look / Catch).</li>
-              <li>P — peer-check. R — report. H — hide (three hides close the week as unfinished power).</li>
-              <li>ESC — pause for the plant map, hearts, Academy, arcade. K closes the shift.</li>
-              <li>Mabel's parlor: same bezel, different jobs. North wall is Unit 1. South is after-shift. Pebble is a comparison.</li>
-              <li>Academy in Control. Priya's ΔT bench. Tommy's LOTOTO. Day 5: fuel shuffle.</li>
-              <li>Teaching model only — not a real plant, not a license.</li>
-            </ul>
-            <button type="button" className="btn-primary mt-6" onPointerDown={() => goMenu("menu")}>
-              Back
-            </button>
-          </Panel>
-        )}
-
-        {mode === "credits" && ART.menu && (
-          <PixelRead title="THESIS" onBack={() => goMenu("menu")}>
-            <p>
-              A reactor only makes power in the right environment. People are the same. Mistakes are expected. Hiding them
-              is the hazard. Catch greater than heroics.
-            </p>
-            <p>
-              Director: Mr. Reginald Holt. Cafe: Dr. Mabel Quinn. Academic designer: Dr. Priya Sharma. Site: {SITE} on Lake
-              Master. Education is frozen teaching content, not a license.
-            </p>
-          </PixelRead>
-        )}
-        {mode === "credits" && !ART.menu && (
-          <Panel>
-            <h2 className="font-display text-2xl">Thesis</h2>
-            <p className="mt-3 max-w-md text-sm leading-relaxed text-muted">
-              A reactor only makes power in the right environment. People are the same. Mistakes are expected.
-              Hiding them is the hazard. Catch greater than heroics.
-            </p>
-            <p className="mt-3 max-w-md text-sm leading-relaxed text-subtle">
-              Director: Mr. Reginald Holt. Cafe: Dr. Mabel Quinn. Academic designer: Dr. Priya Sharma. Site: {SITE} on
-              Lake Master. Education is frozen teaching content — not a license.
-            </p>
-            <button type="button" className="btn-primary mt-6" onPointerDown={() => goMenu("menu")}>
-              Back
-            </button>
-          </Panel>
-        )}
-
-        {mode === "role" && (
-          <PixelBadge
-            look={look}
-            onLook={(next) => {
-              setLook(next);
-              s.playerLook = next;
-            }}
-            onRole={pickRole}
-            onBack={() => goMenu("menu")}
-          />
-        )}
-
-        {mode === "build" && (
-          <ReactorBuilder
-            onDone={(plant) => {
-              finishBuilder(s, plant);
-              applyMode("intro");
-              playBlip("ok");
-              refresh();
-            }}
-          />
-        )}
-
-        {mode === "intro" && INTRO[s.introI] && (
-          <PixelBeat
-            index={s.introI}
-            exchange={Math.min(s.introJ, INTRO[s.introI].exchanges.length - 1)}
-            beat={INTRO[s.introI]}
-            look={look}
-            onContinue={() => {
-              if (isRevealing()) requestSkip();
-              else pulse("Enter");
-            }}
-          />
-        )}
-
-        {mode === "brief" && (
-          <PixelBrief
-            day={s.day || 1}
-            kicker={dayDef(s.day || 1).kicker}
-            title={dayDef(s.day || 1).title}
-            holt={dayDef(s.day || 1).holt}
-            items={dayDef(s.day || 1).items}
-            yesterday={yesterdayLine(s.day || 1, s.weekLog, s.residue)}
-            onWalk={() => {
-              if (isRevealing()) requestSkip();
-              else pulse("Enter");
-            }}
-          />
-        )}
-
-        {mode === "dialogue" && line && (
-          <DialogueStage
-            line={line}
-            npc={s.talkNpc}
-            role={s.talkNpc ? NPCS[s.talkNpc].role : ""}
-            beat={s.talkNpc ? NPC_INTRO[s.talkNpc].beat : undefined}
-            who={s.talkNpc && s.dialogueI === 0 ? NPC_INTRO[s.talkNpc].who : undefined}
-            time={s.timeLabel}
-            room={ROOMS[s.room].name}
-            hearts={s.talkNpc ? heartCount(s.trust[s.talkNpc]) : 0}
-            pendingChoices={pendingChoices}
-            onChoice={(c) => {
-              pickChoice(s, c);
-              playBlip("ok");
-              refresh();
-            }}
-            onContinue={() => pulse("Enter")}
-          />
-        )}
-
-        {mode === "still" && s.stillId === "scores" && (
-          <ScoresBoard
-            scores={s.scores}
-            onClose={() => {
-              closeStill(s);
-              applyMode("play");
-              refresh();
-            }}
-          />
-        )}
-
-        {mode === "still" && s.stillId && s.stillId !== "scores" && STILLS[s.stillId] && (
-          <StillStage
-            still={STILLS[s.stillId]}
-            stillId={s.stillId}
-            onClose={() => {
-              closeStill(s);
-              applyMode("play");
-              refresh();
-            }}
-          />
-        )}
-
+  const deskHosted = s.deskHost && DESK_HOSTS.includes(mode);
+  const deskShown = mode === "desktop" || deskHosted;
+  // Sim overlays: full screen from the world, inside a desktop window when the desktop launched them.
+  const simOverlays = (
+    <>
         {mode === "cabs" && (
           <ArcadeHall
             fromEod={s.returnMode === "eod"}
@@ -1207,13 +963,13 @@ export function GameApp() {
           <MaintGame
             onDone={(score) => {
               finishMaint(s, score);
-              applyMode("play");
+              applyMode(s.mode);
               playBlip("ok");
               refresh();
             }}
             onAbort={() => {
               abortOverlay(s);
-              applyMode("play");
+              applyMode(s.mode);
               refresh();
             }}
           />
@@ -1317,6 +1073,358 @@ export function GameApp() {
           />
         )}
 
+    </>
+  );
+
+  return (
+    <div className={"relative flex h-svh min-h-[100dvh] flex-col overflow-hidden bg-bg text-fg" + (ART.hud || ART.menu ? " art-on" : "")}>
+      <header className="pointer-events-none absolute inset-x-0 top-0 z-40 flex items-start justify-between gap-3 p-3 sm:p-4">
+        {!playing && mode !== "splash" && mode !== "brief" && mode !== "intro" && mode !== "role" && !(ART.menu && mode === "menu") ? (
+          <div className="pointer-events-auto max-w-[58%] border border-border bg-bg-elevated px-3 py-2">
+            <p className="font-display text-[11px] uppercase tracking-[0.16em] text-muted">{SITE}</p>
+            <p className="font-display text-lg leading-none text-fg">{TITLE}</p>
+          </div>
+        ) : (
+          <div className="pointer-events-none h-8" />
+        )}
+        <div className="pointer-events-auto flex items-center gap-2">
+          {BEZEL_MODES.includes(mode) || deskShown ||
+          (ART.menu && (mode === "menu" || mode === "splash" || mode === "role" || mode === "intro" || mode === "brief")) ? null : (
+            <MuteToggle />
+          )}
+          <AuthChip />
+        </div>
+      </header>
+
+      <div ref={wrapRef} className="relative min-h-0 flex-1">
+        {!playing && !deskShown && !(ART.menu && (mode === "role" || mode === "intro" || mode === "brief")) && (
+          <MenuBackdrop />
+        )}
+
+        <canvas
+          ref={canvasRef}
+          className={
+            "pixel-canvas absolute inset-0 h-full w-full touch-none " + (playing ? "" : "pointer-events-none opacity-0")
+          }
+          style={{ touchAction: "none", imageRendering: "pixelated" }}
+        />
+
+        {!ready && <div className="absolute inset-0 z-50 bg-bg" />}
+
+        {mode === "play" && (
+          <Hud
+            room={ROOMS[s.room].name}
+            roomId={s.room}
+            culture={s.culture}
+            stage={stage}
+            time={s.timeLabel}
+            period={s.period}
+            dusk={!!s.flags.endingWalk}
+            toast={s.toastT > 0 ? s.toast : ""}
+            objective={s.objective}
+            day={s.day}
+            nearLabel={s.nearLabel}
+          />
+        )}
+
+        {mode === "play" && s.announceT > 0.15 && (
+          <div className="pointer-events-none absolute inset-x-0 top-[22%] z-20 text-center">
+            <p className={ART.hud ? "cc-title" : "font-display text-xl text-fg sm:text-2xl"}>{s.announce}</p>
+          </div>
+        )}
+
+        {mode === "splash" && !booted && (
+          <BootLog
+            reduced={s.desktop.reducedMotion || window.matchMedia("(prefers-reduced-motion: reduce)").matches}
+            onDone={() => setBooted(true)}
+          />
+        )}
+
+        {ART.menu && (mode === "menu" || (mode === "splash" && booted)) && (
+          <PixelMenu
+            saved={saved}
+            onBegin={() => {
+              if (saved) {
+                setWipeNext("setup");
+                setAskWipe(true);
+                return;
+              }
+              beginNewWeek("setup");
+            }}
+            onContinue={() => {
+              if (!hydrateSave(s)) {
+                setSaved(false);
+                return;
+              }
+              unlockAudio();
+              playBlip("ok");
+              const next = "play";
+              s.mode = next;
+              playBed(bedForRoom(s.room, "play"));
+              applyMode(next);
+              refresh();
+            }}
+            onHow={() => goMenu("how")}
+            onCredits={() => goMenu("credits")}
+          />
+        )}
+
+        {!ART.menu && mode === "splash" && booted && (
+          <Panel onActivate={() => goMenu("menu")} hint="Click anywhere · Enter">
+            <p className="font-display text-xs uppercase tracking-[0.2em] text-muted">Lake Master</p>
+            <h1 className="font-display mt-2 max-w-xl text-4xl leading-[1.05] text-fg sm:text-5xl">{TITLE}</h1>
+            <p className="mt-3 max-w-md text-base leading-relaxed text-muted">{TAGLINE}</p>
+            <p className="mt-2 max-w-md text-sm leading-relaxed text-subtle">{THESIS}</p>
+            <button
+              type="button"
+              className="btn-primary mt-6"
+              onClick={(e) => {
+                e.stopPropagation();
+                goMenu("menu");
+              }}
+              onPointerDown={(e) => {
+                e.stopPropagation();
+                goMenu("menu");
+              }}
+            >
+              Begin
+            </button>
+          </Panel>
+        )}
+
+        {!ART.menu && mode === "menu" && (
+          <Panel>
+            <h1 className="font-display text-3xl text-fg sm:text-4xl">{TITLE}</h1>
+            <p className="mt-2 max-w-md text-sm leading-relaxed text-muted">
+              Design Unit 1 with Priya. Then walk {SITE} for a week. Catch errors. Do not hide them.
+            </p>
+            <div className="mt-6 flex w-full max-w-xs flex-col gap-2">
+              {saved ? (
+                <button
+                  type="button"
+                  className={peekSave()?.ended ? "btn-ghost" : "btn-primary"}
+                  data-testid="continue-shift"
+                  onClick={() => {
+                    if (!hydrateSave(s)) {
+                      setSaved(false);
+                      return;
+                    }
+                    unlockAudio();
+                    playBlip("ok");
+                    const next = s.mode === "splash" || s.mode === "menu" ? "play" : s.mode;
+                    s.mode = next;
+                    if (next === "play") playBed(bedForRoom(s.room, "play"));
+                    else playBed("menu");
+                    applyMode(next);
+                    refresh();
+                  }}
+                >
+                  {peekSave()?.ended ? `Review week · Day ${peekSave()?.day ?? 1}` : `Continue · Day ${peekSave()?.day ?? 1}`}
+                </button>
+              ) : null}
+              <button
+                type="button"
+                className={saved && !peekSave()?.ended ? "btn-ghost" : "btn-primary"}
+                data-testid="new-shift"
+                onClick={() => {
+                  if (saved) {
+                    setWipeNext("setup");
+                    setAskWipe(true);
+                    return;
+                  }
+                  beginNewWeek("setup");
+                }}
+              >
+                New shift
+              </button>
+              <button type="button" className="btn-ghost" onClick={() => goMenu("how")} onPointerDown={() => goMenu("how")}>
+                How to play
+              </button>
+              <button type="button" className="btn-ghost" onClick={() => goMenu("credits")} onPointerDown={() => goMenu("credits")}>
+                Thesis / credits
+              </button>
+              <MuteToggle />
+            </div>
+          </Panel>
+        )}
+
+        {mode === "how" && ART.menu && (
+          <PixelRead title="HOW TO PLAY" onBack={() => goMenu("menu")}>
+            <ul>
+              <li>New shift starts at the academic designer. You build the core you will walk. It discards a saved week.</li>
+              <li>WASD or the stick to walk. A is left, D is right. The clock pauses while you talk, study, or play.</li>
+              <li>E is the near prompt. P peer-checks. R reports. H hides. Three hides close the week as unfinished power.</li>
+              <li>ESC pauses for the plant map, hearts, Academy, and the arcade. K closes the shift.</li>
+              <li>Teaching model only. Not a real plant. Not a license.</li>
+            </ul>
+          </PixelRead>
+        )}
+        {mode === "how" && !ART.menu && (
+          <Panel>
+            <h2 className="font-display text-2xl">How to play</h2>
+            <ul className="mt-4 max-w-md space-y-2 text-sm leading-relaxed text-muted">
+              <li>New shift starts at the academic designer — you build the core you will walk. It discards a saved week.</li>
+              <li>WASD or stick — walk. A is left, D is right. Clock pauses while you talk, study, or play.</li>
+              <li>E — the near prompt (Talk / Academy / Hang tag / Shuffle / Look / Catch).</li>
+              <li>P — peer-check. R — report. H — hide (three hides close the week as unfinished power).</li>
+              <li>ESC — pause for the plant map, hearts, Academy, arcade. K closes the shift.</li>
+              <li>Mabel's parlor: same bezel, different jobs. North wall is Unit 1. South is after-shift. Pebble is a comparison.</li>
+              <li>Academy in Control. Priya's ΔT bench. Tommy's LOTOTO. Day 5: fuel shuffle.</li>
+              <li>Teaching model only — not a real plant, not a license.</li>
+            </ul>
+            <button type="button" className="btn-primary mt-6" onPointerDown={() => goMenu("menu")}>
+              Back
+            </button>
+          </Panel>
+        )}
+
+        {mode === "credits" && ART.menu && (
+          <PixelRead title="THESIS" onBack={() => goMenu("menu")}>
+            <p>
+              A reactor only makes power in the right environment. People are the same. Mistakes are expected. Hiding them
+              is the hazard. Catch greater than heroics.
+            </p>
+            <p>
+              Director: Mr. Reginald Holt. Cafe: Dr. Mabel Quinn. Academic designer: Dr. Priya Sharma. Site: {SITE} on Lake
+              Master. Education is frozen teaching content, not a license.
+            </p>
+          </PixelRead>
+        )}
+        {mode === "credits" && !ART.menu && (
+          <Panel>
+            <h2 className="font-display text-2xl">Thesis</h2>
+            <p className="mt-3 max-w-md text-sm leading-relaxed text-muted">
+              A reactor only makes power in the right environment. People are the same. Mistakes are expected.
+              Hiding them is the hazard. Catch greater than heroics.
+            </p>
+            <p className="mt-3 max-w-md text-sm leading-relaxed text-subtle">
+              Director: Mr. Reginald Holt. Cafe: Dr. Mabel Quinn. Academic designer: Dr. Priya Sharma. Site: {SITE} on
+              Lake Master. Education is frozen teaching content — not a license.
+            </p>
+            <button type="button" className="btn-primary mt-6" onPointerDown={() => goMenu("menu")}>
+              Back
+            </button>
+          </Panel>
+        )}
+
+        {mode === "setup" && (
+          <SetupScreen
+            season={s.setup.season}
+            stance={s.setup.stance}
+            onBack={() => goMenu("menu")}
+            onDone={(season, stance) => {
+              applySetup(s, season, stance);
+              openDesktop(s);
+              applyMode("desktop");
+              playBlip("ok");
+              refresh();
+            }}
+          />
+        )}
+
+        {mode === "role" && (
+          <PixelBadge
+            look={look}
+            onLook={(next) => {
+              setLook(next);
+              s.playerLook = next;
+            }}
+            onRole={pickRole}
+            onBack={() => {
+              // A shift started from the desktop goes back to the desktop. The menu path never reaches here with a desktop.
+              if (s.deskHost) {
+                applyMode("desktop");
+                refresh();
+              } else {
+                goMenu("menu");
+              }
+            }}
+          />
+        )}
+
+        {mode === "build" && (
+          <ReactorBuilder
+            onDone={(plant) => {
+              finishBuilder(s, plant);
+              applyMode("intro");
+              playBlip("ok");
+              refresh();
+            }}
+          />
+        )}
+
+        {mode === "intro" && INTRO[s.introI] && (
+          <PixelBeat
+            index={s.introI}
+            exchange={Math.min(s.introJ, INTRO[s.introI].exchanges.length - 1)}
+            beat={INTRO[s.introI]}
+            look={look}
+            onContinue={() => {
+              if (isRevealing()) requestSkip();
+              else pulse("Enter");
+            }}
+          />
+        )}
+
+        {mode === "brief" && (
+          <PixelBrief
+            day={s.day || 1}
+            kicker={dayDef(s.day || 1).kicker}
+            title={dayDef(s.day || 1).title}
+            holt={dayDef(s.day || 1).holt}
+            items={dayDef(s.day || 1).items}
+            yesterday={yesterdayLine(s.day || 1, s.weekLog, s.residue)}
+            onWalk={() => {
+              if (isRevealing()) requestSkip();
+              else pulse("Enter");
+            }}
+          />
+        )}
+
+        {mode === "dialogue" && line && (
+          <DialogueStage
+            line={line}
+            npc={s.talkNpc}
+            role={s.talkNpc ? NPCS[s.talkNpc].role : ""}
+            beat={s.talkNpc ? NPC_INTRO[s.talkNpc].beat : undefined}
+            who={s.talkNpc && s.dialogueI === 0 ? NPC_INTRO[s.talkNpc].who : undefined}
+            time={s.timeLabel}
+            room={ROOMS[s.room].name}
+            hearts={s.talkNpc ? heartCount(s.trust[s.talkNpc]) : 0}
+            pendingChoices={pendingChoices}
+            onChoice={(c) => {
+              pickChoice(s, c);
+              playBlip("ok");
+              refresh();
+            }}
+            onContinue={() => pulse("Enter")}
+          />
+        )}
+
+        {mode === "still" && s.stillId === "scores" && (
+          <ScoresBoard
+            scores={s.scores}
+            onClose={() => {
+              closeStill(s);
+              applyMode("play");
+              refresh();
+            }}
+          />
+        )}
+
+        {mode === "still" && s.stillId && s.stillId !== "scores" && STILLS[s.stillId] && (
+          <StillStage
+            still={STILLS[s.stillId]}
+            stillId={s.stillId}
+            onClose={() => {
+              closeStill(s);
+              applyMode("play");
+              refresh();
+            }}
+          />
+        )}
+
+        {!deskHosted && simOverlays}
         {mode === "pause" && (
           <PauseStage
             s={s}
@@ -1353,7 +1461,15 @@ export function GameApp() {
               playBed("menu");
               applyMode("menu");
             }}
-            onNewWeek={() => setAskWipe(true)}
+            onNewWeek={() => {
+              setWipeNext("desk");
+              setAskWipe(true);
+            }}
+            onDesktop={() => {
+              openDesktop(s);
+              applyMode("desktop");
+              refresh();
+            }}
           />
         )}
 
@@ -1463,7 +1579,10 @@ export function GameApp() {
                   type="button"
                   className="paper-btn-primary"
                   data-testid="new-shift-ending"
-                  onClick={() => setAskWipe(true)}
+                  onClick={() => {
+                    setWipeNext("desk");
+                    setAskWipe(true);
+                  }}
                 >
                   New week
                 </button>
@@ -1503,6 +1622,49 @@ export function GameApp() {
         )}
       </div>
 
+      {deskShown ? (
+        <Desktop
+          shown
+          s={s}
+          simMode={deskHosted ? mode : null}
+          simContent={deskHosted ? simOverlays : null}
+          onLaunchSim={(app) => {
+            if (!app.mode) return;
+            launchFromDesk(s, app.mode as Mode);
+            applyMode(s.mode);
+            playBlip("ok");
+            refresh();
+          }}
+          onAbortSim={() => {
+            abortOverlay(s);
+            applyMode(s.mode);
+            refresh();
+          }}
+          onLeave={() => {
+            leaveDesktop(s);
+            playBed(bedForRoom(s.room, "play"));
+            applyMode("play");
+            refresh();
+          }}
+          onMenu={() => goMenu("menu")}
+          onStartShift={startShiftFromDesk}
+          onSaveShift={() => {
+            writeSave(s, true);
+            setSaved(true);
+            refresh();
+          }}
+          onPatch={(patch) => {
+            Object.assign(s.desktop, patch);
+            writeSave(s, true);
+            refresh();
+          }}
+          onDesign={(plant) => {
+            saveDesign(s, plant);
+            refresh();
+          }}
+        />
+      ) : null}
+
       {askWipe ? (
         <div
           className="absolute inset-0 z-50 flex items-center justify-center bg-bg/85 p-4"
@@ -1517,7 +1679,7 @@ export function GameApp() {
             </p>
             <p className="mt-2 text-[11px] text-[#8a7864]">You pick a badge again. Priya's designer is first.</p>
             <div className="mt-5 flex flex-col gap-2">
-              <button type="button" className="btn-primary" data-testid="wipe-confirm-yes" onClick={beginNewWeek}>
+              <button type="button" className="btn-primary" data-testid="wipe-confirm-yes" onClick={() => beginNewWeek(wipeNext)}>
                 New week
               </button>
               <button type="button" className="btn-ghost" data-testid="wipe-confirm-no" onClick={() => setAskWipe(false)}>
@@ -2179,6 +2341,7 @@ function PauseStage({
   onClose,
   onMenu,
   onNewWeek,
+  onDesktop,
   onTravel,
 }: {
   s: GameState;
@@ -2190,6 +2353,7 @@ function PauseStage({
   onClose: () => void;
   onMenu: () => void;
   onNewWeek: () => void;
+  onDesktop: () => void;
   onTravel: (id: RoomId) => void;
 }) {
   const [focus, setFocus] = useState<RoomId>(s.room);
@@ -2299,6 +2463,9 @@ function PauseStage({
           <div className="mt-5 flex flex-col gap-2">
             <button type="button" className="btn-primary" onClick={onResume}>
               Resume
+            </button>
+            <button type="button" className="btn-ghost" data-testid="pause-desktop" onClick={onDesktop}>
+              Desktop
             </button>
             <button type="button" className="btn-ghost" onClick={onSave}>
               Save shift
@@ -2799,6 +2966,12 @@ declare global {
       finishBuild: () => void;
       setDay: (n: number) => void;
       getPlant: () => unknown;
+      openDesk: () => void;
+      deskLaunch: (mode: string) => void;
+      getDesk: () => object;
+      getSetup: () => object;
+      getDeskHost: () => boolean;
+      getRole: () => string | null;
       save: () => boolean;
       load: () => boolean;
       hasSave: () => boolean;

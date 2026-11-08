@@ -51,6 +51,8 @@ const OVERLAY: Mode[] = [
   "bowl",
   "phys",
   "load",
+  "desktop",
+  "setup",
 ];
 
 export interface SaveV1 {
@@ -243,9 +245,17 @@ export function canAutosave(s: GameState): boolean {
   return true;
 }
 
+/**
+ * The desktop may write once a shift has started, so settings made there survive a reload.
+ * Before a shift there is no save to write to, and settings stay in memory until one exists.
+ */
+export function canWriteSettings(s: GameState): boolean {
+  return s.mode === "desktop" && s.role !== null;
+}
+
 export function writeSave(s: GameState, quiet = true): boolean {
   if (typeof localStorage === "undefined") return false;
-  if (!canAutosave(s) && s.mode !== "pause") return false;
+  if (!canAutosave(s) && s.mode !== "pause" && !canWriteSettings(s)) return false;
   try {
     const snap = snapshot(s);
     localStorage.setItem(SAVE_KEY_V2, JSON.stringify(snap));

@@ -134,7 +134,8 @@ export interface Interactable {
     | "bowl"
     | "phys"
     | "load"
-    | "scores";
+    | "scores"
+    | "desktop";
   npc?: NpcId;
   still?: string;
 }
@@ -1078,6 +1079,8 @@ export const ROOMS: Record<RoomId, RoomDef> = {
     ],
     props: [
       { rect: t(3, 6, 6, 3), kind: "counter" },
+      // The laptop on the counter. Drawn in code (render.ts), not from the atlas. Opens the desktop.
+      { rect: t(7, 6, 2, 2), kind: "laptop", block: false },
       { rect: t(9, 10, 2, 2), kind: "chair", block: false },
       { rect: t(12, 10, 2, 2), kind: "chair", block: false },
       { rect: t(15, 11, 2, 2), kind: "chair", block: false },
@@ -1093,6 +1096,7 @@ export const ROOMS: Record<RoomId, RoomDef> = {
       { id: "coffee", rect: t(3, 6, 6, 3), label: "Kettle", kind: "coffee" },
       { id: "sit-cafe", rect: t(9, 10, 2, 2), label: "Sit", kind: "sit" },
       { id: "still-cafe", rect: t(1, 4, 2, 3), label: "Look", kind: "still", still: "cafe" },
+      { id: "laptop", rect: t(7, 9, 2, 1), label: "Laptop", kind: "desktop" },
     ],
   },
   parlor: {
