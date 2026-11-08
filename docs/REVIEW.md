@@ -20,6 +20,10 @@ These values and rules do not change in any PR without the owner's approval. Thi
 - Residue: a hide leaves the lie up, and `beginDay` must not clear residue.
 - `incidentResolved` means "the day is over," not "a catch happened." `beginDay` resets it, and `beginDay` still does not clear residue. These are two separate rules.
 
+## Cross-review between the two AIs
+
+Every change is authored by one AI (G for Grok, C for Claude) and reviewed by the other. The rules and the gate are in `docs/CROSS-REVIEW.md`. The review record lives at `reviews/PR-<number>.md`. The owner still decides what reaches `main`.
+
 ## What a reviewer checks
 
 1. **Scope.** The PR does what its description says, and nothing else. Stacked PRs name the one that must merge first.

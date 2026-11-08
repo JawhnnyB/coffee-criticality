@@ -1,0 +1,17 @@
+name: cross-review
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Check the other AI reviewed this head
+        run: node scripts/check-cross-review.mjs "${{ github.event.pull_request.number }}"
