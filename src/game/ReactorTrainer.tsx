@@ -30,6 +30,7 @@ export function ReactorTrainer({
   run,
   writeRun,
   onMinute,
+  colorSafe = false,
 }: {
   onPass: () => void;
   onAbort: () => void;
@@ -37,6 +38,7 @@ export function ReactorTrainer({
   run: RunState;
   writeRun: (patch: Partial<Pick<RunState, "powerPct" | "flowPct" | "rodsWithdrawnPct" | "scram">>) => void;
   onMinute: (openMinutes: number) => void;
+  colorSafe?: boolean;
 }) {
   const plant = design?.type ?? null;
   const [rods, setRods] = useState(run.rodsWithdrawnPct);
@@ -136,7 +138,7 @@ export function ReactorTrainer({
         <p className="mt-3 max-w-md text-center font-mono text-sm leading-relaxed text-good/80">
           Q = m * cp * dT. You matched flow to power. Teaching model only — not a real core, not a license.
         </p>
-        <Schematic plant={plant} tHot={tHot} tCold={tCold} />
+        <Schematic plant={plant} tHot={tHot} tCold={tCold} colorSafe={colorSafe} />
         <button type="button" className="btn-primary mt-6" onClick={onPass}>
           Thank Priya later
         </button>
@@ -162,7 +164,7 @@ export function ReactorTrainer({
           </button>
         </div>
       </div>
-      <Schematic plant={plant} tHot={tHot} tCold={tCold} />
+      <Schematic plant={plant} tHot={tHot} tCold={tCold} colorSafe={colorSafe} />
       <p className="mt-2 text-sm text-muted">{msg}</p>
       <div className="mt-4 grid grid-cols-2 gap-2 text-sm sm:grid-cols-4">
         <Stat k="Power" v={`${power.toFixed(0)} %`} />
@@ -282,6 +284,6 @@ function Stat({ k, v, warn }: { k: string; v: string; warn?: boolean }) {
 }
 
 /** One pixel drawing for every plant type: the same grid, labels, footer and colour bar. */
-function Schematic({ plant, tHot, tCold }: { plant: PlantType; tHot: number; tCold: number }) {
-  return <PixelSchematic plant={plant} tHot={tHot} tCold={tCold} />;
+function Schematic({ plant, tHot, tCold, colorSafe }: { plant: PlantType; tHot: number; tCold: number; colorSafe: boolean }) {
+  return <PixelSchematic plant={plant} tHot={tHot} tCold={tCold} colorSafe={colorSafe} />;
 }

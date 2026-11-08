@@ -927,6 +927,7 @@ export function GameApp() {
               if (patch.scram != null) r.scram = patch.scram;
             }}
             onMinute={(openMinutes) => noteControlMinute(stateRef.current, openMinutes)}
+            colorSafe={s.desktop.colorSafe}
             onPass={() => {
               finishTrainer(s);
               applyMode(s.mode);
@@ -1660,6 +1661,11 @@ export function GameApp() {
           }}
           onDesign={(plant) => {
             saveDesign(s, plant);
+            refresh();
+          }}
+          onResults={(patch) => {
+            Object.assign(s.results, patch);
+            writeSave(s, true);
             refresh();
           }}
         />

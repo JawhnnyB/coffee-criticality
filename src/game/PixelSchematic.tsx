@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import {
   BANDS,
+  SAFE_BANDS,
   BWR_SHAPES,
   DRAWINGS,
   MSR_SHAPES,
@@ -87,11 +88,16 @@ function pixelCircle(g: CanvasRenderingContext2D, cx: number, cy: number, r: num
 }
 
 /** Colour bar: seven 6 px bands, hot at the top, outlined. */
-function scaleBar(g: CanvasRenderingContext2D, r: Rect) {
+function scaleBar(g: CanvasRenderingContext2D, r: Rect, safe: boolean) {
+  const palette = safe ? SAFE_BANDS : BANDS;
   const h = r.h / 7;
   for (let i = 0; i < 7; i++) {
-    g.fillStyle = BANDS[6 - i];
+    g.fillStyle = palette[6 - i];
     g.fillRect(r.x, r.y + i * h, r.w, h);
+    if (safe) {
+      g.fillStyle = i < 3 ? "#f3e6d0" : "#16110d";
+      for (let n = 0; n < i + 1 && n < 4; n++) g.fillRect(r.x + 1, r.y + i * h + 1 + n, 2, 1);
+    }
   }
   g.fillStyle = OUTLINE;
   g.fillRect(r.x, r.y, r.w, 1);
@@ -205,31 +211,31 @@ function drawMsr(g: CanvasRenderingContext2D, hot: string, cold: string) {
 }
 
 /** Draws one plant on the native grid. Colours come from that plant's scale. */
-export function drawPlant(plant: PlantKey, g: CanvasRenderingContext2D, tHot: number, tCold: number) {
+export function drawPlant(plant: PlantKey, g: CanvasRenderingContext2D, tHot: number, tCold: number, safe = false) {
   g.imageSmoothingEnabled = false;
   g.fillStyle = BG;
   g.fillRect(0, 0, NATIVE_W, NATIVE_H);
   const s = SCALES[plant];
-  const hot = bandColor(tHot, s.lo, s.hi);
-  const cold = bandColor(tCold, s.lo, s.hi);
+  const hot = bandColor(tHot, s.lo, s.hi, safe);
+  const cold = bandColor(tCold, s.lo, s.hi, safe);
   if (plant === "pwr") drawPwr(g, hot, cold);
   else if (plant === "bwr") drawBwr(g, hot, cold);
   else if (plant === "pebble") drawPebble(g, hot, cold);
   else drawMsr(g, hot, cold);
-  scaleBar(g, DRAWINGS[plant].shapes.bar);
+  scaleBar(g, DRAWINGS[plant].shapes.bar, safe);
 }
 
 const NAME: Record<PlantKey, string> = { pwr: "PWR", bwr: "BWR", pebble: "Pebble bed", msr: "Molten salt" };
 
-export function PixelSchematic({ plant = "pwr", tHot, tCold }: { plant?: PlantKey; tHot: number; tCold: number }) {
+export function PixelSchematic({ plant = "pwr", tHot, tCold, colorSafe = false }: { plant?: PlantKey; tHot: number; tCold: number; colorSafe?: boolean }) {
   const ref = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
     const c = ref.current;
     const g = c?.getContext("2d");
     if (!c || !g) return;
-    drawPlant(plant, g, tHot, tCold);
-  }, [plant, tHot, tCold]);
+    drawPlant(plant, g, tHot, tCold, colorSafe);
+  }, [plant, tHot, tCold, colorSafe]);
 
   const labels: Label[] = DRAWINGS[plant].labels(tHot, tCold);
   const tone: Record<Label["color"], string> = { cream: CREAM, dim: "#b5a48c", outline: OUTLINE, gold: "#c9a227", orange: ORANGE };
