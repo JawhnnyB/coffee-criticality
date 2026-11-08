@@ -7,6 +7,9 @@ import { NuclearDesk } from "./NuclearDesk";
 import { TrackPlayer, TRACKS } from "./parlorMusic";
 import { setMuted, isMuted, unlockAudio } from "./audio";
 import { CoreCamApp, CoreMapApp, ResultsApp } from "./ReactorApps";
+import { NewsApp } from "./NewsApp";
+import { ACADEMY } from "./content";
+import { NRC_ROWS, filterNrc } from "./nrcIndex";
 import type { DesktopSave, GameState, ResultsSave } from "./sim";
 import type { PlantDesign } from "./plant";
 import {
@@ -262,6 +265,8 @@ export interface AppCtx {
   visible: AppDef[];
   onDesign: (plant: PlantDesign) => void;
   onResults: (patch: Partial<ResultsSave>) => void;
+  /** Open the Academy on one page, by index. Same route as the Academy icon. */
+  onAcademy: (index: number) => void;
 }
 
 /** The body of a static or placeholder app. Sim and mini apps are mounted by the game, not here. */
@@ -272,7 +277,8 @@ export function AppBody({ app, ctx }: { app: AppDef; ctx: AppCtx }) {
   if (app.id === "cam") return <CoreCamApp s={ctx.s} />;
   if (app.id === "results") return <ResultsApp s={ctx.s} />;
   if (app.id === "coremap") return <CoreMapApp s={ctx.s} onResults={ctx.onResults} />;
-  if (app.id === "radiation") return <RadiationApp />;
+  if (app.id === "news") return <NewsApp s={ctx.s} />;
+  if (app.id === "radiation") return <RadiationApp ctx={ctx} />;
   if (app.id === "nrc") return <NrcApp />;
   if (app.kind === "placeholder") return <PlaceholderApp app={app} />;
   return null;
@@ -297,7 +303,11 @@ const RAD_ROWS: { label: string }[] = [
   { label: "Contamination" },
 ];
 
-export function RadiationApp() {
+/** Region slots (spec 12). None is selectable, and none has a value. Data: public/data/background.json. */
+const REGION_SLOTS = Array.from({ length: 9 }, (_, i) => `Region slot ${i + 1}`);
+
+export function RadiationApp({ ctx }: { ctx: AppCtx }) {
+  const alara = ACADEMY.findIndex((p) => p.title === "ALARA with eyes open");
   return (
     <div className="p-3" style={{ ...FIELD, color: PAL.ink }} data-testid="app-radiation">
       <p style={{ fontFamily: "CCPixel5x7, monospace", fontSize: 16, margin: 0 }}>Radiation</p>
@@ -311,15 +321,33 @@ export function RadiationApp() {
           ))}
         </tbody>
       </table>
-      <p style={{ fontSize: 12, marginTop: 8 }}>Academy: ALARA with eyes open.</p>
+      <p style={{ fontSize: 14, marginTop: 10, margin: "10px 0 0" }}>Your region</p>
+      <p style={{ fontSize: 12, margin: "2px 0 6px" }} data-testid="radiation-region">
+        {REGION_PENDING}
+      </p>
+      <ul style={{ fontSize: 12, margin: 0, paddingLeft: 0, listStyle: "none" }} data-testid="region-slots">
+        {REGION_SLOTS.map((name) => (
+          <li key={name} style={{ paddingBottom: 2 }}>
+            {name}: Pending verification
+          </li>
+        ))}
+      </ul>
+      <button
+        type="button"
+        data-testid="radiation-alara"
+        onClick={() => ctx.onAcademy(alara)}
+        style={{ fontFamily: "inherit", fontSize: 12, marginTop: 10, textDecoration: "underline", background: "transparent", border: 0, color: PAL.copper, padding: 0 }}
+      >
+        ALARA with eyes open
+      </button>
     </div>
   );
 }
 
-/** The eCFR link is the only live content. The index is the starter list from GROK_PHASES §9: numbers only, no titles, no summaries. */
-const NRC_STARTER = ["Part 19", "Part 20", "Part 21", "Part 26", "Part 50", "Part 50 Appendix B", "Section 50.59", "Part 52", "Part 55", "Part 100"];
-
 export function NrcApp() {
+  const [q, setQ] = useState("");
+  const rows = filterNrc(NRC_ROWS, q);
+  const needle = q.trim();
   return (
     <div className="p-3" style={{ ...FIELD, color: PAL.ink }} data-testid="app-nrc">
       <p style={{ fontFamily: "CCPixel5x7, monospace", fontSize: 16, margin: 0 }}>NRC Regulations</p>
@@ -329,20 +357,31 @@ export function NrcApp() {
         </a>{" "}
         · official text, opens in a new tab
       </p>
+      <label style={{ display: "block", fontSize: 12, marginTop: 10 }}>
+        Search
+        <input
+          type="search"
+          data-testid="nrc-search"
+          value={q}
+          onChange={(e) => setQ(e.target.value)}
+          style={{ display: "block", marginTop: 4, fontFamily: "inherit", fontSize: 12, color: PAL.ink, background: PAL.cream, border: `1px solid ${PAL.ink}`, padding: "2px 4px", width: "100%", maxWidth: 260 }}
+        />
+      </label>
       <table style={{ fontSize: 12, marginTop: 10, borderCollapse: "collapse" }}>
         <tbody>
-          {NRC_STARTER.map((n) => (
-            <tr key={n}>
-              <td style={{ paddingRight: 12, paddingBottom: 6 }}>{n}</td>
-              <td style={{ paddingBottom: 6 }}>verify before publish</td>
+          {rows.map((r) => (
+            <tr key={r.label}>
+              <td style={{ paddingRight: 12, paddingBottom: 6 }}>{r.label}</td>
+              <td style={{ paddingBottom: 6 }}>{r.status}</td>
             </tr>
           ))}
-          <tr>
-            <td style={{ paddingRight: 12, paddingBottom: 6 }}>Part 73</td>
-            <td style={{ paddingBottom: 6 }}>exists, and is not described here.</td>
-          </tr>
         </tbody>
       </table>
+      {needle !== "" && rows.length === 0 ? (
+        <p style={{ fontSize: 12, marginTop: 8 }} data-testid="nrc-no-match">
+          No match. Titles are not in this build.
+        </p>
+      ) : null}
     </div>
   );
 }

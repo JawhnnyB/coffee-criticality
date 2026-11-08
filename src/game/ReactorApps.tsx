@@ -5,7 +5,8 @@ import { PAL } from "./palette";
 import { CAM_H, CAM_W, COL, camScale, drawCamScene } from "./camDraw";
 import { DEFAULT_PLANT, plantTitle, type PlantDesign } from "./plant";
 import { computeKeff } from "./nuclearLab";
-import { fluxOf, passes, startMap, type Burn } from "./shuffleModel";
+import { fluxOf, passes, type Burn } from "./shuffleModel";
+import { readCoreMap, rememberCoreMap } from "./coreMapMemory";
 import {
   BURNUP_PENDING,
   bubbleCount,
@@ -166,7 +167,8 @@ export function ResultsApp({ s }: { s: GameState }) {
   return (
     <div className="p-3" style={FIELD} data-testid="app-results">
       <p style={{ margin: 0, fontSize: 14 }}>Results</p>
-      <p style={{ fontSize: 28, margin: "6px 0" }}>{health.score}</p>
+      <p style={{ fontSize: 12, margin: "6px 0 0" }}>Core health</p>
+      <p style={{ fontSize: 28, margin: "2px 0 6px" }}>{health.score}</p>
       <table style={{ fontSize: 12, borderCollapse: "collapse" }}>
         <tbody>
           {health.parts.map((p) => (
@@ -242,8 +244,9 @@ function Trend({ rows }: { rows: { day: number; coreHealth: number; incidentCoun
 
 export function CoreMapApp({ s, onResults }: { s: GameState; onResults: (patch: Partial<ResultsSave>) => void }) {
   const plant = s.plant ?? DEFAULT_PLANT;
-  const [grid, setGrid] = useState<Burn[]>(() => startMap());
-  const [swaps, setSwaps] = useState(0);
+  // The grid and the count come from results, so closing and reopening the window keeps them.
+  const [grid, setGrid] = useState<Burn[]>(() => readCoreMap(s.results.coreMap).grid);
+  const [swaps, setSwaps] = useState(() => readCoreMap(s.results.coreMap).swaps);
   const [pick, setPick] = useState<number | null>(null);
   const flux = fluxOf(grid, plant.enrich);
   const ok = passes(flux, swaps);
@@ -263,6 +266,7 @@ export function CoreMapApp({ s, onResults }: { s: GameState; onResults: (patch: 
     setGrid(next);
     setSwaps(n);
     setPick(null);
+    s.results.coreMap = rememberCoreMap(next, n);
     const f = fluxOf(next, plant.enrich);
     if (passes(f, n) && (s.results.shuffleBest === null || f.fq < s.results.shuffleBest)) {
       onResults({ shuffleBest: f.fq });

@@ -1,0 +1,15 @@
+{
+  "status": "pending",
+  "note": "Region values are pending verification. No value is shown until the owner cites a source.",
+  "regions": [
+    { "id": "slot-1", "label": "Region slot 1", "status": "pending" },
+    { "id": "slot-2", "label": "Region slot 2", "status": "pending" },
+    { "id": "slot-3", "label": "Region slot 3", "status": "pending" },
+    { "id": "slot-4", "label": "Region slot 4", "status": "pending" },
+    { "id": "slot-5", "label": "Region slot 5", "status": "pending" },
+    { "id": "slot-6", "label": "Region slot 6", "status": "pending" },
+    { "id": "slot-7", "label": "Region slot 7", "status": "pending" },
+    { "id": "slot-8", "label": "Region slot 8", "status": "pending" },
+    { "id": "slot-9", "label": "Region slot 9", "status": "pending" }
+  ]
+}

@@ -100,7 +100,7 @@ import {
   type Mode,
   type ParlorScores,
 } from "./sim";
-import type { Choice, Line, NpcId, RoleId } from "./content";
+import type { AcademyTier, Choice, Line, NpcId, RoleId } from "./content";
 
 const GAME_CODES = new Set([
   "KeyW",
@@ -1669,6 +1669,14 @@ export function GameApp() {
             writeSave(s, true);
             refresh();
           }}
+          onAcademy={(index) => {
+            // The same route as the Academy icon: pick the page, then launch the sim.
+            s.academyI = Math.max(0, Math.min(ACADEMY.length - 1, index));
+            s.flags.academy = true;
+            launchFromDesk(s, "academy" as Mode);
+            applyMode(s.mode);
+            refresh();
+          }}
         />
       ) : null}
 
@@ -2026,6 +2034,15 @@ function AcademyStage({
 }) {
   const page = ACADEMY[index];
   const still = STILLS[page.still];
+  const [tierOnly, setTierOnly] = useState<AcademyTier | null>(null);
+  const shown = ACADEMY.map((_, i) => i).filter((i) => tierOnly === null || ACADEMY[i].tier === tierOnly);
+  const pos = shown.indexOf(index);
+  const stepTo = (dir: 1 | -1) => {
+    if (tierOnly === null) return (dir > 0 ? onNext : onPrev)();
+    if (shown.length === 0) return;
+    const next = pos < 0 ? shown[0] : shown[(pos + dir + shown.length) % shown.length];
+    onJump(next);
+  };
   const recIndex = ACADEMY.findIndex((p) => p.track === (REC_TRACK[stance ?? "steady"] ?? "heat"));
   const rec = ACADEMY[recIndex];
   const tracks: { id: NonNullable<(typeof ACADEMY)[number]["track"]>; label: string }[] = [
@@ -2058,9 +2075,46 @@ function AcademyStage({
               );
             })}
           </div>
+          <div className="mt-2 flex flex-wrap items-center gap-1">
+            {([1, 2, 3] as const).map((t) => (
+              <button
+                key={t}
+                type="button"
+                aria-pressed={tierOnly === t}
+                data-testid={`academy-filter-${t}`}
+                className={"px-2 py-1 font-mono text-[12px] tracking-widest " + (tierOnly === t ? "instrument text-fg" : "border border-border text-subtle")}
+                onClick={() => setTierOnly(tierOnly === t ? null : t)}
+              >
+                {`Tier ${t}`}
+              </button>
+            ))}
+          </div>
+          {tierOnly !== null && (
+            <ul className="mt-2 space-y-1 text-sm" data-testid="academy-tier-list">
+              {shown.map((i) => (
+                <li key={i}>
+                  <button type="button" className={"text-left underline " + (i === index ? "text-fg" : "text-muted")} onClick={() => onJump(i)}>
+                    {ACADEMY[i].title}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
           <h2 className="teach-title mt-3">{page.title}</h2>
         </div>
         <div className="teach-span-7">
+          {rec && (
+            <div className="mb-4 border border-border p-3" data-testid="academy-recommended">
+              <p className="font-mono text-[10px] tracking-widest text-subtle">Recommended for you</p>
+              <button type="button" className="mt-1 text-left text-sm text-fg underline" onClick={() => onJump(recIndex)}>
+                {rec.title}
+              </button>
+            </div>
+          )}
+          <div className="mb-4 border border-dashed border-border p-3 font-mono text-[11px] text-subtle" data-testid="academy-calculus" aria-disabled="true">
+            Not in this build.
+          </div>
+          <p className="text-[12px]" data-testid="academy-tier">{`Tier ${page.tier}`}</p>
           <TeachPriya line={page.body} size={96} />
           <p className="mt-2 text-[11px] text-subtle">Teaching model only — not a license. k-numbers stay classroom proxies.</p>
         {page.extra === "trainer" && (
@@ -2294,26 +2348,15 @@ function AcademyStage({
           <p className="mt-3 text-sm text-muted">Sign a unit with Priya first. The desk needs a design.</p>
         )}
         <div className="mt-6 flex flex-wrap gap-2">
-          <button type="button" className="btn-ghost" onClick={onPrev}>
+          <button type="button" className="btn-ghost" onClick={() => stepTo(-1)}>
             Previous
           </button>
-          <button type="button" className="btn-ghost" onClick={onNext}>
+          <button type="button" className="btn-ghost" onClick={() => stepTo(1)}>
             Next
           </button>
           <button type="button" className="btn-primary" onClick={onClose}>
             Close
           </button>
-        </div>
-        {rec && (
-          <div className="mt-6 border border-border p-3" data-testid="academy-recommended">
-            <p className="font-mono text-[10px] tracking-widest text-subtle">Recommended for you</p>
-            <button type="button" className="mt-1 text-left text-sm text-fg underline" onClick={() => onJump(recIndex)}>
-              {rec.title}
-            </button>
-          </div>
-        )}
-        <div className="mt-4 border border-dashed border-border p-3 font-mono text-[11px] text-subtle" data-testid="academy-calculus" aria-disabled="true">
-          Not in this build.
         </div>
         </div>
         <div className="teach-span-5">

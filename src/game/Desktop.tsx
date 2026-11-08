@@ -64,6 +64,7 @@ export interface DesktopProps {
   onPatch: (patch: Partial<DesktopSave>) => void;
   onDesign: (plant: PlantDesign) => void;
   onResults: (patch: Partial<ResultsSave>) => void;
+  onAcademy: (index: number) => void;
 }
 
 function useSize(ref: RefObject<HTMLDivElement | null>) {
@@ -81,7 +82,7 @@ function useSize(ref: RefObject<HTMLDivElement | null>) {
 }
 
 export function Desktop(props: DesktopProps) {
-  const { shown, s, simMode, simContent, onLaunchSim, onAbortSim, onLeave, onMenu, onStartShift, onSaveShift, onPatch, onDesign, onResults } = props;
+  const { shown, s, simMode, simContent, onLaunchSim, onAbortSim, onLeave, onMenu, onStartShift, onSaveShift, onPatch, onDesign, onResults, onAcademy } = props;
   const rootRef = useRef<HTMLDivElement>(null);
   const size = useSize(rootRef);
   const [wins, setWins] = useState<WinState[]>([]);
@@ -102,7 +103,7 @@ export function Desktop(props: DesktopProps) {
   const simW = Math.max(MIN_W, Math.min(960, size.w - 24));
   const simH = Math.max(MIN_H, Math.min(640, size.h - TASKBAR_H - 24));
 
-  const ctx: AppCtx = { s, refresh: () => undefined, onPatch, visible: apps, onDesign, onResults };
+  const ctx: AppCtx = { s, refresh: () => undefined, onPatch, visible: apps, onDesign, onResults, onAcademy };
 
   // Latest values for the window key listener, which is bound once.
   const live = useRef({ wins, startOpen, phone, phoneApp, simMode, hasShift, shown, onLeave, onAbortSim });
