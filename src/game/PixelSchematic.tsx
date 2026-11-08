@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { BANDS, bandColor, pwrLabels, type Label } from "./schematicMath";
+import { BANDS, NATIVE_H, NATIVE_W, PWR_SHAPES, bandColor, pwrLabels, type Label } from "./schematicMath";
 
 /**
  * PWR loop, drawn at native pixel size and shown at whole-number scale (STYLE-STANDARD §2.4).
@@ -9,8 +9,8 @@ import { BANDS, bandColor, pwrLabels, type Label } from "./schematicMath";
  * hot and cold temperatures are labelled. The footer is required (§4). Teaching drawing only.
  */
 
-const W = 160;
-const H = 80;
+const W = NATIVE_W;
+const H = NATIVE_H;
 const OUTLINE = "#3b2318";
 const CREAM = "#f3e6d0";
 const DIM = "#b5a48c";
@@ -38,67 +38,66 @@ function arrow(g: CanvasRenderingContext2D, cx: number, cy: number, dir: 1 | -1,
   }
 }
 
+/** Filled circle with a 1 px outline, drawn row by row so every edge is a hard pixel edge. */
+function pixelCircle(g: CanvasRenderingContext2D, cx: number, cy: number, r: number, fill: string, edge: string) {
+  for (let dy = -(r + 1); dy <= r + 1; dy++) {
+    const inner = Math.round(Math.sqrt(Math.max(0, r * r - dy * dy)));
+    const outer = Math.round(Math.sqrt(Math.max(0, (r + 1) * (r + 1) - dy * dy)));
+    g.fillStyle = edge;
+    g.fillRect(cx - outer, cy + dy, outer * 2 + 1, 1);
+    g.fillStyle = fill;
+    if (Math.abs(dy) <= r) g.fillRect(cx - inner, cy + dy, inner * 2 + 1, 1);
+  }
+}
+
 export function drawPwr(g: CanvasRenderingContext2D, tHot: number, tCold: number) {
   g.imageSmoothingEnabled = false;
   g.fillStyle = "#1c1410";
-  g.fillRect(0, 0, W, H);
+  g.fillRect(0, 0, NATIVE_W, NATIVE_H);
 
   const hot = bandColor(tHot);
   const cold = bandColor(tCold);
+  const ORANGE = "#e8963a";
+  const S = PWR_SHAPES;
 
-  // Hot leg (core top to steam generator), then cold leg (steam generator back to core).
+  // Hot leg: core top-right to the steam generator, with a flow arrow.
+  g.fillStyle = OUTLINE;
+  g.fillRect(S.hot.x, S.hot.y, S.hot.w, S.hot.h);
   g.fillStyle = hot;
-  g.fillRect(31, 14, 38, 4);
+  g.fillRect(S.hot.x, S.hot.y + 1, S.hot.w, S.hot.h - 2);
+  arrow(g, 50, 18, 1, CREAM);
+
+  // Cold leg: steam generator back to the core, with the pump on it and a flow arrow.
   g.fillStyle = OUTLINE;
-  g.fillRect(31, 13, 38, 1);
-  g.fillRect(31, 18, 38, 1);
+  g.fillRect(S.cold.x, S.cold.y, S.cold.w, S.cold.h);
   g.fillStyle = cold;
-  g.fillRect(31, 46, 56, 4);
-  g.fillStyle = OUTLINE;
-  g.fillRect(31, 45, 56, 1);
-  g.fillRect(31, 50, 56, 1);
-  arrow(g, 50, 16, 1, CREAM);
-  arrow(g, 72, 48, -1, CREAM);
+  g.fillRect(S.cold.x, S.cold.y + 1, S.cold.w, S.cold.h - 2);
+  arrow(g, 58, 52, -1, CREAM);
+  pixelCircle(g, 42, 52, 4, "#2a3238", OUTLINE);
 
   // Core, filled with the hot-leg temperature.
-  rect(g, 4, 8, 28, 44, hot);
+  rect(g, S.core.x, S.core.y, S.core.w, S.core.h, hot);
 
   // Steam generator.
-  rect(g, 68, 6, 18, 44, STEEL);
+  rect(g, S.sg.x, S.sg.y, S.sg.w, S.sg.h, STEEL);
 
-  // Heat leaves the steam generator to the turbine side.
-  arrow(g, 89, 28, 1, "#e8963a");
-  g.fillStyle = "#e8963a";
-  g.fillRect(86, 28, 2, 1);
+  // Heat leaves the steam generator toward the turbine side.
+  g.fillStyle = ORANGE;
+  g.fillRect(86, 40, 4, 2);
+  arrow(g, 91, 41, 1, ORANGE);
 
-  // Pump on the cold leg.
-  g.fillStyle = OUTLINE;
-  g.beginPath();
-  g.arc(44, 48, 5, 0, Math.PI * 2);
-  g.fill();
-  g.fillStyle = "#2a3238";
-  g.beginPath();
-  g.arc(44, 48, 4, 0, Math.PI * 2);
-  g.fill();
+  // Pressurizer, outlined like everything else.
+  rect(g, S.pzr.x, S.pzr.y, S.pzr.w, S.pzr.h, PANEL);
 
-  // Pressurizer, with its pressure printed beside it.
-  rect(g, 88, 2, 9, 10, PANEL, GOLD);
-
-  // Temperature labels on each leg.
-
-  // Colour scale, hot at the top.
-  const barX = 137;
-  const barY = 6;
-  const bandH = 6;
+  // Colour scale, hot at the top: seven bands, each 6 px, with a 1 px outline.
+  const bandH = S.bar.h / 7;
   for (let i = 0; i < 7; i++) {
     g.fillStyle = BANDS[6 - i];
-    g.fillRect(barX, barY + i * bandH, 5, bandH);
+    g.fillRect(S.bar.x, S.bar.y + i * bandH, S.bar.w, bandH);
   }
   g.fillStyle = OUTLINE;
-  g.fillRect(barX, barY, 5, 1);
-  g.fillRect(barX, barY + 7 * bandH - 1, 5, 1);
-
-  // Required footer, two lines (§4).
+  g.fillRect(S.bar.x, S.bar.y, S.bar.w, 1);
+  g.fillRect(S.bar.x, S.bar.y + S.bar.h - 1, S.bar.w, 1);
 }
 
 export function PixelSchematic({ tHot, tCold }: { tHot: number; tCold: number }) {
@@ -124,12 +123,11 @@ export function PixelSchematic({ tHot, tCold }: { tHot: number; tCold: number })
         <span
           key={`${l.x}-${l.y}-${l.text}`}
           aria-hidden
-          className="pointer-events-none absolute whitespace-nowrap font-pixel-label text-[10px] leading-none sm:text-[12px]"
+          className="schematic-label pointer-events-none absolute whitespace-nowrap"
           style={{
             left: `${(l.x / W) * 100}%`,
             top: `${(l.y / H) * 100}%`,
             color: tone[l.color],
-            fontFamily: '"CCPixel3x5", monospace',
           }}
         >
           {l.text}

@@ -285,23 +285,6 @@ function Schematic({ plant, dT, inBand, tHot, tCold }: { plant: PlantType; dT: n
   return (
     <svg viewBox="0 0 560 200" className="mt-4 w-full" aria-hidden>
       <rect x="0" y="0" width="560" height="200" fill="#1a1410" rx="8" />
-      {plant === "pwr" && (
-        <>
-          <ellipse cx="130" cy="110" rx="48" ry="72" fill="#2a3238" stroke={glow} strokeWidth="3" />
-          {[0, 1, 2, 3].map((n) => (
-            <rect key={n} x={118 + n * 8} y="18" width="6" height="22" fill="#6b8f71" />
-          ))}
-          <rect x="250" y="36" width="72" height="128" rx="8" fill="#2a261e" stroke="#c4783a" strokeWidth="2" />
-          <circle cx="410" cy="140" r="26" fill="#1c2a2c" stroke="#7a8f9a" strokeWidth="2" />
-          <rect x="470" y="40" width="36" height="70" rx="6" fill="#2a3238" stroke="#c9a227" strokeWidth="2" />
-          <path d="M178 50 H250 M322 50 H410 M410 114 V50" fill="none" stroke="#8a7864" strokeWidth="6" />
-          <path d="M178 150 H250 M322 150 H386" fill="none" stroke="#3d5c66" strokeWidth="6" />
-          <text x="130" y="114" textAnchor="middle" fill="#f3e6d0" fontSize="11">core</text>
-          <text x="286" y="104" textAnchor="middle" fill="#f3e6d0" fontSize="11">SG</text>
-          <text x="410" y="144" textAnchor="middle" fill="#f3e6d0" fontSize="10">pump</text>
-          <text x="488" y="78" textAnchor="middle" fill="#f3e6d0" fontSize="9">PZR</text>
-        </>
-      )}
       {plant === "bwr" && (
         <>
           <ellipse cx="200" cy="110" rx="58" ry="80" fill="#2a3238" stroke={glow} strokeWidth="3" />
