@@ -44,7 +44,7 @@ try {
   if (!has) throw new Error("save did not persist");
 
   await page.evaluate(() => {
-    localStorage.setItem("cc.save.v1", "{not json");
+    localStorage.setItem("cc.save.v2", "{not json");
   });
   const afterCorrupt = await page.evaluate(() => window.__controlsTest.hasSave());
   if (afterCorrupt) throw new Error("corrupt save was not wiped");

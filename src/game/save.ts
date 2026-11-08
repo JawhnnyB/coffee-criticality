@@ -1,17 +1,33 @@
 /**
- * Shift persistence. localStorage cc.save.v1.
+ * Shift persistence.
+ * Read cc.save.v1. Write cc.save.v2. A version 1 save is migrated in memory and is not overwritten.
  * Overlay modes collapse to play. Dialogue is never snapshotted.
  * Teaching plant is stored as JSON — not a license.
  */
 import { ROOMS, emptyResidue, type NpcId, type Residue, type RoleId, type RoomId } from "./content";
-import type { PlantDesign } from "./plant";
+import type { PlantDesign, RunState } from "./plant";
 import { DEFAULT_PLANT, emptyRun } from "./plant";
 import { DEFAULT_PLAYER_LOOK, type PlayerLook } from "./artSpec";
-import type { GameState, Mode, ParlorScores } from "./sim";
+import {
+  defaultDesktop,
+  defaultNews,
+  defaultResults,
+  defaultSetup,
+  type DesktopSave,
+  type GameState,
+  type Mode,
+  type NewsSave,
+  type ParlorScores,
+  type ResultsSave,
+  type SetupSave,
+} from "./sim";
 import type { WeekLogEntry } from "./week";
 
 export const SAVE_KEY = "cc.save.v1";
-export const SAVE_VERSION = 1;
+export const SAVE_KEY_V2 = "cc.save.v2";
+/** Unreadable version 2 bytes. Kept so a bad save is not thrown away. */
+export const SAVE_KEY_V2_CORRUPT = "cc.save.v2.corrupt";
+export const SAVE_VERSION = 2;
 
 const OVERLAY: Mode[] = [
   "dialogue",
@@ -77,9 +93,26 @@ function persistMode(mode: Mode): Mode {
   return mode;
 }
 
-export function snapshot(s: GameState): SaveV1 {
+/** Every Academy page is tier 1 until the tiers exist. The array lines up with academyDone. */
+export function tiersFromDone(done: boolean[]): number[] {
+  return done.map(() => 1);
+}
+
+export interface SaveV2 extends Omit<SaveV1, "version"> {
+  version: 2;
+  setup: SetupSave;
+  run: RunState;
+  desktop: DesktopSave;
+  results: ResultsSave;
+  news: NewsSave;
+  academyTiers: number[];
+  /** Set only while a v1 file is being read. snapshot does not write it. */
+  migratedFrom?: 1;
+}
+
+export function snapshot(s: GameState): SaveV2 {
   return {
-    version: 1,
+    version: 2,
     savedAt: Date.now(),
     mode: persistMode(s.mode),
     role: s.role,
@@ -99,6 +132,7 @@ export function snapshot(s: GameState): SaveV1 {
     hides: s.hides,
     reports: s.reports,
     academyDone: [...s.academyDone],
+    academyTiers: [...s.academyTiers],
     shuffleDone: s.shuffleDone,
     maintDone: s.maintDone,
     ended: s.ended,
@@ -110,10 +144,15 @@ export function snapshot(s: GameState): SaveV1 {
     goals: s.goals.map((g) => ({ ...g })),
     weekLog: s.weekLog.map((e) => ({ ...e })),
     scores: { ...s.scores },
+    setup: { ...s.setup },
+    run: { ...s.run, history: s.run.history.map((h) => ({ ...h })) },
+    desktop: { ...s.desktop, pinned: [...s.desktop.pinned] },
+    results: { daily: [...s.results.daily], shuffleBest: s.results.shuffleBest },
+    news: { seenIds: [...s.news.seenIds] },
   };
 }
 
-function migrate(raw: unknown): SaveV1 | null {
+function parseV1(raw: unknown): SaveV1 | null {
   if (!raw || typeof raw !== "object") return null;
   const v = raw as { version?: number };
   if (v.version !== 1) return null;
@@ -124,19 +163,64 @@ function migrate(raw: unknown): SaveV1 | null {
   return s;
 }
 
-export function peekSave(): SaveV1 | null {
+/** A version 1 save becomes version 2 in memory. The v1 object is not the one written back. */
+export function migrateV1(raw: unknown): SaveV2 | null {
+  const v1 = parseV1(raw);
+  if (!v1) return null;
+  const done = v1.academyDone ?? [];
+  return {
+    ...v1,
+    version: 2,
+    setup: defaultSetup(),
+    run: emptyRun(),
+    desktop: defaultDesktop(),
+    results: defaultResults(),
+    news: defaultNews(),
+    academyTiers: tiersFromDone(done),
+    residue: { ...emptyResidue(), ...v1.residue },
+    migratedFrom: 1,
+  };
+}
+
+function parseV2(raw: unknown): SaveV2 | null {
+  if (!raw || typeof raw !== "object") return null;
+  const s = raw as SaveV2;
+  if (s.version !== 2 || !s.room || !s.playerName) return null;
+  if (!s.plant) s.plant = null;
+  else s.plant = { ...DEFAULT_PLANT, ...s.plant };
+  s.setup = { ...defaultSetup(), ...s.setup };
+  s.desktop = { ...defaultDesktop(), ...s.desktop, pinned: [...(s.desktop?.pinned ?? [])] };
+  s.results = { daily: [...(s.results?.daily ?? [])], shuffleBest: s.results?.shuffleBest ?? null };
+  s.news = { seenIds: [...(s.news?.seenIds ?? [])] };
+  s.run = s.run ? { ...emptyRun(), ...s.run, history: s.run.history ?? [] } : emptyRun();
+  s.residue = { ...emptyResidue(), ...s.residue };
+  s.academyTiers = Array.isArray(s.academyTiers) ? s.academyTiers : tiersFromDone(s.academyDone ?? []);
+  return s;
+}
+
+export function peekSave(): SaveV2 | null {
   if (typeof localStorage === "undefined") return null;
+  const v2 = localStorage.getItem(SAVE_KEY_V2);
+  if (v2 !== null) {
+    try {
+      const parsed = parseV2(JSON.parse(v2) as unknown);
+      if (parsed) return parsed;
+    } catch {
+      /* The bytes are not JSON. Keep them, and do not read version 1. */
+    }
+    localStorage.setItem(SAVE_KEY_V2_CORRUPT, v2);
+    return null;
+  }
   try {
-    const txt = localStorage.getItem(SAVE_KEY);
-    if (!txt) return null;
-    const migrated = migrate(JSON.parse(txt) as unknown);
+    const v1 = localStorage.getItem(SAVE_KEY);
+    if (!v1) return null;
+    const migrated = migrateV1(JSON.parse(v1) as unknown);
     if (!migrated) {
-      wipeSave();
+      localStorage.removeItem(SAVE_KEY);
       return null;
     }
     return migrated;
   } catch {
-    wipeSave();
     return null;
   }
 }
@@ -148,6 +232,8 @@ export function hasSave(): boolean {
 export function wipeSave() {
   if (typeof localStorage === "undefined") return;
   localStorage.removeItem(SAVE_KEY);
+  localStorage.removeItem(SAVE_KEY_V2);
+  localStorage.removeItem(SAVE_KEY_V2_CORRUPT);
 }
 
 export function canAutosave(s: GameState): boolean {
@@ -162,7 +248,7 @@ export function writeSave(s: GameState, quiet = true): boolean {
   if (!canAutosave(s) && s.mode !== "pause") return false;
   try {
     const snap = snapshot(s);
-    localStorage.setItem(SAVE_KEY, JSON.stringify(snap));
+    localStorage.setItem(SAVE_KEY_V2, JSON.stringify(snap));
     if (!quiet) {
       s.toast = "Shift saved.";
       s.toastT = 2.2;
@@ -190,15 +276,20 @@ export function hydrateSave(s: GameState): boolean {
   s.culture = Number.isFinite(data.culture) ? data.culture : 0;
   s.trust = { ...s.trust, ...data.trust };
   s.flags = { ...data.flags };
-  // Save v1 does not store the run. A leftover seed flag would block a fresh seed and point at an empty run.
-  delete s.flags["run:seeded"];
-  s.run = emptyRun();
+  // A version 1 file stored the seed flag but not the run. Seeding again is the v1 rule.
+  if (data.migratedFrom === 1) delete s.flags["run:seeded"];
+  s.run = data.migratedFrom === 1 ? emptyRun() : { ...emptyRun(), ...data.run, history: data.run?.history ? data.run.history.map((h) => ({ ...h })) : [] };
+  s.setup = { ...defaultSetup(), ...data.setup };
+  s.desktop = { ...defaultDesktop(), ...data.desktop, pinned: [...(data.desktop?.pinned ?? [])] };
+  s.results = { daily: [...(data.results?.daily ?? [])], shuffleBest: data.results?.shuffleBest ?? null };
+  s.news = { seenIds: [...(data.news?.seenIds ?? [])] };
   s.plant = data.plant;
   s.catches = data.catches;
   s.hides = data.hides;
   s.reports = data.reports;
   const prevDone = data.academyDone ?? [];
   s.academyDone = s.academyDone.map((_, i) => !!prevDone[i]);
+  s.academyTiers = Array.isArray(data.academyTiers) ? [...data.academyTiers] : s.academyDone.map(() => 1);
   s.shuffleDone = data.shuffleDone;
   s.maintDone = data.maintDone;
   s.ended = data.ended;

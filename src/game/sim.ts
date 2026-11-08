@@ -158,8 +158,15 @@ export interface GameState {
   stillsSeen: number;
   closePrompt: boolean;
   plant: PlantDesign | null;
-  /** Shared operating point. Seeded from `plant` the first time the bench opens. Not saved in v1. */
+  /** Shared operating point. Seeded from `plant` the first time the bench opens. Saved in v2. */
   run: RunState;
+  /** Unset until setup exists. Null region and season mean the setup screen still has to show. */
+  setup: SetupSave;
+  desktop: DesktopSave;
+  results: ResultsSave;
+  news: NewsSave;
+  /** Parallel to academyDone. Every page is tier 1 until the Academy has real tiers. */
+  academyTiers: number[];
   academyDone: boolean[];
   shuffleDone: boolean;
   maintDone: boolean;
@@ -180,6 +187,67 @@ export interface ParlorScores {
   delayEvents: number;
   physBest: number;
   loadBest: number;
+}
+
+/** Saved setup. Null means the player has not chosen. No screen reads this yet. */
+export interface SetupSave {
+  region: string | null;
+  season: string | null;
+  stance: string | null;
+  seed: number;
+}
+
+export interface DesktopSave {
+  pinned: string[];
+  wallpaper: string;
+  followSeason: boolean;
+  accent: string;
+  textScale: number;
+  reducedMotion: boolean;
+  colorSafe: boolean;
+  music: number;
+  sfx: number;
+  musicOn: boolean;
+  clock24: boolean;
+  showAllApps: boolean;
+}
+
+export interface ResultsSave {
+  daily: unknown[];
+  shuffleBest: number | null;
+}
+
+export interface NewsSave {
+  seenIds: string[];
+}
+
+export function defaultSetup(): SetupSave {
+  return { region: null, season: null, stance: null, seed: 1 };
+}
+
+export function defaultDesktop(): DesktopSave {
+  return {
+    pinned: [],
+    wallpaper: "season",
+    followSeason: true,
+    accent: "#c4783a",
+    textScale: 1,
+    reducedMotion: false,
+    colorSafe: false,
+    music: 0.6,
+    sfx: 0.6,
+    musicOn: true,
+    clock24: false,
+    showAllApps: false,
+  };
+}
+
+export function defaultResults(): ResultsSave {
+  return { daily: [], shuffleBest: null };
+}
+
+export function defaultNews(): NewsSave {
+  return { seenIds: [] };
 }
 
 export const EMPTY_SCORES: ParlorScores = {
@@ -293,6 +361,11 @@ export function createState(): GameState {
     closePrompt: false,
     plant: null,
     run: emptyRun(),
+    setup: defaultSetup(),
+    desktop: defaultDesktop(),
+    results: defaultResults(),
+    news: defaultNews(),
+    academyTiers: ACADEMY.map(() => 1),
     academyDone: ACADEMY.map(() => false),
     shuffleDone: false,
     maintDone: false,
