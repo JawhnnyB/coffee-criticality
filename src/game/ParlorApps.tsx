@@ -272,6 +272,8 @@ export function AppBody({ app, ctx }: { app: AppDef; ctx: AppCtx }) {
   if (app.id === "cam") return <CoreCamApp s={ctx.s} />;
   if (app.id === "results") return <ResultsApp s={ctx.s} />;
   if (app.id === "coremap") return <CoreMapApp s={ctx.s} onResults={ctx.onResults} />;
+  if (app.id === "radiation") return <RadiationApp />;
+  if (app.id === "nrc") return <NrcApp />;
   if (app.kind === "placeholder") return <PlaceholderApp app={app} />;
   return null;
 }
@@ -281,6 +283,66 @@ export function PlaceholderApp({ app }: { app: AppDef }) {
     <div className="p-4" style={{ ...FIELD, color: PAL.ink }} data-testid={`placeholder-${app.id}`}>
       <p style={{ fontFamily: "CCPixel5x7, monospace", fontSize: 16, margin: 0 }}>{app.title}</p>
       <p style={{ marginTop: 10, fontSize: 14 }}>{app.note ?? NOT_BUILT}</p>
+    </div>
+  );
+}
+
+/** Labels only (spec 8.2). Every value is pending verification. No unit numbers, no half-life, no essay. */
+const RAD_ROWS: { label: string }[] = [
+  { label: "Units: becquerel (Bq), gray (Gy), sievert (Sv)" },
+  { label: "Half-life" },
+  { label: "Shielding, by material and thickness" },
+  { label: "Time, distance, shielding" },
+  { label: "Dose" },
+  { label: "Contamination" },
+];
+
+export function RadiationApp() {
+  return (
+    <div className="p-3" style={{ ...FIELD, color: PAL.ink }} data-testid="app-radiation">
+      <p style={{ fontFamily: "CCPixel5x7, monospace", fontSize: 16, margin: 0 }}>Radiation</p>
+      <table style={{ fontSize: 12, marginTop: 10, borderCollapse: "collapse" }}>
+        <tbody>
+          {RAD_ROWS.map((r) => (
+            <tr key={r.label}>
+              <td style={{ paddingRight: 12, paddingBottom: 6 }}>{r.label}</td>
+              <td style={{ paddingBottom: 6 }}>Pending verification</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <p style={{ fontSize: 12, marginTop: 8 }}>Academy: ALARA with eyes open.</p>
+    </div>
+  );
+}
+
+/** The eCFR link is the only live content. The index is the starter list from GROK_PHASES §9: numbers only, no titles, no summaries. */
+const NRC_STARTER = ["Part 19", "Part 20", "Part 21", "Part 26", "Part 50", "Part 50 Appendix B", "Section 50.59", "Part 52", "Part 55", "Part 100"];
+
+export function NrcApp() {
+  return (
+    <div className="p-3" style={{ ...FIELD, color: PAL.ink }} data-testid="app-nrc">
+      <p style={{ fontFamily: "CCPixel5x7, monospace", fontSize: 16, margin: 0 }}>NRC Regulations</p>
+      <p style={{ fontSize: 12, marginTop: 10 }}>
+        <a href="https://www.ecfr.gov/current/title-10" target="_blank" rel="noopener noreferrer" style={{ color: PAL.copper, textDecoration: "underline" }}>
+          Title 10 (Energy), eCFR
+        </a>{" "}
+        · official text, opens in a new tab
+      </p>
+      <table style={{ fontSize: 12, marginTop: 10, borderCollapse: "collapse" }}>
+        <tbody>
+          {NRC_STARTER.map((n) => (
+            <tr key={n}>
+              <td style={{ paddingRight: 12, paddingBottom: 6 }}>{n}</td>
+              <td style={{ paddingBottom: 6 }}>verify before publish</td>
+            </tr>
+          ))}
+          <tr>
+            <td style={{ paddingRight: 12, paddingBottom: 6 }}>Part 73</td>
+            <td style={{ paddingBottom: 6 }}>exists, and is not described here.</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   );
 }

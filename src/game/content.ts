@@ -98,8 +98,12 @@ export interface Line {
   choices?: Choice[];
 }
 
+/** 1: plain terms, one idea, no formula. 2: heat, physics or several ideas. 3: states an equation already in nuclearLab.ts. */
+export type AcademyTier = 1 | 2 | 3;
+
 export interface AcademyPage {
   title: string;
+  tier: AcademyTier;
   body: string;
   still: string;
   extra?: AcademyExtra;
@@ -1024,28 +1028,28 @@ export const STILLS: Record<string, { src: string; title: string; body: string; 
 };
 
 export const ACADEMY: AcademyPage[] = [
-  { title: "Just Culture", still: "culture", track: "culture", body: "Mistakes are expected. Hiding them is the hazard. A catch while it is cheap is the product. Heroics are a lagging indicator that the room went quiet. Teaching model — not a license." },
-  { title: "Heat has to leave", still: "pwr", extra: "fluids", track: "heat", body: "On this site (PWR): Q = ṁ × cp × ΔT. Cold leg in, downcomer down, core up, hot leg out. Primary stays liquid at ~16 MPa classroom. Teaching model — not a license." },
-  { title: "The vessel has names", still: "pwr", extra: "anatomy", track: "heat", body: "A PWR pressure vessel holds the fuel, the water, and the control rods. Inlet nozzle, core barrel, downcomer, lower plenum, fuel, upper internals, outlet nozzle. Not a design basis." },
-  { title: "ALARA with eyes open", still: "alara", extra: "alara", track: "safety", body: "Time, distance, shielding — and still seeing. Infinite distance is how rooms go blind. Binoculars from the platform. Two minutes. Then leave." },
-  { title: "Four ways heat leaves", still: "reactor", extra: "types", track: "heat", body: "PWR, BWR, pebble, salt. Different plumbing. Same law: heat leaves. Comparison decks, not a shopping list. Teaching only — not a design basis." },
-  { title: "Salt, three ways", still: "msr", extra: "msr", track: "heat", body: "Call it molten salt and people hear one machine. There are three. Thermal circulating fuel (this classroom). FHR (solid TRISO). Fast chloride (no graphite). Circulating fuel: β_eff is smaller than β. Teaching only — not a license." },
-  { title: "Rod, assembly, core", still: "scales", extra: "lab", track: "physics", body: "A pin in an infinite lattice is not a plant. Leakage is how k comes down from k∞. Play PHYS.CAB — fission in the pellet, P1 diffusion at the edge. Priya will not sign a peak she cannot explain at three scales." },
-  { title: "Fuel as a map", still: "shuffle", extra: "shuffle", track: "fuel", body: "Fresh in the middle peaks. Fresh on the rim flattens but leaks. Low-leakage loading puts burned fuel toward the rim and scatters fresh inside. Fq is a personality, not a score. Outage is Friday. Do not sign a shuffle you cannot walk." },
-  { title: "Export is a letter, not a license", still: "export", extra: "export", track: "fuel", body: "The OpenMC script is a teaching letter to a code. It is not a design basis. Watermark stays on." },
-  { title: "ΔT with your hands", still: "dt", extra: "trainer", track: "heat", body: "Priya's bench. Put heat into coolant until the numbers and the feeling agree." },
-  { title: "Four barriers", still: "barriers", extra: "barriers", track: "safety", body: "Fuel ceramic. Clad. Reactor coolant pressure boundary. Containment. A catch on a tag is the cheap layer." },
-  { title: "STAR — stop before the twist", still: "star", extra: "star", track: "safety", body: "Stop. Think. Act. Review. Questioning attitude is a protocol, not a personality. Stop-work is allowed." },
-  { title: "Three-way communication", still: "comms", extra: "comms", track: "safety", body: "Sender speaks. Receiver repeats. Sender acknowledges. A nod is how blanks get initials." },
-  { title: "Reactivity in three stages", still: "reactivity", extra: "reactivity", track: "physics", body: "Stage 1, the delay: about 0.65% of U-235 thermal neutrons come late, from fragments. That is β. Stage 2, the dollar: ρ($) = ρ/β, so $1 is prompt-critical, the cliff. Stage 3, the period: T is the slope. Delayed neutrons buy seconds. Past $1 the period collapses to the prompt lifetime. The cards have no clock." },
-  { title: "Control rods are a spare absorber", still: "reactor", extra: "rods", track: "physics", body: "A rod is a block of absorber you can move. Pull it out and the pellet eats fewer neutrons, so k rises. Push it in and k falls. Operators hold k near 1 with rods and boron as spare Σ_a. Rods hold power; they are not a switch that makes it. Four banks, 228 steps, a cooldown between moves. Play ROD.BANK. Teaching model — not a license." },
-  { title: "Six-factor formula", still: "six", extra: "six", track: "physics", body: "k∞ = ε p f η. k_eff = k∞ · PNL. A pin is not a plant. Play PHYS.CAB — fission in the pellet, leak at the edge." },
-  { title: "Monte Carlo methods", still: "export", extra: "mc", track: "physics", body: "Analog generation k. Histories, fission bank, k ± σ. 1/√G is the wait. Implicit capture is a transient, not a quiz. OpenMC stays a letter. Play analog MC in PHYS.CAB." },
-  { title: "Temperature is a catch", still: "feedback", extra: "feedback", track: "physics", body: "Doppler is the pellet. MTC is the water. Two temperatures, two timescales." },
-  { title: "Xenon and the iodine pit", still: "xenon", extra: "xenon", track: "physics", body: "Xe-135 is a poison with a clock. You do not get to skip the pit. Play LOAD.CAB — xenon follows power, the load is the opponent." },
-  { title: "LOTOTO — lock, tag, try", still: "lototo", extra: "lototo", track: "safety", body: "Lock out. Tag out. Try out. Zero energy. A leftover IN SERVICE tag is how people go home late." },
-  { title: "Independent verification", still: "verify", extra: "verify", track: "safety", body: "A second set of eyes. Not a nod. Teaching only." },
-  { title: "Stop when unsure", still: "conservative", extra: "conservative", track: "safety", body: "Stop-work is allowed. Faster is how occurrence reports get born." },
+  { title: "Just Culture", tier: 1, still: "culture", track: "culture", body: "Mistakes are expected. Hiding them is the hazard. A catch while it is cheap is the product. Heroics are a lagging indicator that the room went quiet. Teaching model — not a license." },
+  { title: "Heat has to leave", tier: 3, still: "pwr", extra: "fluids", track: "heat", body: "On this site (PWR): Q = ṁ × cp × ΔT. Cold leg in, downcomer down, core up, hot leg out. Primary stays liquid at ~16 MPa classroom. Teaching model — not a license." },
+  { title: "The vessel has names", tier: 2, still: "pwr", extra: "anatomy", track: "heat", body: "A PWR pressure vessel holds the fuel, the water, and the control rods. Inlet nozzle, core barrel, downcomer, lower plenum, fuel, upper internals, outlet nozzle. Not a design basis." },
+  { title: "ALARA with eyes open", tier: 1, still: "alara", extra: "alara", track: "safety", body: "Time, distance, shielding — and still seeing. Infinite distance is how rooms go blind. Binoculars from the platform. Two minutes. Then leave." },
+  { title: "Four ways heat leaves", tier: 2, still: "reactor", extra: "types", track: "heat", body: "PWR, BWR, pebble, salt. Different plumbing. Same law: heat leaves. Comparison decks, not a shopping list. Teaching only — not a design basis." },
+  { title: "Salt, three ways", tier: 2, still: "msr", extra: "msr", track: "heat", body: "Call it molten salt and people hear one machine. There are three. Thermal circulating fuel (this classroom). FHR (solid TRISO). Fast chloride (no graphite). Circulating fuel: β_eff is smaller than β. Teaching only — not a license." },
+  { title: "Rod, assembly, core", tier: 2, still: "scales", extra: "lab", track: "physics", body: "A pin in an infinite lattice is not a plant. Leakage is how k comes down from k∞. Play PHYS.CAB — fission in the pellet, P1 diffusion at the edge. Priya will not sign a peak she cannot explain at three scales." },
+  { title: "Fuel as a map", tier: 2, still: "shuffle", extra: "shuffle", track: "fuel", body: "Fresh in the middle peaks. Fresh on the rim flattens but leaks. Low-leakage loading puts burned fuel toward the rim and scatters fresh inside. Fq is a personality, not a score. Outage is Friday. Do not sign a shuffle you cannot walk." },
+  { title: "Export is a letter, not a license", tier: 1, still: "export", extra: "export", track: "fuel", body: "The OpenMC script is a teaching letter to a code. It is not a design basis. Watermark stays on." },
+  { title: "ΔT with your hands", tier: 2, still: "dt", extra: "trainer", track: "heat", body: "Priya's bench. Put heat into coolant until the numbers and the feeling agree." },
+  { title: "Four barriers", tier: 2, still: "barriers", extra: "barriers", track: "safety", body: "Fuel ceramic. Clad. Reactor coolant pressure boundary. Containment. A catch on a tag is the cheap layer." },
+  { title: "STAR — stop before the twist", tier: 2, still: "star", extra: "star", track: "safety", body: "Stop. Think. Act. Review. Questioning attitude is a protocol, not a personality. Stop-work is allowed." },
+  { title: "Three-way communication", tier: 2, still: "comms", extra: "comms", track: "safety", body: "Sender speaks. Receiver repeats. Sender acknowledges. A nod is how blanks get initials." },
+  { title: "Reactivity in three stages", tier: 3, still: "reactivity", extra: "reactivity", track: "physics", body: "Stage 1, the delay: about 0.65% of U-235 thermal neutrons come late, from fragments. That is β. Stage 2, the dollar: ρ($) = ρ/β, so $1 is prompt-critical, the cliff. Stage 3, the period: T is the slope. Delayed neutrons buy seconds. Past $1 the period collapses to the prompt lifetime. The cards have no clock." },
+  { title: "Control rods are a spare absorber", tier: 2, still: "reactor", extra: "rods", track: "physics", body: "A rod is a block of absorber you can move. Pull it out and the pellet eats fewer neutrons, so k rises. Push it in and k falls. Operators hold k near 1 with rods and boron as spare Σ_a. Rods hold power; they are not a switch that makes it. Four banks, 228 steps, a cooldown between moves. Play ROD.BANK. Teaching model — not a license." },
+  { title: "Six-factor formula", tier: 3, still: "six", extra: "six", track: "physics", body: "k∞ = ε p f η. k_eff = k∞ · PNL. A pin is not a plant. Play PHYS.CAB — fission in the pellet, leak at the edge." },
+  { title: "Monte Carlo methods", tier: 2, still: "export", extra: "mc", track: "physics", body: "Analog generation k. Histories, fission bank, k ± σ. 1/√G is the wait. Implicit capture is a transient, not a quiz. OpenMC stays a letter. Play analog MC in PHYS.CAB." },
+  { title: "Temperature is a catch", tier: 2, still: "feedback", extra: "feedback", track: "physics", body: "Doppler is the pellet. MTC is the water. Two temperatures, two timescales." },
+  { title: "Xenon and the iodine pit", tier: 2, still: "xenon", extra: "xenon", track: "physics", body: "Xe-135 is a poison with a clock. You do not get to skip the pit. Play LOAD.CAB — xenon follows power, the load is the opponent." },
+  { title: "LOTOTO — lock, tag, try", tier: 2, still: "lototo", extra: "lototo", track: "safety", body: "Lock out. Tag out. Try out. Zero energy. A leftover IN SERVICE tag is how people go home late." },
+  { title: "Independent verification", tier: 1, still: "verify", extra: "verify", track: "safety", body: "A second set of eyes. Not a nod. Teaching only." },
+  { title: "Stop when unsure", tier: 1, still: "conservative", extra: "conservative", track: "safety", body: "Stop-work is allowed. Faster is how occurrence reports get born." },
 ];
 
 export const ACADEMY_FUEL = ACADEMY.findIndex((p) => p.extra === "shuffle");
