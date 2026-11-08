@@ -267,8 +267,9 @@ export function paintBeat(
     mouth: "smile" | "talk";
     kicker: string;
     title: string;
-    speaker: string;
     pip: number;
+    /** The SPACE hint. Off on phones, where a tap continues. */
+    hint?: boolean;
   },
 ) {
   ctx.imageSmoothingEnabled = false;
@@ -280,9 +281,8 @@ export function paintBeat(
   const face = o.you ? playerPortrait(o.look, o.mouth) : castPortrait(o.who, o.mouth);
   blitPortrait(ctx, face, 22, 156);
   text5(ctx, 78, 155, o.title, "#8a4a2a", 1);
-  text3(ctx, 78, 166, o.you ? "YOU" : o.speaker, "#c4783a");
   arrow(ctx);
-  text3(ctx, 316, 197, "SPACE", "#a8937a");
+  if (o.hint !== false) text3(ctx, 316, 197, "SPACE", "#a8937a");
 }
 
 export function paintBrief(

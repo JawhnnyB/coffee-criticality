@@ -20,6 +20,14 @@ test("a wide cafe keeps the cover zoom", () => {
   assert.equal(M.worldZoom(1100, 720, 320, 256), 3);
 });
 
-test("a phone-width cafe fits the whole room at zoom 1", () => {
-  assert.equal(M.worldZoom(390, 844, 320, 256), 1);
+test("a phone-width view is zoom 2, and the camera pans because the room is bigger than the view", () => {
+  assert.equal(M.worldZoom(390, 844, 320, 256), 2);
+  // At zoom 2 the 320×256 room is 640×512 device pixels: wider than the 390px phone view, so it must pan.
+  assert.ok(320 * 2 > 390);
+});
+
+test("a phone at the PHONE_VIEW_W threshold is still zoom 2", () => {
+  assert.equal(M.worldZoom(M.PHONE_VIEW_W - 1, 720, 160, 256), 2);
+  // At exactly PHONE_VIEW_W the cover law applies again: 720 / 160 = 4.5, floored to 4.
+  assert.equal(M.worldZoom(M.PHONE_VIEW_W, 720, 160, 256), 4);
 });
