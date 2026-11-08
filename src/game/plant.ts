@@ -77,12 +77,15 @@ export function emptyRun(): RunState {
   return { powerPct: 0, flowPct: 0, rodsWithdrawnPct: 0, scram: false, history: [] };
 }
 
+/** Owner decision: the bench opens on the drill, short of the ΔT band. Not full power. */
+export const SEED_POWER_PCT = 62;
+
 /**
- * Operating point of the designed plant: full design power, the design's own flow.
- * Not the trainer's old 62% drill preset.
+ * The drill, not the finished plant. Power and rods start at SEED_POWER_PCT so power
+ * does not climb on its own. Flow stays the plant's own.
  */
 export function seedRun(plant: PlantDesign): RunState {
-  const powerPct = 100;
+  const powerPct = SEED_POWER_PCT;
   const flowPct = plant.flow;
   return {
     powerPct,
