@@ -645,6 +645,9 @@ export function getAudioProbe() {
     bed: bed?.kind ?? null,
     period: bed?.period ?? null,
     duck: duckAmt,
+    /** The bed's gain as it is set now. A track holds it down, so this is below duck while one plays. */
+    bedGain: lastDuck,
+    hold: musicHold,
     ctx: ctx?.state ?? "none",
     steam: steamGain ? steamGain.gain.value : 0,
     core: coreGain ? coreGain.gain.value : 0,

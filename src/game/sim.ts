@@ -27,6 +27,7 @@ import {
   type RoomId,
 } from "./content";
 import { RADIUS, SPEED, WALL } from "./const";
+import type { CoreMapSave } from "./coreMapMemory";
 import { emptyRun, pushSample, seedRun, shouldSample, thermalState, type PlantDesign, type RunState, type ShuffleCell } from "./plant";
 import { DEFAULT_PLAYER_LOOK, PROP_NATIVE, type PlayerLook } from "./artSpec";
 import { INCIDENTS, occupancyOverlay, dayDef, incidentOwner, COMMUTE_SPAWN, DUSK_SPAWN, type WeekLogEntry } from "./week";
@@ -221,6 +222,8 @@ export interface DesktopSave {
 export interface ResultsSave {
   daily: unknown[];
   shuffleBest: number | null;
+  /** The Core Map's grid and swap count, so the window reopens where it was. Never sets shuffleDone. */
+  coreMap?: CoreMapSave | null;
 }
 
 export interface NewsSave {
@@ -249,7 +252,7 @@ export function defaultDesktop(): DesktopSave {
 }
 
 export function defaultResults(): ResultsSave {
-  return { daily: [], shuffleBest: null };
+  return { daily: [], shuffleBest: null, coreMap: null };
 }
 
 export function defaultNews(): NewsSave {

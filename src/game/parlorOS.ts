@@ -163,7 +163,7 @@ export const APPS: Record<AppId, AppDef> = {
   design: { id: "design", title: "Reactor Design", short: "DSN", kind: "static" },
   control: { id: "control", title: "Reactor Control", short: "CTL", kind: "sim", mode: "reactor", needsDesign: true },
   academy: { id: "academy", title: "Academy", short: "ACA", kind: "sim", mode: "academy" },
-  news: { id: "news", title: "News", short: "NEW", kind: "placeholder", note: NOT_BUILT },
+  news: { id: "news", title: "News", short: "NEW", kind: "static" },
   radiation: { id: "radiation", title: "Radiation", short: "RAD", kind: "static" },
   nrc: { id: "nrc", title: "NRC Regulations", short: "NRC", kind: "static" },
   results: { id: "results", title: "Results", short: "RES", kind: "static", needsDesign: true },

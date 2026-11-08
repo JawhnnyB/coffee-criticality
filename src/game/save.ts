@@ -7,6 +7,7 @@
 import { ROOMS, emptyResidue, type NpcId, type Residue, type RoleId, type RoomId } from "./content";
 import type { PlantDesign, RunState } from "./plant";
 import { DEFAULT_PLANT, emptyRun } from "./plant";
+import { sanitizeCoreMap } from "./coreMapMemory";
 import { DEFAULT_PLAYER_LOOK, type PlayerLook } from "./artSpec";
 import {
   defaultDesktop,
@@ -149,7 +150,11 @@ export function snapshot(s: GameState): SaveV2 {
     setup: { ...s.setup },
     run: { ...s.run, history: s.run.history.map((h) => ({ ...h })) },
     desktop: { ...s.desktop, pinned: [...s.desktop.pinned] },
-    results: { daily: [...s.results.daily], shuffleBest: s.results.shuffleBest },
+    results: {
+      daily: [...s.results.daily],
+      shuffleBest: s.results.shuffleBest,
+      coreMap: s.results.coreMap ? { grid: [...s.results.coreMap.grid], swaps: s.results.coreMap.swaps } : null,
+    },
     news: { seenIds: [...s.news.seenIds] },
   };
 }
@@ -291,7 +296,11 @@ export function hydrateSave(s: GameState): boolean {
   s.run = data.migratedFrom === 1 ? emptyRun() : { ...emptyRun(), ...data.run, history: data.run?.history ? data.run.history.map((h) => ({ ...h })) : [] };
   s.setup = { ...defaultSetup(), ...data.setup };
   s.desktop = { ...defaultDesktop(), ...data.desktop, pinned: [...(data.desktop?.pinned ?? [])] };
-  s.results = { daily: [...(data.results?.daily ?? [])], shuffleBest: data.results?.shuffleBest ?? null };
+  s.results = {
+    daily: [...(data.results?.daily ?? [])],
+    shuffleBest: data.results?.shuffleBest ?? null,
+    coreMap: sanitizeCoreMap(data.results?.coreMap),
+  };
   s.news = { seenIds: [...(data.news?.seenIds ?? [])] };
   s.plant = data.plant;
   s.catches = data.catches;
