@@ -1,0 +1,12 @@
+{
+  "name": "Parlor OS season tracks",
+  "license": "Original. Generated in code by src/game/parlorMusic.ts. No samples, no recordings, no audio files.",
+  "method": "Each track is a short loop from a seeded pattern generator. Every bar holds a chord pad (three notes, one octave down), plays a bass note on beats one and three, and adds a sparse lead chosen from the season's scale. Voices are Web Audio oscillators with a short exponential envelope. The same seed gives the same notes.",
+  "files": [],
+  "tracks": [
+    { "season": "spring", "title": "Spring rain, first light", "bpm": 96, "root": 57, "scale": [0, 2, 4, 7, 9], "progression": [0, 3, 4, 0], "lead": "triangle", "pad": "sine", "density": 0.55 },
+    { "season": "summer", "title": "Summer glare on the taskbar", "bpm": 116, "root": 60, "scale": [0, 2, 4, 5, 7, 9, 11], "progression": [0, 4, 5, 3], "lead": "triangle", "pad": "sine", "density": 0.7 },
+    { "season": "fall", "title": "Fall leaves, long shadows", "bpm": 88, "root": 57, "scale": [0, 2, 3, 5, 7, 9, 10], "progression": [0, 5, 3, 6], "lead": "sine", "pad": "triangle", "density": 0.5 },
+    { "season": "winter", "title": "Winter, cream lamps", "bpm": 72, "root": 50, "scale": [0, 2, 3, 5, 7, 8, 10], "progression": [0, 5, 2, 6], "lead": "sine", "pad": "triangle", "density": 0.3 }
+  ]
+}

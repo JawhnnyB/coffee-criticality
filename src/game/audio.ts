@@ -7,11 +7,19 @@ type Period = "morning" | "midday" | "afternoon";
 
 const MASTER = 0.18;
 const DUCK = 0.28;
+/** While a Music track plays, the existing bed sits this low. The two never play at full volume together. */
+const MUSIC_HOLD_DUCK = 0.2;
+/** Gain of the Music app's own bus, before the master. */
+const TRACKS_GAIN = 0.55;
 
 let ctx: AudioContext | null = null;
 let master: GainNode | null = null;
 let music: GainNode | null = null;
 let sfx: GainNode | null = null;
+let tracks: GainNode | null = null;
+let musicHold = false;
+let lastMode = "play";
+let lastDuck = 1;
 let muted = false;
 try {
   muted = localStorage.getItem("cc.mute") === "1";
@@ -50,11 +58,14 @@ function ac() {
   master = ctx.createGain();
   music = ctx.createGain();
   sfx = ctx.createGain();
+  tracks = ctx.createGain();
   master.gain.value = muted ? 0 : MASTER;
   music.gain.value = 1;
   sfx.gain.value = 1;
+  tracks.gain.value = TRACKS_GAIN;
   music.connect(master);
   sfx.connect(master);
+  tracks.connect(master);
   master.connect(ctx.destination);
   return ctx;
 }
@@ -265,14 +276,29 @@ export function playBed(kind: BedKind) {
 
 function duckTo(mode: string) {
   const { c, music: m } = bus();
-  const next =
+  lastMode = mode;
+  const base =
     mode === "pause" || mode === "dialogue" || mode === "incident" || mode === "academy" || mode === "still"
       ? DUCK
       : 1;
-  if (Math.abs(next - duckAmt) < 0.01) return;
-  duckAmt = next;
+  duckAmt = base;
+  const next = musicHold ? Math.min(base, MUSIC_HOLD_DUCK) : base;
+  if (Math.abs(next - lastDuck) < 0.01) return;
+  lastDuck = next;
   m.gain.cancelScheduledValues(c.currentTime);
   m.gain.setTargetAtTime(next, c.currentTime, 0.07);
+}
+
+/** The Music app's output bus. Tracks connect here, not to the bed. */
+export function playbackBus(): { c: AudioContext; dest: GainNode } {
+  const b = bus();
+  return { c: b.c, dest: tracks! };
+}
+
+/** On while a Music track plays. Ducks the existing bed to a low level and holds it there. */
+export function setMusicHold(on: boolean) {
+  musicHold = on;
+  duckTo(lastMode);
 }
 
 function stopSteam() {

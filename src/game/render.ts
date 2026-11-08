@@ -4,6 +4,7 @@ import { LOOKS, PAL, drawChibi, drawEmote, pix } from "./pixel";
 import { A6_ROOMS } from "./roomArt";
 import { ROOM_ATLAS, type AtlasStamp } from "./roomAtlas";
 import { worldZoom } from "./artScale";
+import { SEASON_INFO, seasonOrDefault } from "./parlorOS";
 import { npcsHere, type GameState } from "./sim";
 
 const artCache = new Map<string, HTMLImageElement>();
@@ -167,6 +168,9 @@ export function drawWorld(
 
   drawables.sort((a, b) => a.y - b.y);
   for (const d of drawables) d.draw();
+  for (const p of room.props) {
+    if (p.kind === "laptop") drawLaptop(g, p.rect.x, p.rect.y);
+  }
   if (usingA6) {
     g.fillStyle = "#3b2318";
     g.fillRect(0, 0, 1, room.h);
@@ -221,11 +225,29 @@ export function drawWorld(
     ctx.fillRect(ox, oy, dw, dh);
     ctx.restore();
   }
+  // Lot scenes take the season's tint on the same path as the day tint. Rooms are not repainted.
+  if (room.id === "gate") {
+    ctx.fillStyle = SEASON_INFO[seasonOrDefault(s.setup.season)].lotTint;
+    ctx.fillRect(ox, oy, dw, dh);
+  }
 
   if (s.fade > 0 && !s.mapHop) {
     ctx.fillStyle = `rgba(22,17,13,${Math.min(1, s.fade)})`;
     ctx.fillRect(0, 0, viewW, viewH);
   }
+}
+
+/** A pixel laptop, open, on the cafe counter. Palette only. Its position is the laptop prop's corner. */
+function drawLaptop(g: CanvasRenderingContext2D, x: number, y: number) {
+  g.fillStyle = PAL.steelD;
+  g.fillRect(x + 4, y + 9, 22, 2);
+  g.fillStyle = PAL.steel;
+  g.fillRect(x + 5, y + 2, 20, 8);
+  g.fillStyle = PAL.leafL;
+  g.fillRect(x + 7, y + 4, 16, 4);
+  g.fillStyle = PAL.ink;
+  g.fillRect(x + 8, y + 5, 6, 1);
+  g.fillRect(x + 8, y + 7, 10, 1);
 }
 
 function fillEdge(ctx: CanvasRenderingContext2D, room: (typeof ROOMS)[RoomId]) {

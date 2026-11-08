@@ -31,6 +31,7 @@ import { emptyRun, pushSample, seedRun, shouldSample, thermalState, type PlantDe
 import { DEFAULT_PLAYER_LOOK, PROP_NATIVE, type PlayerLook } from "./artSpec";
 import { INCIDENTS, occupancyOverlay, dayDef, incidentOwner, COMMUTE_SPAWN, DUSK_SPAWN, type WeekLogEntry } from "./week";
 import { writeSave, wipeSave } from "./save";
+import { DEFAULT_PINNED, type Season, type Stance } from "./parlorOS";
 import { playCatch, playDoor, playFoot, playHide, playReport, playSit, playStand, playTalk } from "./audio";
 import { isRevealing, requestSkip } from "./chatter";
 import type { CabId } from "./Arcade";
@@ -69,7 +70,9 @@ export type Mode =
   | "pebble"
   | "bowl"
   | "phys"
-  | "load";
+  | "load"
+  | "desktop"
+  | "setup";
 
 export interface NpcLive {
   room: RoomId;
@@ -171,6 +174,8 @@ export interface GameState {
   shuffleDone: boolean;
   maintDone: boolean;
   returnMode: Mode;
+  /** Runtime only, not saved. True while the desktop hosts the overlay that is running (or the desktop itself). */
+  deskHost: boolean;
   fq: number;
   npcLive: Partial<Record<NpcId, NpcLive>>;
   sitting: boolean;
@@ -227,7 +232,7 @@ export function defaultSetup(): SetupSave {
 
 export function defaultDesktop(): DesktopSave {
   return {
-    pinned: [],
+    pinned: [...DEFAULT_PINNED],
     wallpaper: "season",
     followSeason: true,
     accent: "#c4783a",
@@ -370,6 +375,7 @@ export function createState(): GameState {
     shuffleDone: false,
     maintDone: false,
     returnMode: "play",
+    deskHost: false,
     fq: 0,
     npcLive: {},
     sitting: false,
@@ -863,10 +869,75 @@ export function finishDay(s: GameState) {
   s.mode = "eod";
   writeSave(s);
 }
+/** Where an overlay returns when it ends: the desktop if the desktop hosts it, otherwise the world. */
+export function homeMode(s: GameState): Mode {
+  return s.deskHost ? "desktop" : "play";
+}
+
+/** Time is charged the same way on a return to the world or to the desktop. */
+function chargedHome(m: Mode): boolean {
+  return m === "play" || m === "desktop";
+}
+
+/** Open the desktop. The world is frozen until it closes: no clock, no walking. */
+export function openDesktop(s: GameState) {
+  s.deskHost = true;
+  s.returnMode = "play";
+  s.stillId = null;
+  s.mode = "desktop";
+}
+
+/** Close the desktop and go back to the world. */
+export function leaveDesktop(s: GameState) {
+  s.deskHost = false;
+  s.returnMode = "play";
+  s.mode = "play";
+  refreshObjective(s);
+}
+
+/** Launch a sim app or a mini game from the desktop. Its finish function sends the player back to the desktop. */
+export function launchFromDesk(s: GameState, mode: Mode) {
+  s.deskHost = true;
+  s.returnMode = "play";
+  s.stillId = null;
+  if (mode === "reactor") ensureRun(s);
+  if (mode === "academy") {
+    s.flags.academy = true;
+    setGoal(s, "study");
+  }
+  s.mode = mode;
+}
+
+/** Setup: the season and stance are chosen once, at a new shift. Region stays unset. */
+export function applySetup(s: GameState, season: Season, stance: Stance) {
+  s.setup = { ...s.setup, season, stance, region: null };
+}
+
+/**
+ * The desk's design, saved from the desktop. The first design pays Priya the same trust a build pays,
+ * once. Designing again changes the plant and nothing else.
+ */
+export function saveDesign(s: GameState, plant: PlantDesign) {
+  s.plant = plant;
+  if (!s.flags.built) {
+    s.flags.built = true;
+    s.flags.priyaTalked = true;
+    bumpTrust(s, "priya", 10);
+  }
+}
+
+/** A new shift keeps the setup and the desktop settings. Everything else starts over. */
+export function resetShift(s: GameState) {
+  const keepSetup = s.setup;
+  const keepDesk = s.desktop;
+  Object.assign(s, createState());
+  s.setup = keepSetup;
+  s.desktop = keepDesk;
+}
+
 export function startShift(s: GameState, role: RoleId, look: PlayerLook = DEFAULT_PLAYER_LOOK) {
   wipeSave();
-  const fresh = createState();
-  Object.assign(s, fresh);
+  resetShift(s);
   s.role = role;
   s.playerLook = { ...look };
   s.mode = "build";
@@ -1098,6 +1169,10 @@ export function useInteract(s: GameState) {
     return;
   }
   const kind = ROOMS[s.room].interacts.find((x) => x.id === s.nearId)?.kind;
+  if (kind === "desktop") {
+    openDesktop(s);
+    return;
+  }
   if (kind === "sit") {
     const it = ROOMS[s.room].interacts.find((x) => x.id === s.nearId);
     if (!it) return;
@@ -1261,12 +1336,12 @@ export function closeStill(s: GameState) {
   refreshObjective(s);
 }
 export function finishArcade(s: GameState, score: number, leftover = 0) {
-  const back = s.returnMode === "eod" ? "eod" : "play";
+  const back = s.returnMode === "eod" ? "eod" : homeMode(s);
   s.mode = back;
   s.returnMode = "play";
   s.flags.arcade = true;
   setGoal(s, "arcade");
-  if (back === "play") addMinutes(s, 8);
+  if (chargedHome(back)) addMinutes(s, 8);
   if (score > s.scores.catchBest || score === s.scores.catchBest && leftover > s.scores.catchTime) {
     s.scores.catchBest = score;
     s.scores.catchTime = leftover;
@@ -1313,7 +1388,7 @@ export function finishLeisure(s: GameState, score: number) {
     s.flags[k] = true;
     bumpCulture(s, n);
   };
-  const back = s.returnMode === "eod" ? "eod" : s.returnMode === "academy" ? "academy" : "play";
+  const back = s.returnMode === "eod" ? "eod" : s.returnMode === "academy" ? "academy" : homeMode(s);
   if (from === "horde") s.scores.hordeBest = Math.max(s.scores.hordeBest, score);
   if (from === "golf") {
     if (s.scores.golfBest <= 0 || (score > 0 && score < s.scores.golfBest)) s.scores.golfBest = score;
@@ -1373,7 +1448,7 @@ export function finishLeisure(s: GameState, score: number) {
   s.returnMode = "play";
   s.flags.arcade = true;
   setGoal(s, "arcade");
-  if (back === "play") addMinutes(s, 6);
+  if (chargedHome(back)) addMinutes(s, 6);
   if (score >= 3 && !delayRun && !physRun && !loadRun) payOnce(4);
   // Hosts pay trust for a good score: Jordan bowls, Mabel golfs. Scores are higher-is-better.
   if (score >= 3 && from === "bowl") bumpTrust(s, "jordan", 2);
@@ -1397,28 +1472,28 @@ export function abortOverlay(s: GameState) {
     s.stillId = null;
     return;
   }
-  const back = s.returnMode === "eod" || s.returnMode === "academy" ? s.returnMode : "play";
+  const back = s.returnMode === "eod" || s.returnMode === "academy" ? s.returnMode : homeMode(s);
   s.stillId = null;
   s.flags.physMc = false;
   s.mode = back;
   s.returnMode = "play";
-  if (back === "play") addMinutes(s, 1);
+  if (chargedHome(back)) addMinutes(s, 1);
   refreshObjective(s);
 }
 export function finishTrainer(s: GameState) {
-  const back = s.returnMode === "academy" ? "academy" : "play";
+  const back = s.returnMode === "academy" ? "academy" : homeMode(s);
   s.mode = back;
   s.returnMode = "play";
   s.flags.trainer = true;
   setGoal(s, "study");
-  if (back === "play") addMinutes(s, 12);
+  if (chargedHome(back)) addMinutes(s, 12);
   bumpTrust(s, "priya", 10);
   bumpCulture(s, 4);
   pushMsg(s, "Priya: Heat left. Teaching model only. Now go see if the paper agrees with the board.");
   refreshObjective(s);
 }
 export function closeAcademy(s: GameState) {
-  s.mode = "play";
+  s.mode = homeMode(s);
   s.flags.academy = true;
   s.academyDone[s.academyI] = true;
   setGoal(s, "study");
@@ -1437,7 +1512,7 @@ export function openShufflePractice(s: GameState) {
 }
 export function finishShuffle(s: GameState, fq: number, map: ShuffleCell[]) {
   const official = s.day >= 5 && s.returnMode !== "academy";
-  const back = s.returnMode === "academy" ? "academy" : "play";
+  const back = s.returnMode === "academy" ? "academy" : homeMode(s);
   s.mode = back;
   s.returnMode = "play";
   s.fq = fq;
@@ -1452,13 +1527,13 @@ export function finishShuffle(s: GameState, fq: number, map: ShuffleCell[]) {
     pushLog(s, "shuffle", `Day 5 · Fuel map Fq ${fq.toFixed(2)}. Teaching model only.`);
     pushMsg(s, `Priya: Fq ${fq.toFixed(2)}. Teaching model only. Now tell Holt.`);
   } else {
-    if (back === "play") addMinutes(s, 8);
+    if (chargedHome(back)) addMinutes(s, 8);
     pushMsg(s, "Priya: That's practice. Friday is the signature. Teaching only.");
   }
   refreshObjective(s);
 }
 export function finishMaint(s: GameState, score: number) {
-  s.mode = "play";
+  s.mode = homeMode(s);
   s.maintDone = true;
   s.flags.maint = true;
   setGoal(s, "maint");
@@ -1636,6 +1711,8 @@ export function update(s: GameState, a: Actions, dt: number) {
     s.fade = Math.max(0, s.fade - t * (s.mapHop ? 2.2 : 2.9));
     if (s.fade === 0) s.mapHop = false;
   }
+  // The desktop and the setup screen freeze the world: no clock, no walking, no NPCs.
+  if (s.mode === "desktop" || s.mode === "setup") return;
   if (s.mode === "splash") {
     if (a.confirm || a.interact) s.mode = "menu";
     return;
