@@ -87,3 +87,24 @@ test("a version 2 save round-trips, and writing it does not change the version 1
   assert.equal(fresh.desktop.clock24, true);
   assert.equal(fresh.setup.region, null);
 });
+
+test("a corrupt version 2 save is kept, and the version 1 save is not loaded", () => {
+  const original = JSON.stringify(fixture);
+  const broken = '{"version":2}';
+  store.clear();
+  store.set(Save.SAVE_KEY, original);
+  store.set(Save.SAVE_KEY_V2, broken);
+
+  assert.equal(Save.peekSave(), null);
+  assert.equal(store.get(Save.SAVE_KEY), original);
+  assert.equal(store.get(Save.SAVE_KEY_V2), broken);
+  assert.equal(store.get(Save.SAVE_KEY_V2_CORRUPT), broken);
+
+  assert.equal(Save.peekSave(), null, "a second read still must not revive version 1");
+  assert.equal(store.get(Save.SAVE_KEY), original);
+
+  store.set(Save.SAVE_KEY_V2, "{not json");
+  assert.equal(Save.peekSave(), null);
+  assert.equal(store.get(Save.SAVE_KEY_V2_CORRUPT), "{not json");
+  assert.equal(store.get(Save.SAVE_KEY), original);
+});

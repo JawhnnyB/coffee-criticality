@@ -25,6 +25,8 @@ import type { WeekLogEntry } from "./week";
 
 export const SAVE_KEY = "cc.save.v1";
 export const SAVE_KEY_V2 = "cc.save.v2";
+/** Unreadable version 2 bytes. Kept so a bad save is not thrown away. */
+export const SAVE_KEY_V2_CORRUPT = "cc.save.v2.corrupt";
 export const SAVE_VERSION = 2;
 
 const OVERLAY: Mode[] = [
@@ -198,16 +200,18 @@ function parseV2(raw: unknown): SaveV2 | null {
 
 export function peekSave(): SaveV2 | null {
   if (typeof localStorage === "undefined") return null;
-  try {
-    const v2 = localStorage.getItem(SAVE_KEY_V2);
-    if (v2) {
+  const v2 = localStorage.getItem(SAVE_KEY_V2);
+  if (v2 !== null) {
+    try {
       const parsed = parseV2(JSON.parse(v2) as unknown);
-      if (!parsed) {
-        localStorage.removeItem(SAVE_KEY_V2);
-        return null;
-      }
-      return parsed;
+      if (parsed) return parsed;
+    } catch {
+      /* The bytes are not JSON. Keep them, and do not read version 1. */
     }
+    localStorage.setItem(SAVE_KEY_V2_CORRUPT, v2);
+    return null;
+  }
+  try {
     const v1 = localStorage.getItem(SAVE_KEY);
     if (!v1) return null;
     const migrated = migrateV1(JSON.parse(v1) as unknown);
@@ -229,6 +233,7 @@ export function wipeSave() {
   if (typeof localStorage === "undefined") return;
   localStorage.removeItem(SAVE_KEY);
   localStorage.removeItem(SAVE_KEY_V2);
+  localStorage.removeItem(SAVE_KEY_V2_CORRUPT);
 }
 
 export function canAutosave(s: GameState): boolean {
