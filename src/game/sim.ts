@@ -35,7 +35,8 @@ import { DEFAULT_PINNED, type Season, type Stance } from "./parlorOS";
 import { playCatch, playDoor, playFoot, playHide, playReport, playSit, playStand, playTalk } from "./audio";
 import { isRevealing, requestSkip } from "./chatter";
 import type { CabId } from "./Arcade";
-import { kAt } from "./nuclearLab";
+import { kAt, computeKeff } from "./nuclearLab";
+import { inBandFraction, makeDaily } from "./reactorReadout";
 import { doorCardinal, spawnInside } from "./site";
 
 export type Mode =
@@ -866,6 +867,18 @@ export function finishDay(s: GameState) {
   const honest = s.reports + s.catches > s.hides;
   if (s.hides >= 3) s.ended = "c";
   else s.ended = honest && s.culture >= 28 ? "a" : "c";
+  if (s.plant) {
+    const row = makeDaily({
+      day: s.day,
+      inBandFrac: inBandFraction(s.run.history),
+      incidentOpen: s.incidentOpen,
+      residue: s.residue,
+      k: computeKeff(s.plant).kCore,
+    });
+    const prev = s.results.daily as { day?: number }[];
+    const last = prev[prev.length - 1];
+    if (!last || last.day !== s.day) s.results.daily = [...prev, row].slice(-14);
+  }
   s.mode = "eod";
   writeSave(s);
 }

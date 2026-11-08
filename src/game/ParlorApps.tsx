@@ -6,7 +6,8 @@ import { ReactorBuilder } from "./ReactorBuilder";
 import { NuclearDesk } from "./NuclearDesk";
 import { TrackPlayer, TRACKS } from "./parlorMusic";
 import { setMuted, isMuted, unlockAudio } from "./audio";
-import type { DesktopSave, GameState } from "./sim";
+import { CoreCamApp, CoreMapApp, ResultsApp } from "./ReactorApps";
+import type { DesktopSave, GameState, ResultsSave } from "./sim";
 import type { PlantDesign } from "./plant";
 import {
   ACCENTS,
@@ -260,6 +261,7 @@ export interface AppCtx {
   /** Apps the start menu shows right now. Settings uses it for the pin list. */
   visible: AppDef[];
   onDesign: (plant: PlantDesign) => void;
+  onResults: (patch: Partial<ResultsSave>) => void;
 }
 
 /** The body of a static or placeholder app. Sim and mini apps are mounted by the game, not here. */
@@ -267,6 +269,9 @@ export function AppBody({ app, ctx }: { app: AppDef; ctx: AppCtx }) {
   if (app.id === "settings") return <SettingsApp ctx={ctx} />;
   if (app.id === "music") return <MusicApp ctx={ctx} />;
   if (app.id === "design") return <DesignApp ctx={ctx} />;
+  if (app.id === "cam") return <CoreCamApp s={ctx.s} />;
+  if (app.id === "results") return <ResultsApp s={ctx.s} />;
+  if (app.id === "coremap") return <CoreMapApp s={ctx.s} onResults={ctx.onResults} />;
   if (app.kind === "placeholder") return <PlaceholderApp app={app} />;
   return null;
 }
