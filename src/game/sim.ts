@@ -371,7 +371,7 @@ export function createState(): GameState {
     desktop: defaultDesktop(),
     results: defaultResults(),
     news: defaultNews(),
-    academyTiers: ACADEMY.map(() => 1),
+    academyTiers: ACADEMY.map((page) => page.tier),
     academyDone: ACADEMY.map(() => false),
     shuffleDone: false,
     maintDone: false,

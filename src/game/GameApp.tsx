@@ -1010,6 +1010,7 @@ export function GameApp() {
             index={s.academyI}
             done={s.academyDone}
             plant={s.plant}
+            stance={s.setup.stance}
             onPlant={(p) => {
               s.plant = p;
               refresh();
@@ -1983,10 +1984,14 @@ function AcademyQuiz({
   );
 }
 
+/** The stance points at one existing page: the first page of its track. It is shown, not forced. */
+const REC_TRACK: Record<string, NonNullable<(typeof ACADEMY)[number]["track"]>> = { cautious: "safety", steady: "heat", bold: "physics" };
+
 function AcademyStage({
   index,
   done,
   plant,
+  stance,
   onPlant,
   onPrev,
   onNext,
@@ -2004,6 +2009,7 @@ function AcademyStage({
   index: number;
   done: boolean[];
   plant: PlantDesign | null;
+  stance?: string | null;
   onPlant: (p: PlantDesign) => void;
   onPrev: () => void;
   onNext: () => void;
@@ -2020,6 +2026,8 @@ function AcademyStage({
 }) {
   const page = ACADEMY[index];
   const still = STILLS[page.still];
+  const recIndex = ACADEMY.findIndex((p) => p.track === (REC_TRACK[stance ?? "steady"] ?? "heat"));
+  const rec = ACADEMY[recIndex];
   const tracks: { id: NonNullable<(typeof ACADEMY)[number]["track"]>; label: string }[] = [
     { id: "culture", label: "Culture" },
     { id: "heat", label: "Heat" },
@@ -2295,6 +2303,17 @@ function AcademyStage({
           <button type="button" className="btn-primary" onClick={onClose}>
             Close
           </button>
+        </div>
+        {rec && (
+          <div className="mt-6 border border-border p-3" data-testid="academy-recommended">
+            <p className="font-mono text-[10px] tracking-widest text-subtle">Recommended for you</p>
+            <button type="button" className="mt-1 text-left text-sm text-fg underline" onClick={() => onJump(recIndex)}>
+              {rec.title}
+            </button>
+          </div>
+        )}
+        <div className="mt-4 border border-dashed border-border p-3 font-mono text-[11px] text-subtle" data-testid="academy-calculus" aria-disabled="true">
+          Not in this build.
         </div>
         </div>
         <div className="teach-span-5">
