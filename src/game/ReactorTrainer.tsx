@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { DT_BAND, thermalState, type PlantDesign, type PlantType, type RunState } from "./plant";
 import { PixelSchematic } from "./PixelSchematic";
+import { BENCH_HOLD, stepBench } from "./benchStep";
 
 const PLANTS: { id: PlantType; title: string; note: string }[] = [
   { id: "pwr", title: "PWR — this site", note: "Pressurized primary. Steam generators. Rods from above. Heat leaves with flow." },
@@ -12,10 +13,10 @@ const PLANTS: { id: PlantType; title: string; note: string }[] = [
 ];
 
 const BAND: Record<PlantType, { lo: number; hi: number; hold: number }> = {
-  pwr: { ...DT_BAND.pwr, hold: 8 },
-  bwr: { ...DT_BAND.bwr, hold: 8 },
-  pebble: { ...DT_BAND.pebble, hold: 8 },
-  msr: { ...DT_BAND.msr, hold: 8 },
+  pwr: { ...DT_BAND.pwr, hold: BENCH_HOLD.pwr },
+  bwr: { ...DT_BAND.bwr, hold: BENCH_HOLD.bwr },
+  pebble: { ...DT_BAND.pebble, hold: BENCH_HOLD.pebble },
+  msr: { ...DT_BAND.msr, hold: BENCH_HOLD.msr },
 };
 
 /**
@@ -52,6 +53,9 @@ export function ReactorTrainer({
   );
   const rodsRef = useRef(rods);
   const flowRef = useRef(flow);
+  const powerRef = useRef(power);
+  const holdRef = useRef(hold);
+  const writtenRef = useRef<number | null>(null);
   const writeRef = useRef(writeRun);
   const minuteRef = useRef(onMinute);
   rodsRef.current = rods;
@@ -65,7 +69,9 @@ export function ReactorTrainer({
     let acc = 0;
     let lastMin = -1;
     let raf = 0;
+    let stopped = false;
     const loop = (now: number) => {
+      if (stopped) return;
       const dt = Math.min(0.05, (now - last) / 1000);
       last = now;
       acc += dt;
@@ -74,35 +80,28 @@ export function ReactorTrainer({
         lastMin = openMin;
         minuteRef.current(openMin);
       }
-      setPower((p) => {
-        const target = rodsRef.current;
-        const next = p + (target - p) * dt * 0.45;
-        const band = BAND[plant];
-        const ts = thermalState(plant, { powerPct: next, flowPct: flowRef.current });
-        const dNow = ts.dT;
-        const tHot = ts.tHot;
-        const scramHot = plant === "pwr" ? 332 : plant === "bwr" ? 300 : plant === "pebble" ? 950 : 750;
-        if (dNow > band.hi * 1.45 || tHot > scramHot || next > 114) {
-          setScram(true);
-          writeRef.current({ scram: true, powerPct: next });
-          setMsg("Scram. Teaching model — you get the bench again. Heat still had to leave.");
-          return next;
-        }
-        writeRef.current({ powerPct: next });
-        if (dNow >= band.lo && dNow <= band.hi) {
-          setHold((h) => {
-            const n = h + dt;
-            if (n >= band.hold && !passed) {
-              setPassed(true);
-              setMsg("Band held. The courier took the heat. Teaching only.");
-            }
-            return n;
-          });
-        } else {
-          setHold(0);
-        }
-        return next;
+      const step = stepBench({
+        power: powerRef.current,
+        rods: rodsRef.current,
+        flow: flowRef.current,
+        hold: holdRef.current,
+        dt,
+        plant,
+        lastWritten: writtenRef.current,
       });
+      powerRef.current = step.power;
+      holdRef.current = step.hold;
+      writtenRef.current = step.lastWritten;
+      setPower(step.power);
+      setHold(step.hold);
+      if (step.msg) setMsg(step.msg);
+      if (step.write) writeRef.current(step.write);
+      if (step.scram) setScram(true);
+      if (step.passed) setPassed(true);
+      if (step.scram || step.passed) {
+        stopped = true;
+        return;
+      }
       raf = requestAnimationFrame(loop);
     };
     raf = requestAnimationFrame(loop);
@@ -188,6 +187,9 @@ export function ReactorTrainer({
             setRods(40);
             setFlow(100);
             setHold(0);
+            powerRef.current = 40;
+            holdRef.current = 0;
+            writtenRef.current = 40;
             writeRun({ scram: false, powerPct: 40, rodsWithdrawnPct: 40, flowPct: 100 });
             setMsg("Reset. Slower on the rods. Match the pump.");
           }}
