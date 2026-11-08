@@ -1,0 +1,803 @@
+=== typecheck ===
+
+> typecheck
+> tsc --noEmit
+
+TC:0
+
+=== test ===
+
+> test
+> node --test 'scripts/**/*.test.mjs'
+
+TAP version 13
+# Subtest: non-canvas app with placeholder gets a soft BRAND NOTE (utility exception)
+ok 1 - non-canvas app with placeholder gets a soft BRAND NOTE (utility exception)
+  ---
+  duration_ms: 1.790026
+  type: 'test'
+  ...
+# Subtest: non-canvas app with a compliant card is silent
+ok 2 - non-canvas app with a compliant card is silent
+  ---
+  duration_ms: 1.51485
+  type: 'test'
+  ...
+# Subtest: non-canvas app with no og:image at all is silent
+ok 3 - non-canvas app with no og:image at all is silent
+  ---
+  duration_ms: 0.351872
+  type: 'test'
+  ...
+# Subtest: oversized card warns for non-canvas apps too
+ok 4 - oversized card warns for non-canvas apps too
+  ---
+  duration_ms: 1.16546
+  type: 'test'
+  ...
+# Subtest: canvas app with no card warns 'missing' and missing og:type
+ok 5 - canvas app with no card warns 'missing' and missing og:type
+  ---
+  duration_ms: 1.196073
+  type: 'test'
+  ...
+# Subtest: card present but placeholder still wired warns 'wire og:image' and missing og:type
+ok 6 - card present but placeholder still wired warns 'wire og:image' and missing og:type
+  ---
+  duration_ms: 1.006423
+  type: 'test'
+  ...
+# Subtest: oversized card warns on the scraper budget (jpg and legacy png)
+ok 7 - oversized card warns on the scraper budget (jpg and legacy png)
+  ---
+  duration_ms: 2.867301
+  type: 'test'
+  ...
+# Subtest: compliant jpg card under budget still warns without og:type for canvas apps
+ok 8 - compliant jpg card under budget still warns without og:type for canvas apps
+  ---
+  duration_ms: 1.037021
+  type: 'test'
+  ...
+# Subtest: compliant game (custom card + og:type + x:game:image + narrow card) is silent
+ok 9 - compliant game (custom card + og:type + x:game:image + narrow card) is silent
+  ---
+  duration_ms: 1.313777
+  type: 'test'
+  ...
+# Subtest: oversized x-banner warns on the same scraper budget as og.jpg
+ok 10 - oversized x-banner warns on the same scraper budget as og.jpg
+  ---
+  duration_ms: 1.87922
+  type: 'test'
+  ...
+# Subtest: legacy png under budget with custom wiring still requires og:type for canvas
+ok 11 - legacy png under budget with custom wiring still requires og:type for canvas
+  ---
+  duration_ms: 1.675656
+  type: 'test'
+  ...
+# Subtest: legacy png + og:type game still needs the X feed card
+ok 12 - legacy png + og:type game still needs the X feed card
+  ---
+  duration_ms: 0.624984
+  type: 'test'
+  ...
+# Subtest: rootDeclaresOgTypeGame accepts property/content order variants
+ok 13 - rootDeclaresOgTypeGame accepts property/content order variants
+  ---
+  duration_ms: 0.13742
+  type: 'test'
+  ...
+# Subtest: rootDeclaresOgTypeGame ignores comment-only scaffold examples
+ok 14 - rootDeclaresOgTypeGame ignores comment-only scaffold examples
+  ---
+  duration_ms: 0.393487
+  type: 'test'
+  ...
+# Subtest: canvas app with comment-only og:type still warns
+ok 15 - canvas app with comment-only og:type still warns
+  ---
+  duration_ms: 0.596083
+  type: 'test'
+  ...
+# Subtest: rootDeclaresGameImage requires a live x:game:image property
+ok 16 - rootDeclaresGameImage requires a live x:game:image property
+  ---
+  duration_ms: 0.124384
+  type: 'test'
+  ...
+# node:internal/modules/package_json_reader:314
+#   throw new ERR_MODULE_NOT_FOUND(packageName, fileURLToPath(base), null);
+#         ^
+# Error [ERR_MODULE_NOT_FOUND]: Cannot find package 'esbuild' imported from /tmp/cc-wp0/scripts/cabinet-rewards.test.mjs
+#     at Object.getPackageJSONURL (node:internal/modules/package_json_reader:314:9)
+#     at packageResolve (node:internal/modules/esm/resolve:768:81)
+#     at moduleResolve (node:internal/modules/esm/resolve:855:18)
+#     at defaultResolve (node:internal/modules/esm/resolve:985:11)
+#     at \#cachedDefaultResolve (node:internal/modules/esm/loader:747:20)
+#     at ModuleLoader.resolve (node:internal/modules/esm/loader:724:38)
+#     at ModuleLoader.getModuleJobForImport (node:internal/modules/esm/loader:320:38)
+#     at onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:680:36)
+#     at TracingChannel.tracePromise (node:diagnostics_channel:350:14)
+#     at ModuleLoader.import (node:internal/modules/esm/loader:679:21) {
+#   code: 'ERR_MODULE_NOT_FOUND'
+# }
+# Node.js v22.23.2
+# Subtest: scripts/cabinet-rewards.test.mjs
+not ok 2 - scripts/cabinet-rewards.test.mjs
+  ---
+  duration_ms: 42.580592
+  type: 'test'
+  location: '/tmp/cc-wp0/scripts/cabinet-rewards.test.mjs:1:1'
+  failureType: 'testCodeFailure'
+  exitCode: 1
+  signal: ~
+  error: 'test failed'
+  code: 'ERR_TEST_FAILURE'
+  ...
+# Subtest: parses frontmatter keys
+ok 18 - parses frontmatter keys
+  ---
+  duration_ms: 2.265123
+  type: 'test'
+  ...
+# Subtest: passes when the other AI approved and only the record changed since
+ok 19 - passes when the other AI approved and only the record changed since
+  ---
+  duration_ms: 0.675389
+  type: 'test'
+  ...
+# Subtest: fails when one AI reviews its own work
+ok 20 - fails when one AI reviews its own work
+  ---
+  duration_ms: 0.228134
+  type: 'test'
+  ...
+# Subtest: fails on an unknown code, not G or C
+ok 21 - fails on an unknown code, not G or C
+  ---
+  duration_ms: 0.205744
+  type: 'test'
+  ...
+# Subtest: fails without an approve verdict
+ok 22 - fails without an approve verdict
+  ---
+  duration_ms: 0.15672
+  type: 'test'
+  ...
+# Subtest: fails if code changed after the reviewed commit
+ok 23 - fails if code changed after the reviewed commit
+  ---
+  duration_ms: 0.143441
+  type: 'test'
+  ...
+# Subtest: fails if the reviewed commit is not in the head's history
+ok 24 - fails if the reviewed commit is not in the head's history
+  ---
+  duration_ms: 0.181277
+  type: 'test'
+  ...
+# Subtest: fails when the record is for another PR
+ok 25 - fails when the record is for another PR
+  ---
+  duration_ms: 0.316809
+  type: 'test'
+  ...
+# node:internal/modules/package_json_reader:314
+#   throw new ERR_MODULE_NOT_FOUND(packageName, fileURLToPath(base), null);
+#         ^
+# Error [ERR_MODULE_NOT_FOUND]: Cannot find package 'esbuild' imported from /tmp/cc-wp0/scripts/desk-verdict.test.mjs
+#     at Object.getPackageJSONURL (node:internal/modules/package_json_reader:314:9)
+#     at packageResolve (node:internal/modules/esm/resolve:768:81)
+#     at moduleResolve (node:internal/modules/esm/resolve:855:18)
+#     at defaultResolve (node:internal/modules/esm/resolve:985:11)
+#     at \#cachedDefaultResolve (node:internal/modules/esm/loader:747:20)
+#     at ModuleLoader.resolve (node:internal/modules/esm/loader:724:38)
+#     at ModuleLoader.getModuleJobForImport (node:internal/modules/esm/loader:320:38)
+#     at onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:680:36)
+#     at TracingChannel.tracePromise (node:diagnostics_channel:350:14)
+#     at ModuleLoader.import (node:internal/modules/esm/loader:679:21) {
+#   code: 'ERR_MODULE_NOT_FOUND'
+# }
+# Node.js v22.23.2
+# Subtest: scripts/desk-verdict.test.mjs
+not ok 4 - scripts/desk-verdict.test.mjs
+  ---
+  duration_ms: 41.094651
+  type: 'test'
+  location: '/tmp/cc-wp0/scripts/desk-verdict.test.mjs:1:1'
+  failureType: 'testCodeFailure'
+  exitCode: 1
+  signal: ~
+  error: 'test failed'
+  code: 'ERR_TEST_FAILURE'
+  ...
+# Subtest: every spoken line is quoted speech
+ok 27 - every spoken line is quoted speech
+  ---
+  duration_ms: 1.519872
+  type: 'test'
+  ...
+# Subtest: spoken lines fit the box and are whole sentences
+ok 28 - spoken lines fit the box and are whole sentences
+  ---
+  duration_ms: 0.512686
+  type: 'test'
+  ...
+# Subtest: no stage directions inside spoken lines
+ok 29 - no stage directions inside spoken lines
+  ---
+  duration_ms: 0.616741
+  type: 'test'
+  ...
+# Subtest: no line repeats another character's line word-for-word
+ok 30 - no line repeats another character's line word-for-word
+  ---
+  duration_ms: 0.238754
+  type: 'test'
+  ...
+# Subtest: injects before </head>
+ok 31 - injects before </head>
+  ---
+  duration_ms: 2.332499
+  type: 'test'
+  ...
+# Subtest: injects the extensions script without a project id
+ok 32 - injects the extensions script without a project id
+  ---
+  duration_ms: 0.457114
+  type: 'test'
+  ...
+# Subtest: injects project id on the script and meta when provided
+not ok 33 - injects project id on the script and meta when provided
+  ---
+  duration_ms: 0.834419
+  type: 'test'
+  location: '/tmp/cc-wp0/scripts/grok-pwa-plugin.test.mjs:36:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    The input did not match the regular expression /name="grok-project-id" content="proj-123"/. Input:
+    
+    '<html><head><meta name="twitter:card" content="summary_large_image"><meta property="og:title" content="Grok App"><link rel="manifest" href="/__grok/manifest.webmanifest"><link rel="apple-touch-icon" href="/__grok/icon-180.png"><meta name="apple-mobile-web-app-title" content="Grok App"><meta name="apple-mobile-web-app-status-bar-style" content="black"><meta name="theme-color" content="#000000"><script src="https://grok.com/grok-app-builder/extensions.js" defer></script></head></html>'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  actual: '<html><head><meta name="twitter:card" content="summary_large_image"><meta property="og:title" content="Grok App"><link rel="manifest" href="/__grok/manifest.webmanifest"><link rel="apple-touch-icon" href="/__grok/icon-180.png"><meta name="apple-mobile-web-app-title" content="Grok App"><meta name="apple-mobile-web-app-status-bar-style" content="black"><meta name="theme-color" content="#000000"><script src="https://grok.com/grok-app-builder/extensions.js" defer></script></head></html>'
+  operator: 'match'
+  stack: |-
+    TestContext.<anonymous> (file:///tmp/cc-wp0/scripts/grok-pwa-plugin.test.mjs:38:10)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: does not duplicate grok:app_id
+not ok 34 - does not duplicate grok:app_id
+  ---
+  duration_ms: 0.973656
+  type: 'test'
+  location: '/tmp/cc-wp0/scripts/grok-pwa-plugin.test.mjs:43:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    
+    0 !== 1
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 1
+  actual: 0
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///tmp/cc-wp0/scripts/grok-pwa-plugin.test.mjs:47:10)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: omits x:creator tags without both creator values
+ok 35 - omits x:creator tags without both creator values
+  ---
+  duration_ms: 0.769003
+  type: 'test'
+  ...
+# Subtest: injects x:creator tags when both creator values are set
+not ok 36 - injects x:creator tags when both creator values are set
+  ---
+  duration_ms: 1.683919
+  type: 'test'
+  location: '/tmp/cc-wp0/scripts/grok-pwa-plugin.test.mjs:57:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    The input did not match the regular expression /property="x:creator" content="@alice"/. Input:
+    
+    '<html><head><meta name="twitter:card" content="summary_large_image"><meta property="og:title" content="Grok App"><link rel="manifest" href="/__grok/manifest.webmanifest"><link rel="apple-touch-icon" href="/__grok/icon-180.png"><meta name="apple-mobile-web-app-title" content="Grok App"><meta name="apple-mobile-web-app-status-bar-style" content="black"><meta name="theme-color" content="#000000"><script src="https://grok.com/grok-app-builder/extensions.js" defer></script></head></html>'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  actual: '<html><head><meta name="twitter:card" content="summary_large_image"><meta property="og:title" content="Grok App"><link rel="manifest" href="/__grok/manifest.webmanifest"><link rel="apple-touch-icon" href="/__grok/icon-180.png"><meta name="apple-mobile-web-app-title" content="Grok App"><meta name="apple-mobile-web-app-status-bar-style" content="black"><meta name="theme-color" content="#000000"><script src="https://grok.com/grok-app-builder/extensions.js" defer></script></head></html>'
+  operator: 'match'
+  stack: |-
+    TestContext.<anonymous> (file:///tmp/cc-wp0/scripts/grok-pwa-plugin.test.mjs:59:10)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: escapes x:creator values
+ok 37 - escapes x:creator values
+  ---
+  duration_ms: 0.179248
+  type: 'test'
+  ...
+# Subtest: does not duplicate x:creator tags
+not ok 38 - does not duplicate x:creator tags
+  ---
+  duration_ms: 0.629922
+  type: 'test'
+  location: '/tmp/cc-wp0/scripts/grok-pwa-plugin.test.mjs:75:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    
+    0 !== 1
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 1
+  actual: 0
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///tmp/cc-wp0/scripts/grok-pwa-plugin.test.mjs:79:10)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: platform chrome injects twitter:card when the document has none
+not ok 39 - platform chrome injects twitter:card when the document has none
+  ---
+  duration_ms: 0.547934
+  type: 'test'
+  location: '/tmp/cc-wp0/scripts/grok-pwa-plugin.test.mjs:83:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    The input was expected to not match the regular expression /property="og:title"/. Input:
+    
+    '<html><head><meta name="twitter:card" content="summary_large_image"><meta property="og:title" content="Hello World"><title>Hello World</title><link rel="manifest" href="/__grok/manifest.webmanifest"><link rel="apple-touch-icon" href="/__grok/icon-180.png"><meta name="apple-mobile-web-app-title" content="Hello World"><meta name="apple-mobile-web-app-status-bar-style" content="black"><meta name="theme-color" content="#000000"><script src="https://grok.com/grok-app-builder/extensions.js" defer></script></head></html>'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  actual: '<html><head><meta name="twitter:card" content="summary_large_image"><meta property="og:title" content="Hello World"><title>Hello World</title><link rel="manifest" href="/__grok/manifest.webmanifest"><link rel="apple-touch-icon" href="/__grok/icon-180.png"><meta name="apple-mobile-web-app-title" content="Hello World"><meta name="apple-mobile-web-app-status-bar-style" content="black"><meta name="theme-color" content="#000000"><script src="https://grok.com/grok-app-builder/extensions.js" defer></script></head></html>'
+  operator: 'doesNotMatch'
+  stack: |-
+    TestContext.<anonymous> (file:///tmp/cc-wp0/scripts/grok-pwa-plugin.test.mjs:86:10)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: does not duplicate twitter:card
+ok 40 - does not duplicate twitter:card
+  ---
+  duration_ms: 0.688253
+  type: 'test'
+  ...
+# Subtest: leaves an existing twitter:card alone
+not ok 41 - leaves an existing twitter:card alone
+  ---
+  duration_ms: 0.453185
+  type: 'test'
+  location: '/tmp/cc-wp0/scripts/grok-pwa-plugin.test.mjs:96:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    The input did not match the regular expression /name="twitter:card" content="summary"/. Input:
+    
+    '<html><head><meta name="twitter:card" content="summary_large_image"><meta property="og:title" content="Grok App"><link rel="manifest" href="/__grok/manifest.webmanifest"><link rel="apple-touch-icon" href="/__grok/icon-180.png"><meta name="apple-mobile-web-app-title" content="Grok App"><meta name="apple-mobile-web-app-status-bar-style" content="black"><meta name="theme-color" content="#000000"><script src="https://grok.com/grok-app-builder/extensions.js" defer></script></head></html>'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  actual: '<html><head><meta name="twitter:card" content="summary_large_image"><meta property="og:title" content="Grok App"><link rel="manifest" href="/__grok/manifest.webmanifest"><link rel="apple-touch-icon" href="/__grok/icon-180.png"><meta name="apple-mobile-web-app-title" content="Grok App"><meta name="apple-mobile-web-app-status-bar-style" content="black"><meta name="theme-color" content="#000000"><script src="https://grok.com/grok-app-builder/extensions.js" defer></script></head></html>'
+  operator: 'match'
+  stack: |-
+    TestContext.<anonymous> (file:///tmp/cc-wp0/scripts/grok-pwa-plugin.test.mjs:99:10)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: does not duplicate the extensions script
+ok 42 - does not duplicate the extensions script
+  ---
+  duration_ms: 0.311592
+  type: 'test'
+  ...
+# Subtest: is idempotent
+ok 43 - is idempotent
+  ---
+  duration_ms: 0.331203
+  type: 'test'
+  ...
+# Subtest: uses the app name in the injected title tag
+not ok 44 - uses the app name in the injected title tag
+  ---
+  duration_ms: 0.236571
+  type: 'test'
+  location: '/tmp/cc-wp0/scripts/grok-pwa-plugin.test.mjs:117:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    The input did not match the regular expression /apple-mobile-web-app-title" content="Wild Race"/. Input:
+    
+    '<html><head><meta name="twitter:card" content="summary_large_image"><meta property="og:title" content="Grok App"><link rel="manifest" href="/__grok/manifest.webmanifest"><link rel="apple-touch-icon" href="/__grok/icon-180.png"><meta name="apple-mobile-web-app-title" content="Grok App"><meta name="apple-mobile-web-app-status-bar-style" content="black"><meta name="theme-color" content="#000000"><script src="https://grok.com/grok-app-builder/extensions.js" defer></script></head></html>'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  actual: '<html><head><meta name="twitter:card" content="summary_large_image"><meta property="og:title" content="Grok App"><link rel="manifest" href="/__grok/manifest.webmanifest"><link rel="apple-touch-icon" href="/__grok/icon-180.png"><meta name="apple-mobile-web-app-title" content="Grok App"><meta name="apple-mobile-web-app-status-bar-style" content="black"><meta name="theme-color" content="#000000"><script src="https://grok.com/grok-app-builder/extensions.js" defer></script></head></html>'
+  operator: 'match'
+  stack: |-
+    TestContext.<anonymous> (file:///tmp/cc-wp0/scripts/grok-pwa-plugin.test.mjs:119:10)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: streaming injector handles </head> split across chunks
+ok 45 - streaming injector handles </head> split across chunks
+  ---
+  duration_ms: 0.920699
+  type: 'test'
+  ...
+# Subtest: streaming injector passes post-head chunks through untouched
+ok 46 - streaming injector passes post-head chunks through untouched
+  ---
+  duration_ms: 0.726093
+  type: 'test'
+  ...
+# Subtest: streaming injector falls back when no </head> is seen
+ok 47 - streaming injector falls back when no </head> is seen
+  ---
+  duration_ms: 0.274404
+  type: 'test'
+  ...
+# Subtest: detects install query
+ok 48 - detects install query
+  ---
+  duration_ms: 0.296454
+  type: 'test'
+  ...
+# Subtest: filters non-document paths
+ok 49 - filters non-document paths
+  ---
+  duration_ms: 0.318795
+  type: 'test'
+  ...
+# Subtest: strips install params from the app link
+ok 50 - strips install params from the app link
+  ---
+  duration_ms: 2.811409
+  type: 'test'
+  ...
+# Subtest: names the install page from host slug
+ok 51 - names the install page from host slug
+  ---
+  duration_ms: 0.200184
+  type: 'test'
+  ...
+# Subtest: rejects hosts that are not plain slugs
+ok 52 - rejects hosts that are not plain slugs
+  ---
+  duration_ms: 0.104886
+  type: 'test'
+  ...
+# Subtest: renders install page markup
+ok 53 - renders install page markup
+  ---
+  duration_ms: 0.354701
+  type: 'test'
+  ...
+# Subtest: escapes host-derived values in the install page
+ok 54 - escapes host-derived values in the install page
+  ---
+  duration_ms: 0.152706
+  type: 'test'
+  ...
+# Subtest: renders the manifest with the per-app name
+ok 55 - renders the manifest with the per-app name
+  ---
+  duration_ms: 0.147576
+  type: 'test'
+  ...
+# Subtest: vite config keeps the nitro serverDir wiring
+ok 56 - vite config keeps the nitro serverDir wiring
+  ---
+  duration_ms: 0.164779
+  type: 'test'
+  ...
+# Subtest: nitro middleware and its bundled assets exist
+ok 57 - nitro middleware and its bundled assets exist
+  ---
+  duration_ms: 0.250621
+  type: 'test'
+  ...
+# Subtest: PWR labels at 324/292 sit clear of every drawn object
+ok 58 - PWR labels at 324/292 sit clear of every drawn object
+  ---
+  duration_ms: 1.221092
+  type: 'test'
+  ...
+# Subtest: PWR labels at 350/285 sit clear of every drawn object
+ok 59 - PWR labels at 350/285 sit clear of every drawn object
+  ---
+  duration_ms: 0.230897
+  type: 'test'
+  ...
+# Subtest: PWR labels at 285/285 sit clear of every drawn object
+ok 60 - PWR labels at 285/285 sit clear of every drawn object
+  ---
+  duration_ms: 0.144712
+  type: 'test'
+  ...
+# Subtest: PWR labels do not overlap each other
+ok 61 - PWR labels do not overlap each other
+  ---
+  duration_ms: 0.235879
+  type: 'test'
+  ...
+# Subtest: the drawn objects stay inside the native drawing
+ok 62 - the drawn objects stay inside the native drawing
+  ---
+  duration_ms: 0.150503
+  type: 'test'
+  ...
+# Subtest: seven bands, coldest first, hottest last
+ok 63 - seven bands, coldest first, hottest last
+  ---
+  duration_ms: 1.400431
+  type: 'test'
+  ...
+# Subtest: values outside the scale are clamped to the end bands
+ok 64 - values outside the scale are clamped to the end bands
+  ---
+  duration_ms: 0.153613
+  type: 'test'
+  ...
+# Subtest: the designed plant's operating points land where the eye expects
+ok 65 - the designed plant's operating points land where the eye expects
+  ---
+  duration_ms: 0.167974
+  type: 'test'
+  ...
+# Subtest: the drawing carries the required labels: pressure, hot and cold, scale, and the footer
+ok 66 - the drawing carries the required labels: pressure, hot and cold, scale, and the footer
+  ---
+  duration_ms: 0.24554
+  type: 'test'
+  ...
+# Subtest: every label fits on the 160 × 80 native grid
+ok 67 - every label fits on the 160 × 80 native grid
+  ---
+  duration_ms: 0.22615
+  type: 'test'
+  ...
+# Subtest: start map is not a plateau: a single swap can lower Fq
+ok 68 - start map is not a plateau: a single swap can lower Fq
+  ---
+  duration_ms: 13.28088
+  type: 'test'
+  ...
+# Subtest: start map does not already pass
+ok 69 - start map does not already pass
+  ---
+  duration_ms: 0.223239
+  type: 'test'
+  ...
+# Subtest: greedy play from the start map reaches the pass band at every enrichment
+ok 70 - greedy play from the start map reaches the pass band at every enrichment
+  ---
+  duration_ms: 44.031291
+  type: 'test'
+  ...
+# Subtest: pass band has real margin: guided play lands well under the limit
+ok 71 - pass band has real margin: guided play lands well under the limit
+  ---
+  duration_ms: 450.6473
+  type: 'test'
+  ...
+# Subtest: the trade-off is real: out-in is flat but leaks, in-out is quiet on the rim but peaks
+ok 72 - the trade-off is real: out-in is flat but leaks, in-out is quiet on the rim but peaks
+  ---
+  duration_ms: 0.53641
+  type: 'test'
+  ...
+# Subtest: full-core and depletion change k and the OpenMC letter
+ok 73 - full-core and depletion change k and the OpenMC letter
+  ---
+  duration_ms: 767.458988
+  type: 'test'
+  ...
+# Subtest: PWR bench values match the trainer's own readout
+ok 74 - PWR bench values match the trainer's own readout
+  ---
+  duration_ms: 1.110139
+  type: 'test'
+  ...
+# Subtest: ΔT is in band at 100% power and 100% flow for PWR
+ok 75 - ΔT is in band at 100% power and 100% flow for PWR
+  ---
+  duration_ms: 0.154954
+  type: 'test'
+  ...
+# Subtest: ΔT rises with power and falls with flow, for every plant type
+ok 76 - ΔT rises with power and falls with flow, for every plant type
+  ---
+  duration_ms: 0.275083
+  type: 'test'
+  ...
+# Subtest: fuel is hotter than the hot leg, which is hotter than the cold leg, whenever power is above zero
+ok 77 - fuel is hotter than the hot leg, which is hotter than the cold leg, whenever power is above zero
+  ---
+  duration_ms: 0.376325
+  type: 'test'
+  ...
+# Subtest: zero power gives no ΔT and no fuel rise
+ok 78 - zero power gives no ΔT and no fuel rise
+  ---
+  duration_ms: 0.130144
+  type: 'test'
+  ...
+# Subtest: a PlantDesign and its type give the same answer
+ok 79 - a PlantDesign and its type give the same answer
+  ---
+  duration_ms: 0.691168
+  type: 'test'
+  ...
+# Subtest: the flow floor keeps ΔT finite at very low flow
+ok 80 - the flow floor keeps ΔT finite at very low flow
+  ---
+  duration_ms: 0.194845
+  type: 'test'
+  ...
+# Subtest: the shared run seeds from the design, not the 62% drill
+ok 81 - the shared run seeds from the design, not the 62% drill
+  ---
+  duration_ms: 0.149472
+  type: 'test'
+  ...
+# Subtest: history is per minute while open and per hour while closed, and it caps
+ok 82 - history is per minute while open and per hour while closed, and it caps
+  ---
+  duration_ms: 0.579762
+  type: 'test'
+  ...
+# Subtest: fuel mass stays pending until someone cites an inventory
+ok 83 - fuel mass stays pending until someone cites an inventory
+  ---
+  duration_ms: 0.352284
+  type: 'test'
+  ...
+1..83
+# tests 83
+# suites 0
+# pass 74
+# fail 9
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 5552.492713
+TEST:1
+
+=== build ===
+
+> build
+> vite build && npm run db:migrate
+
+[nitro:vercel] ℹ Using nodejs22.x runtime.
+[nitro:vercel] ℹ Using web entry format.
+vite v8.2.1 building client environment for production...
+[2Ktransforming...✓ 1968 modules transformed.
+rendering chunks...
+computing gzip size...
+.vercel/output/static/assets/pixelify-sans-cyrillic-400-normal-DfOZNMlW.woff      4.41 kB
+.vercel/output/static/assets/pixelify-sans-latin-ext-400-normal-DdH6zlBQ.woff2    5.36 kB
+.vercel/output/static/assets/pixelify-sans-latin-ext-400-normal-BkfTUL4s.woff     7.44 kB
+.vercel/output/static/assets/pixelify-sans-latin-400-normal-DLrIX9QE.woff2        7.69 kB
+.vercel/output/static/assets/pixelify-sans-latin-400-normal-JapMNN6Z.woff        10.26 kB
+.vercel/output/static/assets/styles-VsyQTWHu.css                                 58.19 kB │ gzip:  15.06 kB
+.vercel/output/static/assets/login-DgrEvwNp.js                                    1.33 kB │ gzip:   0.69 kB
+.vercel/output/static/assets/client-DYvMNzKh.js                                  31.66 kB │ gzip:  11.98 kB
+.vercel/output/static/assets/index-ChGp--p5.js                                  402.72 kB │ gzip: 126.90 kB
+.vercel/output/static/assets/routes-MdwyeROq.js                                 415.49 kB │ gzip: 129.50 kB
+
+✓ built in 1.39s
+vite v8.2.1 building ssr environment for production...
+[2Ktransforming...✓ 339 modules transformed.
+rendering chunks...
+computing gzip size...
+node_modules/.nitro/vite/services/ssr/assets/pixelify-sans-cyrillic-400-normal-DfOZNMlW.woff      4.41 kB
+node_modules/.nitro/vite/services/ssr/assets/pixelify-sans-latin-ext-400-normal-DdH6zlBQ.woff2    5.36 kB
+node_modules/.nitro/vite/services/ssr/assets/pixelify-sans-latin-ext-400-normal-BkfTUL4s.woff     7.44 kB
+node_modules/.nitro/vite/services/ssr/assets/pixelify-sans-latin-400-normal-DLrIX9QE.woff2        7.69 kB
+node_modules/.nitro/vite/services/ssr/assets/pixelify-sans-latin-400-normal-JapMNN6Z.woff        10.26 kB
+node_modules/.nitro/vite/services/ssr/assets/styles-VsyQTWHu.css                                 58.19 kB │ gzip:  15.06 kB
+node_modules/.nitro/vite/services/ssr/assets/kysely-adapter-Cj_QZw5p.js                           0.05 kB │ gzip:   0.07 kB
+node_modules/.nitro/vite/services/ssr/assets/start-Cl7ERJbw.js                                    0.16 kB │ gzip:   0.14 kB
+node_modules/.nitro/vite/services/ssr/assets/empty-plugin-adapters-V3Y20QRU.js                    0.24 kB │ gzip:   0.17 kB
+node_modules/.nitro/vite/services/ssr/assets/_tanstack-start-manifest_v-DiLWD_ua.js               0.70 kB │ gzip:   0.35 kB
+node_modules/.nitro/vite/services/ssr/assets/login-CHk2ZOi2.js                                    1.74 kB │ gzip:   0.81 kB
+node_modules/.nitro/vite/services/ssr/assets/client-BHDJwW9k.js                                  31.42 kB │ gzip:   9.46 kB
+node_modules/.nitro/vite/services/ssr/index.js                                                   70.70 kB │ gzip:  18.05 kB
+node_modules/.nitro/vite/services/ssr/assets/router-DR2pu1ij.js                                 369.28 kB │ gzip:  88.10 kB
+node_modules/.nitro/vite/services/ssr/assets/routes-B-Kumioe.js                                 626.80 kB │ gzip: 159.31 kB
+
+✓ built in 602ms
+
+[nitro] ◐ Building [Nitro] (preset: vercel, compatibility: 2026-11-08)
+[nitro] ✔ Generated public .vercel/output/static
+vite v8.2.1 building nitro environment for production...
+[2Ktransforming...✓ 2409 modules transformed.
+rendering chunks...
+computing gzip size...
+.vercel/output/functions/__server.func/_ssr/start-Cl7ERJbw.mjs                        0.15 kB │ gzip:   0.14 kB
+.vercel/output/functions/__server.func/_ssr/kysely-adapter-Cj_QZw5p.mjs               0.15 kB │ gzip:   0.12 kB
+.vercel/output/functions/__server.func/_ssr/empty-plugin-adapters-V3Y20QRU.mjs        0.24 kB │ gzip:   0.17 kB
+.vercel/output/functions/__server.func/_chunks/core.mjs                               0.25 kB │ gzip:   0.18 kB
+.vercel/output/functions/__server.func/_libs/zod.mjs                                  0.38 kB │ gzip:   0.23 kB
+.vercel/output/functions/__server.func/_tanstack-start-manifest_v-DiLWD_ua.mjs        0.77 kB │ gzip:   0.39 kB
+.vercel/output/functions/__server.func/_chunks/ssr-renderer.mjs                       0.99 kB │ gzip:   0.50 kB
+.vercel/output/functions/__server.func/_libs/defu.mjs                                 1.42 kB │ gzip:   0.59 kB
+.vercel/output/functions/__server.func/_runtime.mjs                                   1.92 kB │ gzip:   0.87 kB
+.vercel/output/functions/__server.func/_ssr/login-CHk2ZOi2.mjs                        2.03 kB │ gzip:   0.88 kB
+.vercel/output/functions/__server.func/_libs/lucide-react.mjs                         3.64 kB │ gzip:   1.31 kB
+.vercel/output/functions/__server.func/_libs/better-auth__utils.mjs                   3.87 kB │ gzip:   1.33 kB
+.vercel/output/functions/__server.func/_libs/nanostores.mjs                           5.59 kB │ gzip:   1.82 kB
+.vercel/output/functions/__server.func/_libs/tanstack__history.mjs                   12.52 kB │ gzip:   3.71 kB
+.vercel/output/functions/__server.func/_libs/better-auth__memory-adapter.mjs         14.73 kB │ gzip:   4.14 kB
+.vercel/output/functions/__server.func/_libs/@better-auth/telemetry+[...].mjs        17.58 kB │ gzip:   4.92 kB
+.vercel/output/functions/__server.func/_libs/h3-v2+rou3.mjs                          17.61 kB │ gzip:   5.17 kB
+.vercel/output/functions/__server.func/_libs/h3+rou3+srvx.mjs                        22.63 kB │ gzip:   6.13 kB
+.vercel/output/functions/__server.func/_libs/noble__hashes.mjs                       23.70 kB │ gzip:   7.88 kB
+.vercel/output/functions/__server.func/_libs/@tanstack/router-core+[...].mjs         29.84 kB │ gzip:   7.99 kB
+.vercel/output/functions/__server.func/_ssr/client-BHDJwW9k.mjs                      30.39 kB │ gzip:   9.42 kB
+.vercel/output/functions/__server.func/index.mjs                                     31.80 kB │ gzip:   9.93 kB
+.vercel/output/functions/__server.func/_libs/jose.mjs                                38.88 kB │ gzip:   8.62 kB
+.vercel/output/functions/__server.func/_libs/noble__ciphers.mjs                      46.64 kB │ gzip:  14.47 kB
+.vercel/output/functions/__server.func/_ssr/ssr.mjs                                  68.51 kB │ gzip:  17.92 kB
+.vercel/output/functions/__server.func/_libs/pg.mjs                                 149.28 kB │ gzip:  34.42 kB
+.vercel/output/functions/__server.func/_ssr/router-DR2pu1ij.mjs                     362.77 kB │ gzip:  87.55 kB
+.vercel/output/functions/__server.func/_libs/@better-auth/kysely-adapter+[...].mjs  476.64 kB │ gzip:  78.59 kB
+.vercel/output/functions/__server.func/_ssr/routes-B-Kumioe.mjs                     650.05 kB │ gzip: 159.91 kB
+.vercel/output/functions/__server.func/_libs/electric-sql__pglite.mjs               750.60 kB │ gzip: 153.07 kB
+.vercel/output/functions/__server.func/_libs/@tanstack/react-router+[...].mjs       779.33 kB │ gzip: 164.47 kB
+.vercel/output/functions/__server.func/_libs/@better-auth/core+[...].mjs            811.69 kB │ gzip: 159.95 kB
+
+✓ built in 1.07s
+ℹ Generated .vercel/output/nitro.json
+
+[nitro] ✔ You can preview this build using npx vite preview
+[nitro] ✔ You can deploy this build using npx nitro deploy --prebuilt
+
+> db:migrate
+> node scripts/migrate.mjs
+
+[migrate] DATABASE_URL not set — skipping (the PGLite fallback migrates itself).
+BUILD:0
