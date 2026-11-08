@@ -56,6 +56,23 @@
 }
 
 @layer base {
+  /* Sliders use the copper accent from the palette, not the browser's default blue (STYLE-STANDARD §2.3). */
+  input[type="range"] {
+    accent-color: #c4783a;
+  }
+
+  /* Reactor schematic labels. Own class, so the art-on text-size group does not change them. */
+  .schematic-label {
+    font-family: "CCPixel3x5", monospace;
+    font-size: 10px;
+    line-height: 1;
+  }
+  @media (min-width: 640px) {
+    .schematic-label {
+      font-size: 12px;
+    }
+  }
+
   html,
   body,
   #app {
