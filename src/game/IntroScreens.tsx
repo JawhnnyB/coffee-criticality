@@ -222,15 +222,20 @@ function useTalking() {
 }
 
 function lineBox(zoom: number, y: number): CSSProperties {
+  const phone = 10 * zoom < 12;
+  const fs = Math.max(12, 10 * zoom);
+  const lh = Math.max(14, 11 * zoom);
   return {
     position: "absolute",
     left: 78 * zoom,
-    top: y * zoom,
+    top: (phone ? y - 8 : y) * zoom,
     width: 282 * zoom,
     margin: 0,
     pointerEvents: "none",
-    ["--intro-fs" as string]: `${10 * zoom}px`,
-    ["--intro-lh" as string]: `${11 * zoom}px`,
+    ["--intro-fs" as string]: `${fs}px`,
+    ["--intro-lh" as string]: `${lh}px`,
+    background: phone ? "#f3e6d0" : undefined,
+    padding: phone ? "2px 4px" : undefined,
   };
 }
 

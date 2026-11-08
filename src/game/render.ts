@@ -3,6 +3,7 @@ import { ROOMS, residueKey, type ResidueHow, type RoomId } from "./content";
 import { LOOKS, PAL, drawChibi, drawEmote, pix } from "./pixel";
 import { A6_ROOMS } from "./roomArt";
 import { ROOM_ATLAS, type AtlasStamp } from "./roomAtlas";
+import { worldZoom } from "./artScale";
 import { npcsHere, type GameState } from "./sim";
 
 const artCache = new Map<string, HTMLImageElement>();
@@ -71,8 +72,7 @@ export function drawWorld(
 ) {
   pix(ctx);
   const room = ROOMS[s.room];
-  const cover = Math.max(viewW / Math.max(1, room.w), viewH / Math.max(1, room.h));
-  const zoom = Math.max(2, Math.min(5, Math.floor(cover)));
+  const zoom = worldZoom(viewW, viewH, room.w, room.h);
   const bw = Math.max(1, Math.min(room.w, Math.ceil(viewW / zoom)));
   const bh = Math.max(1, Math.min(room.h, Math.ceil(viewH / zoom)));
   const off = getBuf(bw, bh);

@@ -2544,7 +2544,7 @@ function Hud({
   nearLabel: string;
 }) {
   const hud = MAP_HUD[roomId] ?? MAP_HUD.cafe;
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(() => typeof window === "undefined" || window.innerWidth >= 720);
   const wash =
     period === "afternoon" ? "rgba(90,48,28,0.28)" : period === "morning" ? "rgba(243,214,170,0.22)" : "rgba(170,200,220,0.16)";
   const when = `${time} D${day} ${dusk ? "DUSK" : periodLabel(period)}`;
