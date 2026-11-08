@@ -18,6 +18,7 @@ These values and rules do not change in any PR without the owner's approval. Thi
 - The tuned numbers in LOAD, ROD.BANK, PHYS.CAB, CATCH, and LOTOTO.
 - `flags.hid`: "hid at least once." Do not reuse it.
 - Residue: a hide leaves the lie up, and `beginDay` must not clear residue.
+- `incidentResolved` means "the day is over," not "a catch happened." `beginDay` resets it, and `beginDay` still does not clear residue. These are two separate rules.
 
 ## What a reviewer checks
 
