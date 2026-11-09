@@ -422,17 +422,34 @@ export function normalizeHeadContext(ctx = {}) {
   };
 }
 
-export function injectGrokPwaHead(html, ctx = {}) {
+function coerceHeadContext(ctx, projectId, creator, creatorId) {
+  // Tests and older callers pass (html, appName, projectId, creator, creatorId).
+  // The Vite plugin passes a context object. Both have to work.
+  if (typeof ctx === "string") {
+    return { appName: ctx, projectId, creator, creatorId };
+  }
+  if (ctx && typeof ctx === "object") return ctx;
+  return {};
+}
+
+export function injectGrokPwaHead(html, ctx = {}, projectId, creator, creatorId) {
   if (typeof html !== "string") return html;
-  const { site, projectId, creator, creatorId, host, cwd } = normalizeHeadContext(ctx);
+  const input = coerceHeadContext(ctx, projectId, creator, creatorId);
+  const { site, projectId: id, creator: cr, creatorId: cid, host, cwd } = normalizeHeadContext(input);
   const documentTitle = titleFromDocument(html);
-  const appName = resolveOgTitle(
-    site,
-    ctx.appName ?? DEFAULT_APP_NAME,
-    host,
-    documentTitle,
-  );
-  let next = stripShareMetaTags(html);
+  const appName = resolveOgTitle(site, input.appName ?? DEFAULT_APP_NAME, host, documentTitle);
+  // Share tags (og:title and a replaced twitter card) only when a public host
+  // is known. With no host, leave an existing twitter card alone and do not
+  // invent og:title.
+  const emitOg = Boolean(String(host ?? "").trim());
+  let next = emitOg ? stripShareMetaTags(html) : html;
+
+  if (emitOg) {
+    next = insertAfterHeadOpen(
+      next,
+      grokOgHeadTags({ host, appName, site, documentTitle, cwd }).join(""),
+    );
+  }
 
   const missing = grokPwaHeadTags(appName)
     .filter(([key]) => {
@@ -442,24 +459,23 @@ export function injectGrokPwaHead(html, ctx = {}) {
     })
     .map(([, tag]) => tag);
 
-  next = insertAfterHeadOpen(
-    next,
-    grokOgHeadTags({ host, appName, site, documentTitle, cwd }).join(""),
-  );
+  if (!/name=["']twitter:card["']/i.test(next)) {
+    missing.push('<meta name="twitter:card" content="summary_large_image">');
+  }
 
   if (!next.includes("/grok-app-builder/extensions.js")) {
-    missing.push(...grokExtensionsHeadTags(projectId));
-  } else if (projectId && !next.includes('name="grok-project-id"')) {
-    missing.push(`<meta name="grok-project-id" content="${escapeHtml(projectId)}">`);
+    missing.push(...grokExtensionsHeadTags(id));
+  } else if (id && !next.includes('name="grok-project-id"')) {
+    missing.push(`<meta name="grok-project-id" content="${escapeHtml(id)}">`);
   }
   if (
-    projectId &&
+    id &&
     !next.includes('property="grok:app_id"') &&
     !next.includes("property='grok:app_id'")
   ) {
-    missing.push(`<meta property="grok:app_id" content="${escapeHtml(projectId)}">`);
+    missing.push(`<meta property="grok:app_id" content="${escapeHtml(id)}">`);
   }
-  const creatorTags = grokXCreatorHeadTags(creator, creatorId);
+  const creatorTags = grokXCreatorHeadTags(cr, cid);
   if (creatorTags.length > 0) {
     const hasCreator =
       next.includes('property="x:creator" content=') ||
@@ -482,8 +498,8 @@ function findHeadClose(buf) {
  * appears inside a UTF-8 continuation byte), overwrites share-card metas,
  * then passes later chunks through so streaming SSR keeps streaming.
  */
-export function createHeadInjector(ctx = {}) {
-  const normalized = normalizeHeadContext(ctx);
+export function createHeadInjector(ctx = {}, projectId, creator, creatorId) {
+  const normalized = normalizeHeadContext(coerceHeadContext(ctx, projectId, creator, creatorId));
 
   /** @type {Buffer[]} */
   let pending = [];

@@ -241,7 +241,7 @@ export function PixelSchematic({ plant = "pwr", tHot, tCold, colorSafe = false }
   const tone: Record<Label["color"], string> = { cream: CREAM, dim: "#b5a48c", outline: OUTLINE, gold: "#c9a227", orange: ORANGE };
   return (
     <div
-      className="relative mx-auto mt-4 h-[160px] w-[320px] sm:h-[240px] sm:w-[480px]"
+      className="schematic-stage relative mx-auto mt-4"
       role="img"
       aria-label={`${NAME[plant]} loop drawing. Hot leg ${tHot.toFixed(0)} degrees, cold leg ${tCold.toFixed(0)} degrees.`}
     >
@@ -250,7 +250,7 @@ export function PixelSchematic({ plant = "pwr", tHot, tCold, colorSafe = false }
         <span
           key={`${l.x}-${l.y}-${l.text}`}
           aria-hidden
-          className="schematic-label pointer-events-none absolute whitespace-nowrap"
+          className={"schematic-label pointer-events-none absolute whitespace-nowrap" + (/MPA/.test(l.text) ? " schematic-label-mpa" : l.text === "HEAT" ? " schematic-label-heat" : "")}
           style={{
             left: `${(l.x / NATIVE_W) * 100}%`,
             top: `${(l.y / NATIVE_H) * 100}%`,

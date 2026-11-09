@@ -25,7 +25,7 @@ export function TeachPriya({ line, size = 96 }: { line: string; size?: 64 | 96 |
           className="shrink-0"
           style={{ width: 48 * zoom, height: 48 * zoom, imageRendering: "pixelated" }}
         />
-        <Chatter key={line} text={line} voice="priya" className="teach-body cc-prose min-w-[16rem] flex-1" />
+        <Chatter key={line} text={line} voice="priya" className="teach-body cc-prose min-w-0 flex-1" />
       </div>
     );
   }
@@ -40,7 +40,7 @@ export function TeachPriya({ line, size = 96 }: { line: string; size?: 64 | 96 |
         className={`${px} shrink-0 object-cover`}
         style={{ imageRendering: "pixelated" }}
       />
-      <p className="teach-body min-w-[16rem] flex-1">{line}</p>
+      <p className="teach-body min-w-0 flex-1">{line}</p>
     </div>
   );
 }

@@ -21,7 +21,6 @@ import {
 } from "./parlorOS";
 import {
   TASKBAR_H,
-  TITLE_H,
   MIN_W,
   MIN_H,
   cascadeAt,
@@ -37,7 +36,8 @@ import {
   type WinState,
 } from "./deskWindows";
 import { particleCount, makePool, stepPool, type Particle } from "./particles";
-import { AppBody, APP_ICON_TONE, type AppCtx } from "./ParlorApps";
+import { AppBody, type AppCtx } from "./ParlorApps";
+import { AppGlyph } from "./icons/glyphs";
 import type { DesktopSave, GameState, Mode, ResultsSave } from "./sim";
 import type { PlantDesign } from "./plant";
 
@@ -45,7 +45,15 @@ import type { PlantDesign } from "./plant";
 const SIM_TITLE: Record<string, string> = { shuffle: "Fuel shuffle" };
 
 const WIN_W = 470;
-const WIN_H = 340;
+const WIN_H = 400;
+
+/** Frame accent only. Wallpapers stay on SEASON_INFO. */
+const SEASON_FRAME: Record<Season, string> = {
+  spring: PAL.leaf,
+  summer: PAL.copper,
+  fall: PAL.gold,
+  winter: PAL.steel,
+};
 
 export interface DesktopProps {
   /** True while the desktop is the screen: its own mode, or hosting an overlay. */
@@ -106,8 +114,30 @@ export function Desktop(props: DesktopProps) {
   const ctx: AppCtx = { s, refresh: () => undefined, onPatch, visible: apps, onDesign, onResults, onAcademy };
 
   // Latest values for the window key listener, which is bound once.
-  const live = useRef({ wins, startOpen, phone, phoneApp, simMode, hasShift, shown, onLeave, onAbortSim });
-  live.current = { wins, startOpen, phone, phoneApp, simMode, hasShift, shown, onLeave, onAbortSim };
+  const live = useRef({
+    wins,
+    startOpen,
+    phone,
+    phoneApp,
+    simMode,
+    hasShift,
+    shown,
+    onLeave,
+    onAbortSim,
+    close: (_w: WinState) => {},
+  });
+  live.current = {
+    wins,
+    startOpen,
+    phone,
+    phoneApp,
+    simMode,
+    hasShift,
+    shown,
+    onLeave,
+    onAbortSim,
+    close: live.current.close,
+  };
 
   // Leaving the desktop closes its own windows. A running sim overlay is handled by the game.
   useEffect(() => {
@@ -187,8 +217,7 @@ export function Desktop(props: DesktopProps) {
     }
     const f = focusedWin(v.wins);
     if (f) {
-      if (f.sim) v.onAbortSim();
-      else setWins((w) => closeWin(w, f.id));
+      v.close(f);
       return;
     }
     // Nothing focused. A minimized game stays where it is. Leave only when a shift exists.
@@ -206,10 +235,40 @@ export function Desktop(props: DesktopProps) {
 
   const focusWindow = (id: string) => setWins((w) => focusWin(w, id));
   const drag = (id: string, dx: number, dy: number) => setWins((w) => w.map((x) => (x.id === id ? dragWin(x, dx, dy, screen) : x)));
-  const close = (w: WinState) => {
-    if (w.sim) onAbortSim();
+  const timers = useRef<number[]>([]);
+  useEffect(() => {
+    const held = timers.current;
+    return () => {
+      for (const t of held) window.clearTimeout(t);
+    };
+  }, []);
+  const [closing, setClosing] = useState<ReadonlySet<string>>(new Set());
+
+  const finishClose = (w: WinState) => {
+    if (w.sim) live.current.onAbortSim();
     else setWins((list) => closeWin(list, w.id));
+    setClosing((prev) => {
+      if (!prev.has(w.id)) return prev;
+      const next = new Set(prev);
+      next.delete(w.id);
+      return next;
+    });
   };
+
+  const close = (w: WinState) => {
+    if (d.reducedMotion || closing.has(w.id)) {
+      finishClose(w);
+      return;
+    }
+    setClosing((prev) => {
+      const next = new Set(prev);
+      next.add(w.id);
+      return next;
+    });
+    const t = window.setTimeout(() => finishClose(w), 140);
+    timers.current.push(t);
+  };
+  live.current.close = close;
   const minimize = (id: string) => setWins((w) => minimizeWin(w, id));
 
   const openStatic = (app: AppDef) => {
@@ -281,6 +340,7 @@ export function Desktop(props: DesktopProps) {
       {phone ? (
         <PhoneHome
           apps={apps}
+          accent={SEASON_FRAME[season]}
           phoneApp={phoneApp}
           simOpen={simOpenOnPhone}
           simContent={simContent}
@@ -312,7 +372,10 @@ export function Desktop(props: DesktopProps) {
               onClose={() => close(w)}
               onMinimize={() => minimize(w.id)}
               hidden={w.minimized}
-              accent={d.accent}
+              accent={SEASON_FRAME[season]}
+              cabinet={w.game}
+              popping={!d.reducedMotion && !closing.has(w.id) && !w.minimized}
+              closing={closing.has(w.id)}
             >
               {w.sim ? (
                 simContent
@@ -354,6 +417,8 @@ export function Desktop(props: DesktopProps) {
           taskbar={info.taskbar}
           clock={clockText(s.minutes, d.clock24)}
           wins={wins}
+          apps={apps}
+          onOpenApp={openApp}
           focusedId={focused?.id ?? null}
           startOpen={startOpen}
           onStart={() => setStartOpen((v) => !v)}
@@ -449,18 +514,18 @@ function AppIcon({ app }: { app: AppDef }) {
   return (
     <span
       className="flex items-center justify-center"
+      aria-label={app.short}
+      data-app-icon={app.id}
       style={{
         width: 44,
         height: 44,
-        background: APP_ICON_TONE[app.id],
-        border: `2px solid ${PAL.outline}`,
+        background: PAL.woodDark,
+        border: `2px solid ${PAL.woodDark}`,
+        boxShadow: `inset 0 0 0 2px ${PAL.creamD}`,
         color: PAL.cream,
-        fontFamily: "CCPixel3x5, monospace",
-        fontSize: 12,
-        letterSpacing: 1,
       }}
     >
-      {app.short}
+      <AppGlyph id={app.id} />
     </span>
   );
 }
@@ -472,7 +537,7 @@ function DeskIcon({ app, onOpen }: { app: AppDef; onOpen: () => void }) {
       onClick={onOpen}
       aria-label={app.title}
       data-testid={`icon-${app.id}`}
-      className="flex w-20 flex-col items-center gap-1"
+      className="flex w-28 flex-col items-center gap-1"
       style={{ color: PAL.cream, fontFamily: "CCPixel3x5, monospace", fontSize: 12, textShadow: `1px 1px 0 ${PAL.ink}`, background: "transparent" }}
     >
       <AppIcon app={app} />
@@ -490,6 +555,9 @@ function WindowFrame({
   onMinimize,
   hidden,
   accent,
+  cabinet,
+  popping,
+  closing,
   children,
 }: {
   win: WinState;
@@ -500,16 +568,21 @@ function WindowFrame({
   onMinimize: () => void;
   hidden: boolean;
   accent: string;
+  cabinet: boolean;
+  popping: boolean;
+  closing: boolean;
   children: ReactNode;
 }) {
   const drag = useRef<{ x: number; y: number } | null>(null);
+  const motion = closing ? " desk-win-out" : popping ? " desk-win-in" : "";
   return (
     <section
       role="dialog"
       aria-label={win.title}
       data-testid={`window-${win.appId}`}
+      data-focused={focused ? "true" : "false"}
       onPointerDown={onFocus}
-      className="absolute"
+      className={"desk-win absolute" + motion}
       style={{
         left: win.x,
         top: win.y,
@@ -518,19 +591,14 @@ function WindowFrame({
         zIndex: 10 + win.z,
         display: hidden ? "none" : "flex",
         flexDirection: "column",
-        background: PAL.cream,
-        border: `2px solid ${PAL.outline}`,
-        outline: focused ? `2px solid ${accent}` : "none",
-        outlineOffset: 2,
-        boxShadow: `4px 4px 0 ${PAL.ink}`,
         minWidth: MIN_W,
         minHeight: MIN_H,
       }}
     >
+      <div className="desk-frame-edge" style={{ background: accent }} aria-hidden />
       <header
         onPointerDown={(e) => {
           onFocus();
-          // A press on the minimize or close button is a click, not a drag. Capturing it here would stop the click.
           if ((e.target as HTMLElement).closest("button")) return;
           drag.current = { x: e.clientX, y: e.clientY };
           (e.currentTarget as HTMLElement).setPointerCapture?.(e.pointerId);
@@ -548,23 +616,55 @@ function WindowFrame({
         onPointerCancel={() => {
           drag.current = null;
         }}
-        className="flex select-none items-center justify-between gap-2 px-2"
-        style={{ height: TITLE_H, background: PAL.woodDark, color: PAL.cream, fontFamily: "CCPixel3x5, monospace", fontSize: 12, touchAction: "none", cursor: "move" }}
+        className="desk-titlebar"
+        style={{ fontFamily: "CCPixel3x5, monospace", touchAction: "none", cursor: "move" }}
       >
-        <span className="truncate">{win.title}</span>
-        <span className="flex gap-1">
+        <span className="desk-stamp" aria-hidden>
+          <i />
+          <i />
+          <i />
+        </span>
+        <span className={focused ? "desk-latch" : "desk-latch desk-latch-off"} aria-hidden />
+        <span className="desk-title-text">{win.title}</span>
+        <span className="flex gap-1" style={{ flexShrink: 0 }}>
           <button type="button" aria-label={`Minimize ${win.title}`} onClick={onMinimize} style={chromeBtn}>
-            _
+            <PixelMin />
           </button>
           <button type="button" aria-label={`Close ${win.title}`} data-testid={`close-${win.appId}`} onClick={onClose} style={chromeBtn}>
-            ×
+            <PixelClose />
           </button>
         </span>
       </header>
-      <div className="relative min-h-0 flex-1 overflow-hidden" style={{ background: PAL.cream }}>
-        {children}
+      <div data-testid="window-body" className={"desk-well relative min-h-0 flex-1" + (cabinet ? " desk-cabinet" : "")}>
+        <div className="desk-well-pad">
+          <div className="desk-well-fit">{children}</div>
+        </div>
       </div>
     </section>
+  );
+}
+
+function PixelMin() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden shapeRendering="crispEdges">
+      <rect x="3" y="12" width="10" height="2" fill="#16110d" />
+    </svg>
+  );
+}
+
+function PixelClose() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden shapeRendering="crispEdges">
+      <rect x="3" y="3" width="2" height="2" fill="#16110d" />
+      <rect x="5" y="5" width="2" height="2" fill="#16110d" />
+      <rect x="7" y="7" width="2" height="2" fill="#16110d" />
+      <rect x="9" y="9" width="2" height="2" fill="#16110d" />
+      <rect x="11" y="11" width="2" height="2" fill="#16110d" />
+      <rect x="11" y="3" width="2" height="2" fill="#16110d" />
+      <rect x="9" y="5" width="2" height="2" fill="#16110d" />
+      <rect x="5" y="9" width="2" height="2" fill="#16110d" />
+      <rect x="3" y="11" width="2" height="2" fill="#16110d" />
+    </svg>
   );
 }
 
@@ -573,11 +673,13 @@ const chromeBtn: CSSProperties = {
   height: 18,
   background: PAL.cream,
   color: PAL.ink,
-  border: `1px solid ${PAL.ink}`,
-  fontFamily: "CCPixel3x5, monospace",
-  fontSize: 12,
-  lineHeight: 1,
+  border: `2px solid ${PAL.woodDark}`,
+  padding: 0,
+  display: "inline-flex",
+  alignItems: "center",
+  justifyContent: "center",
   cursor: "pointer",
+  flexShrink: 0,
 };
 
 function Taskbar({
@@ -585,6 +687,8 @@ function Taskbar({
   taskbar,
   clock,
   wins,
+  apps,
+  onOpenApp,
   focusedId,
   startOpen,
   onStart,
@@ -597,6 +701,8 @@ function Taskbar({
   taskbar: string;
   clock: string;
   wins: WinState[];
+  apps: AppDef[];
+  onOpenApp: (app: AppDef) => void;
   focusedId: string | null;
   startOpen: boolean;
   onStart: () => void;
@@ -609,18 +715,45 @@ function Taskbar({
   return (
     <nav
       aria-label="Taskbar"
+      data-testid="taskbar"
       className="absolute inset-x-0 bottom-0 flex items-center gap-2 px-2"
-      style={{ height: TASKBAR_H, background: taskbar, color: PAL.cream, borderTop: `2px solid ${PAL.outline}`, fontFamily: "CCPixel3x5, monospace", fontSize: 12 }}
+      style={{ height: TASKBAR_H, background: taskbar, color: PAL.cream, borderTop: `2px solid ${PAL.woodDark}`, fontFamily: "CCPixel3x5, monospace", fontSize: 12, overflow: "hidden" }}
     >
       <button
         type="button"
         onClick={onStart}
         aria-expanded={startOpen}
         data-testid="start-button"
-        style={{ height: 26, padding: "0 10px", background: PAL.copper, color: PAL.ink, border: `2px solid ${PAL.outline}`, fontFamily: "CCPixel3x5, monospace", fontSize: 12, cursor: "pointer" }}
+        style={{ height: 26, padding: "0 10px", background: PAL.copper, color: PAL.ink, border: `2px solid ${PAL.woodDark}`, fontFamily: "CCPixel3x5, monospace", fontSize: 12, cursor: "pointer", flexShrink: 0 }}
       >
         Start
       </button>
+      <div className="flex shrink-0 items-center gap-1">
+        {apps.map((app) => (
+          <button
+            key={app.id}
+            type="button"
+            data-app-icon={app.id}
+            aria-label={app.short}
+            onClick={() => onOpenApp(app)}
+            style={{
+              width: 28,
+              height: 26,
+              padding: 0,
+              display: "inline-flex",
+              alignItems: "center",
+              justifyContent: "center",
+              background: "transparent",
+              color: PAL.cream,
+              border: "1px solid transparent",
+              cursor: "pointer",
+              flexShrink: 0,
+            }}
+          >
+            <AppGlyph id={app.id} />
+          </button>
+        ))}
+      </div>
       <div className="flex min-w-0 flex-1 items-center gap-1 overflow-hidden">
         {wins.map((w) => (
           <button
@@ -729,6 +862,7 @@ function StartMenu({
 /** The phone layout: the home grid replaces the desktop. An app is full screen, with a back control. */
 function PhoneHome({
   apps,
+  accent,
   phoneApp,
   simOpen,
   simContent,
@@ -743,6 +877,7 @@ function PhoneHome({
   onAbortSim,
 }: {
   apps: AppDef[];
+  accent: string;
   phoneApp: AppId | null;
   simOpen: boolean;
   simContent: ReactNode;
@@ -759,7 +894,7 @@ function PhoneHome({
   if (simOpen) {
     const app = appForMode(simMode ?? "");
     return (
-      <FullScreen title={app?.title ?? SIM_TITLE[simMode ?? ""] ?? PARLOR_OS} onBack={onAbortSim}>
+      <FullScreen title={app?.title ?? SIM_TITLE[simMode ?? ""] ?? PARLOR_OS} accent={accent} onBack={onAbortSim}>
         {simContent}
       </FullScreen>
     );
@@ -767,13 +902,13 @@ function PhoneHome({
   if (phoneApp) {
     const app = APPS[phoneApp];
     return (
-      <FullScreen title={app.title} onBack={onBackToGrid}>
+      <FullScreen title={app.title} accent={accent} onBack={onBackToGrid}>
         <AppBody app={app} ctx={ctx} />
       </FullScreen>
     );
   }
   return (
-    <div className="absolute inset-0 flex flex-col gap-3 overflow-y-auto p-4" data-testid="phone-home">
+    <div className="absolute inset-0 flex flex-col gap-3 overflow-x-hidden overflow-y-auto p-4" data-testid="phone-home">
       <p style={{ fontFamily: "CCPixel5x7, monospace", fontSize: 16, color: PAL.cream, margin: 0 }}>{PARLOR_OS}</p>
       <div className="grid grid-cols-4 gap-3">
         {apps.map((app) => (
@@ -809,16 +944,21 @@ function PhoneHome({
   );
 }
 
-function FullScreen({ title, onBack, children }: { title: string; onBack: () => void; children: ReactNode }) {
+function FullScreen({ title, accent, onBack, children }: { title: string; accent: string; onBack: () => void; children: ReactNode }) {
   return (
-    <div className="absolute inset-0 flex flex-col" style={{ background: PAL.cream }} data-testid="fullscreen-app">
-      <header className="flex items-center gap-2 px-2" style={{ height: 40, background: PAL.woodDark, color: PAL.cream, fontFamily: "CCPixel3x5, monospace", fontSize: 12 }}>
-        <button type="button" onClick={onBack} aria-label="Back" data-testid="phone-back" style={{ ...chromeBtn, width: 56, height: 28 }}>
+    <div className="absolute inset-0 flex flex-col overflow-hidden" style={{ background: PAL.cream }} data-testid="fullscreen-app">
+      <div className="desk-frame-edge" style={{ background: accent }} aria-hidden />
+      <header className="desk-titlebar" style={{ height: 40, fontFamily: "CCPixel3x5, monospace" }}>
+        <button type="button" onClick={onBack} aria-label="Back" data-testid="phone-back" style={{ ...chromeBtn, width: 56, height: 28, fontFamily: "CCPixel3x5, monospace", fontSize: 12 }}>
           Back
         </button>
-        <span className="truncate">{title}</span>
+        <span className="desk-title-text">{title}</span>
       </header>
-      <div className="relative min-h-0 flex-1 overflow-hidden">{children}</div>
+      <div className="desk-well relative min-h-0 flex-1" data-testid="window-body">
+        <div className="desk-well-pad">
+          <div className="desk-well-fit">{children}</div>
+        </div>
+      </div>
     </div>
   );
 }
