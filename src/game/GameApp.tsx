@@ -1975,7 +1975,7 @@ function AcademyQuiz({
           key={o.id}
           type="button"
           className={
-            "rounded-md border px-3 py-2.5 text-left text-sm " +
+            "academy-choice rounded-md border px-3 py-2.5 text-left text-sm " +
             (pick === o.id
               ? o.ok
                 ? "border-good bg-good/20 text-fg"
@@ -2053,7 +2053,7 @@ function AcademyStage({
     { id: "fuel", label: "Fuel" },
   ];
   return (
-    <div className="absolute inset-0 z-30 overflow-y-auto bg-bg px-4 pb-28 pt-16 sm:px-8" data-testid="academy-stage">
+    <div className="absolute inset-0 z-30 overflow-x-hidden overflow-y-auto bg-bg px-4 pb-28 pt-16 sm:px-8" data-testid="academy-stage">
       <div className="teach-grid">
         <div className="teach-span-12">
           <TeachMeta>
