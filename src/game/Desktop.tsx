@@ -295,6 +295,8 @@ export function Desktop(props: DesktopProps) {
           simMode={simMode}
           ctx={ctx}
           hasShift={hasShift}
+          season={info.label}
+          clock={clockText(s.minutes, d.clock24)}
           onOpen={openApp}
           onBackToGrid={() => setPhoneApp(null)}
           onLeave={onLeave}
@@ -643,7 +645,7 @@ function Taskbar({
     <nav
       aria-label="Taskbar"
       className="absolute inset-x-0 bottom-0 flex items-center gap-2 px-2"
-      style={{ height: TASKBAR_H, background: taskbar, color: PAL.cream, borderTop: `2px solid ${PAL.outline}`, fontFamily: "var(--font-tag)", fontSize: "var(--text-tag-sm)", lineHeight: "1" }}
+      style={{ height: TASKBAR_H, background: taskbar, color: PAL.cream, borderTop: `2px solid ${PAL.outline}`, fontFamily: "var(--font-body)", fontSize: "var(--text-small)", lineHeight: "1.4" }}
     >
       <button
         type="button"
@@ -679,7 +681,7 @@ function Taskbar({
           </button>
         ))}
       </div>
-      <span style={{ color: PAL.creamD, textTransform: "uppercase" }}>{season}</span>
+      <span data-testid="desk-season" style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-small)", lineHeight: "1.4" }}>{season}</span>
       <button
         type="button"
         onClick={onSound}
@@ -689,7 +691,7 @@ function Taskbar({
       >
         {muted ? "SOUND OFF" : "SOUND ON"}
       </button>
-      <span data-testid="desk-clock" style={{ minWidth: 66, textAlign: "right" }}>
+      <span data-testid="desk-clock" style={{ minWidth: 72, textAlign: "right", fontFamily: "var(--font-body)", fontSize: "var(--text-small)", lineHeight: "1.4" }}>
         {clock}
       </span>
     </nav>
@@ -769,6 +771,8 @@ function PhoneHome({
   simMode,
   ctx,
   hasShift,
+  season,
+  clock,
   onOpen,
   onBackToGrid,
   onLeave,
@@ -783,6 +787,8 @@ function PhoneHome({
   simMode: Mode | null;
   ctx: AppCtx;
   hasShift: boolean;
+  season: string;
+  clock: string;
   onOpen: (app: AppDef) => void;
   onBackToGrid: () => void;
   onLeave: () => void;
@@ -807,7 +813,8 @@ function PhoneHome({
     );
   }
   return (
-    <div className="absolute inset-0 flex flex-col gap-3 overflow-y-auto p-4" data-testid="phone-home">
+    <div className="absolute inset-0 flex flex-col" data-testid="phone-home">
+      <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto p-4">
       <p style={{ fontFamily: "var(--font-title)", fontSize: "var(--text-title-sm)", color: PAL.cream, margin: 0 }}>{PARLOR_OS}</p>
       <div className="grid grid-cols-4 gap-3">
         {apps.map((app) => (
@@ -839,6 +846,15 @@ function PhoneHome({
           </button>
         )}
       </div>
+      </div>
+      <nav
+        aria-label="Taskbar"
+        className="flex items-center justify-between px-3"
+        style={{ height: TASKBAR_H, background: PAL.woodDark, color: PAL.cream, borderTop: `2px solid ${PAL.outline}`, fontFamily: "var(--font-body)", fontSize: "var(--text-small)", lineHeight: "1.4" }}
+      >
+        <span data-testid="desk-season">{season}</span>
+        <span data-testid="desk-clock">{clock}</span>
+      </nav>
     </div>
   );
 }
