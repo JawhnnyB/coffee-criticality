@@ -1131,8 +1131,8 @@ export function GameApp() {
         )}
 
         {mode === "play" && s.announceT > 0.15 && (
-          <div className="pointer-events-none absolute inset-x-0 top-[22%] z-20 text-center">
-            <p className={ART.hud ? "cc-title" : "font-display text-xl text-fg sm:text-2xl"}>{s.announce}</p>
+          <div className="pointer-events-none absolute inset-x-0 top-2 z-20 flex justify-center px-4">
+            <p className={ART.hud ? "cc-title" : "font-display text-xl text-fg sm:text-2xl"} style={{ background: "#16110d", padding: "4px 8px" }}>{s.announce}</p>
           </div>
         )}
 

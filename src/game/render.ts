@@ -385,9 +385,14 @@ function drawBoardA(
   ctx.fillRect(x + 6, y + h - 7, w - 12, 3);
   const color = face.leaf ? PAL.leaf : PAL.gold;
   const parts = face.line.toUpperCase().split(" ");
+  const plateW = Math.max(...parts.map((part) => part.length * 8)) + 8;
+  const plateH = parts.length * 12 + 4;
+  const plateX = x + 4;
+  const plateY = y - plateH - 4;
+  ctx.fillStyle = PAL.ink;
+  ctx.fillRect(plateX, plateY, plateW, plateH);
   parts.forEach((part, i) => {
-    const tw = part.length * 8 - 2;
-    pixText(ctx, part, x + w - 8 - tw / 2, y - 24 + i * 12, color, tw + 4);
+    pixText(ctx, part, plateX + 4 + (part.length * 8 - 2) / 2, plateY + 2 + i * 12, color, plateW - 4);
   });
 }
 
