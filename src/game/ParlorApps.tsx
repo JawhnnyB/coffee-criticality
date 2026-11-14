@@ -176,7 +176,7 @@ export function SetupScreen({
           </p>
         </div>
 
-        <div className="mt-6 flex flex-wrap gap-2">
+        <div className="sticky bottom-0 z-10 mt-6 flex flex-wrap gap-2 py-3" style={{ background: "#16110d" }}>
           <button type="button" className="btn-primary" data-testid="setup-continue" onClick={() => onDone(season, stance)}>
             Continue to the desktop
           </button>
