@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import { integerScale } from "./artScale";
+import { integerCover, integerScale } from "./artScale";
 import { isMuted, setMuted, unlockAudio } from "./audio";
 
 /** Native layout from tools/artkit/menu.py. Do not redraw it. */
@@ -47,7 +47,8 @@ export function PixelMenu({
   const host = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const box = useBox(host);
-  const scale = integerScale(box.w, box.h, MW, MH);
+  const phone = box.w > 0 && box.w < 720;
+  const scale = phone ? integerCover(box.w, box.h, MW, MH) : integerScale(box.w, box.h, MW, MH);
   const [sel, setSel] = useState(0);
   const [mute, setMute] = useState(isMuted());
   const [sheet, setSheet] = useState(false);
@@ -130,7 +131,6 @@ export function PixelMenu({
     setMute(next);
   };
 
-  const phone = scale.zoom < 2;
   return (
     <div ref={host} className="absolute inset-0 z-30 overflow-hidden" style={{ background: "#16110d" }} data-testid="pixel-menu">
       <img
@@ -169,7 +169,7 @@ export function PixelMenu({
           style={{
             left: 12,
             right: 12,
-            top: scale.oy + BTN_Y[0] * scale.zoom - 8,
+            bottom: 16,
             background: "#16110d",
           }}
         >

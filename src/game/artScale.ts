@@ -12,6 +12,20 @@ export function integerScale(viewW: number, viewH: number, nativeW: number, nati
   };
 }
 
+/** Whole-number cover. The image fills the frame and the extra is cropped. Not a stretch. */
+export function integerCover(viewW: number, viewH: number, nativeW: number, nativeH: number) {
+  const zoom = Math.max(1, Math.ceil(Math.max(viewW / Math.max(1, nativeW), viewH / Math.max(1, nativeH))));
+  const dw = nativeW * zoom;
+  const dh = nativeH * zoom;
+  return {
+    zoom,
+    dw,
+    dh,
+    ox: Math.floor((viewW - dw) / 2),
+    oy: Math.floor((viewH - dh) / 2),
+  };
+}
+
 /** Views narrower than this are phones (the notes panel also starts closed here). */
 export const PHONE_VIEW_W = 720;
 
