@@ -561,7 +561,7 @@ function WindowFrame({
           </button>
         </span>
       </header>
-      <div className="relative min-h-0 flex-1 overflow-hidden" style={{ background: PAL.cream }}>
+      <div className="relative min-h-0 flex-1 overflow-hidden" data-testid="window-body" style={{ background: PAL.cream, paddingLeft: 16 }}>
         {children}
       </div>
     </section>
