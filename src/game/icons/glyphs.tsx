@@ -1,4 +1,9 @@
-/** 16×16 pixel marks. One drawing per app. Shape tells them apart; colour does not. */
+/**
+ * 16×16 pixel marks, drawn at 32×32. One drawing per app.
+ * The drawing matches PR #24 (`c/window-style`). This copy is the one the game loads, so PR #26 owns it.
+ * PR #24 should delete its copy when this merges. This branch cannot push `c/window-style`.
+ */
+
 const GLYPHS: Record<string, string[]> = {
   settings: [
     "................",
