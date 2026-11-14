@@ -1,0 +1,26 @@
+{
+  "hid": {
+    "residue": {
+      "valve": "hid",
+      "tag": "open",
+      "dose": "open",
+      "log": "open"
+    },
+    "mode": "play",
+    "room": "control",
+    "file": "02-hid-cafe-1280.png"
+  },
+  "caught": {
+    "residue": {
+      "valve": "caught",
+      "tag": "open",
+      "dose": "open",
+      "log": "open"
+    },
+    "mode": "play",
+    "room": "control",
+    "file": "02-caught-cafe-1280.png"
+  },
+  "pageErrors": []
+}
+EXIT:0
