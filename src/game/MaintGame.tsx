@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Bezel } from "./Arcade";
 import { playHuntHit, playHuntMiss } from "./audio";
+import { lieSlot } from "./lototoSlot";
 
 const W = 320;
 const H = 180;
@@ -34,12 +35,14 @@ function layout(lie: number): Tag[] {
 export function MaintGame({
   onDone,
   onAbort,
+  seed = 1,
 }: {
   onDone: (score: number) => void;
   onAbort: () => void;
+  seed?: number;
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [lieAt] = useState(() => Math.floor(Math.random() * 9));
+  const [lieAt] = useState(() => lieSlot(seed));
   const [phase, setPhase] = useState<"brief" | "play" | "end">("brief");
   const [end, setEnd] = useState<{ ok: boolean; time: number } | null>(null);
 
