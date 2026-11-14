@@ -132,7 +132,7 @@ export function PixelMenu({
   };
 
   return (
-    <div ref={host} className="absolute inset-0 z-30 overflow-hidden" style={{ background: "#16110d" }} data-testid="pixel-menu">
+    <div ref={host} className="absolute inset-0 z-30" style={{ background: "#16110d", overflow: "clip" }} data-testid="pixel-menu">
       <img
         src="/art/ui/menu-scene.png"
         alt=""
@@ -145,6 +145,8 @@ export function PixelMenu({
           top: scale.oy,
           width: scale.dw,
           height: scale.dh,
+          maxWidth: "none",
+          maxHeight: "none",
           imageRendering: "pixelated",
         }}
       />
@@ -202,7 +204,7 @@ export function PixelRead({ title, children, onBack }: { title: string; children
   const box = useBox(host);
   const scale = integerScale(box.w, box.h, MW, MH);
   return (
-    <div ref={host} className="absolute inset-0 z-30 overflow-hidden" style={{ background: "#16110d" }}>
+    <div ref={host} className="absolute inset-0 z-30" style={{ background: "#16110d", overflow: "clip" }}>
       <img
         src="/art/ui/menu-scene.png"
         alt=""
@@ -215,6 +217,8 @@ export function PixelRead({ title, children, onBack }: { title: string; children
           top: scale.oy,
           width: scale.dw,
           height: scale.dh,
+          maxWidth: "none",
+          maxHeight: "none",
           imageRendering: "pixelated",
         }}
       />
