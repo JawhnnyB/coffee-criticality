@@ -44,6 +44,7 @@ import { Chatter } from "./ChatterLine";
 import { heartCount } from "./pixel";
 import { drawWorld, glyphWidth, paintGlyphs, preloadRoomArt } from "./render";
 import { DEFAULT_PLANT, plantTitle, type PlantDesign } from "./plant";
+import { systemReducedMotion } from "./reducedMotion";
 import { hasSave, hydrateSave, peekSave, wipeSave, writeSave } from "./save";
 import { computeKeff } from "./nuclearLab";
 import { NuclearDesk } from "./NuclearDesk";
@@ -1137,7 +1138,7 @@ export function GameApp() {
 
         {mode === "splash" && !booted && (
           <BootLog
-            reduced={s.desktop.reducedMotion || window.matchMedia("(prefers-reduced-motion: reduce)").matches}
+            reduced={s.desktop.reducedMotion || systemReducedMotion()}
             onDone={() => setBooted(true)}
           />
         )}
