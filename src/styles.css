@@ -64,12 +64,12 @@
   /* Reactor schematic labels. Own class, so the art-on text-size group does not change them. */
   .schematic-label {
     font-family: "CCPixel3x5", monospace;
-    font-size: 10px;
+    font-size: 24px;
     line-height: 1;
   }
   @media (min-width: 640px) {
     .schematic-label {
-      font-size: 12px;
+      font-size: 24px;
     }
   }
 
@@ -268,9 +268,9 @@
 .art-on .teach-meta,
 .art-on .teach-kicker {
   font-family: "CCPixel3x5", monospace !important;
-  font-size: 12px !important;
+  font-size: 24px !important;
   line-height: 1.35 !important;
-  letter-spacing: 0.06em !important;
+  letter-spacing: 0.04em !important;
 }
 .art-on .dialogue-line,
 .art-on .teach-body,
@@ -296,8 +296,8 @@
 }
 .art-on .cc-label-sm {
   font-family: "CCPixel3x5", monospace !important;
-  font-size: 10px !important;
-  line-height: 10px !important;
+  font-size: 20px !important;
+  line-height: 22px !important;
   letter-spacing: 0 !important;
   text-transform: uppercase;
   -webkit-font-smoothing: none;
