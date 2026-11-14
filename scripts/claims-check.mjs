@@ -1,13 +1,18 @@
 #!/usr/bin/env node
 /**
  * Refuse a PASS that a reviewer cannot check from files in the repo.
- * Parses the claims table in docs/audit/2026-11-14-dream-pass-4.md.
+ * Usage: node scripts/claims-check.mjs [claims.md]
+ * Default table: docs/audit/2026-11-14-dream-pass-4.md
+ *
+ * A number matches only as a whole token. 9 does not match 194.
+ * A cited artifact whose last EXIT: line is not 0 must be explained
+ * in the result with the words "expected" and "because".
  */
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 
 const root = process.cwd();
-const mdPath = join(root, "docs/audit/2026-11-14-dream-pass-4.md");
+const mdPath = join(root, process.argv[2] || "docs/audit/2026-11-14-dream-pass-4.md");
 const text = readFileSync(mdPath, "utf8");
 const failures = [];
 const rows = [];
@@ -34,6 +39,17 @@ function pathsIn(cell) {
 
 function numbersIn(cell) {
   return [...cell.matchAll(/\d+(?:\.\d+)?/g)].map((m) => m[0]);
+}
+
+function hasWholeNumber(blob, n) {
+  const esc = n.replace(/\./g, "\\.");
+  return new RegExp(`(?<![0-9.])${esc}(?![0-9.])`).test(blob);
+}
+
+function lastExit(blob) {
+  const marks = [...blob.matchAll(/(?:^|\n)[A-Z0-9_]*EXIT:(\d+)/g)];
+  if (!marks.length) return null;
+  return marks[marks.length - 1][1];
 }
 
 const banned = ["not used", "never", "no caller", "no call", "owner visual check"];
@@ -65,7 +81,14 @@ for (const row of rows) {
   }
   const blob = bodies.join("\n");
   for (const n of numbersIn(row.result)) {
-    if (!blob.includes(n)) failures.push(`${row.claim}: result number ${n} is not in the artifact`);
+    if (!hasWholeNumber(blob, n)) failures.push(`${row.claim}: result number ${n} is not a whole token in the artifact`);
+  }
+  const exitCode = lastExit(blob);
+  if (exitCode != null && exitCode !== "0") {
+    const why = /expected/i.test(row.result) && /because/i.test(row.result);
+    if (!why) {
+      failures.push(`${row.claim}: artifact EXIT:${exitCode} is not 0, and the result does not say the nonzero exit is expected because ...`);
+    }
   }
   const visual = cited.some((p) => p.endsWith(".png")) || /still/i.test(row.claim);
   if (visual) {
