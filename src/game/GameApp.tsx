@@ -962,6 +962,7 @@ export function GameApp() {
 
         {mode === "maint" && (
           <MaintGame
+            seed={s.setup.seed}
             onDone={(score) => {
               finishMaint(s, score);
               applyMode(s.mode);
