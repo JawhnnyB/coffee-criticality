@@ -900,6 +900,7 @@ export function GameApp() {
         {mode === "arcade" && (
           <Arcade
             day={s.day}
+            seed={s.setup.seed}
             fromEod={s.returnMode === "eod"}
             onDone={(score, leftover = 0) => {
               finishArcade(s, score, leftover);

@@ -2,6 +2,7 @@
 
 import { type ReactNode, useEffect, useRef, useState } from "react";
 import { playHuntHit, playHuntMiss } from "./audio";
+import { rng } from "./parlorMusic";
 
 export type CabId = "catch" | "fish" | "plot" | "horde" | "delay" | "golf" | "rods" | "pebble" | "bowl" | "phys" | "load";
 
@@ -117,8 +118,10 @@ type Item = {
 type Deco = { x: number; y: number; w: number; h: number; label: string; ink: string };
 type Board = { items: Item[]; deco: Deco[]; prompt: string; kind: Kind; clean?: boolean };
 
+let roll = Math.random;
+
 function pickLie(n: number) {
-  return Math.floor(Math.random() * n);
+  return Math.floor(roll() * n);
 }
 
 function clutter(n: number, ink = "#3a3228"): Deco[] {
@@ -348,18 +351,37 @@ function cleanBoard(make: () => Board): Board {
   return b;
 }
 
-/** Today's board first (the week's lie), then four more, one of them clean. */
-function deckFor(day: number): Board[] {
-  const first = DAY_BOARD[day] ?? makeValve;
-  const rest = POOL.filter((m) => m !== first);
-  for (let i = rest.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [rest[i], rest[j]] = [rest[j], rest[i]];
+/** Today's board first (the week's lie), then four more, one of them clean. Seed fixes the draw. */
+export function deckFor(day: number, seed?: number): Board[] {
+  const prev = roll;
+  if (seed == null) roll = Math.random;
+  else {
+    const next = rng(seed);
+    next();
+    roll = next;
   }
-  const deck = [first(), ...rest.slice(0, BOARDS - 1).map((m) => m())];
-  const cleanAt = 1 + Math.floor(Math.random() * (BOARDS - 1));
-  deck[cleanAt] = cleanBoard(rest[cleanAt - 1]);
-  return deck;
+  try {
+    const first = DAY_BOARD[day] ?? makeValve;
+    const rest = POOL.filter((m) => m !== first);
+    for (let i = rest.length - 1; i > 0; i--) {
+      const j = Math.floor(roll() * (i + 1));
+      [rest[i], rest[j]] = [rest[j], rest[i]];
+    }
+    const deck = [first(), ...rest.slice(0, BOARDS - 1).map((m) => m())];
+    const cleanAt = 1 + Math.floor(roll() * (BOARDS - 1));
+    deck[cleanAt] = cleanBoard(rest[cleanAt - 1]);
+    return deck;
+  } finally {
+    roll = prev;
+  }
+}
+
+export function deckSignature(day: number, seed: number): { kind: string; clean: boolean; lie: number }[] {
+  return deckFor(day, seed).map((b) => ({
+    kind: b.kind,
+    clean: !!b.clean,
+    lie: b.items.findIndex((it) => it.lie),
+  }));
 }
 
 function drawValve(ctx: CanvasRenderingContext2D, it: Item) {
@@ -573,11 +595,13 @@ export function Arcade({
   onAbort,
   fromEod = false,
   day = 1,
+  seed,
 }: {
   onDone: (score: number, leftover?: number) => void;
   onAbort: () => void;
   fromEod?: boolean;
   day?: number;
+  seed?: number;
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [phase, setPhase] = useState<"brief" | "play" | "end">("brief");
@@ -591,7 +615,7 @@ export function Arcade({
     if (!ctx) return;
     ctx.imageSmoothingEnabled = false;
 
-    const deck = deckFor(day);
+    const deck = deckFor(day, seed);
     let round = 0;
     let board = deck[0];
     let clock = CLOCK;
@@ -726,7 +750,7 @@ export function Arcade({
       canvas.removeEventListener("touchend", touch);
       window.removeEventListener("keydown", key);
     };
-  }, [phase, onAbort, day]);
+  }, [phase, onAbort, day, seed]);
 
   if (phase === "brief") {
     return (
