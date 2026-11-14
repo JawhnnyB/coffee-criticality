@@ -133,6 +133,9 @@ export default defineConfig(({ command }) => ({
     host: "0.0.0.0",
     port: 8080,
     strictPort: true,
+    // The Grok preview proxy forwards its public host. Vite 8 rejects that
+    // with 403, so the pane never receives the game.
+    allowedHosts: true,
   },
   resolve: { tsconfigPaths: true },
   plugins: [
