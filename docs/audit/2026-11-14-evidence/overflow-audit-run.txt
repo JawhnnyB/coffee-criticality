@@ -1,7 +1,102 @@
-{"w":1280,"h":720,"clips":0,"overlaps":0,"windowFails":0,"shortButtons":0}
-{"w":1440,"h":900,"clips":0,"overlaps":0,"windowFails":0,"shortButtons":0}
-{"w":1920,"h":1080,"clips":0,"overlaps":0,"windowFails":0,"shortButtons":0}
-{"w":768,"h":1024,"clips":0,"overlaps":0,"windowFails":0,"shortButtons":0}
-{"w":390,"h":844,"clips":0,"overlaps":0,"windowFails":0,"shortButtons":0}
-Overflow audit: 0 violations across 5 viewports.
-EXIT:0
+{"screen":"title","w":1280,"h":720,"clips":0,"scrolls":0,"overlaps":0,"windowFails":0,"shortButtons":0,"violations":0}
+{"screen":"setup","w":1280,"h":720,"clips":0,"scrolls":0,"overlaps":0,"windowFails":0,"shortButtons":0,"violations":0}
+{"screen":"desktop","w":1280,"h":720,"clips":0,"scrolls":0,"overlaps":0,"windowFails":0,"shortButtons":0,"violations":0}
+{"screen":"settings","w":1280,"h":720,"clips":0,"scrolls":1,"overlaps":0,"windowFails":0,"shortButtons":0,"violations":0}
+{"screen":"music","w":1280,"h":720,"clips":0,"scrolls":0,"overlaps":0,"windowFails":0,"shortButtons":0,"violations":0}
+{"screen":"news","w":1280,"h":720,"clips":0,"scrolls":0,"overlaps":0,"windowFails":0,"shortButtons":0,"violations":0}
+{"screen":"radiation","w":1280,"h":720,"clips":0,"scrolls":1,"overlaps":0,"windowFails":0,"shortButtons":0,"violations":0}
+{"screen":"nrc","w":1280,"h":720,"clips":0,"scrolls":0,"overlaps":0,"windowFails":0,"shortButtons":0,"violations":0}
+{"screen":"academy","w":1280,"h":720,"clips":0,"scrolls":1,"overlaps":0,"windowFails":0,"shortButtons":0,"violations":0}
+{"screen":"design","w":1280,"h":720,"clips":0,"scrolls":1,"overlaps":0,"windowFails":0,"shortButtons":0,"violations":0}
+{"screen":"control","w":1280,"h":720,"opened":false,"reason":"needs a signed design"}
+{"screen":"results","w":1280,"h":720,"opened":false,"reason":"needs a signed design"}
+{"screen":"coremap","w":1280,"h":720,"opened":false,"reason":"needs a signed design"}
+{"screen":"cam","w":1280,"h":720,"opened":false,"reason":"needs a signed design"}
+{"screen":"cafe","w":1280,"h":720,"opened":false,"reason":"not opened: this audit does not walk the world"}
+{"screen":"load-cab","w":1280,"h":720,"opened":false,"reason":"not opened: this audit does not walk the world"}
+{"screen":"catch","w":1280,"h":720,"opened":false,"reason":"not opened: this audit does not walk the world"}
+{"screen":"hide","w":1280,"h":720,"opened":false,"reason":"not opened: this audit does not walk the world"}
+{"screen":"dusk-lot","w":1280,"h":720,"opened":false,"reason":"not opened: this audit does not walk the world"}
+{"screen":"maintenance","w":1280,"h":720,"opened":false,"reason":"not opened: this audit does not walk the world"}
+{"screen":"title","w":1440,"h":900,"clips":0,"scrolls":0,"overlaps":0,"windowFails":0,"shortButtons":0,"violations":0}
+{"screen":"setup","w":1440,"h":900,"clips":0,"scrolls":0,"overlaps":0,"windowFails":0,"shortButtons":0,"violations":0}
+{"screen":"desktop","w":1440,"h":900,"clips":0,"scrolls":0,"overlaps":0,"windowFails":0,"shortButtons":0,"violations":0}
+{"screen":"settings","w":1440,"h":900,"clips":0,"scrolls":1,"overlaps":0,"windowFails":0,"shortButtons":0,"violations":0}
+{"screen":"music","w":1440,"h":900,"clips":0,"scrolls":0,"overlaps":0,"windowFails":0,"shortButtons":0,"violations":0}
+{"screen":"news","w":1440,"h":900,"clips":0,"scrolls":0,"overlaps":0,"windowFails":0,"shortButtons":0,"violations":0}
+{"screen":"radiation","w":1440,"h":900,"clips":0,"scrolls":0,"overlaps":0,"windowFails":0,"shortButtons":0,"violations":0}
+{"screen":"nrc","w":1440,"h":900,"clips":0,"scrolls":0,"overlaps":0,"windowFails":0,"shortButtons":0,"violations":0}
+{"screen":"academy","w":1440,"h":900,"clips":0,"scrolls":1,"overlaps":0,"windowFails":0,"shortButtons":0,"violations":0}
+{"screen":"design","w":1440,"h":900,"clips":0,"scrolls":1,"overlaps":0,"windowFails":0,"shortButtons":0,"violations":0}
+{"screen":"control","w":1440,"h":900,"opened":false,"reason":"needs a signed design"}
+{"screen":"results","w":1440,"h":900,"opened":false,"reason":"needs a signed design"}
+{"screen":"coremap","w":1440,"h":900,"opened":false,"reason":"needs a signed design"}
+{"screen":"cam","w":1440,"h":900,"opened":false,"reason":"needs a signed design"}
+{"screen":"cafe","w":1440,"h":900,"opened":false,"reason":"not opened: this audit does not walk the world"}
+{"screen":"load-cab","w":1440,"h":900,"opened":false,"reason":"not opened: this audit does not walk the world"}
+{"screen":"catch","w":1440,"h":900,"opened":false,"reason":"not opened: this audit does not walk the world"}
+{"screen":"hide","w":1440,"h":900,"opened":false,"reason":"not opened: this audit does not walk the world"}
+{"screen":"dusk-lot","w":1440,"h":900,"opened":false,"reason":"not opened: this audit does not walk the world"}
+{"screen":"maintenance","w":1440,"h":900,"opened":false,"reason":"not opened: this audit does not walk the world"}
+{"screen":"title","w":1920,"h":1080,"clips":0,"scrolls":0,"overlaps":0,"windowFails":0,"shortButtons":0,"violations":0}
+{"screen":"setup","w":1920,"h":1080,"clips":0,"scrolls":0,"overlaps":0,"windowFails":0,"shortButtons":0,"violations":0}
+{"screen":"desktop","w":1920,"h":1080,"clips":0,"scrolls":0,"overlaps":0,"windowFails":0,"shortButtons":0,"violations":0}
+{"screen":"settings","w":1920,"h":1080,"clips":0,"scrolls":1,"overlaps":0,"windowFails":0,"shortButtons":0,"violations":0}
+{"screen":"music","w":1920,"h":1080,"clips":0,"scrolls":0,"overlaps":0,"windowFails":0,"shortButtons":0,"violations":0}
+{"screen":"news","w":1920,"h":1080,"clips":0,"scrolls":0,"overlaps":0,"windowFails":0,"shortButtons":0,"violations":0}
+{"screen":"radiation","w":1920,"h":1080,"clips":0,"scrolls":0,"overlaps":0,"windowFails":0,"shortButtons":0,"violations":0}
+{"screen":"nrc","w":1920,"h":1080,"clips":0,"scrolls":0,"overlaps":0,"windowFails":0,"shortButtons":0,"violations":0}
+{"screen":"academy","w":1920,"h":1080,"clips":0,"scrolls":1,"overlaps":0,"windowFails":0,"shortButtons":0,"violations":0}
+{"screen":"design","w":1920,"h":1080,"clips":0,"scrolls":0,"overlaps":0,"windowFails":0,"shortButtons":0,"violations":0}
+{"screen":"control","w":1920,"h":1080,"opened":false,"reason":"needs a signed design"}
+{"screen":"results","w":1920,"h":1080,"opened":false,"reason":"needs a signed design"}
+{"screen":"coremap","w":1920,"h":1080,"opened":false,"reason":"needs a signed design"}
+{"screen":"cam","w":1920,"h":1080,"opened":false,"reason":"needs a signed design"}
+{"screen":"cafe","w":1920,"h":1080,"opened":false,"reason":"not opened: this audit does not walk the world"}
+{"screen":"load-cab","w":1920,"h":1080,"opened":false,"reason":"not opened: this audit does not walk the world"}
+{"screen":"catch","w":1920,"h":1080,"opened":false,"reason":"not opened: this audit does not walk the world"}
+{"screen":"hide","w":1920,"h":1080,"opened":false,"reason":"not opened: this audit does not walk the world"}
+{"screen":"dusk-lot","w":1920,"h":1080,"opened":false,"reason":"not opened: this audit does not walk the world"}
+{"screen":"maintenance","w":1920,"h":1080,"opened":false,"reason":"not opened: this audit does not walk the world"}
+{"screen":"title","w":768,"h":1024,"clips":0,"scrolls":0,"overlaps":0,"windowFails":0,"shortButtons":0,"violations":0}
+{"screen":"setup","w":768,"h":1024,"clips":0,"scrolls":0,"overlaps":0,"windowFails":0,"shortButtons":0,"violations":0}
+{"screen":"desktop","w":768,"h":1024,"clips":0,"scrolls":0,"overlaps":0,"windowFails":0,"shortButtons":0,"violations":0}
+{"screen":"settings","w":768,"h":1024,"clips":0,"scrolls":1,"overlaps":0,"windowFails":0,"shortButtons":0,"violations":0}
+{"screen":"music","w":768,"h":1024,"clips":0,"scrolls":0,"overlaps":0,"windowFails":0,"shortButtons":0,"violations":0}
+{"screen":"news","w":768,"h":1024,"clips":0,"scrolls":0,"overlaps":0,"windowFails":0,"shortButtons":0,"violations":0}
+{"screen":"radiation","w":768,"h":1024,"clips":0,"scrolls":0,"overlaps":0,"windowFails":0,"shortButtons":0,"violations":0}
+{"screen":"nrc","w":768,"h":1024,"clips":0,"scrolls":0,"overlaps":0,"windowFails":0,"shortButtons":0,"violations":0}
+{"screen":"academy","w":768,"h":1024,"clips":0,"scrolls":1,"overlaps":1,"windowFails":0,"shortButtons":0,"violations":1}
+{"screen":"design","w":768,"h":1024,"clips":0,"scrolls":1,"overlaps":0,"windowFails":0,"shortButtons":0,"violations":0}
+{"screen":"control","w":768,"h":1024,"opened":false,"reason":"needs a signed design"}
+{"screen":"results","w":768,"h":1024,"opened":false,"reason":"needs a signed design"}
+{"screen":"coremap","w":768,"h":1024,"opened":false,"reason":"needs a signed design"}
+{"screen":"cam","w":768,"h":1024,"opened":false,"reason":"needs a signed design"}
+{"screen":"cafe","w":768,"h":1024,"opened":false,"reason":"not opened: this audit does not walk the world"}
+{"screen":"load-cab","w":768,"h":1024,"opened":false,"reason":"not opened: this audit does not walk the world"}
+{"screen":"catch","w":768,"h":1024,"opened":false,"reason":"not opened: this audit does not walk the world"}
+{"screen":"hide","w":768,"h":1024,"opened":false,"reason":"not opened: this audit does not walk the world"}
+{"screen":"dusk-lot","w":768,"h":1024,"opened":false,"reason":"not opened: this audit does not walk the world"}
+{"screen":"maintenance","w":768,"h":1024,"opened":false,"reason":"not opened: this audit does not walk the world"}
+{"screen":"title","w":390,"h":844,"clips":0,"scrolls":0,"overlaps":0,"windowFails":0,"shortButtons":0,"violations":0}
+{"screen":"setup","w":390,"h":844,"clips":0,"scrolls":0,"overlaps":0,"windowFails":0,"shortButtons":0,"violations":0}
+{"screen":"desktop","w":390,"h":844,"clips":0,"scrolls":0,"overlaps":0,"windowFails":0,"shortButtons":0,"violations":0}
+{"screen":"settings","w":390,"h":844,"clips":0,"scrolls":1,"overlaps":0,"windowFails":0,"shortButtons":32,"violations":32}
+{"screen":"music","w":390,"h":844,"clips":0,"scrolls":0,"overlaps":0,"windowFails":0,"shortButtons":2,"violations":2}
+{"screen":"news","w":390,"h":844,"clips":0,"scrolls":0,"overlaps":0,"windowFails":0,"shortButtons":0,"violations":0}
+{"screen":"radiation","w":390,"h":844,"clips":0,"scrolls":0,"overlaps":0,"windowFails":0,"shortButtons":1,"violations":1}
+{"screen":"nrc","w":390,"h":844,"clips":0,"scrolls":0,"overlaps":0,"windowFails":0,"shortButtons":0,"violations":0}
+{"screen":"academy","w":390,"h":844,"clips":0,"scrolls":1,"overlaps":0,"windowFails":0,"shortButtons":9,"violations":9}
+{"screen":"design","w":390,"h":844,"clips":0,"scrolls":1,"overlaps":0,"windowFails":0,"shortButtons":0,"violations":0}
+{"screen":"control","w":390,"h":844,"opened":false,"reason":"needs a signed design"}
+{"screen":"results","w":390,"h":844,"opened":false,"reason":"needs a signed design"}
+{"screen":"coremap","w":390,"h":844,"opened":false,"reason":"needs a signed design"}
+{"screen":"cam","w":390,"h":844,"opened":false,"reason":"needs a signed design"}
+{"screen":"cafe","w":390,"h":844,"opened":false,"reason":"not opened: this audit does not walk the world"}
+{"screen":"load-cab","w":390,"h":844,"opened":false,"reason":"not opened: this audit does not walk the world"}
+{"screen":"catch","w":390,"h":844,"opened":false,"reason":"not opened: this audit does not walk the world"}
+{"screen":"hide","w":390,"h":844,"opened":false,"reason":"not opened: this audit does not walk the world"}
+{"screen":"dusk-lot","w":390,"h":844,"opened":false,"reason":"not opened: this audit does not walk the world"}
+{"screen":"maintenance","w":390,"h":844,"opened":false,"reason":"not opened: this audit does not walk the world"}
+Overflow audit: 45 violations across 5 viewports.
+OVERFLOW_EXIT:1
