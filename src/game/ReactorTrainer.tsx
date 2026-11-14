@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import { DT_BAND, thermalState, type PlantDesign, type PlantType, type RunState } from "./plant";
+import { DT_BAND, benchThermal, thermalState, type PlantDesign, type PlantType, type RunState } from "./plant";
 import { PixelSchematic } from "./PixelSchematic";
 import { BENCH_HOLD, stepBench } from "./benchStep";
 
@@ -125,7 +125,7 @@ export function ReactorTrainer({
     );
   }
 
-  const ts = thermalState(design, { powerPct: power, flowPct: flow });
+  const ts = benchThermal(design, { powerPct: power, flowPct: flow });
   const { dT, tCold, tHot } = ts;
   const band = BAND[plant];
   const inBand = dT >= band.lo && dT <= band.hi && !scram;

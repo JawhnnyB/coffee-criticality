@@ -134,8 +134,23 @@ export function thermalState(plant: PlantType | PlantDesign, run: RunPoint): The
   const type: PlantType = typeof plant === "string" ? plant : plant.type;
   const power = Math.max(0, run.powerPct);
   const flow = run.flowPct;
-  // A designed plant carries its own full-power ΔT. A bare type keeps the type constant.
+  const dT = (power / Math.max(40, flow)) * DT_AT_UNIT[type];
+  const tCold = T_COLD_AT_FLOW100[type] - (flow - 100) * T_COLD_SLOPE[type];
+  const tHot = tCold + dT;
+  const tFuel = tHot + T_FUEL_RISE_AT_FULL[type] * (power / 100);
+  const band = DT_BAND[type];
+  return { dT, tCold, tHot, tFuel, inBand: dT >= band.lo && dT <= band.hi };
+}
+
+/**
+ * Bench only. A designed plant uses its own full-power ΔT. A bare type keeps DT_AT_UNIT.
+ * Everyone else stays on thermalState, so a type and a design that share a type still match.
+ */
+export function benchThermal(plant: PlantType | PlantDesign, run: RunPoint): ThermalState {
+  const type: PlantType = typeof plant === "string" ? plant : plant.type;
   const unit = typeof plant === "string" ? DT_AT_UNIT[type] : plant.dT;
+  const power = Math.max(0, run.powerPct);
+  const flow = run.flowPct;
   const dT = (power / Math.max(40, flow)) * unit;
   const tCold = T_COLD_AT_FLOW100[type] - (flow - 100) * T_COLD_SLOPE[type];
   const tHot = tCold + dT;

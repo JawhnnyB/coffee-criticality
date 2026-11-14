@@ -1,4 +1,4 @@
-import { DT_BAND, thermalState, type PlantDesign, type PlantType } from "./plant";
+import { DT_BAND, benchThermal, type PlantDesign, type PlantType } from "./plant";
 
 /** Seconds the ΔT band must be held. Same number the bench shows. */
 export const BENCH_HOLD: Record<PlantType, number> = { pwr: 8, bwr: 8, pebble: 8, msr: 8 };
@@ -41,7 +41,7 @@ export function stepBench(frame: BenchFrame): BenchResult {
   const type: PlantType = typeof frame.plant === "string" ? frame.plant : frame.plant.type;
   const next = frame.power + (frame.rods - frame.power) * frame.dt * 0.45;
   const band = DT_BAND[type];
-  const ts = thermalState(frame.plant, { powerPct: next, flowPct: frame.flow });
+  const ts = benchThermal(frame.plant, { powerPct: next, flowPct: frame.flow });
   if (ts.dT > band.hi * 1.45 || ts.tHot > SCRAM_HOT[type] || next > 114) {
     return {
       power: next,
