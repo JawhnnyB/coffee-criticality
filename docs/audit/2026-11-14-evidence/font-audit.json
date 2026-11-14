@@ -1,5 +1,5 @@
 {
-  "url": "http://127.0.0.1:8080/",
+  "url": "http://127.0.0.1:8094/",
   "palette": [
     {
       "fg": "ink",
@@ -151,7 +151,7 @@
       "stages": [
         {
           "name": "title",
-          "nodes": 0,
+          "nodes": 5,
           "skipped": 0,
           "violationCount": 0
         },
@@ -168,528 +168,14 @@
           "violationCount": 0
         },
         {
-          "name": "news",
-          "nodes": 16,
-          "skipped": 0,
-          "violationCount": 0
-        }
-      ],
-      "violations": [],
-      "usedPairs": [
-        {
-          "color": "rgb(181, 164, 140)",
-          "background": "rgb(34, 28, 22)",
-          "ratio": 6.95,
-          "count": 1,
-          "sample": "Lake Master teaching plant"
-        },
-        {
-          "color": "rgb(243, 230, 208)",
-          "background": "rgb(34, 28, 22)",
-          "ratio": 13.68,
-          "count": 1,
-          "sample": "Coffee & Criticality"
-        },
-        {
-          "color": "rgb(243, 230, 208)",
-          "background": "rgb(42, 22, 16)",
-          "ratio": 13.96,
-          "count": 1,
-          "sample": "SOUND ON"
-        },
-        {
-          "color": "rgb(181, 164, 140)",
-          "background": "rgb(22, 17, 13)",
-          "ratio": 7.73,
-          "count": 6,
-          "sample": "NEW SHIFT · SETUP"
-        },
-        {
-          "color": "rgb(243, 230, 208)",
-          "background": "rgb(22, 17, 13)",
-          "ratio": 15.21,
-          "count": 3,
-          "sample": "Set the shift"
-        },
-        {
-          "color": "rgb(243, 230, 208)",
-          "background": "rgb(42, 34, 27)",
-          "ratio": 12.69,
-          "count": 6,
-          "sample": "Spring"
-        },
-        {
-          "color": "rgb(22, 17, 13)",
-          "background": "rgb(196, 120, 58)",
-          "ratio": 5.44,
-          "count": 4,
-          "sample": "Fall"
-        },
-        {
-          "color": "rgb(201, 162, 39)",
-          "background": "rgb(22, 17, 13)",
-          "ratio": 7.75,
-          "count": 1,
-          "sample": "Pending verification"
-        },
-        {
-          "color": "rgb(26, 20, 16)",
-          "background": "rgb(243, 230, 208)",
-          "ratio": 14.8,
-          "count": 1,
-          "sample": "Continue to the desktop"
-        },
-        {
-          "color": "rgb(243, 230, 208)",
-          "background": "rgb(106, 74, 50)",
-          "ratio": 6.46,
-          "count": 8,
-          "sample": "Reactor Design"
-        },
-        {
-          "color": "rgb(220, 200, 170)",
-          "background": "rgb(58, 40, 24)",
-          "ratio": 8.61,
-          "count": 2,
-          "sample": "Fall"
-        },
-        {
-          "color": "rgb(243, 230, 208)",
-          "background": "rgb(58, 40, 24)",
-          "ratio": 11.39,
-          "count": 5,
-          "sample": "SOUND ON"
-        },
-        {
-          "color": "rgb(22, 17, 13)",
-          "background": "rgb(243, 230, 208)",
-          "ratio": 15.21,
-          "count": 6,
-          "sample": "_"
-        }
-      ]
-    },
-    {
-      "w": 1440,
-      "h": 900,
-      "faces": {
-        "16px Pixelify Sans": true,
-        "20px CCPixel5x7": false,
-        "10px CCPixel3x5": false
-      },
-      "pageErrors": [],
-      "stages": [
-        {
-          "name": "title",
-          "nodes": 0,
-          "skipped": 0,
-          "violationCount": 0
-        },
-        {
-          "name": "setup",
-          "nodes": 21,
-          "skipped": 0,
-          "violationCount": 0
-        },
-        {
-          "name": "desktop",
-          "nodes": 8,
+          "name": "design",
+          "nodes": 40,
           "skipped": 0,
           "violationCount": 0
         },
         {
           "name": "news",
           "nodes": 16,
-          "skipped": 0,
-          "violationCount": 0
-        }
-      ],
-      "violations": [],
-      "usedPairs": [
-        {
-          "color": "rgb(181, 164, 140)",
-          "background": "rgb(34, 28, 22)",
-          "ratio": 6.95,
-          "count": 1,
-          "sample": "Lake Master teaching plant"
-        },
-        {
-          "color": "rgb(243, 230, 208)",
-          "background": "rgb(34, 28, 22)",
-          "ratio": 13.68,
-          "count": 1,
-          "sample": "Coffee & Criticality"
-        },
-        {
-          "color": "rgb(243, 230, 208)",
-          "background": "rgb(42, 22, 16)",
-          "ratio": 13.96,
-          "count": 1,
-          "sample": "SOUND ON"
-        },
-        {
-          "color": "rgb(181, 164, 140)",
-          "background": "rgb(22, 17, 13)",
-          "ratio": 7.73,
-          "count": 6,
-          "sample": "NEW SHIFT · SETUP"
-        },
-        {
-          "color": "rgb(243, 230, 208)",
-          "background": "rgb(22, 17, 13)",
-          "ratio": 15.21,
-          "count": 3,
-          "sample": "Set the shift"
-        },
-        {
-          "color": "rgb(243, 230, 208)",
-          "background": "rgb(42, 34, 27)",
-          "ratio": 12.69,
-          "count": 6,
-          "sample": "Spring"
-        },
-        {
-          "color": "rgb(22, 17, 13)",
-          "background": "rgb(196, 120, 58)",
-          "ratio": 5.44,
-          "count": 4,
-          "sample": "Fall"
-        },
-        {
-          "color": "rgb(201, 162, 39)",
-          "background": "rgb(22, 17, 13)",
-          "ratio": 7.75,
-          "count": 1,
-          "sample": "Pending verification"
-        },
-        {
-          "color": "rgb(26, 20, 16)",
-          "background": "rgb(243, 230, 208)",
-          "ratio": 14.8,
-          "count": 1,
-          "sample": "Continue to the desktop"
-        },
-        {
-          "color": "rgb(243, 230, 208)",
-          "background": "rgb(106, 74, 50)",
-          "ratio": 6.46,
-          "count": 8,
-          "sample": "Reactor Design"
-        },
-        {
-          "color": "rgb(220, 200, 170)",
-          "background": "rgb(58, 40, 24)",
-          "ratio": 8.61,
-          "count": 2,
-          "sample": "Fall"
-        },
-        {
-          "color": "rgb(243, 230, 208)",
-          "background": "rgb(58, 40, 24)",
-          "ratio": 11.39,
-          "count": 5,
-          "sample": "SOUND ON"
-        },
-        {
-          "color": "rgb(22, 17, 13)",
-          "background": "rgb(243, 230, 208)",
-          "ratio": 15.21,
-          "count": 6,
-          "sample": "_"
-        }
-      ]
-    },
-    {
-      "w": 1920,
-      "h": 1080,
-      "faces": {
-        "16px Pixelify Sans": true,
-        "20px CCPixel5x7": false,
-        "10px CCPixel3x5": false
-      },
-      "pageErrors": [],
-      "stages": [
-        {
-          "name": "title",
-          "nodes": 0,
-          "skipped": 0,
-          "violationCount": 0
-        },
-        {
-          "name": "setup",
-          "nodes": 21,
-          "skipped": 0,
-          "violationCount": 0
-        },
-        {
-          "name": "desktop",
-          "nodes": 8,
-          "skipped": 0,
-          "violationCount": 0
-        },
-        {
-          "name": "news",
-          "nodes": 16,
-          "skipped": 0,
-          "violationCount": 0
-        }
-      ],
-      "violations": [],
-      "usedPairs": [
-        {
-          "color": "rgb(181, 164, 140)",
-          "background": "rgb(34, 28, 22)",
-          "ratio": 6.95,
-          "count": 1,
-          "sample": "Lake Master teaching plant"
-        },
-        {
-          "color": "rgb(243, 230, 208)",
-          "background": "rgb(34, 28, 22)",
-          "ratio": 13.68,
-          "count": 1,
-          "sample": "Coffee & Criticality"
-        },
-        {
-          "color": "rgb(243, 230, 208)",
-          "background": "rgb(42, 22, 16)",
-          "ratio": 13.96,
-          "count": 1,
-          "sample": "SOUND ON"
-        },
-        {
-          "color": "rgb(181, 164, 140)",
-          "background": "rgb(22, 17, 13)",
-          "ratio": 7.73,
-          "count": 6,
-          "sample": "NEW SHIFT · SETUP"
-        },
-        {
-          "color": "rgb(243, 230, 208)",
-          "background": "rgb(22, 17, 13)",
-          "ratio": 15.21,
-          "count": 3,
-          "sample": "Set the shift"
-        },
-        {
-          "color": "rgb(243, 230, 208)",
-          "background": "rgb(42, 34, 27)",
-          "ratio": 12.69,
-          "count": 6,
-          "sample": "Spring"
-        },
-        {
-          "color": "rgb(22, 17, 13)",
-          "background": "rgb(196, 120, 58)",
-          "ratio": 5.44,
-          "count": 4,
-          "sample": "Fall"
-        },
-        {
-          "color": "rgb(201, 162, 39)",
-          "background": "rgb(22, 17, 13)",
-          "ratio": 7.75,
-          "count": 1,
-          "sample": "Pending verification"
-        },
-        {
-          "color": "rgb(26, 20, 16)",
-          "background": "rgb(243, 230, 208)",
-          "ratio": 14.8,
-          "count": 1,
-          "sample": "Continue to the desktop"
-        },
-        {
-          "color": "rgb(243, 230, 208)",
-          "background": "rgb(106, 74, 50)",
-          "ratio": 6.46,
-          "count": 8,
-          "sample": "Reactor Design"
-        },
-        {
-          "color": "rgb(220, 200, 170)",
-          "background": "rgb(58, 40, 24)",
-          "ratio": 8.61,
-          "count": 2,
-          "sample": "Fall"
-        },
-        {
-          "color": "rgb(243, 230, 208)",
-          "background": "rgb(58, 40, 24)",
-          "ratio": 11.39,
-          "count": 5,
-          "sample": "SOUND ON"
-        },
-        {
-          "color": "rgb(22, 17, 13)",
-          "background": "rgb(243, 230, 208)",
-          "ratio": 15.21,
-          "count": 6,
-          "sample": "_"
-        }
-      ]
-    },
-    {
-      "w": 768,
-      "h": 1024,
-      "faces": {
-        "16px Pixelify Sans": true,
-        "20px CCPixel5x7": false,
-        "10px CCPixel3x5": false
-      },
-      "pageErrors": [],
-      "stages": [
-        {
-          "name": "title",
-          "nodes": 0,
-          "skipped": 0,
-          "violationCount": 0
-        },
-        {
-          "name": "setup",
-          "nodes": 20,
-          "skipped": 0,
-          "violationCount": 0
-        },
-        {
-          "name": "desktop",
-          "nodes": 8,
-          "skipped": 0,
-          "violationCount": 0
-        },
-        {
-          "name": "news",
-          "nodes": 16,
-          "skipped": 0,
-          "violationCount": 0
-        }
-      ],
-      "violations": [],
-      "usedPairs": [
-        {
-          "color": "rgb(181, 164, 140)",
-          "background": "rgb(34, 28, 22)",
-          "ratio": 6.95,
-          "count": 1,
-          "sample": "Lake Master teaching plant"
-        },
-        {
-          "color": "rgb(243, 230, 208)",
-          "background": "rgb(34, 28, 22)",
-          "ratio": 13.68,
-          "count": 1,
-          "sample": "Coffee & Criticality"
-        },
-        {
-          "color": "rgb(243, 230, 208)",
-          "background": "rgb(42, 22, 16)",
-          "ratio": 13.96,
-          "count": 1,
-          "sample": "SOUND ON"
-        },
-        {
-          "color": "rgb(243, 230, 208)",
-          "background": "rgb(22, 17, 13)",
-          "ratio": 15.21,
-          "count": 3,
-          "sample": "Set the shift"
-        },
-        {
-          "color": "rgb(181, 164, 140)",
-          "background": "rgb(22, 17, 13)",
-          "ratio": 7.73,
-          "count": 5,
-          "sample": "Season"
-        },
-        {
-          "color": "rgb(243, 230, 208)",
-          "background": "rgb(42, 34, 27)",
-          "ratio": 12.69,
-          "count": 6,
-          "sample": "Spring"
-        },
-        {
-          "color": "rgb(22, 17, 13)",
-          "background": "rgb(196, 120, 58)",
-          "ratio": 5.44,
-          "count": 4,
-          "sample": "Fall"
-        },
-        {
-          "color": "rgb(201, 162, 39)",
-          "background": "rgb(22, 17, 13)",
-          "ratio": 7.75,
-          "count": 1,
-          "sample": "Pending verification"
-        },
-        {
-          "color": "rgb(26, 20, 16)",
-          "background": "rgb(243, 230, 208)",
-          "ratio": 14.8,
-          "count": 1,
-          "sample": "Continue to the desktop"
-        },
-        {
-          "color": "rgb(243, 230, 208)",
-          "background": "rgb(106, 74, 50)",
-          "ratio": 6.46,
-          "count": 8,
-          "sample": "Reactor Design"
-        },
-        {
-          "color": "rgb(220, 200, 170)",
-          "background": "rgb(58, 40, 24)",
-          "ratio": 8.61,
-          "count": 2,
-          "sample": "Fall"
-        },
-        {
-          "color": "rgb(243, 230, 208)",
-          "background": "rgb(58, 40, 24)",
-          "ratio": 11.39,
-          "count": 5,
-          "sample": "SOUND ON"
-        },
-        {
-          "color": "rgb(22, 17, 13)",
-          "background": "rgb(243, 230, 208)",
-          "ratio": 15.21,
-          "count": 6,
-          "sample": "_"
-        }
-      ]
-    },
-    {
-      "w": 390,
-      "h": 844,
-      "faces": {
-        "16px Pixelify Sans": true,
-        "20px CCPixel5x7": false,
-        "10px CCPixel3x5": false
-      },
-      "pageErrors": [],
-      "stages": [
-        {
-          "name": "title",
-          "nodes": 4,
-          "skipped": 0,
-          "violationCount": 0
-        },
-        {
-          "name": "setup",
-          "nodes": 19,
-          "skipped": 0,
-          "violationCount": 0
-        },
-        {
-          "name": "desktop",
-          "nodes": 10,
-          "skipped": 0,
-          "violationCount": 0
-        },
-        {
-          "name": "news",
-          "nodes": 6,
           "skipped": 0,
           "violationCount": 0
         }
@@ -707,7 +193,7 @@
           "color": "rgb(243, 230, 208)",
           "background": "rgb(22, 17, 13)",
           "ratio": 15.21,
-          "count": 5,
+          "count": 12,
           "sample": "Continue"
         },
         {
@@ -735,7 +221,635 @@
           "color": "rgb(181, 164, 140)",
           "background": "rgb(22, 17, 13)",
           "ratio": 7.73,
+          "count": 10,
+          "sample": "NEW SHIFT · SETUP"
+        },
+        {
+          "color": "rgb(243, 230, 208)",
+          "background": "rgb(42, 34, 27)",
+          "ratio": 12.69,
+          "count": 7,
+          "sample": "Spring"
+        },
+        {
+          "color": "rgb(22, 17, 13)",
+          "background": "rgb(196, 120, 58)",
+          "ratio": 5.44,
           "count": 5,
+          "sample": "Fall"
+        },
+        {
+          "color": "rgb(201, 162, 39)",
+          "background": "rgb(22, 17, 13)",
+          "ratio": 7.75,
+          "count": 1,
+          "sample": "Pending verification"
+        },
+        {
+          "color": "rgb(243, 230, 208)",
+          "background": "rgb(106, 74, 50)",
+          "ratio": 6.46,
+          "count": 12,
+          "sample": "Reactor Design"
+        },
+        {
+          "color": "rgb(243, 230, 208)",
+          "background": "rgb(58, 40, 24)",
+          "ratio": 11.39,
+          "count": 11,
+          "sample": "Fall"
+        },
+        {
+          "color": "rgb(22, 17, 13)",
+          "background": "rgb(243, 230, 208)",
+          "ratio": 15.21,
+          "count": 8,
+          "sample": "_"
+        },
+        {
+          "color": "rgb(107, 143, 113)",
+          "background": "rgb(22, 17, 13)",
+          "ratio": 5.17,
+          "count": 5,
+          "sample": "UNIT 1 · PRIYA ·"
+        },
+        {
+          "color": "rgb(58, 40, 24)",
+          "background": "rgb(243, 230, 208)",
+          "ratio": 11.39,
+          "count": 1,
+          "sample": "Dr. Priya Sharm"
+        },
+        {
+          "color": "rgb(181, 164, 140)",
+          "background": "rgb(11, 10, 9)",
+          "ratio": 8.15,
+          "count": 4,
+          "sample": "This site ·"
+        },
+        {
+          "color": "rgb(243, 230, 208)",
+          "background": "rgb(11, 10, 9)",
+          "ratio": 16.05,
+          "count": 8,
+          "sample": "·"
+        }
+      ]
+    },
+    {
+      "w": 1440,
+      "h": 900,
+      "faces": {
+        "16px Pixelify Sans": true,
+        "20px CCPixel5x7": false,
+        "10px CCPixel3x5": false
+      },
+      "pageErrors": [],
+      "stages": [
+        {
+          "name": "title",
+          "nodes": 5,
+          "skipped": 0,
+          "violationCount": 0
+        },
+        {
+          "name": "setup",
+          "nodes": 21,
+          "skipped": 0,
+          "violationCount": 0
+        },
+        {
+          "name": "desktop",
+          "nodes": 8,
+          "skipped": 0,
+          "violationCount": 0
+        },
+        {
+          "name": "design",
+          "nodes": 42,
+          "skipped": 0,
+          "violationCount": 0
+        },
+        {
+          "name": "news",
+          "nodes": 16,
+          "skipped": 0,
+          "violationCount": 0
+        }
+      ],
+      "violations": [],
+      "usedPairs": [
+        {
+          "color": "rgb(26, 20, 16)",
+          "background": "rgb(243, 230, 208)",
+          "ratio": 14.8,
+          "count": 3,
+          "sample": "Begin"
+        },
+        {
+          "color": "rgb(243, 230, 208)",
+          "background": "rgb(22, 17, 13)",
+          "ratio": 15.21,
+          "count": 11,
+          "sample": "Continue"
+        },
+        {
+          "color": "rgb(181, 164, 140)",
+          "background": "rgb(34, 28, 22)",
+          "ratio": 6.95,
+          "count": 1,
+          "sample": "Lake Master teaching plant"
+        },
+        {
+          "color": "rgb(243, 230, 208)",
+          "background": "rgb(34, 28, 22)",
+          "ratio": 13.68,
+          "count": 1,
+          "sample": "Coffee & Criticality"
+        },
+        {
+          "color": "rgb(243, 230, 208)",
+          "background": "rgb(42, 22, 16)",
+          "ratio": 13.96,
+          "count": 1,
+          "sample": "SOUND ON"
+        },
+        {
+          "color": "rgb(181, 164, 140)",
+          "background": "rgb(22, 17, 13)",
+          "ratio": 7.73,
+          "count": 10,
+          "sample": "NEW SHIFT · SETUP"
+        },
+        {
+          "color": "rgb(243, 230, 208)",
+          "background": "rgb(42, 34, 27)",
+          "ratio": 12.69,
+          "count": 8,
+          "sample": "Spring"
+        },
+        {
+          "color": "rgb(22, 17, 13)",
+          "background": "rgb(196, 120, 58)",
+          "ratio": 5.44,
+          "count": 5,
+          "sample": "Fall"
+        },
+        {
+          "color": "rgb(201, 162, 39)",
+          "background": "rgb(22, 17, 13)",
+          "ratio": 7.75,
+          "count": 1,
+          "sample": "Pending verification"
+        },
+        {
+          "color": "rgb(243, 230, 208)",
+          "background": "rgb(106, 74, 50)",
+          "ratio": 6.46,
+          "count": 12,
+          "sample": "Reactor Design"
+        },
+        {
+          "color": "rgb(243, 230, 208)",
+          "background": "rgb(58, 40, 24)",
+          "ratio": 11.39,
+          "count": 11,
+          "sample": "Fall"
+        },
+        {
+          "color": "rgb(22, 17, 13)",
+          "background": "rgb(243, 230, 208)",
+          "ratio": 15.21,
+          "count": 8,
+          "sample": "_"
+        },
+        {
+          "color": "rgb(107, 143, 113)",
+          "background": "rgb(22, 17, 13)",
+          "ratio": 5.17,
+          "count": 5,
+          "sample": "UNIT 1 · PRIYA ·"
+        },
+        {
+          "color": "rgb(58, 40, 24)",
+          "background": "rgb(243, 230, 208)",
+          "ratio": 11.39,
+          "count": 1,
+          "sample": "Dr. Priya Sharma"
+        },
+        {
+          "color": "rgb(181, 164, 140)",
+          "background": "rgb(11, 10, 9)",
+          "ratio": 8.15,
+          "count": 6,
+          "sample": "This site ·"
+        },
+        {
+          "color": "rgb(243, 230, 208)",
+          "background": "rgb(11, 10, 9)",
+          "ratio": 16.05,
+          "count": 8,
+          "sample": "·"
+        }
+      ]
+    },
+    {
+      "w": 1920,
+      "h": 1080,
+      "faces": {
+        "16px Pixelify Sans": true,
+        "20px CCPixel5x7": false,
+        "10px CCPixel3x5": false
+      },
+      "pageErrors": [],
+      "stages": [
+        {
+          "name": "title",
+          "nodes": 5,
+          "skipped": 0,
+          "violationCount": 0
+        },
+        {
+          "name": "setup",
+          "nodes": 21,
+          "skipped": 0,
+          "violationCount": 0
+        },
+        {
+          "name": "desktop",
+          "nodes": 8,
+          "skipped": 0,
+          "violationCount": 0
+        },
+        {
+          "name": "design",
+          "nodes": 42,
+          "skipped": 0,
+          "violationCount": 0
+        },
+        {
+          "name": "news",
+          "nodes": 16,
+          "skipped": 0,
+          "violationCount": 0
+        }
+      ],
+      "violations": [],
+      "usedPairs": [
+        {
+          "color": "rgb(26, 20, 16)",
+          "background": "rgb(243, 230, 208)",
+          "ratio": 14.8,
+          "count": 3,
+          "sample": "Begin"
+        },
+        {
+          "color": "rgb(243, 230, 208)",
+          "background": "rgb(22, 17, 13)",
+          "ratio": 15.21,
+          "count": 12,
+          "sample": "Continue"
+        },
+        {
+          "color": "rgb(181, 164, 140)",
+          "background": "rgb(34, 28, 22)",
+          "ratio": 6.95,
+          "count": 1,
+          "sample": "Lake Master teaching plant"
+        },
+        {
+          "color": "rgb(243, 230, 208)",
+          "background": "rgb(34, 28, 22)",
+          "ratio": 13.68,
+          "count": 1,
+          "sample": "Coffee & Criticality"
+        },
+        {
+          "color": "rgb(243, 230, 208)",
+          "background": "rgb(42, 22, 16)",
+          "ratio": 13.96,
+          "count": 1,
+          "sample": "SOUND ON"
+        },
+        {
+          "color": "rgb(181, 164, 140)",
+          "background": "rgb(22, 17, 13)",
+          "ratio": 7.73,
+          "count": 10,
+          "sample": "NEW SHIFT · SETUP"
+        },
+        {
+          "color": "rgb(243, 230, 208)",
+          "background": "rgb(42, 34, 27)",
+          "ratio": 12.69,
+          "count": 7,
+          "sample": "Spring"
+        },
+        {
+          "color": "rgb(22, 17, 13)",
+          "background": "rgb(196, 120, 58)",
+          "ratio": 5.44,
+          "count": 5,
+          "sample": "Fall"
+        },
+        {
+          "color": "rgb(201, 162, 39)",
+          "background": "rgb(22, 17, 13)",
+          "ratio": 7.75,
+          "count": 1,
+          "sample": "Pending verification"
+        },
+        {
+          "color": "rgb(243, 230, 208)",
+          "background": "rgb(106, 74, 50)",
+          "ratio": 6.46,
+          "count": 12,
+          "sample": "Reactor Design"
+        },
+        {
+          "color": "rgb(243, 230, 208)",
+          "background": "rgb(58, 40, 24)",
+          "ratio": 11.39,
+          "count": 11,
+          "sample": "Fall"
+        },
+        {
+          "color": "rgb(22, 17, 13)",
+          "background": "rgb(243, 230, 208)",
+          "ratio": 15.21,
+          "count": 8,
+          "sample": "_"
+        },
+        {
+          "color": "rgb(107, 143, 113)",
+          "background": "rgb(22, 17, 13)",
+          "ratio": 5.17,
+          "count": 5,
+          "sample": "UNIT 1 · PRIYA ·"
+        },
+        {
+          "color": "rgb(58, 40, 24)",
+          "background": "rgb(243, 230, 208)",
+          "ratio": 11.39,
+          "count": 1,
+          "sample": "Dr. Priya Sharm"
+        },
+        {
+          "color": "rgb(181, 164, 140)",
+          "background": "rgb(11, 10, 9)",
+          "ratio": 8.15,
+          "count": 6,
+          "sample": "This site ·"
+        },
+        {
+          "color": "rgb(243, 230, 208)",
+          "background": "rgb(11, 10, 9)",
+          "ratio": 16.05,
+          "count": 8,
+          "sample": "·"
+        }
+      ]
+    },
+    {
+      "w": 768,
+      "h": 1024,
+      "faces": {
+        "16px Pixelify Sans": true,
+        "20px CCPixel5x7": false,
+        "10px CCPixel3x5": false
+      },
+      "pageErrors": [],
+      "stages": [
+        {
+          "name": "title",
+          "nodes": 5,
+          "skipped": 0,
+          "violationCount": 0
+        },
+        {
+          "name": "setup",
+          "nodes": 20,
+          "skipped": 0,
+          "violationCount": 0
+        },
+        {
+          "name": "desktop",
+          "nodes": 8,
+          "skipped": 0,
+          "violationCount": 0
+        },
+        {
+          "name": "design",
+          "nodes": 38,
+          "skipped": 0,
+          "violationCount": 0
+        },
+        {
+          "name": "news",
+          "nodes": 16,
+          "skipped": 0,
+          "violationCount": 0
+        }
+      ],
+      "violations": [],
+      "usedPairs": [
+        {
+          "color": "rgb(26, 20, 16)",
+          "background": "rgb(243, 230, 208)",
+          "ratio": 14.8,
+          "count": 3,
+          "sample": "Begin"
+        },
+        {
+          "color": "rgb(243, 230, 208)",
+          "background": "rgb(22, 17, 13)",
+          "ratio": 15.21,
+          "count": 12,
+          "sample": "Continue"
+        },
+        {
+          "color": "rgb(181, 164, 140)",
+          "background": "rgb(34, 28, 22)",
+          "ratio": 6.95,
+          "count": 1,
+          "sample": "Lake Master teaching plant"
+        },
+        {
+          "color": "rgb(243, 230, 208)",
+          "background": "rgb(34, 28, 22)",
+          "ratio": 13.68,
+          "count": 1,
+          "sample": "Coffee & Criticality"
+        },
+        {
+          "color": "rgb(243, 230, 208)",
+          "background": "rgb(42, 22, 16)",
+          "ratio": 13.96,
+          "count": 1,
+          "sample": "SOUND ON"
+        },
+        {
+          "color": "rgb(181, 164, 140)",
+          "background": "rgb(22, 17, 13)",
+          "ratio": 7.73,
+          "count": 9,
+          "sample": "Season"
+        },
+        {
+          "color": "rgb(243, 230, 208)",
+          "background": "rgb(42, 34, 27)",
+          "ratio": 12.69,
+          "count": 7,
+          "sample": "Spring"
+        },
+        {
+          "color": "rgb(22, 17, 13)",
+          "background": "rgb(196, 120, 58)",
+          "ratio": 5.44,
+          "count": 5,
+          "sample": "Fall"
+        },
+        {
+          "color": "rgb(201, 162, 39)",
+          "background": "rgb(22, 17, 13)",
+          "ratio": 7.75,
+          "count": 1,
+          "sample": "Pending verification"
+        },
+        {
+          "color": "rgb(243, 230, 208)",
+          "background": "rgb(106, 74, 50)",
+          "ratio": 6.46,
+          "count": 12,
+          "sample": "Reactor Design"
+        },
+        {
+          "color": "rgb(243, 230, 208)",
+          "background": "rgb(58, 40, 24)",
+          "ratio": 11.39,
+          "count": 11,
+          "sample": "Fall"
+        },
+        {
+          "color": "rgb(22, 17, 13)",
+          "background": "rgb(243, 230, 208)",
+          "ratio": 15.21,
+          "count": 8,
+          "sample": "_"
+        },
+        {
+          "color": "rgb(107, 143, 113)",
+          "background": "rgb(22, 17, 13)",
+          "ratio": 5.17,
+          "count": 5,
+          "sample": "UNIT 1 · PRIYA ·"
+        },
+        {
+          "color": "rgb(58, 40, 24)",
+          "background": "rgb(243, 230, 208)",
+          "ratio": 11.39,
+          "count": 1,
+          "sample": "Dr. Priya Sharm"
+        },
+        {
+          "color": "rgb(181, 164, 140)",
+          "background": "rgb(11, 10, 9)",
+          "ratio": 8.15,
+          "count": 4,
+          "sample": "This site ·"
+        },
+        {
+          "color": "rgb(243, 230, 208)",
+          "background": "rgb(11, 10, 9)",
+          "ratio": 16.05,
+          "count": 6,
+          "sample": "·"
+        }
+      ]
+    },
+    {
+      "w": 390,
+      "h": 844,
+      "faces": {
+        "16px Pixelify Sans": true,
+        "20px CCPixel5x7": false,
+        "10px CCPixel3x5": false
+      },
+      "pageErrors": [],
+      "stages": [
+        {
+          "name": "title",
+          "nodes": 5,
+          "skipped": 0,
+          "violationCount": 0
+        },
+        {
+          "name": "setup",
+          "nodes": 19,
+          "skipped": 0,
+          "violationCount": 0
+        },
+        {
+          "name": "desktop",
+          "nodes": 12,
+          "skipped": 0,
+          "violationCount": 0
+        },
+        {
+          "name": "design",
+          "nodes": 21,
+          "skipped": 0,
+          "violationCount": 0
+        },
+        {
+          "name": "news",
+          "nodes": 6,
+          "skipped": 0,
+          "violationCount": 0
+        }
+      ],
+      "violations": [],
+      "usedPairs": [
+        {
+          "color": "rgb(26, 20, 16)",
+          "background": "rgb(243, 230, 208)",
+          "ratio": 14.8,
+          "count": 4,
+          "sample": "Begin"
+        },
+        {
+          "color": "rgb(243, 230, 208)",
+          "background": "rgb(22, 17, 13)",
+          "ratio": 15.21,
+          "count": 11,
+          "sample": "Continue"
+        },
+        {
+          "color": "rgb(181, 164, 140)",
+          "background": "rgb(34, 28, 22)",
+          "ratio": 6.95,
+          "count": 1,
+          "sample": "Lake Master teaching plant"
+        },
+        {
+          "color": "rgb(243, 230, 208)",
+          "background": "rgb(34, 28, 22)",
+          "ratio": 13.68,
+          "count": 1,
+          "sample": "Coffee & Criticality"
+        },
+        {
+          "color": "rgb(243, 230, 208)",
+          "background": "rgb(42, 22, 16)",
+          "ratio": 13.96,
+          "count": 1,
+          "sample": "SOUND ON"
+        },
+        {
+          "color": "rgb(181, 164, 140)",
+          "background": "rgb(22, 17, 13)",
+          "ratio": 7.73,
+          "count": 9,
           "sample": "Season"
         },
         {
@@ -767,18 +881,39 @@
           "sample": "Parlor OS"
         },
         {
-          "color": "rgb(22, 17, 13)",
-          "background": "rgb(243, 230, 208)",
-          "ratio": 15.21,
-          "count": 5,
-          "sample": "Back"
-        },
-        {
           "color": "rgb(243, 230, 208)",
           "background": "rgb(58, 40, 24)",
           "ratio": 11.39,
+          "count": 4,
+          "sample": "Fall"
+        },
+        {
+          "color": "rgb(22, 17, 13)",
+          "background": "rgb(243, 230, 208)",
+          "ratio": 15.21,
+          "count": 6,
+          "sample": "Back"
+        },
+        {
+          "color": "rgb(107, 143, 113)",
+          "background": "rgb(22, 17, 13)",
+          "ratio": 5.17,
+          "count": 5,
+          "sample": "UNIT 1 · PRIYA ·"
+        },
+        {
+          "color": "rgb(58, 40, 24)",
+          "background": "rgb(243, 230, 208)",
+          "ratio": 11.39,
           "count": 1,
-          "sample": "News"
+          "sample": "Dr. Priya Shar"
+        },
+        {
+          "color": "rgb(181, 164, 140)",
+          "background": "rgb(11, 10, 9)",
+          "ratio": 8.15,
+          "count": 3,
+          "sample": "This site ·"
         }
       ]
     }
@@ -836,6 +971,20 @@
   "violationCount": 0,
   "usedPairs": [
     {
+      "color": "rgb(26, 20, 16)",
+      "background": "rgb(243, 230, 208)",
+      "ratio": 14.8,
+      "count": 16,
+      "sample": "Begin"
+    },
+    {
+      "color": "rgb(243, 230, 208)",
+      "background": "rgb(22, 17, 13)",
+      "ratio": 15.21,
+      "count": 58,
+      "sample": "Continue"
+    },
+    {
       "color": "rgb(181, 164, 140)",
       "background": "rgb(34, 28, 22)",
       "ratio": 6.95,
@@ -860,28 +1009,21 @@
       "color": "rgb(181, 164, 140)",
       "background": "rgb(22, 17, 13)",
       "ratio": 7.73,
-      "count": 28,
+      "count": 48,
       "sample": "NEW SHIFT · SETUP"
-    },
-    {
-      "color": "rgb(243, 230, 208)",
-      "background": "rgb(22, 17, 13)",
-      "ratio": 15.21,
-      "count": 17,
-      "sample": "Set the shift"
     },
     {
       "color": "rgb(243, 230, 208)",
       "background": "rgb(42, 34, 27)",
       "ratio": 12.69,
-      "count": 29,
+      "count": 34,
       "sample": "Spring"
     },
     {
       "color": "rgb(22, 17, 13)",
       "background": "rgb(196, 120, 58)",
       "ratio": 5.44,
-      "count": 18,
+      "count": 22,
       "sample": "Fall"
     },
     {
@@ -892,39 +1034,53 @@
       "sample": "Pending verification"
     },
     {
-      "color": "rgb(26, 20, 16)",
-      "background": "rgb(243, 230, 208)",
-      "ratio": 14.8,
-      "count": 7,
-      "sample": "Continue to the desktop"
-    },
-    {
       "color": "rgb(243, 230, 208)",
       "background": "rgb(106, 74, 50)",
       "ratio": 6.46,
-      "count": 41,
+      "count": 57,
       "sample": "Reactor Design"
-    },
-    {
-      "color": "rgb(220, 200, 170)",
-      "background": "rgb(58, 40, 24)",
-      "ratio": 8.61,
-      "count": 8,
-      "sample": "Fall"
     },
     {
       "color": "rgb(243, 230, 208)",
       "background": "rgb(58, 40, 24)",
       "ratio": 11.39,
-      "count": 21,
-      "sample": "SOUND ON"
+      "count": 48,
+      "sample": "Fall"
     },
     {
       "color": "rgb(22, 17, 13)",
       "background": "rgb(243, 230, 208)",
       "ratio": 15.21,
-      "count": 29,
+      "count": 38,
       "sample": "_"
+    },
+    {
+      "color": "rgb(107, 143, 113)",
+      "background": "rgb(22, 17, 13)",
+      "ratio": 5.17,
+      "count": 25,
+      "sample": "UNIT 1 · PRIYA ·"
+    },
+    {
+      "color": "rgb(58, 40, 24)",
+      "background": "rgb(243, 230, 208)",
+      "ratio": 11.39,
+      "count": 5,
+      "sample": "Dr. Priya Sharm"
+    },
+    {
+      "color": "rgb(181, 164, 140)",
+      "background": "rgb(11, 10, 9)",
+      "ratio": 8.15,
+      "count": 23,
+      "sample": "This site ·"
+    },
+    {
+      "color": "rgb(243, 230, 208)",
+      "background": "rgb(11, 10, 9)",
+      "ratio": 16.05,
+      "count": 30,
+      "sample": "·"
     }
   ]
 }

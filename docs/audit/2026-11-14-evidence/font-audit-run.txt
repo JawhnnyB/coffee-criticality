@@ -1,0 +1,7 @@
+{"w":1280,"h":720,"violations":0,"pageErrors":0,"stages":["title:5/0","setup:21/0","desktop:8/0","design:40/0","news:16/0"]}
+{"w":1440,"h":900,"violations":0,"pageErrors":0,"stages":["title:5/0","setup:21/0","desktop:8/0","design:42/0","news:16/0"]}
+{"w":1920,"h":1080,"violations":0,"pageErrors":0,"stages":["title:5/0","setup:21/0","desktop:8/0","design:42/0","news:16/0"]}
+{"w":768,"h":1024,"violations":0,"pageErrors":0,"stages":["title:5/0","setup:20/0","desktop:8/0","design:38/0","news:16/0"]}
+{"w":390,"h":844,"violations":0,"pageErrors":0,"stages":["title:5/0","setup:19/0","desktop:12/0","design:21/0","news:6/0"]}
+Font audit: 0 text violations, 0 on-screen colour pairs under 4.5:1, 6 listed palette pairs under 4.5:1, across 5 viewports.
+EXIT:0

@@ -1,0 +1,35 @@
+{"scene":"title","width":1280,"ok":true,"note":"Begin fully on screen y=422 h=45 bottom=467","pageErrors":0,"consoleErrors":0}
+{"scene":"new-shift","width":1280,"ok":true,"note":"Continue on screen y=510 bottom=557. Desktop open.","pageErrors":0,"consoleErrors":0}
+{"scene":"reactor-design","width":1280,"ok":true,"note":"schematic null windows [{\"id\":\"window-design\",\"x\":136,\"y\":36,\"r\":1058,\"b\":571,\"under\":false,\"off\":false}] icons overlap false","pageErrors":0,"consoleErrors":0}
+{"scene":"reactor-control","width":1280,"ok":true,"note":"slider clicked at 70%. [{\"id\":\"window-control\",\"x\":136,\"y\":16,\"r\":1096,\"b\":656,\"under\":false,\"off\":false}] bar 686","pageErrors":0,"consoleErrors":0}
+{"scene":"core-cam","width":1280,"ok":true,"note":"PWR · 1100 MWe · ΔT 32 °C · 15.5 MPa · liquid water Teaching view. Glow shows fuel activity and core temperature. Not a measurement. Classroom proxy k 0.978. Core health 60. Below  box [{\"id\":\"window-control\",\"x\":136,\"y\":16,\"r\":1096,\"b\":656","pageErrors":0,"consoleErrors":0}
+{"scene":"results","width":1280,"ok":true,"note":"{\"css\":16,\"ink\":16,\"family\":\"\\\"Pixelify Sans\\\", sans-serif\",\"text\":\"Results\"} Results Core health 60 Time in band 40% 0.0 No open incident 20% 100 Residue clean 20% 100 Classroom k 20% 99.7 What to look at Time in band","pageErrors":0,"consoleErrors":0}
+{"scene":"core-map","width":1280,"ok":true,"note":"horizontal scroll false. grid fits.","pageErrors":0,"consoleErrors":0}
+{"scene":"news","width":1280,"ok":true,"note":"World: The wire is quiet. Nothing has come in for this shift. Local: The plant paper is blank today. clock {\"css\":14,\"ink\":14,\"family\":\"\\\"Pixelify Sans\\\", sans-serif\",\"text\":\"6:52 AM\"} icons [{\"id\":\"icon-design\",\"t\":\"Reactor Design\",\"y\":12,","pageErrors":0,"consoleErrors":0}
+{"scene":"cafe","width":1280,"ok":true,"note":"06:52 D1 MORNING LESS CRITICALITY CAFE HONEST Sit with Mabel. Don't r.","pageErrors":0,"consoleErrors":0}
+{"scene":"mabel","width":1280,"ok":true,"note":"Dialogue open: 06:52 · Criticality Cafe · clock frozen Mabel Cafe / retired floor Cup, then chalk. She poured before you spoke. Chalk only moves for a catch. Cup's poured. Sit","pageErrors":0,"consoleErrors":0}
+{"scene":"lot","width":1280,"ok":true,"note":"Lot on foot. Not dusk. 06:56 D1 MORNING LESS LOT / CAMPUS HONEST East through Plant. The.","pageErrors":0,"consoleErrors":0}
+{"scene":"control-room","width":1280,"ok":true,"note":"07:05 D1 MORNING LESS CONTROL ROOM HONEST Control Room — Holt wan.","pageErrors":0,"consoleErrors":0}
+{"scene":"second-person","width":1280,"ok":true,"note":"07:06 · Control room · clock frozen Holt Director Ink already spent. He funds the line. He will not fund the introduction. Skip the hello. T","pageErrors":0,"consoleErrors":0}
+{"scene":"paper-log","width":1280,"ok":false,"note":"log not in range. hud 07:08 D1 MORNING LESS CONTROL ROOM HONEST Meet the floor — Elena,.","pageErrors":0,"consoleErrors":0}
+{"scene":"catch","width":1280,"ok":false,"note":"incident paper did not open","pageErrors":0,"consoleErrors":0}
+{"scene":"load-cab","width":1280,"ok":false,"note":"LOAD.CAB not reached. hud 07:15 D1 MORNING LESS LOT / CAMPUS HONEST Meet the floor — Elena,.","pageErrors":0,"consoleErrors":0}
+{"scene":"hide","width":1280,"ok":false,"note":"no incident on the second run. hud 07:00 D1 MORNING LESS LOT / CAMPUS HONEST Sit with Mabel. Don't r.","pageErrors":0,"consoleErrors":0}
+{"scene":"title","width":390,"ok":true,"note":"Begin fully on screen y=582 h=45 bottom=627","pageErrors":0,"consoleErrors":0}
+{"scene":"new-shift","width":390,"ok":true,"note":"Continue on screen y=600 bottom=647. Desktop open.","pageErrors":0,"consoleErrors":0}
+{"scene":"reactor-design","width":390,"ok":true,"note":"schematic null windows [] icons overlap false","pageErrors":0,"consoleErrors":0}
+{"scene":"reactor-control","width":390,"ok":true,"note":"slider clicked at 70%. [] bar null","pageErrors":0,"consoleErrors":0}
+{"scene":"core-cam","width":390,"ok":true,"note":"PWR · 1100 MWe · ΔT 32 °C · 15.5 MPa · liquid water Teaching view. Glow shows fuel activity and core temperature. Not a measurement. Classroom proxy k 0.978. Core health 60. Below  box []","pageErrors":0,"consoleErrors":0}
+{"scene":"results","width":390,"ok":true,"note":"{\"css\":16,\"ink\":16,\"family\":\"\\\"Pixelify Sans\\\", sans-serif\",\"text\":\"Results\"} Results Core health 60 Time in band 40% 0.0 No open incident 20% 100 Residue clean 20% 100 Classroom k 20% 99.7 What to look at Time in band","pageErrors":0,"consoleErrors":0}
+{"scene":"core-map","width":390,"ok":true,"note":"horizontal scroll false. grid fits.","pageErrors":0,"consoleErrors":0}
+{"scene":"news","width":390,"ok":true,"note":"World: The wire is quiet. Nothing has come in for this shift. Local: The plant paper is blank today. clock null icons [] overlap false","pageErrors":0,"consoleErrors":0}
+{"scene":"cafe","width":390,"ok":true,"note":"06:52 D1 MORNING MORE CRITICALITY CAFE","pageErrors":0,"consoleErrors":0}
+{"scene":"mabel","width":390,"ok":true,"note":"Dialogue open: 06:52 · Criticality Cafe · clock frozen Mabel Cafe / retired floor Cup, then chalk. She poured before you spoke. Chalk only moves for a catch. Cup's poured. Sit","pageErrors":0,"consoleErrors":0}
+{"scene":"lot","width":390,"ok":true,"note":"Lot on foot. Not dusk. 06:56 D1 MORNING MORE LOT / CAMPUS","pageErrors":0,"consoleErrors":0}
+{"scene":"control-room","width":390,"ok":true,"note":"07:05 D1 MORNING MORE CONTROL ROOM","pageErrors":0,"consoleErrors":0}
+{"scene":"second-person","width":390,"ok":true,"note":"07:05 · Control room · clock frozen Holt Director Ink already spent. He funds the line. He will not fund the introduction. Skip the hello. T","pageErrors":0,"consoleErrors":0}
+{"scene":"paper-log","width":390,"ok":false,"note":"log not in range. hud 07:07 D1 MORNING MORE CONTROL ROOM","pageErrors":0,"consoleErrors":0}
+{"scene":"catch","width":390,"ok":false,"note":"incident paper did not open","pageErrors":0,"consoleErrors":0}
+{"scene":"load-cab","width":390,"ok":false,"note":"LOAD.CAB not reached. hud ","pageErrors":0,"consoleErrors":0}
+scenes 33 failed 7
+PLAY_EXIT:1

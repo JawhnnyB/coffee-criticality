@@ -1,0 +1,24 @@
+URL http://127.0.0.1:8094/
+--- 1280x720 title ---
+[data-testid=new-shift] text="Begin" family="Pixelify Sans" size=16px color=rgb(26, 20, 16)
+[data-testid=continue-shift] text="Continue" family="Pixelify Sans" size=16px color=rgb(243, 230, 208)
+[data-testid=menu-settings] text="Settings" family="Pixelify Sans" size=16px color=rgb(243, 230, 208)
+[data-testid=mute] text="Sound on" family="Pixelify Sans" size=16px color=rgb(243, 230, 208)
+footer text="Teaching model, not a license" family="Pixelify Sans" size=14px
+--- 1280x720 taskbar ---
+[data-testid=desk-season] text="Fall" family="Pixelify Sans" size=14px color=rgb(243, 230, 208)
+[data-testid=desk-clock] text="6:52 AM" family="Pixelify Sans" size=14px color=rgb(243, 230, 208)
+.teach-kicker text="This site · PWR — this site · teaching only" family="Pixelify Sans" size=14px color=rgb(181, 164, 140)
+.teach-meta text="UNIT 1 · PRIYA · 1/7 · teaching only" family="Pixelify Sans" size=14px color=rgb(107, 143, 113)
+URL http://127.0.0.1:8094/
+--- 390x844 title ---
+[data-testid=new-shift] text="Begin" family="Pixelify Sans" size=16px color=rgb(26, 20, 16)
+[data-testid=continue-shift] text="Continue" family="Pixelify Sans" size=16px color=rgb(243, 230, 208)
+[data-testid=menu-settings] text="Settings" family="Pixelify Sans" size=16px color=rgb(243, 230, 208)
+[data-testid=mute] text="Sound on" family="Pixelify Sans" size=16px color=rgb(243, 230, 208)
+footer text="Teaching model, not a license" family="Pixelify Sans" size=14px
+--- 390x844 taskbar ---
+[data-testid=desk-season] text="Fall" family="Pixelify Sans" size=14px color=rgb(243, 230, 208)
+[data-testid=desk-clock] text="6:52 AM" family="Pixelify Sans" size=14px color=rgb(243, 230, 208)
+.teach-kicker text="This site · PWR — this site · teaching only" family="Pixelify Sans" size=14px color=rgb(181, 164, 140)
+.teach-meta text="UNIT 1 · PRIYA · 1/7 · teaching only" family="Pixelify Sans" size=14px color=rgb(107, 143, 113)

@@ -1,0 +1,5 @@
+{"w":1280,"h":720,"begin":1,"pageErrors":0,"consoleErrors":0,"react419":false,"mime":false,"pageErrorText":[],"consoleErrorText":[]}
+{"w":1440,"h":900,"begin":1,"pageErrors":0,"consoleErrors":0,"react419":false,"mime":false,"pageErrorText":[],"consoleErrorText":[]}
+{"w":1920,"h":1080,"begin":1,"pageErrors":0,"consoleErrors":0,"react419":false,"mime":false,"pageErrorText":[],"consoleErrorText":[]}
+{"w":768,"h":1024,"begin":1,"pageErrors":0,"consoleErrors":0,"react419":false,"mime":false,"pageErrorText":[],"consoleErrorText":[]}
+{"w":390,"h":844,"begin":1,"pageErrors":0,"consoleErrors":0,"react419":false,"mime":false,"pageErrorText":[],"consoleErrorText":[]}
