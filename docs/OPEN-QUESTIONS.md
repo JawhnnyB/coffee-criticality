@@ -46,6 +46,14 @@ Options: follow the old line (steam off after any resolution), or follow the tab
 
 Default used: follow the table. `maintenanceSteamOn` in `src/game/steamRule.ts` is `day === 1 && valve !== "caught"`. `incidentResolved` and residue are not redefined. The pictures of a caught room, a hid room, and day 2 were not walked, so those stills stay unverified.
 
+## DELAY LAMBDA on main (D1)
+
+Question: commit `5e9f1e6` on `main` changed frozen behavior. `LAMBDA` went from 0.055 to 0.005. `N_MAX` is clamped at 40. A CATCH win no longer does `s.catches += 1`, and that cabinet's culture pay is once per day. The commit title also says host trust changed (a good bowl pays Jordan, a good golf pays Mabel).
+
+Options: the owner approves each line, or reverts each line. This branch does not do either.
+
+Default used: do not revert, and do not extend. `docs/REVIEW.md` names `LAMBDA` and does not state a value, so a row that cites 0.055 as the frozen number stays unverified.
+
 ## Whether type and the chair merge before the playthrough
 
 Question: may the type work and the control-room chair merge while hide, LOAD.CAB, and the dusk lot are still unverified?
