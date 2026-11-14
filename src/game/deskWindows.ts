@@ -5,7 +5,7 @@
 
 export const MIN_W = 240;
 export const MIN_H = 160;
-export const TITLE_H = 22;
+export const TITLE_H = 30;
 export const TASKBAR_H = 34;
 
 export interface Screen {
@@ -83,10 +83,11 @@ export function focusedWin(list: WinState[]): WinState | null {
   return best;
 }
 
-/** Where a new window opens: a small cascade, always on screen. */
+/** Where a new window opens: a small cascade, to the right of the icon column, always on screen. */
 export function cascadeAt(list: WinState[], screen: Screen, w: number, h: number): { x: number; y: number } {
   const n = list.length % 6;
-  const x = Math.min(Math.max(0, screen.w - w), 40 + n * 24);
+  const iconGutter = 136;
+  const x = Math.min(Math.max(0, screen.w - w), iconGutter + n * 24);
   const y = Math.min(Math.max(0, screen.h - TASKBAR_H - TITLE_H - h), 36 + n * 24);
   return { x, y };
 }

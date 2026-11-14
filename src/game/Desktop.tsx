@@ -276,7 +276,7 @@ export function Desktop(props: DesktopProps) {
       style={
         {
           background: info.wall,
-          fontFamily: "CCPixel3x5, monospace",
+          fontFamily: "var(--font-body)",
           color: PAL.ink,
           ["--accent" as string]: d.accent,
           ["--ui-scale" as string]: String(d.textScale),
@@ -498,16 +498,16 @@ function DeskIcon({ app, onOpen }: { app: AppDef; onOpen: () => void }) {
       className="flex flex-col items-center gap-1"
       style={{
         color: PAL.cream,
-        fontFamily: "CCPixel3x5, monospace",
-        fontSize: 20,
-        lineHeight: "22px",
+        fontFamily: "var(--font-body)",
+        fontSize: "var(--text-small)",
+        lineHeight: "1.3",
         textShadow: `1px 1px 0 ${PAL.ink}`,
         background: "transparent",
         width: 108,
       }}
     >
       <AppIcon app={app} />
-      <span style={{ display: "block", width: "100%", textAlign: "center", lineHeight: "22px" }}>{app.title}</span>
+      <span style={{ display: "block", width: "100%", textAlign: "center", lineHeight: "1.3" }}>{app.title}</span>
     </button>
   );
 }
@@ -581,7 +581,7 @@ function WindowFrame({
           drag.current = null;
         }}
         className="flex select-none items-center justify-between gap-2 px-2"
-        style={{ height: TITLE_H, background: PAL.woodDark, color: PAL.cream, fontFamily: "CCPixel3x5, monospace", fontSize: 20, lineHeight: "20px", touchAction: "none", cursor: "move" }}
+        style={{ height: TITLE_H, background: PAL.woodDark, color: PAL.cream, fontFamily: "var(--font-title)", fontSize: "var(--text-title-sm)", lineHeight: "30px", touchAction: "none", cursor: "move" }}
       >
         <span className="truncate">{win.title}</span>
         <span className="flex gap-1">
@@ -602,14 +602,15 @@ function WindowFrame({
 
 const chromeBtn: CSSProperties = {
   width: 22,
-  height: 18,
+  height: 22,
   background: PAL.cream,
   color: PAL.ink,
   border: `1px solid ${PAL.ink}`,
-  fontFamily: "CCPixel3x5, monospace",
-  fontSize: 16,
-  lineHeight: "16px",
+  fontFamily: "var(--font-tag)",
+  fontSize: "var(--text-tag)",
+  lineHeight: "20px",
   cursor: "pointer",
+  padding: 0,
 };
 
 function Taskbar({
@@ -642,14 +643,14 @@ function Taskbar({
     <nav
       aria-label="Taskbar"
       className="absolute inset-x-0 bottom-0 flex items-center gap-2 px-2"
-      style={{ height: TASKBAR_H, background: taskbar, color: PAL.cream, borderTop: `2px solid ${PAL.outline}`, fontFamily: "CCPixel3x5, monospace", fontSize: 20, lineHeight: "22px" }}
+      style={{ height: TASKBAR_H, background: taskbar, color: PAL.cream, borderTop: `2px solid ${PAL.outline}`, fontFamily: "var(--font-tag)", fontSize: "var(--text-tag-sm)", lineHeight: "1" }}
     >
       <button
         type="button"
         onClick={onStart}
         aria-expanded={startOpen}
         data-testid="start-button"
-        style={{ height: 26, padding: "0 10px", background: PAL.copper, color: PAL.ink, border: `2px solid ${PAL.outline}`, fontFamily: "CCPixel3x5, monospace", fontSize: 20, lineHeight: "20px", cursor: "pointer" }}
+        style={{ height: 26, padding: "0 10px", background: PAL.copper, color: PAL.ink, border: `2px solid ${PAL.outline}`, fontFamily: "var(--font-body)", fontSize: "var(--text-small)", lineHeight: "1.2", cursor: "pointer" }}
       >
         Start
       </button>
@@ -668,9 +669,9 @@ function Taskbar({
               background: focusedId === w.id && !w.minimized ? PAL.surface : "transparent",
               color: PAL.cream,
               border: `1px solid ${w.minimized ? PAL.ash : PAL.cream}`,
-              fontFamily: "CCPixel3x5, monospace",
-              fontSize: 20,
-              lineHeight: "20px",
+              fontFamily: "var(--font-body)",
+              fontSize: "var(--text-small)",
+              lineHeight: "1.2",
               cursor: "pointer",
             }}
           >
@@ -678,13 +679,13 @@ function Taskbar({
           </button>
         ))}
       </div>
-      <span style={{ color: PAL.creamD }}>{season}</span>
+      <span style={{ color: PAL.creamD, textTransform: "uppercase" }}>{season}</span>
       <button
         type="button"
         onClick={onSound}
         data-testid="desk-sound"
         aria-label={muted ? "Sound off" : "Sound on"}
-        style={{ height: 26, padding: "0 6px", background: "transparent", color: PAL.cream, border: `1px solid ${PAL.cream}`, fontFamily: "CCPixel3x5, monospace", fontSize: 20, lineHeight: "20px", cursor: "pointer" }}
+        style={{ height: 26, padding: "0 6px", background: "transparent", color: PAL.cream, border: `1px solid ${PAL.cream}`, fontFamily: "var(--font-body)", fontSize: "var(--text-small)", lineHeight: "1.2", cursor: "pointer" }}
       >
         {muted ? "SOUND OFF" : "SOUND ON"}
       </button>
@@ -729,7 +730,7 @@ function StartMenu({
             aria-label={app.title}
             onClick={() => onOpen(app)}
             className="flex flex-col items-center gap-1"
-            style={{ background: "transparent", color: PAL.ink, fontFamily: "CCPixel3x5, monospace", fontSize: 12, cursor: "pointer" }}
+            style={{ background: "transparent", color: PAL.ink, fontFamily: "var(--font-body)", fontSize: "var(--text-small)", minHeight: 44, cursor: "pointer" }}
           >
             <AppIcon app={app} />
             <span className="text-center leading-tight">{app.title}</span>
@@ -742,15 +743,15 @@ function StartMenu({
         </button>
         {hasShift ? (
           <>
-            <button type="button" role="menuitem" onClick={onSave} className="btn-ghost">
+            <button type="button" role="menuitem" onClick={onSave} className="btn-ghost" style={{ color: PAL.ink, borderColor: PAL.ink }}>
               Save shift
             </button>
-            <button type="button" role="menuitem" onClick={onLeave} className="btn-ghost">
+            <button type="button" role="menuitem" onClick={onLeave} className="btn-ghost" style={{ color: PAL.ink, borderColor: PAL.ink }}>
               Back to shift
             </button>
           </>
         ) : (
-          <button type="button" role="menuitem" onClick={onMenu} className="btn-ghost">
+          <button type="button" role="menuitem" onClick={onMenu} className="btn-ghost" style={{ color: PAL.ink, borderColor: PAL.ink }}>
             Main menu
           </button>
         )}
@@ -807,7 +808,7 @@ function PhoneHome({
   }
   return (
     <div className="absolute inset-0 flex flex-col gap-3 overflow-y-auto p-4" data-testid="phone-home">
-      <p style={{ fontFamily: "CCPixel5x7, monospace", fontSize: 16, color: PAL.cream, margin: 0 }}>{PARLOR_OS}</p>
+      <p style={{ fontFamily: "var(--font-title)", fontSize: "var(--text-title-sm)", color: PAL.cream, margin: 0 }}>{PARLOR_OS}</p>
       <div className="grid grid-cols-4 gap-3">
         {apps.map((app) => (
           <button
@@ -817,7 +818,7 @@ function PhoneHome({
             onClick={() => onOpen(app)}
             data-testid={`home-${app.id}`}
             className="flex flex-col items-center gap-1"
-            style={{ background: "transparent", color: PAL.cream, fontFamily: "CCPixel3x5, monospace", fontSize: 12, textShadow: `1px 1px 0 ${PAL.ink}` }}
+            style={{ background: "transparent", color: PAL.cream, fontFamily: "var(--font-body)", fontSize: "var(--text-small)", minHeight: 44, textShadow: `1px 1px 0 ${PAL.ink}` }}
           >
             <AppIcon app={app} />
             <span className="text-center leading-tight">{app.title}</span>
@@ -845,13 +846,13 @@ function PhoneHome({
 function FullScreen({ title, onBack, children }: { title: string; onBack: () => void; children: ReactNode }) {
   return (
     <div className="absolute inset-0 flex flex-col" style={{ background: PAL.cream }} data-testid="fullscreen-app">
-      <header className="flex items-center gap-2 px-2" style={{ height: 40, background: PAL.woodDark, color: PAL.cream, fontFamily: "CCPixel3x5, monospace", fontSize: 12 }}>
-        <button type="button" onClick={onBack} aria-label="Back" data-testid="phone-back" style={{ ...chromeBtn, width: 56, height: 28 }}>
+      <header className="flex items-center gap-2 px-2" style={{ height: 50, background: PAL.woodDark, color: PAL.cream, fontFamily: "var(--font-title)", fontSize: "var(--text-title-sm)" }}>
+        <button type="button" onClick={onBack} aria-label="Back" data-testid="phone-back" style={{ ...chromeBtn, width: 72, height: 44, fontFamily: "var(--font-body)", fontSize: "var(--text-body)", lineHeight: "1.2" }}>
           Back
         </button>
         <span className="truncate">{title}</span>
       </header>
-      <div className="relative min-h-0 flex-1 overflow-hidden">{children}</div>
+      <div className="relative min-h-0 flex-1 overflow-auto">{children}</div>
     </div>
   );
 }

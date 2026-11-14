@@ -130,10 +130,11 @@ export function PixelMenu({
     setMute(next);
   };
 
+  const phone = scale.zoom < 2;
   return (
     <div ref={host} className="absolute inset-0 z-30 overflow-hidden" style={{ background: "#16110d" }} data-testid="pixel-menu">
       <img
-        src="/art/ui/menu.png"
+        src={phone ? "/art/ui/menu-scene.png" : "/art/ui/menu.png"}
         alt=""
         width={MW}
         height={MH}
@@ -162,6 +163,31 @@ export function PixelMenu({
           pointerEvents: "none",
         }}
       />
+      {phone ? (
+        <div
+          className="absolute z-10 flex flex-col gap-2 p-2"
+          style={{
+            left: 12,
+            right: 12,
+            top: scale.oy + BTN_Y[0] * scale.zoom - 8,
+            background: "#16110d",
+          }}
+        >
+          <button type="button" data-testid="new-shift" className="btn-primary" onClick={() => activate(0)}>
+            Begin
+          </button>
+          <button type="button" data-testid="continue-shift" className="btn-ghost" disabled={!saved} onClick={() => activate(1)}>
+            Continue
+          </button>
+          <button type="button" data-testid="menu-settings" className="btn-ghost" onClick={() => activate(2)}>
+            Settings
+          </button>
+          <button type="button" data-testid="mute" className="btn-ghost" onClick={toggleMute}>
+            {mute ? "Sound off" : "Sound on"}
+          </button>
+        </div>
+      ) : (
+        <>
       {ACTIONS.map((id, i) => (
         <button
           key={id}
@@ -193,6 +219,8 @@ export function PixelMenu({
         }}
         onClick={toggleMute}
       />
+        </>
+      )}
       {sheet ? (
         <div className="absolute inset-0 z-10 flex items-center justify-center" style={{ background: "rgba(22,17,13,0.72)" }}>
           <div className="cc-sheet">
