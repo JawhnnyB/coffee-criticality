@@ -1,0 +1,155 @@
+[
+  {
+    "scene": "title",
+    "width": 1280,
+    "ok": true,
+    "note": "Begin fully on screen y=288 h=42 bottom=330",
+    "file": "01-title-1280x720.png",
+    "pageErrors": [],
+    "consoleErrors": []
+  },
+  {
+    "scene": "new-shift",
+    "width": 1280,
+    "ok": true,
+    "note": "Continue on screen y=483 bottom=527. Desktop open.",
+    "file": "02-setup-1280x720.png",
+    "pageErrors": [],
+    "consoleErrors": []
+  },
+  {
+    "scene": "reactor-design",
+    "width": 1280,
+    "ok": true,
+    "note": "schematic null windows [{\"id\":\"window-design\",\"x\":40,\"y\":36,\"r\":962,\"b\":571,\"under\":false,\"off\":false}] icons overlap false",
+    "file": "03-design-1280x720.png",
+    "pageErrors": [],
+    "consoleErrors": []
+  },
+  {
+    "scene": "reactor-control",
+    "width": 1280,
+    "ok": true,
+    "note": "slider clicked at 70%. [{\"id\":\"window-control\",\"x\":40,\"y\":24,\"r\":1000,\"b\":664,\"under\":false,\"off\":false}] bar 686",
+    "file": "04-control-1280x720.png",
+    "pageErrors": [],
+    "consoleErrors": []
+  },
+  {
+    "scene": "core-cam",
+    "width": 1280,
+    "ok": true,
+    "note": "PWR · 1100 MWe · ΔT 32 °C · 15.5 MPa · liquid water Teaching view. Glow shows fuel activity and core temperature. Not a measurement. Classroom proxy k 0.978. Core health 60. Below  box [{\"id\":\"window-control\",\"x\":40,\"y\":24,\"r\":1000,\"b\":664,\"under\":false,\"off\":false},{\"id\":\"window-cam\",\"x\":64,\"y\":60,\"r\":986,\"b\":595,\"under\":false,\"off\":false}]",
+    "file": "05-cam-1280x720.png",
+    "pageErrors": [],
+    "consoleErrors": []
+  },
+  {
+    "scene": "results",
+    "width": 1280,
+    "ok": true,
+    "note": "{\"css\":24,\"ink\":12,\"family\":\"CCPixel3x5, monospace\",\"text\":\"Results\"} Results Core health 60 Time in band 40% 0.0 No open incident 20% 100 Residue clean 20% 100 Classroom k 20% 99.7 What to look at Time in band",
+    "file": "06-results-1280x720.png",
+    "pageErrors": [],
+    "consoleErrors": []
+  },
+  {
+    "scene": "core-map",
+    "width": 1280,
+    "ok": true,
+    "note": "horizontal scroll false. grid fits.",
+    "file": "07-coremap-1280x720.png",
+    "pageErrors": [],
+    "consoleErrors": []
+  },
+  {
+    "scene": "news",
+    "width": 1280,
+    "ok": true,
+    "note": "World: The wire is quiet. Nothing has come in for this shift. Local: The plant paper is blank today. clock {\"css\":20,\"ink\":10,\"family\":\"CCPixel3x5, monospace\",\"text\":\"6:52 AM\"} icons [{\"id\":\"icon-design\",\"t\":\"Reactor Design\",\"y\":12,\"b\":92,\"h\":80},{\"id\":\"icon-academy\",\"t\":\"Academy\",\"y\":104,\"b\":162,\"h\":58},{\"id\":\"icon-music\",\"t\":\"Music\",\"y\":174,\"b\":232,\"h\":58},{\"id\":\"icon-settings\",\"t\":\"Settings\",\"y\":244,\"b\":302,\"h\":58}] overlap false",
+    "file": "08-news-1280x720.png",
+    "pageErrors": [],
+    "consoleErrors": []
+  },
+  {
+    "scene": "cafe",
+    "width": 1280,
+    "ok": true,
+    "note": "06:52 D1 MORNING LESS CRITICALITY CAFE HONEST SIT WITH MABEL. DON'T R.",
+    "file": "09-cafe-1280x720.png",
+    "pageErrors": [],
+    "consoleErrors": []
+  },
+  {
+    "scene": "mabel",
+    "width": 1280,
+    "ok": true,
+    "note": "Dialogue open: 06:52 · Criticality Cafe · clock frozen MABEL Cafe / retired floor Cup, then chalk. She poured before you spoke. Chalk only moves for a catch. Cup's poured. Sit",
+    "file": "10-mabel-1280x720.png",
+    "pageErrors": [],
+    "consoleErrors": []
+  },
+  {
+    "scene": "lot",
+    "width": 1280,
+    "ok": true,
+    "note": "Lot on foot. Not dusk. 06:56 D1 MORNING LESS LOT / CAMPUS HONEST EAST THROUGH PLANT. THE.",
+    "file": "11-lot-1280x720.png",
+    "pageErrors": [],
+    "consoleErrors": []
+  },
+  {
+    "scene": "control-room",
+    "width": 1280,
+    "ok": true,
+    "note": "07:05 D1 MORNING LESS CONTROL ROOM HONEST CONTROL ROOM — HOLT WAN.",
+    "file": "12-control-room-1280x720.png",
+    "pageErrors": [],
+    "consoleErrors": []
+  },
+  {
+    "scene": "second-person",
+    "width": 1280,
+    "ok": true,
+    "note": "07:05 · Control room · clock frozen HOLT Director Ink already spent. He funds the line. He will not fund the introduction. Skip the hello. T",
+    "file": "13-holt-1280x720.png",
+    "pageErrors": [],
+    "consoleErrors": []
+  },
+  {
+    "scene": "paper-log",
+    "width": 1280,
+    "ok": false,
+    "note": "log not in range. hud 07:07 D1 MORNING LESS CONTROL ROOM HONEST MEET THE FLOOR — ELENA,.",
+    "file": "14-paper-1280x720.png",
+    "pageErrors": [],
+    "consoleErrors": []
+  },
+  {
+    "scene": "catch",
+    "width": 1280,
+    "ok": false,
+    "note": "incident paper did not open",
+    "file": "15-catch-1280x720.png",
+    "pageErrors": [],
+    "consoleErrors": []
+  },
+  {
+    "scene": "load-cab",
+    "width": 1280,
+    "ok": false,
+    "note": "LOAD.CAB not reached. hud 07:15 D1 MORNING LESS LOT / CAMPUS HONEST MEET THE FLOOR — ELENA,.",
+    "file": "16-load-1280x720.png",
+    "pageErrors": [],
+    "consoleErrors": []
+  },
+  {
+    "scene": "hide",
+    "width": 1280,
+    "ok": false,
+    "note": "no incident on the second run. hud 07:00 D1 MORNING LESS LOT / CAMPUS HONEST SIT WITH MABEL. DON'T R.",
+    "file": "17-hide-1280x720.png",
+    "pageErrors": [],
+    "consoleErrors": []
+  }
+]
