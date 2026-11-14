@@ -1,5 +1,6 @@
 import { applyWorldPostFx, postFxOn, type Light } from "./postfx";
 import { ROOMS, residueKey, type ResidueHow, type RoomId } from "./content";
+import { boardFace } from "./boardMark";
 import { LOOKS, PAL, drawChibi, drawEmote, pix } from "./pixel";
 import { A6_ROOMS } from "./roomArt";
 import { ROOM_ATLAS, type AtlasStamp } from "./roomAtlas";
@@ -374,59 +375,40 @@ function drawBoardA(
   mark: ResidueHow,
   now: number,
 ) {
-  const caught = mark === "caught";
-  const pulse = caught ? 0.2 : 0.45 + Math.abs(Math.sin(now * 3.2)) * 0.5;
+  const face = boardFace(day, mark);
+  const pulse = face.leaf ? 0.2 : 0.45 + Math.abs(Math.sin(now * 3.2)) * 0.5;
   const x = Math.round(rect.x);
   const y = Math.round(rect.y);
   const w = Math.round(rect.w);
   const h = Math.round(rect.h);
-  ctx.fillStyle = caught ? PAL.leaf : `rgba(201,162,39,${0.45 + pulse * 0.5})`;
+  ctx.fillStyle = face.leaf ? PAL.leaf : `rgba(201,162,39,${0.45 + pulse * 0.5})`;
   ctx.fillRect(x + 6, y + h - 7, w - 12, 3);
-  const line =
-    day === 1 ? (caught ? "14-R CLOSED" : "14-B OPEN")
-    : day === 2 ? (caught ? "2A LOCKED" : "2A IN SVC")
-    : day === 3 ? (caught ? "0.04 mSv/h" : "40 mSv/h")
-    : day === 4 ? (caught ? "LOG SIGNED" : mark === "hid" ? "YOUR NAME" : "NO INITIALS")
-    : "SHUFFLE DAY";
-  const color = caught ? PAL.leaf : PAL.gold;
-  const parts = line.toUpperCase().split(" ");
+  const color = face.leaf ? PAL.leaf : PAL.gold;
+  const parts = face.line.toUpperCase().split(" ");
+  const plateW = Math.max(...parts.map((part) => part.length * 8)) + 8;
+  const plateH = parts.length * 12 + 4;
+  const plateX = x + 4;
+  const plateY = y - plateH - 4;
+  ctx.fillStyle = PAL.ink;
+  ctx.fillRect(plateX, plateY, plateW, plateH);
   parts.forEach((part, i) => {
-    const tw = part.length * 8 - 2;
-    pixText(ctx, part, x + w - 8 - tw / 2, y - 24 + i * 12, color, tw + 4);
+    pixText(ctx, part, plateX + 4 + (part.length * 8 - 2) / 2, plateY + 2 + i * 12, color, plateW - 4);
   });
 }
 
 function drawPaperLog(ctx: CanvasRenderingContext2D, day: number, mark: ResidueHow) {
+  const face = boardFace(day, mark);
   const x = 88;
   const y = 164;
   const w = 104;
   const h = 48;
-  const caught = mark === "caught";
-  ctx.fillStyle = caught ? PAL.leaf : PAL.gold;
+  ctx.fillStyle = face.leaf ? PAL.leaf : PAL.gold;
   ctx.fillRect(x, y, w, h);
   ctx.fillStyle = PAL.cream;
   ctx.fillRect(x + 3, y + 3, w - 6, h - 6);
-  let mid = "EV 07:12";
-  let foot = "CHECK";
-  if (day === 1) {
-    mid = "14-R CLOSED";
-    foot = caught ? "CAUGHT" : mark === "hid" ? "HID" : "!= 14-B";
-  } else if (day === 2) {
-    mid = caught ? "2A LOCKED" : "2A IN SVC";
-    foot = caught ? "CAUGHT" : mark === "hid" ? "HID" : "CHECK";
-  } else if (day === 3) {
-    mid = caught ? "0.04" : "40";
-    foot = caught ? "CAUGHT" : mark === "hid" ? "HID" : "CHECK";
-  } else if (day === 4) {
-    mid = caught ? "SIGNED" : mark === "hid" ? "YOUR NAME" : "- 07:12";
-    foot = caught ? "CAUGHT" : mark === "hid" ? "HID" : "BLANK";
-  } else {
-    mid = "SHUFFLE";
-    foot = "DAY";
-  }
   pixText(ctx, "PAPER LOG", x + w / 2, y + 6, PAL.ink, w - 8);
-  pixText(ctx, mid, x + w / 2, y + 18, PAL.ink, w - 8);
-  pixText(ctx, foot, x + w / 2, y + 30, caught ? PAL.leaf : "#8a3a32", w - 8);
+  pixText(ctx, face.paperMid, x + w / 2, y + 18, PAL.ink, w - 8);
+  pixText(ctx, face.paperFoot, x + w / 2, y + 30, face.leaf ? PAL.leaf : "#8a3a32", w - 8);
 }
 
 export function roomName(id: RoomId) {

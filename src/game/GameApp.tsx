@@ -44,6 +44,7 @@ import { Chatter } from "./ChatterLine";
 import { heartCount } from "./pixel";
 import { drawWorld, glyphWidth, paintGlyphs, preloadRoomArt } from "./render";
 import { DEFAULT_PLANT, plantTitle, type PlantDesign } from "./plant";
+import { systemReducedMotion } from "./reducedMotion";
 import { hasSave, hydrateSave, peekSave, wipeSave, writeSave } from "./save";
 import { computeKeff } from "./nuclearLab";
 import { NuclearDesk } from "./NuclearDesk";
@@ -1130,14 +1131,14 @@ export function GameApp() {
         )}
 
         {mode === "play" && s.announceT > 0.15 && (
-          <div className="pointer-events-none absolute inset-x-0 top-[22%] z-20 text-center">
-            <p className={ART.hud ? "cc-title" : "font-display text-xl text-fg sm:text-2xl"}>{s.announce}</p>
+          <div className="pointer-events-none absolute inset-x-0 top-2 z-20 flex justify-center px-4">
+            <p className={ART.hud ? "cc-title" : "font-display text-xl text-fg sm:text-2xl"} style={{ background: "#16110d", padding: "4px 8px" }}>{s.announce}</p>
           </div>
         )}
 
         {mode === "splash" && !booted && (
           <BootLog
-            reduced={s.desktop.reducedMotion || window.matchMedia("(prefers-reduced-motion: reduce)").matches}
+            reduced={s.desktop.reducedMotion || systemReducedMotion()}
             onDone={() => setBooted(true)}
           />
         )}
@@ -1489,7 +1490,7 @@ export function GameApp() {
                   <CastFace key={id} id={id} zoom={1} />
                 ))}
               </div>
-              <p className="font-mono text-[10px] tracking-widest text-[#8a7864]">Shift log · {dayDef(s.day).name}</p>
+              <p className="font-mono text-[10px] tracking-widest text-[#6a4a32]">Shift log · {dayDef(s.day).name}</p>
               <h2 className="font-display mt-2 text-3xl">{s.day < 5 ? "The floor writes back" : "The week writes back"}</h2>
               <p className="mt-3 text-sm leading-relaxed">
                 Culture {stage} ({s.culture}). Reports {s.reports}. Catches {s.catches}. Hides {s.hides}.
@@ -1509,14 +1510,14 @@ export function GameApp() {
                   ))}
                 </ul>
               ) : null}
-              <p className="mt-2 text-[11px] text-[#8a7864]">
+              <p className="mt-2 text-[11px] text-[#6a4a32]">
                 {s.hides >= 3
                   ? "Three hides close the week as unfinished power — even if the culture number looks fine."
                   : s.ended === "a"
                     ? "Honest catches outnumbered silence. Holt can fund a real review."
                     : "Skill without a safe floor is unfinished power. The numbers can still run."}
               </p>
-              <p className="mt-2 text-[11px] text-[#8a7864]">Teaching model — not a license. Catch greater than heroics.</p>
+              <p className="mt-2 text-[11px] text-[#6a4a32]">Teaching model — not a license. Catch greater than heroics.</p>
               <div className="mt-5 flex flex-col gap-2">
                 <button
                   type="button"
@@ -1559,7 +1560,7 @@ export function GameApp() {
         {mode === "ending" && (
           <div className="absolute inset-0 z-30 flex items-end justify-center overflow-y-auto bg-bg/55 p-3 pb-28 sm:items-center sm:p-6">
             <div className="paper mx-auto w-full max-w-xl p-4 sm:p-5" data-testid="paper-ending">
-              <p className="font-mono text-[10px] tracking-widest text-[#8a7864]">
+              <p className="font-mono text-[10px] tracking-widest text-[#6a4a32]">
                 Dusk · {s.timeLabel} · Lot · Lake north
               </p>
               <h2 className="font-display mt-2 text-3xl">{s.ended === "a" ? "The floor holds" : "Unfinished power"}</h2>
@@ -1575,7 +1576,7 @@ export function GameApp() {
                   ))}
                 </ul>
               ) : null}
-              <p className="mt-3 text-[11px] text-[#8a7864]">Teaching model — not a license. Catch greater than heroics.</p>
+              <p className="mt-3 text-[11px] text-[#6a4a32]">Teaching model — not a license. Catch greater than heroics.</p>
               <div className="mt-5 flex flex-col gap-2">
                 <button
                   type="button"
@@ -1692,12 +1693,12 @@ export function GameApp() {
               {(peekSave()?.plant ?? s.plant) ? ` and ${plantTitle((peekSave()?.plant ?? s.plant)!)}` : ""}. Culture,
               catches, and the saved shift go with it.
             </p>
-            <p className="mt-2 text-[11px] text-[#8a7864]">You pick a badge again. Priya's designer is first.</p>
+            <p className="mt-2 text-[11px] text-[#6a4a32]">You pick a badge again. Priya's designer is first.</p>
             <div className="mt-5 flex flex-col gap-2">
               <button type="button" className="btn-primary" data-testid="wipe-confirm-yes" onClick={() => beginNewWeek(wipeNext)}>
                 New week
               </button>
-              <button type="button" className="btn-ghost" data-testid="wipe-confirm-no" onClick={() => setAskWipe(false)}>
+              <button type="button" className="btn-ghost" data-testid="wipe-confirm-no" style={{ color: "#16110d", borderColor: "#16110d" }} onClick={() => setAskWipe(false)}>
                 Keep this week
               </button>
             </div>
@@ -1716,7 +1717,7 @@ export function GameApp() {
 
 function paperMood(mood?: Line["mood"]) {
   if (mood === "warm") return "text-[#c4783a]";
-  if (mood === "tired") return "text-[#8a7864]";
+  if (mood === "tired") return "text-[#6a4a32]";
   if (mood === "sharp") return "text-[#b85c4a]";
   if (mood === "soft") return "text-[#3d5c44]";
   if (mood === "wry") return "text-[#6a4a32]";
@@ -1781,7 +1782,7 @@ function DialogueStage({
       >
         {npc ? <PixelPortrait npc={npc} /> : null}
         <div className="min-w-0 flex-1">
-          <p className="font-mono text-[10px] tracking-widest text-[#8a7864]">
+          <p className="font-mono text-[10px] tracking-widest text-[#6a4a32]">
             {time} · {room} · clock frozen
           </p>
           <div className="mt-1 flex items-center justify-between gap-2">
@@ -1789,7 +1790,7 @@ function DialogueStage({
               <p className={"font-display text-xs font-semibold uppercase tracking-[0.14em] " + paperMood(line.mood)}>
                 {line.speaker}
               </p>
-              {role ? <p className="text-[11px] text-[#8a7864]">{role}</p> : null}
+              {role ? <p className="text-[11px] text-[#6a4a32]">{role}</p> : null}
               {beat ? <p className="text-[11px] leading-snug text-[#6a4a32]">{beat}</p> : null}
             </div>
             <HeartRow n={hearts} />
@@ -1810,7 +1811,7 @@ function DialogueStage({
               ))}
             </div>
           ) : (
-            <p className="mt-2 text-[11px] text-[#8a7864]">Click or Space skips the line. Again to continue. Esc leaves.</p>
+            <p className="mt-2 text-[11px] text-[#6a4a32]">Click or Space skips the line. Again to continue. Esc leaves.</p>
           )}
         </div>
       </div>
@@ -1851,7 +1852,7 @@ function IncidentStage({
       >
         <CastFace id={npc} zoom={4} />
         <div className="min-w-0 flex-1">
-          <p className="font-mono text-[10px] tracking-widest text-[#8a7864]">
+          <p className="font-mono text-[10px] tracking-widest text-[#6a4a32]">
             {time} · {room} · Just Culture
           </p>
           <h2 className="font-display mt-1 text-2xl">{title}</h2>
@@ -1859,7 +1860,7 @@ function IncidentStage({
           <p className="mt-2 text-sm leading-relaxed text-[#3a2818]">
             A catch changes the board. A hide leaves it wrong. Three hides end the week unfinished.
           </p>
-          <p className="mt-1 text-[11px] text-[#8a7864]">The cheaper truth. Teaching model — not a license.</p>
+          <p className="mt-1 text-[11px] text-[#6a4a32]">The cheaper truth. Teaching model — not a license.</p>
           <div className="mt-4 flex flex-col gap-2">
             <button type="button" className="paper-btn" onPointerDown={onReport}>
               <span className="font-mono text-[11px] text-[#6a4a32]">R · Report.</span> Your name goes on it. The board changes.
@@ -1897,7 +1898,7 @@ function ScoresBoard({ scores, onClose }: { scores: ParlorScores; onClose: () =>
           {row("PHYS", scores.physBest ? String(scores.physBest) : "—")}
           {row("LOAD", scores.loadBest ? String(scores.loadBest) : "—")}
         </div>
-        <p className="mt-3 font-mono text-[10px] text-[#8a7864]">Teaching only. Holt reads the board.</p>
+        <p className="mt-3 font-mono text-[10px] text-[#6a4a32]">Teaching only. Holt reads the board.</p>
         <button type="button" className="btn-primary mt-5" onClick={onClose}>
           Back
         </button>
@@ -2496,7 +2497,7 @@ function PauseStage({
                       {NPCS[id].role} · {met ? trustState(s.trust[id]) : "Not introduced"}
                     </div>
                     {met ? <div className="text-[11px] text-muted">{relationLine(id, s.flags, s.trust[id])}</div> : null}
-                    <div className="text-[11px] text-[#8a7864]">{met ? NPC_INTRO[id].who : NPC_INTRO[id].beat}</div>
+                    <div className="text-[11px] text-[#b5a48c]">{met ? NPC_INTRO[id].who : NPC_INTRO[id].beat}</div>
                     </div>
                   </div>
                   {met ? <HeartRow n={heartCount(s.trust[id])} /> : <span className="text-[11px] text-subtle">—</span>}
@@ -2836,7 +2837,7 @@ function Hud({
               </div>
             </div>
             <div className="mt-1">
-              {ART.hud ? <span className="cc-label-sm">{obj}</span> : <PixelLine text={obj} color="#6a4a32" scale={1} />}
+              <span style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-small)", lineHeight: 1.4, color: "#3a2818" }}>{obj}</span>
             </div>
           </>
         ) : null}
@@ -2855,7 +2856,11 @@ function Hud({
       {toast && (
         <div className={`pointer-events-none absolute inset-x-0 z-10 flex justify-center px-4 ${nearLabel ? "bottom-16" : "bottom-4"}`}>
           <div className="pixel-chip">
-            {ART.hud ? <span className="cc-label-sm">{toast}</span> : <PixelLine text={toast} color="#3b2318" scale={1} />}
+            {ART.hud ? (
+              <span style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-small)", lineHeight: 1.4, color: "#3b2318" }}>{toast}</span>
+            ) : (
+              <PixelLine text={toast} color="#3b2318" scale={1} />
+            )}
           </div>
         </div>
       )}

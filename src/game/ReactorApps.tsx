@@ -28,7 +28,7 @@ import {
 } from "./reactorReadout";
 import type { GameState, ResultsSave } from "./sim";
 
-const FIELD = { fontFamily: "CCPixel3x5, monospace", color: PAL.ink } as const;
+const FIELD = { fontFamily: "var(--font-body)", fontSize: "var(--text-body)", color: PAL.ink, lineHeight: 1.5 } as const;
 /** Wood token. Contrast on cream is well above 4.5:1. */
 const CAPTION = COL.wood;
 
@@ -127,12 +127,12 @@ export function CoreCamApp({ s }: { s: GameState }) {
         : "";
 
   return (
-    <div className="p-3" style={FIELD} data-testid="app-cam">
-      <p style={{ margin: 0, fontSize: 14 }}>{plantTitle(plant)}</p>
-      <p style={{ margin: "4px 0 8px", fontSize: 12, color: CAPTION }}>
+    <div className="app-pad" style={FIELD} data-testid="app-cam">
+      <p style={{ margin: 0, fontSize: "var(--text-body)" }}>{plantTitle(plant)}</p>
+      <p style={{ margin: "4px 0 8px", fontSize: "var(--text-body)", color: CAPTION }}>
         Teaching view. Glow shows fuel activity and core temperature. Not a measurement.
       </p>
-      {missing ? <p style={{ fontSize: 12 }}>Using the default design.</p> : null}
+      {missing ? <p style={{ fontSize: "var(--text-body)" }}>Using the default design.</p> : null}
       <div ref={wrap} style={{ display: "flex", justifyContent: "center" }}>
         <canvas
           ref={ref}
@@ -148,13 +148,13 @@ export function CoreCamApp({ s }: { s: GameState }) {
           }}
         />
       </div>
-      <p style={{ fontSize: 12, marginTop: 6 }}>
+      <p style={{ fontSize: "var(--text-body)", marginTop: 6 }}>
         Classroom proxy k {computeKeff(plant).kCore.toFixed(3)}. Core health {health.score}.
         {plant.type === "bwr" ? ` Boiling proxy ${frame.voidFrac.toFixed(2)}.` : ""}
       </p>
-      {fault ? <p style={{ fontSize: 12 }}>{fault}</p> : null}
+      {fault ? <p style={{ fontSize: "var(--text-body)" }}>{fault}</p> : null}
       {plant.scale === "core" && !plant.fullCore ? (
-        <p style={{ fontSize: 12 }}>3×3 window, not the whole core.</p>
+        <p style={{ fontSize: "var(--text-body)" }}>3×3 window, not the whole core.</p>
       ) : null}
     </div>
   );
@@ -165,11 +165,11 @@ export function ResultsApp({ s }: { s: GameState }) {
   const health = healthOf(s, plant);
   const rows = (s.results.daily as { day: number; coreHealth: number; incidentCount: number }[]) ?? [];
   return (
-    <div className="p-3" style={FIELD} data-testid="app-results">
-      <p style={{ margin: 0, fontSize: 14 }}>Results</p>
-      <p style={{ fontSize: 12, margin: "6px 0 0" }}>Core health</p>
-      <p style={{ fontSize: 28, margin: "2px 0 6px" }}>{health.score}</p>
-      <table style={{ fontSize: 12, borderCollapse: "collapse" }}>
+    <div className="app-pad" style={FIELD} data-testid="app-results">
+      <p style={{ margin: 0, fontSize: "var(--text-body)" }}>Results</p>
+      <p style={{ fontSize: "var(--text-body)", margin: "6px 0 0" }}>Core health</p>
+      <p style={{ fontSize: "var(--text-title)", margin: "2px 0 6px" }}>{health.score}</p>
+      <table style={{ fontSize: "var(--text-body)", borderCollapse: "collapse" }}>
         <tbody>
           {health.parts.map((p) => (
             <tr key={p.id}>
@@ -180,12 +180,12 @@ export function ResultsApp({ s }: { s: GameState }) {
           ))}
         </tbody>
       </table>
-      <p style={{ fontSize: 12, marginTop: 8, marginBottom: 0 }}>What to look at</p>
-      <p style={{ fontSize: 12, marginTop: 4 }}>{lookLine(s.setup.stance, health.parts)}</p>
-      <p style={{ fontSize: 12 }}>{BURNUP_PENDING}</p>
-      <p style={{ fontSize: 12 }}>1 in-game day = 1 real day. Time-compressed burnup stays off until a fuel mass is cited.</p>
+      <p style={{ fontSize: "var(--text-body)", marginTop: 8, marginBottom: 0 }}>What to look at</p>
+      <p style={{ fontSize: "var(--text-body)", marginTop: 4 }}>{lookLine(s.setup.stance, health.parts)}</p>
+      <p style={{ fontSize: "var(--text-body)" }}>{BURNUP_PENDING}</p>
+      <p style={{ fontSize: "var(--text-body)" }}>1 in-game day = 1 real day. Time-compressed burnup stays off until a fuel mass is cited.</p>
       <Trend rows={rows} />
-      <table style={{ fontSize: 12, marginTop: 8 }} data-testid="results-table">
+      <table style={{ fontSize: "var(--text-body)", marginTop: 8 }} data-testid="results-table">
         <thead>
           <tr>
             <th>Day</th>
@@ -229,10 +229,10 @@ function Trend({ rows }: { rows: { day: number; coreHealth: number; incidentCoun
       {pts.map((p) => (
         <g key={p.r.day}>
           <circle cx={p.x} cy={p.y} r="2" fill={COL.cream} />
-          <text x={p.x} y={p.y - 5} fontSize="12" textAnchor="middle" fill={COL.ink}>
+          <text x={p.x} y={p.y - 5} fontSize="10" fontFamily="CCPixel3x5, monospace" textAnchor="middle" fill={COL.ink}>
             {p.r.coreHealth}
           </text>
-          <text x={p.x} y={h - 2} fontSize="12" textAnchor="middle" fill={CAPTION}>
+          <text x={p.x} y={h - 2} fontSize="10" fontFamily="CCPixel3x5, monospace" textAnchor="middle" fill={CAPTION}>
             {p.r.day}
             {p.r.incidentCount > 0 ? " i" : ""}
           </text>
@@ -274,9 +274,9 @@ export function CoreMapApp({ s, onResults }: { s: GameState; onResults: (patch: 
   };
 
   return (
-    <div className="p-3" style={FIELD} data-testid="app-coremap">
-      <p style={{ margin: 0, fontSize: 14 }}>Core Map</p>
-      <p style={{ fontSize: 12 }}>
+    <div className="app-pad" style={FIELD} data-testid="app-coremap">
+      <p style={{ margin: 0, fontSize: "var(--text-body)" }}>Core Map</p>
+      <p style={{ fontSize: "var(--text-body)" }}>
         Enrichment {plant.enrich.toFixed(1)}%. {BURNUP_PENDING} Fq {flux.fq.toFixed(2)}. Swaps {swaps}.{" "}
         {ok ? "Pass." : "Not a pass yet."}
       </p>
@@ -294,8 +294,9 @@ export function CoreMapApp({ s, onResults }: { s: GameState; onResults: (patch: 
               background: pick === i ? "#c4783a" : cell === 0 ? "#f3e6d0" : cell === 1 ? "#c9a227" : "#6a4a32",
               color: "#16110d",
               border: `1px solid ${COL.ink}`,
-              fontFamily: "inherit",
-              fontSize: 12,
+              fontFamily: "var(--font-tag)",
+              fontSize: "var(--text-tag)",
+              lineHeight: 1,
             }}
           >
             {cell}
@@ -303,7 +304,7 @@ export function CoreMapApp({ s, onResults }: { s: GameState; onResults: (patch: 
         ))}
       </div>
       {s.results.shuffleBest !== null ? (
-        <p style={{ fontSize: 12 }}>Best Fq {s.results.shuffleBest.toFixed(2)}. This does not close the Day 5 shuffle.</p>
+        <p style={{ fontSize: "var(--text-body)" }}>Best Fq {s.results.shuffleBest.toFixed(2)}. This does not close the Day 5 shuffle.</p>
       ) : null}
     </div>
   );

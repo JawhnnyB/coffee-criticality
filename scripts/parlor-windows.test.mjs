@@ -37,7 +37,7 @@ const win = (id, extra = {}) => ({
 test("a window is clamped so it stays on the screen above the taskbar", () => {
   const far = W.clampWin(win("a", { x: 790, y: 590 }), screen);
   assert.equal(far.x, screen.w - far.w);
-  assert.equal(far.y, screen.h - W.TASKBAR_H - W.TITLE_H);
+  assert.equal(far.y + far.h, screen.h - W.TASKBAR_H, "the bottom edge stops at the taskbar");
   const neg = W.clampWin(win("a", { x: -50, y: -50 }), screen);
   assert.equal(neg.x, 0);
   assert.equal(neg.y, 0);
@@ -47,7 +47,7 @@ test("dragging cannot take a window off any edge", () => {
   let w = win("a", { x: 100, y: 100 });
   for (let i = 0; i < 20; i++) w = W.dragWin(w, 500, 500, screen);
   assert.equal(w.x, screen.w - w.w);
-  assert.equal(w.y, screen.h - W.TASKBAR_H - W.TITLE_H);
+  assert.equal(w.y + w.h, screen.h - W.TASKBAR_H);
   for (let i = 0; i < 20; i++) w = W.dragWin(w, -500, -500, screen);
   assert.equal(w.x, 0);
   assert.equal(w.y, 0);

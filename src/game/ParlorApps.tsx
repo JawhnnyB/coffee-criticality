@@ -103,14 +103,14 @@ export function BootLog({ reduced, onDone }: { reduced: boolean; onDone: () => v
       data-testid="boot-log"
       role="presentation"
     >
-      <div className="mx-auto w-full max-w-xl" style={{ fontFamily: "CCPixel3x5, monospace", fontSize: 14, lineHeight: 1.7 }}>
+      <div className="mx-auto w-full max-w-xl" style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-body)", lineHeight: 1.5 }}>
         {BOOT_LINES.slice(0, shown).map((line, i) => (
           <p key={i} style={{ color: i === 0 ? PAL.copperL : PAL.cream, margin: 0 }}>
             {line}
           </p>
         ))}
         {shown >= BOOT_LINES.length ? (
-          <p style={{ color: PAL.ash, marginTop: 16, fontSize: 12 }}>Press any key or click to continue.</p>
+          <p style={{ color: PAL.muted, marginTop: 16, fontSize: "var(--text-small)" }}>Press any key or click to continue.</p>
         ) : null}
       </div>
     </div>
@@ -135,12 +135,12 @@ export function SetupScreen({
   const [stance, setStance] = useState<Stance>(stanceOrDefault(initialStance ?? DEFAULT_STANCE));
   return (
     <div className="absolute inset-0 z-30 overflow-y-auto bg-[#16110d] px-4 pb-10 pt-16 sm:px-10" data-testid="setup-screen">
-      <div className="mx-auto max-w-xl" style={{ fontFamily: "CCPixel3x5, monospace", color: PAL.cream }}>
-        <p style={{ color: PAL.ash, fontSize: 12, letterSpacing: 2 }}>NEW SHIFT · SETUP</p>
-        <h2 style={{ fontFamily: "CCPixel5x7, monospace", fontSize: 24, margin: "8px 0 16px" }}>Set the shift</h2>
+      <div className="mx-auto max-w-xl" style={{ fontFamily: "var(--font-body)", color: PAL.cream }}>
+        <p style={{ color: PAL.muted, fontSize: "var(--text-small)", letterSpacing: 2 }}>NEW SHIFT · SETUP</p>
+        <h2 style={{ fontFamily: "var(--font-title)", fontSize: "var(--text-title)", margin: "8px 0 16px" }}>Set the shift</h2>
 
         <fieldset style={{ border: 0, padding: 0, margin: 0 }}>
-          <legend style={{ fontSize: 12, color: PAL.muted, marginBottom: 8 }}>Season</legend>
+          <legend style={{ fontSize: "var(--text-small)", color: PAL.muted, marginBottom: 8 }}>Season</legend>
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
             {SEASONS.map((id) => (
               <Pick key={id} selected={season === id} testId={`season-${id}`} onClick={() => setSeason(id)}>
@@ -148,13 +148,13 @@ export function SetupScreen({
               </Pick>
             ))}
           </div>
-          <p data-testid="season-change" style={{ fontSize: 12, color: PAL.muted, margin: "8px 0 0", minHeight: 36 }}>
+          <p data-testid="season-change" style={{ fontSize: "var(--text-small)", color: PAL.muted, margin: "8px 0 0", minHeight: 36 }}>
             {SEASON_INFO[season].change}
           </p>
         </fieldset>
 
         <fieldset style={{ border: 0, padding: 0, margin: "18px 0 0" }}>
-          <legend style={{ fontSize: 12, color: PAL.muted, marginBottom: 8 }}>Starting stance</legend>
+          <legend style={{ fontSize: "var(--text-small)", color: PAL.muted, marginBottom: 8 }}>Starting stance</legend>
           <div className="grid grid-cols-3 gap-2">
             {STANCES.map((id) => (
               <Pick key={id} selected={stance === id} testId={`stance-${id}`} onClick={() => setStance(id)}>
@@ -162,21 +162,21 @@ export function SetupScreen({
               </Pick>
             ))}
           </div>
-          <p data-testid="stance-change" style={{ fontSize: 12, color: PAL.muted, margin: "8px 0 0", minHeight: 36 }}>
+          <p data-testid="stance-change" style={{ fontSize: "var(--text-small)", color: PAL.muted, margin: "8px 0 0", minHeight: 36 }}>
             {STANCE_INFO[stance].change}
           </p>
         </fieldset>
 
         <div style={{ marginTop: 18, borderTop: `1px solid ${PAL.wood}`, paddingTop: 12 }}>
-          <p style={{ fontSize: 12, margin: 0 }}>
+          <p style={{ fontSize: "var(--text-small)", margin: 0 }}>
             Region: <span data-testid="region-pending" style={{ color: PAL.gold }}>{REGION_PENDING}</span>
           </p>
-          <p style={{ fontSize: 12, color: PAL.ash, margin: "4px 0 0" }}>
+          <p style={{ fontSize: "var(--text-small)", color: PAL.muted, margin: "4px 0 0" }}>
             No region is chosen in this build. Every region line says it is pending.
           </p>
         </div>
 
-        <div className="mt-6 flex flex-wrap gap-2">
+        <div className="sticky bottom-0 z-10 mt-6 flex flex-wrap gap-2 py-3" style={{ background: "#16110d" }}>
           <button type="button" className="btn-primary" data-testid="setup-continue" onClick={() => onDone(season, stance)}>
             Continue to the desktop
           </button>
@@ -207,8 +207,10 @@ function Pick({
       aria-pressed={selected}
       onClick={onClick}
       style={{
-        fontFamily: "CCPixel3x5, monospace",
-        fontSize: 12,
+        fontFamily: "var(--font-body)",
+        fontSize: "var(--text-body)",
+        lineHeight: 1.4,
+        minHeight: 44,
         padding: "8px 6px",
         background: selected ? PAL.copper : PAL.surface,
         color: selected ? PAL.ink : PAL.cream,
@@ -223,14 +225,14 @@ function Pick({
 
 /* ---------------------------------------------------------------- apps */
 
-const FIELD: CSSProperties = { fontFamily: "CCPixel3x5, monospace", fontSize: 12, color: PAL.ink };
+const FIELD: CSSProperties = { fontFamily: "var(--font-body)", fontSize: "var(--text-body)", color: PAL.ink, lineHeight: 1.5 };
 
 function Row({ label, children, note }: { label: string; children: ReactNode; note?: string }) {
   return (
     <div style={{ padding: "8px 0", borderBottom: `1px solid ${PAL.creamD}` }}>
       <div style={{ ...FIELD, fontWeight: 700 }}>{label}</div>
       <div className="mt-1 flex flex-wrap gap-1">{children}</div>
-      {note ? <div style={{ ...FIELD, color: PAL.ash, marginTop: 4 }}>{note}</div> : null}
+      {note ? <div style={{ ...FIELD, color: PAL.wood, marginTop: 4 }}>{note}</div> : null}
     </div>
   );
 }
@@ -286,9 +288,9 @@ export function AppBody({ app, ctx }: { app: AppDef; ctx: AppCtx }) {
 
 export function PlaceholderApp({ app }: { app: AppDef }) {
   return (
-    <div className="p-4" style={{ ...FIELD, color: PAL.ink }} data-testid={`placeholder-${app.id}`}>
-      <p style={{ fontFamily: "CCPixel5x7, monospace", fontSize: 16, margin: 0 }}>{app.title}</p>
-      <p style={{ marginTop: 10, fontSize: 14 }}>{app.note ?? NOT_BUILT}</p>
+    <div className="app-pad" style={{ ...FIELD, color: PAL.ink }} data-testid={`placeholder-${app.id}`}>
+      <p style={{ fontFamily: "var(--font-title)", fontSize: "var(--text-title-sm)", margin: 0 }}>{app.title}</p>
+      <p style={{ marginTop: 10, fontSize: "var(--text-small)" }}>{app.note ?? NOT_BUILT}</p>
     </div>
   );
 }
@@ -309,9 +311,9 @@ const REGION_SLOTS = Array.from({ length: 9 }, (_, i) => `Region slot ${i + 1}`)
 export function RadiationApp({ ctx }: { ctx: AppCtx }) {
   const alara = ACADEMY.findIndex((p) => p.title === "ALARA with eyes open");
   return (
-    <div className="p-3" style={{ ...FIELD, color: PAL.ink }} data-testid="app-radiation">
-      <p style={{ fontFamily: "CCPixel5x7, monospace", fontSize: 16, margin: 0 }}>Radiation</p>
-      <table style={{ fontSize: 12, marginTop: 10, borderCollapse: "collapse" }}>
+    <div className="app-pad" style={{ ...FIELD, color: PAL.ink }} data-testid="app-radiation">
+      <p style={{ fontFamily: "var(--font-title)", fontSize: "var(--text-title-sm)", margin: 0 }}>Radiation</p>
+      <table style={{ fontSize: "var(--text-small)", marginTop: 10, borderCollapse: "collapse" }}>
         <tbody>
           {RAD_ROWS.map((r) => (
             <tr key={r.label}>
@@ -321,11 +323,11 @@ export function RadiationApp({ ctx }: { ctx: AppCtx }) {
           ))}
         </tbody>
       </table>
-      <p style={{ fontSize: 14, marginTop: 10, margin: "10px 0 0" }}>Your region</p>
-      <p style={{ fontSize: 12, margin: "2px 0 6px" }} data-testid="radiation-region">
+      <p style={{ fontSize: "var(--text-small)", marginTop: 10, margin: "10px 0 0" }}>Your region</p>
+      <p style={{ fontSize: "var(--text-small)", margin: "2px 0 6px" }} data-testid="radiation-region">
         {REGION_PENDING}
       </p>
-      <ul style={{ fontSize: 12, margin: 0, paddingLeft: 0, listStyle: "none" }} data-testid="region-slots">
+      <ul style={{ fontSize: "var(--text-small)", margin: 0, paddingLeft: 0, listStyle: "none" }} data-testid="region-slots">
         {REGION_SLOTS.map((name) => (
           <li key={name} style={{ paddingBottom: 2 }}>
             {name}: Pending verification
@@ -336,7 +338,7 @@ export function RadiationApp({ ctx }: { ctx: AppCtx }) {
         type="button"
         data-testid="radiation-alara"
         onClick={() => ctx.onAcademy(alara)}
-        style={{ fontFamily: "inherit", fontSize: 12, marginTop: 10, textDecoration: "underline", background: "transparent", border: 0, color: PAL.copper, padding: 0 }}
+        style={{ fontFamily: "inherit", fontSize: "var(--text-small)", marginTop: 10, textDecoration: "underline", background: "transparent", border: 0, color: PAL.copper, padding: 0 }}
       >
         ALARA with eyes open
       </button>
@@ -349,25 +351,25 @@ export function NrcApp() {
   const rows = filterNrc(NRC_ROWS, q);
   const needle = q.trim();
   return (
-    <div className="p-3" style={{ ...FIELD, color: PAL.ink }} data-testid="app-nrc">
-      <p style={{ fontFamily: "CCPixel5x7, monospace", fontSize: 16, margin: 0 }}>NRC Regulations</p>
-      <p style={{ fontSize: 12, marginTop: 10 }}>
+    <div className="app-pad" style={{ ...FIELD, color: PAL.ink }} data-testid="app-nrc">
+      <p style={{ fontFamily: "var(--font-title)", fontSize: "var(--text-title-sm)", margin: 0 }}>NRC Regulations</p>
+      <p style={{ fontSize: "var(--text-small)", marginTop: 10 }}>
         <a href="https://www.ecfr.gov/current/title-10" target="_blank" rel="noopener noreferrer" style={{ color: PAL.copper, textDecoration: "underline" }}>
           Title 10 (Energy), eCFR
         </a>{" "}
         · official text, opens in a new tab
       </p>
-      <label style={{ display: "block", fontSize: 12, marginTop: 10 }}>
+      <label style={{ display: "block", fontSize: "var(--text-small)", marginTop: 10 }}>
         Search
         <input
           type="search"
           data-testid="nrc-search"
           value={q}
           onChange={(e) => setQ(e.target.value)}
-          style={{ display: "block", marginTop: 4, fontFamily: "inherit", fontSize: 12, color: PAL.ink, background: PAL.cream, border: `1px solid ${PAL.ink}`, padding: "2px 4px", width: "100%", maxWidth: 260 }}
+          style={{ display: "block", marginTop: 4, fontFamily: "inherit", fontSize: "var(--text-small)", color: PAL.ink, background: PAL.cream, border: `1px solid ${PAL.ink}`, padding: "2px 4px", width: "100%", maxWidth: 260 }}
         />
       </label>
-      <table style={{ fontSize: 12, marginTop: 10, borderCollapse: "collapse" }}>
+      <table style={{ fontSize: "var(--text-small)", marginTop: 10, borderCollapse: "collapse" }}>
         <tbody>
           {rows.map((r) => (
             <tr key={r.label}>
@@ -378,7 +380,7 @@ export function NrcApp() {
         </tbody>
       </table>
       {needle !== "" && rows.length === 0 ? (
-        <p style={{ fontSize: 12, marginTop: 8 }} data-testid="nrc-no-match">
+        <p style={{ fontSize: "var(--text-small)", marginTop: 8 }} data-testid="nrc-no-match">
           No match. Titles are not in this build.
         </p>
       ) : null}
@@ -403,7 +405,7 @@ function SettingsApp({ ctx }: { ctx: AppCtx }) {
     ctx.onPatch({ pinned: pinnedIds.includes(id) ? pinnedIds.filter((x) => x !== id) : [...pinnedIds, id] });
   };
   return (
-    <div className="p-3" style={{ ...FIELD }} data-testid="settings-app">
+    <div className="app-pad" style={{ ...FIELD }} data-testid="settings-app">
       <Row label="Wallpaper" note="The season's set by default. Or any season's set.">
         <Chip on={d.wallpaper === "season"} onClick={() => ctx.onPatch({ wallpaper: "season" })} testId="wall-season">
           Season
@@ -523,7 +525,7 @@ function SettingsApp({ ctx }: { ctx: AppCtx }) {
           </Chip>
         </Row>
       ) : null}
-      <p style={{ ...FIELD, color: PAL.ash, marginTop: 10 }}>
+      <p style={{ ...FIELD, color: PAL.wood, marginTop: 10 }}>
         Settings are saved with the shift. A new shift keeps them.
       </p>
     </div>
@@ -566,8 +568,8 @@ function MusicApp({ ctx }: { ctx: AppCtx }) {
   };
 
   return (
-    <div className="p-3" style={FIELD} data-testid="music-app">
-      <p style={{ fontFamily: "CCPixel5x7, monospace", fontSize: 16, margin: 0 }}>Music</p>
+    <div className="app-pad" style={FIELD} data-testid="music-app">
+      <p style={{ fontFamily: "var(--font-title)", fontSize: "var(--text-title-sm)", margin: 0 }}>Music</p>
       <p data-testid="now-playing" style={{ margin: "8px 0", color: PAL.ink }}>
         {playing && now ? `Now playing: ${TRACKS[now].title}` : "Stopped. Pick a play button to start."}
       </p>
@@ -597,15 +599,15 @@ function MusicApp({ ctx }: { ctx: AppCtx }) {
           data-testid="music-app-volume"
         />
       </label>
-      <p style={{ ...FIELD, color: PAL.ash, margin: "10px 0 4px" }}>Season playlist</p>
+      <p style={{ ...FIELD, color: PAL.wood, margin: "10px 0 4px" }}>Season playlist</p>
       <ol style={{ margin: 0, paddingLeft: 16 }}>
         {SEASONS.map((id) => (
-          <li key={id} style={{ ...FIELD, color: id === shown ? PAL.copper : PAL.ink, fontWeight: id === shown ? 700 : 400 }}>
+          <li key={id} style={{ ...FIELD, color: id === shown ? PAL.copperD : PAL.ink, fontWeight: id === shown ? 700 : 400 }}>
             {SEASON_INFO[id].label} · {TRACKS[id].title}
           </li>
         ))}
       </ol>
-      <p style={{ ...FIELD, color: PAL.ash, marginTop: 10 }}>
+      <p style={{ ...FIELD, color: PAL.wood, marginTop: 10 }}>
         Procedural, written in code. The existing bed ducks while a track plays.
       </p>
     </div>

@@ -1,0 +1,96 @@
+{
+  "url": "http://127.0.0.1:8080/",
+  "viewports": [
+    {
+      "w": 1280,
+      "h": 720,
+      "barTop": 686,
+      "clips": [],
+      "wins": [
+        {
+          "id": "window-news",
+          "x": 136,
+          "y": 36,
+          "r": 1058,
+          "b": 571,
+          "under": false,
+          "off": false
+        }
+      ],
+      "overlaps": [],
+      "windowFails": [],
+      "shortButtons": []
+    },
+    {
+      "w": 1440,
+      "h": 900,
+      "barTop": 866,
+      "clips": [],
+      "wins": [
+        {
+          "id": "window-news",
+          "x": 136,
+          "y": 36,
+          "r": 1173,
+          "b": 711,
+          "under": false,
+          "off": false
+        }
+      ],
+      "overlaps": [],
+      "windowFails": [],
+      "shortButtons": []
+    },
+    {
+      "w": 1920,
+      "h": 1080,
+      "barTop": 1046,
+      "clips": [],
+      "wins": [
+        {
+          "id": "window-news",
+          "x": 136,
+          "y": 36,
+          "r": 1518,
+          "b": 852,
+          "under": false,
+          "off": false
+        }
+      ],
+      "overlaps": [],
+      "windowFails": [],
+      "shortButtons": []
+    },
+    {
+      "w": 768,
+      "h": 1024,
+      "barTop": 990,
+      "clips": [],
+      "wins": [
+        {
+          "id": "window-news",
+          "x": 136,
+          "y": 36,
+          "r": 689,
+          "b": 808,
+          "under": false,
+          "off": false
+        }
+      ],
+      "overlaps": [],
+      "windowFails": [],
+      "shortButtons": []
+    },
+    {
+      "w": 390,
+      "h": 844,
+      "barTop": null,
+      "clips": [],
+      "wins": [],
+      "overlaps": [],
+      "windowFails": [],
+      "shortButtons": []
+    }
+  ],
+  "violationCount": 0
+}

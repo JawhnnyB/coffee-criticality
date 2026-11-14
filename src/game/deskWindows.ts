@@ -5,7 +5,7 @@
 
 export const MIN_W = 240;
 export const MIN_H = 160;
-export const TITLE_H = 22;
+export const TITLE_H = 30;
 export const TASKBAR_H = 34;
 
 export interface Screen {
@@ -31,12 +31,13 @@ export interface WinState {
   game: boolean;
 }
 
-/** A window never leaves the screen, and never goes below the minimum size (or the screen, if the screen is smaller). */
+/** A window never leaves the screen, and never goes below the minimum size (or the screen, if the screen is smaller). The bottom edge stays above the taskbar. */
 export function clampWin(win: WinState, screen: Screen): WinState {
+  const limitH = Math.max(0, screen.h - TASKBAR_H);
   const w = Math.max(Math.min(MIN_W, screen.w), Math.min(Math.max(win.w, MIN_W), screen.w));
-  const h = Math.max(Math.min(MIN_H, screen.h - TASKBAR_H), Math.min(Math.max(win.h, MIN_H), screen.h - TASKBAR_H));
+  const h = Math.max(Math.min(MIN_H, limitH), Math.min(Math.max(win.h, MIN_H), limitH));
   const maxX = Math.max(0, screen.w - w);
-  const maxY = Math.max(0, screen.h - TASKBAR_H - TITLE_H);
+  const maxY = Math.max(0, limitH - h);
   const x = Math.min(maxX, Math.max(0, win.x));
   const y = Math.min(maxY, Math.max(0, win.y));
   return { ...win, x, y, w, h };
@@ -82,10 +83,11 @@ export function focusedWin(list: WinState[]): WinState | null {
   return best;
 }
 
-/** Where a new window opens: a small cascade, always on screen. */
+/** Where a new window opens: a small cascade, to the right of the icon column, always on screen. */
 export function cascadeAt(list: WinState[], screen: Screen, w: number, h: number): { x: number; y: number } {
   const n = list.length % 6;
-  const x = Math.min(Math.max(0, screen.w - w), 40 + n * 24);
+  const iconGutter = 136;
+  const x = Math.min(Math.max(0, screen.w - w), iconGutter + n * 24);
   const y = Math.min(Math.max(0, screen.h - TASKBAR_H - TITLE_H - h), 36 + n * 24);
   return { x, y };
 }

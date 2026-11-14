@@ -1243,7 +1243,7 @@ export const ROOMS: Record<RoomId, RoomDef> = {
       { rect: t(14, 5, 3, 3), kind: "console" },
       { rect: t(1, 10, 2, 1), kind: "pipe_h" },
       { rect: t(2, 9, 1, 2), kind: "valve", label: "14" },
-      { rect: t(6, 9, 2, 2), kind: "chair", block: false },
+      { rect: t(6, 9, 2, 2), kind: "chair" },
       { rect: t(18, 9, 2, 3), kind: "cabinet" },
       { rect: t(1, 1, 2, 2), kind: "prints", block: false },
       { rect: t(18, 3, 1, 2), kind: "lamp", block: false },
