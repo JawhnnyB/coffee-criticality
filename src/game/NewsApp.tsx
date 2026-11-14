@@ -4,7 +4,8 @@ import { pickLocal, SHIPPED_LOCAL_POOL, localLabel, type LocalItem } from "./loc
 import type { GameState } from "./sim";
 
 const FIELD = { fontFamily: "CCPixel3x5, monospace", color: PAL.ink } as const;
-const NOT_BUILT = "Not in this build.";
+const QUIET_WORLD = "The wire is quiet. Nothing has come in for this shift.";
+const QUIET_LOCAL = "The plant paper is blank today.";
 
 interface WorldItem {
   id: string;
@@ -54,13 +55,13 @@ export function NewsApp({ s }: { s: GameState }) {
         ))}
       </div>
       {tab === "world" ? (
-        <div style={{ marginTop: 10, fontSize: 12 }} data-testid="news-world">
-          {world === null ? null : world.length === 0 ? <p>{NOT_BUILT}</p> : world.map((w) => <p key={w.id}>{`${w.headline} · ${w.source} · ${w.date}`}</p>)}
+        <div style={{ marginTop: 10, fontSize: 24 }} data-testid="news-world">
+          {world === null ? null : world.length === 0 ? <p>{QUIET_WORLD}</p> : world.map((w) => <p key={w.id}>{`${w.headline} · ${w.source} · ${w.date}`}</p>)}
         </div>
       ) : (
-        <div style={{ marginTop: 10, fontSize: 12 }} data-testid="news-local">
+        <div style={{ marginTop: 10, fontSize: 24 }} data-testid="news-local">
           {local.length === 0 ? (
-            <p>{NOT_BUILT}</p>
+            <p>{QUIET_LOCAL}</p>
           ) : (
             local.map((item) => (
               <p key={item.id}>
