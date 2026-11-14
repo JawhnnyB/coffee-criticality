@@ -66,7 +66,7 @@ export function ReactorTrainer({
   minuteRef.current = onMinute;
 
   useEffect(() => {
-    if (!plant || passed || scram) return;
+    if (!design || !plant || passed || scram) return;
     let last = performance.now();
     let acc = 0;
     let lastMin = -1;
@@ -88,7 +88,7 @@ export function ReactorTrainer({
         flow: flowRef.current,
         hold: holdRef.current,
         dt,
-        plant,
+        plant: design,
         lastWritten: writtenRef.current,
       });
       powerRef.current = step.power;
@@ -108,7 +108,7 @@ export function ReactorTrainer({
     };
     raf = requestAnimationFrame(loop);
     return () => cancelAnimationFrame(raf);
-  }, [plant, passed, scram]);
+  }, [plant, passed, scram, design]);
 
   if (!design || !plant) {
     return (
@@ -125,7 +125,7 @@ export function ReactorTrainer({
     );
   }
 
-  const ts = thermalState(plant, { powerPct: power, flowPct: flow });
+  const ts = thermalState(design, { powerPct: power, flowPct: flow });
   const { dT, tCold, tHot } = ts;
   const band = BAND[plant];
   const inBand = dT >= band.lo && dT <= band.hi && !scram;
