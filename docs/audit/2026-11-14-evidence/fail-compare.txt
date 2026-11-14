@@ -1,0 +1,16 @@
+same-names: true
+baseline-count: 9
+new-count: 9
+# tests 204
+# pass 195
+# fail 9
+TEST_EXIT:1
+scripts/cabinet-rewards.test.mjs
+scripts/desk-verdict.test.mjs
+injects project id on the script and meta when provided
+does not duplicate grok:app_id
+injects x:creator tags when both creator values are set
+does not duplicate x:creator tags
+platform chrome injects twitter:card when the document has none
+leaves an existing twitter:card alone
+uses the app name in the injected title tag
