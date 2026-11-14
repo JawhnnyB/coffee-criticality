@@ -38,6 +38,14 @@ Options: leave the art, or the owner points at the file and says to remove the l
 
 Default used: do not edit art. WP4 was not started.
 
+## Steam after a hide
+
+Question: `GROK_FEEL.md` used to say steam is `day === 1 && !incidentResolved`. `resolveIncident` sets that flag for Report, Peer, and Hide, so the old line turns steam off after a hide. The Day 1 Hid cell in the same file says "Steam stays."
+
+Options: follow the old line (steam off after any resolution), or follow the table (steam stays until the valve is caught, and only on day 1).
+
+Default used: follow the table. `maintenanceSteamOn` in `src/game/steamRule.ts` is `day === 1 && valve !== "caught"`. `incidentResolved` and residue are not redefined. The pictures of a caught room, a hid room, and day 2 were not walked, so those stills stay unverified.
+
 ## Frozen values and real numbers
 
 Any visual change that needs a frozen value, a real name, a region value, or a radiation number stays stopped. Regions stay "Pending verification". `news.json` stays `[]`. `background.json` stays pending.

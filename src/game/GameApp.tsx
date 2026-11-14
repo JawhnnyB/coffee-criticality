@@ -37,6 +37,7 @@ import { ReactorBuilder } from "./ReactorBuilder";
 import { FuelShuffle } from "./FuelShuffle";
 import { MaintGame } from "./MaintGame";
 import { Desktop } from "./Desktop";
+import { maintenanceSteamOn } from "./steamRule";
 import { BootLog, SetupScreen } from "./ParlorApps";
 import { isMuted, playBed, playBlip, setMuted, unlockAudio, syncWorld, getAudioProbe, bedForRoom } from "./audio";
 import { isRevealing, requestSkip } from "./chatter";
@@ -581,7 +582,7 @@ export function GameApp() {
         room: s.room,
         period: s.period,
         mode: s.mode,
-        valveSteam: s.room === "maintenance" && s.residue.valve !== "caught",
+        valveSteam: s.room === "maintenance" && maintenanceSteamOn(s.day, s.residue.valve),
         dt,
       });
       if (s.mode === "play") {

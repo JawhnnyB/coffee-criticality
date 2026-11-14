@@ -21,7 +21,7 @@ If you cannot see the difference with the text hidden, it is not felt.
 
 ## The bug that makes failure look like success
 
-`resolveIncident` sets `incidentResolved = true` for Report, Peer, and Hide. `drawBoardA` and `drawPaperLog` in [src/game/render.ts](src/game/render.ts) treat that boolean as a catch. A hide paints the board leaf-green and the paper log says `CAUGHT`. The hiss in Maintenance stops, because steam is `day === 1 && !incidentResolved`.
+`resolveIncident` sets `incidentResolved = true` for Report, Peer, and Hide. `drawBoardA` and `drawPaperLog` in [src/game/render.ts](src/game/render.ts) read residue, not that boolean. Steam in Maintenance is on when `day === 1` and `residue.valve !== "caught"`. A hide leaves the valve `"hid"`, so the steam stays. A catch sets `"caught"`, so the steam stops. Day 2 and later draw no steam. `incidentResolved` is not the steam switch.
 
 A hide must leave the lie up.
 

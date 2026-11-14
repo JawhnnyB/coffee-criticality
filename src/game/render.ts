@@ -1,7 +1,8 @@
 import { applyWorldPostFx, postFxOn, type Light } from "./postfx";
 import { ROOMS, residueKey, type ResidueHow, type RoomId } from "./content";
 import { boardFace } from "./boardMark";
-import { LOOKS, PAL, drawChibi, drawEmote, pix } from "./pixel";
+import { LOOKS, PAL, drawChibi, drawEmote, pix, steam } from "./pixel";
+import { maintenanceSteamOn } from "./steamRule";
 import { A6_ROOMS } from "./roomArt";
 import { ROOM_ATLAS, type AtlasStamp } from "./roomAtlas";
 import { worldZoom } from "./artScale";
@@ -171,6 +172,12 @@ export function drawWorld(
   for (const d of drawables) d.draw();
   for (const p of room.props) {
     if (p.kind === "laptop") drawLaptop(g, p.rect.x, p.rect.y);
+  }
+  if (s.room === "maintenance" && maintenanceSteamOn(s.day, s.residue.valve)) {
+    const valve = room.props.find((p) => p.kind === "valve");
+    const vx = valve ? valve.rect.x + Math.round(valve.rect.w / 2) : 120;
+    const vy = valve ? valve.rect.y : 120;
+    steam(g, vx, vy, now, true);
   }
   if (usingA6) {
     g.fillStyle = "#3b2318";
