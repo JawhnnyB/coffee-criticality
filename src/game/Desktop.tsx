@@ -37,15 +37,22 @@ import {
   type WinState,
 } from "./deskWindows";
 import { particleCount, makePool, stepPool, type Particle } from "./particles";
-import { AppBody, APP_ICON_TONE, type AppCtx } from "./ParlorApps";
+import { AppBody, type AppCtx } from "./ParlorApps";
+import { AppGlyph } from "./icons/glyphs";
 import type { DesktopSave, GameState, Mode, ResultsSave } from "./sim";
 import type { PlantDesign } from "./plant";
 
 /** Titles for sim overlays that have no registry entry. */
 const SIM_TITLE: Record<string, string> = { shuffle: "Fuel shuffle" };
 
-const WIN_W = 470;
-const WIN_H = 340;
+/** A static window fills most of the desk and still fits above the taskbar. */
+function deskWinSize(screen: { w: number; h: number }) {
+  const availH = Math.max(MIN_H, screen.h - TASKBAR_H);
+  return {
+    w: Math.max(MIN_W, Math.min(screen.w - 24, Math.round(screen.w * 0.72))),
+    h: Math.max(MIN_H, Math.min(availH - 16, Math.round(availH * 0.78))),
+  };
+}
 
 export interface DesktopProps {
   /** True while the desktop is the screen: its own mode, or hosting an overlay. */
@@ -219,7 +226,8 @@ export function Desktop(props: DesktopProps) {
       return;
     }
     setWins((prev) => {
-      const at = cascadeAt(prev, screen, WIN_W, WIN_H);
+      const fit = deskWinSize(screen);
+      const at = cascadeAt(prev, screen, fit.w, fit.h);
       return openWin(
         prev,
         {
@@ -228,8 +236,8 @@ export function Desktop(props: DesktopProps) {
           title: app.title,
           x: at.x,
           y: at.y,
-          w: WIN_W,
-          h: WIN_H,
+          w: fit.w,
+          h: fit.h,
           z: 0,
           minimized: false,
           sim: false,
@@ -377,21 +385,39 @@ export function Desktop(props: DesktopProps) {
 /* ---------------------------------------------------------------- pieces */
 
 function WallPaper({ season }: { season: Season }) {
-  // Two palette tints in a pixel check, over the season colour. No image files.
-  const tint = season === "winter" ? PAL.steel : season === "spring" ? PAL.leaf : PAL.ink;
-  return (
-    <div
-      aria-hidden
-      className="absolute inset-0"
-      style={{
-        opacity: 0.12,
-        backgroundImage: `linear-gradient(45deg, ${tint} 25%, transparent 25%), linear-gradient(-45deg, ${tint} 25%, transparent 25%)`,
-        backgroundSize: "16px 16px",
-        imageRendering: "pixelated",
-        pointerEvents: "none",
-      }}
-    />
-  );
+  const ref = useRef<HTMLCanvasElement>(null);
+  useEffect(() => {
+    const c = ref.current;
+    if (!c) return;
+    const paint = () => {
+      const r = c.getBoundingClientRect();
+      const w = Math.max(1, Math.floor(r.width));
+      const hgt = Math.max(1, Math.floor(r.height));
+      c.width = w;
+      c.height = hgt;
+      const g = c.getContext("2d");
+      if (!g) return;
+      g.imageSmoothingEnabled = false;
+      const sky = season === "winter" ? "#3d5c66" : season === "summer" ? "#c4783a" : season === "fall" ? "#6a4a32" : "#6b8f71";
+      const hill = season === "winter" ? "#2a3a44" : season === "fall" ? "#4a3020" : "#3d5c66";
+      g.globalAlpha = 0.22;
+      g.fillStyle = sky;
+      g.fillRect(0, 0, w, Math.floor(hgt * 0.42));
+      g.globalAlpha = 0.28;
+      g.fillStyle = hill;
+      const base = Math.floor(hgt * 0.38);
+      for (let x = 0; x < w; x += 8) {
+        const n = ((x * 17 + (season === "summer" ? 3 : 1)) % 5) * 6;
+        g.fillRect(x, base - n, 8, hgt);
+      }
+      g.globalAlpha = 1;
+    };
+    paint();
+    const ro = new ResizeObserver(paint);
+    ro.observe(c);
+    return () => ro.disconnect();
+  }, [season]);
+  return <canvas ref={ref} aria-hidden className="pointer-events-none absolute inset-0 h-full w-full" style={{ imageRendering: "pixelated" }} />;
 }
 
 /** One canvas, one pool, pixel squares. Paused when not shown. Empty under reduced motion. */
@@ -450,17 +476,14 @@ function AppIcon({ app }: { app: AppDef }) {
     <span
       className="flex items-center justify-center"
       style={{
-        width: 44,
-        height: 44,
-        background: APP_ICON_TONE[app.id],
+        width: 32,
+        height: 32,
+        background: PAL.ink,
         border: `2px solid ${PAL.outline}`,
         color: PAL.cream,
-        fontFamily: "CCPixel3x5, monospace",
-        fontSize: 12,
-        letterSpacing: 1,
       }}
     >
-      {app.short}
+      <AppGlyph id={app.id} />
     </span>
   );
 }
@@ -472,11 +495,19 @@ function DeskIcon({ app, onOpen }: { app: AppDef; onOpen: () => void }) {
       onClick={onOpen}
       aria-label={app.title}
       data-testid={`icon-${app.id}`}
-      className="flex w-20 flex-col items-center gap-1"
-      style={{ color: PAL.cream, fontFamily: "CCPixel3x5, monospace", fontSize: 12, textShadow: `1px 1px 0 ${PAL.ink}`, background: "transparent" }}
+      className="flex flex-col items-center gap-1"
+      style={{
+        color: PAL.cream,
+        fontFamily: "CCPixel3x5, monospace",
+        fontSize: 20,
+        lineHeight: "22px",
+        textShadow: `1px 1px 0 ${PAL.ink}`,
+        background: "transparent",
+        width: 108,
+      }}
     >
       <AppIcon app={app} />
-      <span className="text-center leading-tight">{app.title}</span>
+      <span style={{ display: "block", width: "100%", textAlign: "center", lineHeight: "22px" }}>{app.title}</span>
     </button>
   );
 }
@@ -520,6 +551,7 @@ function WindowFrame({
         flexDirection: "column",
         background: PAL.cream,
         border: `2px solid ${PAL.outline}`,
+        borderTop: `4px solid ${accent}`,
         outline: focused ? `2px solid ${accent}` : "none",
         outlineOffset: 2,
         boxShadow: `4px 4px 0 ${PAL.ink}`,
@@ -549,7 +581,7 @@ function WindowFrame({
           drag.current = null;
         }}
         className="flex select-none items-center justify-between gap-2 px-2"
-        style={{ height: TITLE_H, background: PAL.woodDark, color: PAL.cream, fontFamily: "CCPixel3x5, monospace", fontSize: 12, touchAction: "none", cursor: "move" }}
+        style={{ height: TITLE_H, background: PAL.woodDark, color: PAL.cream, fontFamily: "CCPixel3x5, monospace", fontSize: 20, lineHeight: "20px", touchAction: "none", cursor: "move" }}
       >
         <span className="truncate">{win.title}</span>
         <span className="flex gap-1">
@@ -561,7 +593,7 @@ function WindowFrame({
           </button>
         </span>
       </header>
-      <div className="relative min-h-0 flex-1 overflow-hidden" style={{ background: PAL.cream }}>
+      <div className="relative min-h-0 flex-1 overflow-auto" style={{ background: PAL.cream }}>
         {children}
       </div>
     </section>
@@ -575,8 +607,8 @@ const chromeBtn: CSSProperties = {
   color: PAL.ink,
   border: `1px solid ${PAL.ink}`,
   fontFamily: "CCPixel3x5, monospace",
-  fontSize: 12,
-  lineHeight: 1,
+  fontSize: 16,
+  lineHeight: "16px",
   cursor: "pointer",
 };
 
@@ -610,14 +642,14 @@ function Taskbar({
     <nav
       aria-label="Taskbar"
       className="absolute inset-x-0 bottom-0 flex items-center gap-2 px-2"
-      style={{ height: TASKBAR_H, background: taskbar, color: PAL.cream, borderTop: `2px solid ${PAL.outline}`, fontFamily: "CCPixel3x5, monospace", fontSize: 12 }}
+      style={{ height: TASKBAR_H, background: taskbar, color: PAL.cream, borderTop: `2px solid ${PAL.outline}`, fontFamily: "CCPixel3x5, monospace", fontSize: 20, lineHeight: "22px" }}
     >
       <button
         type="button"
         onClick={onStart}
         aria-expanded={startOpen}
         data-testid="start-button"
-        style={{ height: 26, padding: "0 10px", background: PAL.copper, color: PAL.ink, border: `2px solid ${PAL.outline}`, fontFamily: "CCPixel3x5, monospace", fontSize: 12, cursor: "pointer" }}
+        style={{ height: 26, padding: "0 10px", background: PAL.copper, color: PAL.ink, border: `2px solid ${PAL.outline}`, fontFamily: "CCPixel3x5, monospace", fontSize: 20, lineHeight: "20px", cursor: "pointer" }}
       >
         Start
       </button>
@@ -637,7 +669,8 @@ function Taskbar({
               color: PAL.cream,
               border: `1px solid ${w.minimized ? PAL.ash : PAL.cream}`,
               fontFamily: "CCPixel3x5, monospace",
-              fontSize: 12,
+              fontSize: 20,
+              lineHeight: "20px",
               cursor: "pointer",
             }}
           >
@@ -651,7 +684,7 @@ function Taskbar({
         onClick={onSound}
         data-testid="desk-sound"
         aria-label={muted ? "Sound off" : "Sound on"}
-        style={{ height: 26, padding: "0 6px", background: "transparent", color: PAL.cream, border: `1px solid ${PAL.cream}`, fontFamily: "CCPixel3x5, monospace", fontSize: 12, cursor: "pointer" }}
+        style={{ height: 26, padding: "0 6px", background: "transparent", color: PAL.cream, border: `1px solid ${PAL.cream}`, fontFamily: "CCPixel3x5, monospace", fontSize: 20, lineHeight: "20px", cursor: "pointer" }}
       >
         {muted ? "SOUND OFF" : "SOUND ON"}
       </button>
