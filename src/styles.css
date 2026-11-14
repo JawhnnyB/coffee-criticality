@@ -661,7 +661,7 @@
   font-size: var(--text-small);
   letter-spacing: 0;
   text-transform: none;
-  color: var(--color-subtle);
+  color: var(--color-muted);
 }
 .teach-body {
   font-size: 0.9375rem;

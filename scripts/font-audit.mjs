@@ -76,11 +76,36 @@ for (const [w, h] of ports) {
       await page.waitForSelector("[data-testid=desktop], [data-testid=phone-home]", { timeout: 8000 }).catch(() => {});
       await page.waitForTimeout(400);
       await snap("desktop");
+      const clockNow = page.locator("[data-testid=desk-clock]");
+      if (await clockNow.count()) {
+        const box = await clockNow.boundingBox();
+        if (box) {
+          const top = Math.max(0, Math.floor(box.y - 10));
+          await page.screenshot({
+            path: join(SHOTS, `taskbar-${w}x${h}.png`),
+            clip: { x: 0, y: top, width: w, height: Math.min(56, h - top) },
+          }).catch(() => {});
+        }
+      }
       const phone = w < 720;
       if (phone) {
+        const design = page.locator("[data-testid=home-design]");
+        if (await design.count()) await design.click();
+      } else {
+        const icon = page.locator("[data-testid=icon-design]");
+        if (await icon.count()) await icon.click();
+      }
+      await page.waitForTimeout(500);
+      await page.screenshot({ path: join(SHOTS, `builder-${w}x${h}.png`) }).catch(() => {});
+      await snap("design");
+      if (phone) {
+        const back = page.locator("[data-testid=phone-back]");
+        if (await back.count()) await back.click();
         const home = page.locator("[data-testid=home-news]");
         if (await home.count()) await home.click();
       } else {
+        const close = page.locator("[data-testid=close-design]");
+        if (await close.count()) await close.click();
         const start = page.locator("[data-testid=start-button]");
         if (await start.count()) {
           await start.click();
@@ -151,15 +176,17 @@ function md(report, line) {
 
 ${line}
 
+The measured screens are the title, setup, desktop, Reactor Design, and News. Contrast on every other screen is unverified. The six palette pairs under 4.5:1 stay listed below. They were not seen as body text on the measured screens. That is not a claim about the unmeasured screens.
+
+The wide title buttons are live text (Begin, Continue, Settings, Sound), not painted hit targets. The taskbar clock and season label are the body face.
+
 Pixelify Sans is bundled at \`public/fonts/\` under the SIL Open Font License (\`public/fonts/OFL-PixelifySans.txt\`). \`@font-face\` uses \`font-display: block\`.
 
 IntroScreens \`hit()\` sets \`fontSize: 0\` on a transparent absolute target over the canvas (role picker and intro continue). Those nodes are not text and are not violations.
 
-Body, dialogue, news, and buttons use Pixelify Sans at 16px (secondary 14px). Window titles and screen headings use CCPixel5x7 at 20 or 30. Chips, the taskbar clock, and the season label use CCPixel3x5 at 10 or 20.
-
 ## Palette contrast
 
-Computed from the hex values in GROK_ART_101 and the shell palette. A pair under 4.5:1 is not used for body text. On-screen pairs are listed after the viewports.
+Computed from the hex values in GROK_ART_101 and the shell palette. A listed pair under 4.5:1 is a palette fact. It is a failure for body text only when an on-screen pair below uses it.
 
 | Pair | Hex | Ratio | Result |
 |---|---|---|---|
