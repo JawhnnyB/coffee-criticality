@@ -134,7 +134,7 @@ export function PixelMenu({
   return (
     <div ref={host} className="absolute inset-0 z-30 overflow-hidden" style={{ background: "#16110d" }} data-testid="pixel-menu">
       <img
-        src={phone ? "/art/ui/menu-scene.png" : "/art/ui/menu.png"}
+        src="/art/ui/menu-scene.png"
         alt=""
         width={MW}
         height={MH}
@@ -148,79 +148,35 @@ export function PixelMenu({
           imageRendering: "pixelated",
         }}
       />
-      <canvas
-        ref={canvasRef}
-        width={MW}
-        height={MH}
-        aria-hidden
-        style={{
-          position: "absolute",
-          left: scale.ox,
-          top: scale.oy,
-          width: scale.dw,
-          height: scale.dh,
-          imageRendering: "pixelated",
-          pointerEvents: "none",
-        }}
-      />
-      {phone ? (
-        <div
-          className="absolute z-10 flex flex-col gap-2 p-2"
-          style={{
-            left: 12,
-            right: 12,
-            bottom: 16,
-            background: "#16110d",
-          }}
-        >
-          <button type="button" data-testid="new-shift" className="btn-primary" onClick={() => activate(0)}>
-            Begin
-          </button>
-          <button type="button" data-testid="continue-shift" className="btn-ghost" disabled={!saved} onClick={() => activate(1)}>
-            Continue
-          </button>
-          <button type="button" data-testid="menu-settings" className="btn-ghost" onClick={() => activate(2)}>
-            Settings
-          </button>
-          <button type="button" data-testid="mute" className="btn-ghost" onClick={toggleMute}>
-            {mute ? "Sound off" : "Sound on"}
-          </button>
-        </div>
-      ) : (
-        <>
-      {ACTIONS.map((id, i) => (
-        <button
-          key={id}
-          type="button"
-          data-testid={id === "begin" ? "new-shift" : id === "continue" ? "continue-shift" : "menu-settings"}
-          aria-label={id}
-          className="cc-hit"
-          style={{
-            left: scale.ox + BTN_X * scale.zoom,
-            top: scale.oy + BTN_Y[i] * scale.zoom,
-            width: BTN_W * scale.zoom,
-            height: BTN_H * scale.zoom,
-          }}
-          onMouseEnter={() => setSel(i)}
-          onMouseLeave={() => setSel(0)}
-          onClick={() => activate(i)}
-        />
-      ))}
-      <button
-        type="button"
-        data-testid="mute"
-        aria-label={mute ? "Sound off" : "Sound on"}
-        className="cc-hit"
-        style={{
-          left: scale.ox + SOUND.x * scale.zoom,
-          top: scale.oy + SOUND.y * scale.zoom,
-          width: SOUND.w * scale.zoom,
-          height: SOUND.h * scale.zoom,
-        }}
-        onClick={toggleMute}
-      />
-        </>
-      )}
+      <div
+        className="absolute z-10 flex flex-col gap-2 p-2"
+        style={
+          phone
+            ? { left: 12, right: 12, bottom: 16, background: "#16110d" }
+            : {
+                left: scale.ox + Math.max(0, Math.round((scale.dw - 280) / 2)),
+                width: 280,
+                bottom: Math.max(12, box.h - (scale.oy + scale.dh) + 16),
+                background: "#16110d",
+              }
+        }
+      >
+        <button type="button" data-testid="new-shift" className="btn-primary" onClick={() => activate(0)}>
+          Begin
+        </button>
+        <button type="button" data-testid="continue-shift" className="btn-ghost" disabled={!saved} onClick={() => activate(1)}>
+          Continue
+        </button>
+        <button type="button" data-testid="menu-settings" className="btn-ghost" onClick={() => activate(2)}>
+          Settings
+        </button>
+        <button type="button" data-testid="mute" className="btn-ghost" onClick={toggleMute}>
+          {mute ? "Sound off" : "Sound on"}
+        </button>
+        <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-small)", color: "#f3e6d0", margin: 0 }}>
+          Teaching model, not a license
+        </p>
+      </div>
       {sheet ? (
         <div className="absolute inset-0 z-10 flex items-center justify-center" style={{ background: "rgba(22,17,13,0.72)" }}>
           <div className="cc-sheet">
