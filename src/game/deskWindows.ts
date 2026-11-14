@@ -31,12 +31,13 @@ export interface WinState {
   game: boolean;
 }
 
-/** A window never leaves the screen, and never goes below the minimum size (or the screen, if the screen is smaller). */
+/** A window never leaves the screen, and never goes below the minimum size (or the screen, if the screen is smaller). The bottom edge stays above the taskbar. */
 export function clampWin(win: WinState, screen: Screen): WinState {
+  const limitH = Math.max(0, screen.h - TASKBAR_H);
   const w = Math.max(Math.min(MIN_W, screen.w), Math.min(Math.max(win.w, MIN_W), screen.w));
-  const h = Math.max(Math.min(MIN_H, screen.h - TASKBAR_H), Math.min(Math.max(win.h, MIN_H), screen.h - TASKBAR_H));
+  const h = Math.max(Math.min(MIN_H, limitH), Math.min(Math.max(win.h, MIN_H), limitH));
   const maxX = Math.max(0, screen.w - w);
-  const maxY = Math.max(0, screen.h - TASKBAR_H - TITLE_H);
+  const maxY = Math.max(0, limitH - h);
   const x = Math.min(maxX, Math.max(0, win.x));
   const y = Math.min(maxY, Math.max(0, win.y));
   return { ...win, x, y, w, h };
