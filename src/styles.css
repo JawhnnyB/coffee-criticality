@@ -643,10 +643,10 @@
   .teach-span-12 { grid-column: span 4; }
 }
 .teach-meta {
-  font-family: var(--font-mono);
-  font-size: 12px;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
+  font-family: var(--font-body);
+  font-size: var(--text-small);
+  letter-spacing: 0;
+  text-transform: none;
   color: var(--color-good);
 }
 .teach-title {
@@ -657,10 +657,10 @@
   text-wrap: balance;
 }
 .teach-kicker {
-  font-family: var(--font-mono);
-  font-size: 12px;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
+  font-family: var(--font-body);
+  font-size: var(--text-small);
+  letter-spacing: 0;
+  text-transform: none;
   color: var(--color-subtle);
 }
 .teach-body {
