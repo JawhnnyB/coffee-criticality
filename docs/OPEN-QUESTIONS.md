@@ -46,6 +46,14 @@ Options: follow the old line (steam off after any resolution), or follow the tab
 
 Default used: follow the table. `maintenanceSteamOn` in `src/game/steamRule.ts` is `day === 1 && valve !== "caught"`. `incidentResolved` and residue are not redefined. The pictures of a caught room, a hid room, and day 2 were not walked, so those stills stay unverified.
 
+## Whether type and the chair merge before the playthrough
+
+Question: may the type work and the control-room chair merge while hide, LOAD.CAB, and the dusk lot are still unverified?
+
+Options: merge this branch after review, or wait until those three scenes have stills from a mouse-and-keyboard playthrough.
+
+Default used: leave the question open. This pass does not mark those scenes pass, and it does not merge.
+
 ## Frozen values and real numbers
 
 Any visual change that needs a frozen value, a real name, a region value, or a radiation number stays stopped. Regions stay "Pending verification". `news.json` stays `[]`. `background.json` stays pending.
