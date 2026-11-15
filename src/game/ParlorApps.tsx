@@ -6,6 +6,7 @@ import { ReactorBuilder } from "./ReactorBuilder";
 import { NuclearDesk } from "./NuclearDesk";
 import { TrackPlayer, TRACKS } from "./parlorMusic";
 import { setMuted, isMuted, unlockAudio } from "./audio";
+import { hostOwnsKey } from "./keyGate";
 import { CoreCamApp, CoreMapApp, ResultsApp } from "./ReactorApps";
 import { NewsApp } from "./NewsApp";
 import { ACADEMY } from "./content";
@@ -84,7 +85,8 @@ export function BootLog({ reduced, onDone }: { reduced: boolean; onDone: () => v
   }, [reduced]);
 
   useEffect(() => {
-    const key = () => {
+    const key = (e: KeyboardEvent) => {
+      if (!hostOwnsKey("menu", e.code)) return;
       unlockAudio();
       finish();
     };

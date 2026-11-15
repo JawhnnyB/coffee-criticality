@@ -1,0 +1,16 @@
+source: docs/audit/2026-11-14-evidence/npm-test-m1-keys.txt
+baseline: docs/audit/2026-11-14-evidence/fail-baseline.txt
+same-names: true
+suite-tests 210
+suite-pass 201
+suite-fail 9
+The nine failing names are the baseline from 300e4d0.
+scripts/cabinet-rewards.test.mjs
+scripts/desk-verdict.test.mjs
+injects project id on the script and meta when provided
+does not duplicate grok:app_id
+injects x:creator tags when both creator values are set
+does not duplicate x:creator tags
+platform chrome injects twitter:card when the document has none
+leaves an existing twitter:card alone
+uses the app name in the injected title tag

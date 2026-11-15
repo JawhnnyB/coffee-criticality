@@ -38,6 +38,7 @@ import { FuelShuffle } from "./FuelShuffle";
 import { MaintGame } from "./MaintGame";
 import { Desktop } from "./Desktop";
 import { maintenanceSteamOn } from "./steamRule";
+import { getKeyOwner, hostOwnsKey, setKeyOwner } from "./keyGate";
 import { BootLog, SetupScreen } from "./ParlorApps";
 import { isMuted, playBed, playBlip, setMuted, unlockAudio, syncWorld, getAudioProbe, bedForRoom } from "./audio";
 import { isRevealing, requestSkip } from "./chatter";
@@ -251,7 +252,8 @@ export function GameApp() {
 
     const down = (e: KeyboardEvent) => {
       const tag = (e.target as HTMLElement | null)?.tagName;
-      if (tag === "INPUT" || tag === "TEXTAREA") return;
+      if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
+      if (!hostOwnsKey("world", e.code)) return;
       if (GAME_CODES.has(e.code)) e.preventDefault();
       if (!keys.has(e.code)) edges.add(e.code);
       keys.add(e.code);
@@ -574,8 +576,14 @@ export function GameApp() {
     const loop = (now: number) => {
       const dt = Math.min(0.1, (now - last) / 1000);
       last = now;
-      const a = collectActions(keys, edges, stickRef.current);
       const s = stateRef.current;
+      // A full-screen cabinet keeps the owner at "world". The desk, when it is open, sets its own.
+      if (!s.deskHost && getKeyOwner() !== "world") setKeyOwner("world");
+      if (getKeyOwner() !== "world") {
+        keys.clear();
+        edges.clear();
+      }
+      const a = collectActions(keys, edges, stickRef.current);
       if (edges.has("KeyK")) tryCloseShift(s);
       update(s, a, dt);
       syncWorld({

@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { integerCover, integerScale } from "./artScale";
 import { isMuted, setMuted, unlockAudio } from "./audio";
+import { hostOwnsKey } from "./keyGate";
 
 /** Native layout from tools/artkit/menu.py. Do not redraw it. */
 const MW = 384;
@@ -110,6 +111,7 @@ export function PixelMenu({
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
+      if (!hostOwnsKey("menu", e.code)) return;
       const tag = (e.target as HTMLElement | null)?.tagName;
       if (tag === "INPUT" || tag === "TEXTAREA") return;
       if (sheet) {

@@ -37,6 +37,7 @@ import {
   type WinState,
 } from "./deskWindows";
 import { particleCount, makePool, stepPool, type Particle } from "./particles";
+import { setKeyOwner } from "./keyGate";
 import { AppBody, type AppCtx } from "./ParlorApps";
 import { AppGlyph } from "./icons/glyphs";
 import type { DesktopSave, GameState, Mode, ResultsSave } from "./sim";
@@ -115,6 +116,8 @@ export function Desktop(props: DesktopProps) {
   // Latest values for the window key listener, which is bound once.
   const live = useRef({ wins, startOpen, phone, phoneApp, simMode, hasShift, shown, onLeave, onAbortSim });
   live.current = { wins, startOpen, phone, phoneApp, simMode, hasShift, shown, onLeave, onAbortSim };
+  // Written during render so a key that arrives before the effect still sees the focused window.
+  setKeyOwner(shown ? currentFocus(live.current) : "world");
 
   // Leaving the desktop closes its own windows. A running sim overlay is handled by the game.
   useEffect(() => {
