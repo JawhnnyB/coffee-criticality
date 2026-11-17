@@ -315,7 +315,7 @@ export function RadiationApp({ ctx }: { ctx: AppCtx }) {
   return (
     <div className="app-pad" style={{ ...FIELD, color: PAL.ink }} data-testid="app-radiation">
       <p style={{ fontFamily: "var(--font-title)", fontSize: "var(--text-title-sm)", margin: 0 }}>Radiation</p>
-      <table style={{ fontSize: "var(--text-small)", marginTop: 10, borderCollapse: "collapse" }}>
+      <table className="app-table" style={{ fontSize: "var(--text-small)", marginTop: 10, borderCollapse: "collapse" }}>
         <tbody>
           {RAD_ROWS.map((r) => (
             <tr key={r.label}>
@@ -371,7 +371,7 @@ export function NrcApp() {
           style={{ display: "block", marginTop: 4, fontFamily: "inherit", fontSize: "var(--text-small)", color: PAL.ink, background: PAL.cream, border: `1px solid ${PAL.ink}`, padding: "2px 4px", width: "100%", maxWidth: 260 }}
         />
       </label>
-      <table style={{ fontSize: "var(--text-small)", marginTop: 10, borderCollapse: "collapse" }}>
+      <table className="app-table" style={{ fontSize: "var(--text-small)", marginTop: 10, borderCollapse: "collapse" }}>
         <tbody>
           {rows.map((r) => (
             <tr key={r.label}>

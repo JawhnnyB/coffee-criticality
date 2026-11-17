@@ -823,6 +823,23 @@
   background: #b85c4a;
   box-shadow: 16px 0 0 #c9a227, 32px 0 0 #6b8f71;
 }
+/* Tables inside the desktop apps: ruled rows, room to read. */
+.app-table {
+  border-collapse: collapse;
+}
+.app-table td,
+.app-table th {
+  padding: 4px 10px 4px 0;
+  border-bottom: 1px solid rgba(58, 40, 24, 0.25);
+  text-align: left;
+  vertical-align: middle;
+}
+.app-table th {
+  font-weight: 400;
+  color: #6a4a32;
+  border-bottom: 2px solid #3a2818;
+}
+
 /* Plates and stills are pixel art. Never smooth them when they are scaled. */
 img[src*="/art/gen/stills/"],
 video[poster*="/art/gen/stills/"] {

@@ -168,14 +168,20 @@ export function ResultsApp({ s }: { s: GameState }) {
     <div className="app-pad" style={FIELD} data-testid="app-results">
       <p style={{ margin: 0, fontSize: "var(--text-body)" }}>Results</p>
       <p style={{ fontSize: "var(--text-body)", margin: "6px 0 0" }}>Core health</p>
-      <p style={{ fontSize: "var(--text-title)", margin: "2px 0 6px" }}>{health.score}</p>
-      <table style={{ fontSize: "var(--text-body)", borderCollapse: "collapse" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 12, margin: "2px 0 8px" }}>
+        <span style={{ fontSize: "var(--text-title)", lineHeight: 1 }}>{health.score}</span>
+        <Meter value={health.score / 100} width={220} height={14} />
+      </div>
+      <table className="app-table" style={{ fontSize: "var(--text-body)", borderCollapse: "collapse" }}>
         <tbody>
           {health.parts.map((p) => (
             <tr key={p.id}>
               <td style={{ paddingRight: 12 }}>{p.label}</td>
               <td>{Math.round(p.weight * 100)}%</td>
-              <td style={{ paddingLeft: 12 }}>{partPercent(p.value)}</td>
+              <td style={{ paddingLeft: 12, textAlign: "right" }}>{partPercent(p.value)}</td>
+              <td style={{ paddingLeft: 12 }}>
+                <Meter value={p.value} width={120} height={8} />
+              </td>
             </tr>
           ))}
         </tbody>
@@ -185,7 +191,7 @@ export function ResultsApp({ s }: { s: GameState }) {
       <p style={{ fontSize: "var(--text-body)" }}>{BURNUP_PENDING}</p>
       <p style={{ fontSize: "var(--text-body)" }}>1 in-game day = 1 real day. Time-compressed burnup stays off until a fuel mass is cited.</p>
       <Trend rows={rows} />
-      <table style={{ fontSize: "var(--text-body)", marginTop: 8 }} data-testid="results-table">
+      <table className="app-table" style={{ fontSize: "var(--text-body)", marginTop: 8 }} data-testid="results-table">
         <thead>
           <tr>
             <th>Day</th>
@@ -210,6 +216,16 @@ export function ResultsApp({ s }: { s: GameState }) {
         </tbody>
       </table>
     </div>
+  );
+}
+
+/** A flat bar for a share from 0 to 1. The number beside it carries the value. The bar only shows it. */
+function Meter({ value, width, height }: { value: number; width: number; height: number }) {
+  const share = Math.max(0, Math.min(1, value));
+  return (
+    <span aria-hidden style={{ display: "inline-block", width, height, background: PAL.creamD, border: `1px solid ${PAL.outline}`, verticalAlign: "middle" }}>
+      <span style={{ display: "block", width: `${share * 100}%`, height: "100%", background: share >= 0.8 ? PAL.leaf : share >= 0.5 ? PAL.gold : PAL.bad }} />
+    </span>
   );
 }
 
@@ -280,7 +296,10 @@ export function CoreMapApp({ s, onResults }: { s: GameState; onResults: (patch: 
         Enrichment {plant.enrich.toFixed(1)}%. {BURNUP_PENDING} Fq {flux.fq.toFixed(2)}. Swaps {swaps}.{" "}
         {ok ? "Pass." : "Not a pass yet."}
       </p>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(6, 28px)", gap: 4 }} data-testid="core-grid">
+      <div
+        style={{ display: "grid", gridTemplateColumns: "repeat(6, 44px)", gap: 4, width: "fit-content", padding: 8, background: COL.ink, border: `2px solid ${PAL.steel}` }}
+        data-testid="core-grid"
+      >
         {grid.map((cell, i) => (
           <button
             key={i}
@@ -289,11 +308,14 @@ export function CoreMapApp({ s, onResults }: { s: GameState; onResults: (patch: 
             aria-label={`Assembly ${i + 1}, burn class ${cell}, enrichment ${plant.enrich.toFixed(1)} percent`}
             title={`Burn class ${cell}. Design enrichment ${plant.enrich.toFixed(1)}%. Per-assembly burnup is not cited.`}
             style={{
-              width: 28,
-              height: 28,
+              width: 44,
+              height: 44,
               background: pick === i ? "#c4783a" : cell === 0 ? "#f3e6d0" : cell === 1 ? "#c9a227" : "#6a4a32",
-              color: "#16110d",
-              border: `1px solid ${COL.ink}`,
+              color: cell === 2 && pick !== i ? "#f3e6d0" : "#16110d",
+              border: `2px solid ${pick === i ? PAL.cream : PAL.outline}`,
+              // The inner lines stand for the rod lattice. Decoration, not a count.
+              boxShadow: "inset 0 0 0 3px rgba(22,17,13,0.18), inset 0 0 0 4px rgba(243,230,208,0.12)",
+              cursor: "pointer",
               fontFamily: "var(--font-tag)",
               fontSize: "var(--text-tag)",
               lineHeight: 1,
