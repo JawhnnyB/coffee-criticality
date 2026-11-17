@@ -56,7 +56,7 @@ export function ReactorBuilder({
   const plantTypeStep = i === 1;
 
   return (
-    <div className="absolute inset-0 z-30 overflow-x-hidden overflow-y-auto bg-bg px-4 pb-28 pt-12 sm:px-8" data-testid="reactor-builder">
+    <div className="absolute inset-0 z-30 overflow-x-hidden overflow-y-auto bg-bg/90 px-4 pb-28 pt-12 sm:px-8" data-testid="reactor-builder">
       <div className="teach-grid">
         <div className="teach-span-12">
           <TeachMeta>
