@@ -1,0 +1,16 @@
+TAP version 13
+# Subtest: day 1 includes a valve board, and a seed repeats the five boards
+ok 1 - day 1 includes a valve board, and a seed repeats the five boards
+  ---
+  duration_ms: 2.316918
+  type: 'test'
+  ...
+1..1
+# tests 1
+# suites 0
+# pass 1
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 105.114676

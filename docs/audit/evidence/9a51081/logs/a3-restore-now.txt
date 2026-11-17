@@ -1,0 +1,22 @@
+TAP version 13
+# Subtest: default PWR design matches the type constant at the 62% seed
+ok 1 - default PWR design matches the type constant at the 62% seed
+  ---
+  duration_ms: 0.895207
+  type: 'test'
+  ...
+# Subtest: a non-default design ΔT is the bench's unit, not the type constant
+ok 2 - a non-default design ΔT is the bench's unit, not the type constant
+  ---
+  duration_ms: 0.409145
+  type: 'test'
+  ...
+1..2
+# tests 2
+# suites 0
+# pass 2
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 140.602169

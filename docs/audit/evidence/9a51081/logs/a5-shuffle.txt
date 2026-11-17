@@ -1,0 +1,40 @@
+TAP version 13
+# Subtest: start map is not a plateau: a single swap can lower Fq
+ok 1 - start map is not a plateau: a single swap can lower Fq
+  ---
+  duration_ms: 20.037474
+  type: 'test'
+  ...
+# Subtest: start map does not already pass
+ok 2 - start map does not already pass
+  ---
+  duration_ms: 0.950335
+  type: 'test'
+  ...
+# Subtest: greedy play from the start map reaches the pass band at every enrichment
+ok 3 - greedy play from the start map reaches the pass band at every enrichment
+  ---
+  duration_ms: 82.075602
+  type: 'test'
+  ...
+# Subtest: pass band has real margin: guided play lands well under the limit
+ok 4 - pass band has real margin: guided play lands well under the limit
+  ---
+  duration_ms: 687.688196
+  type: 'test'
+  ...
+# Subtest: the trade-off is real: out-in is flat but leaks, in-out is quiet on the rim but peaks
+ok 5 - the trade-off is real: out-in is flat but leaks, in-out is quiet on the rim but peaks
+  ---
+  duration_ms: 5.991473
+  type: 'test'
+  ...
+1..5
+# tests 5
+# suites 0
+# pass 5
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 946.130379

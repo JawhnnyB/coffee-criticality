@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Bezel } from "./Arcade";
+import { generationK, launchVelocity, pinLayout, stepRoll } from "./bowlModel";
 
 const W = 320;
 const H = 180;
@@ -727,15 +728,7 @@ export function BowlGame({ onDone, onAbort }: { onDone: (score: number) => void;
     ctx.imageSmoothingEnabled = false;
 
     type Pin = { x: number; y: number; up: boolean; vx: number; vy: number };
-    const layout = (): Pin[] => {
-      const p: Pin[] = [];
-      for (let r = 0; r < 4; r++) {
-        for (let c = 0; c <= r; c++) {
-          p.push({ x: 160 + (c - r / 2) * 18, y: 36 + r * 16, up: true, vx: 0, vy: 0 });
-        }
-      }
-      return p;
-    };
+    const layout = (): Pin[] => pinLayout();
     let pins = layout();
     let bx = 160;
     let by = 160;
@@ -762,8 +755,9 @@ export function BowlGame({ onDone, onAbort }: { onDone: (score: number) => void;
       rolling = true;
       balls += 1;
       downAtFire = pins.filter((p) => !p.up).length;
-      bvx = Math.sin(aim) * (80 + power * 160);
-      bvy = -Math.cos(aim) * (80 + power * 180);
+      const v = launchVelocity(aim, power);
+      bvx = v.vx;
+      bvy = v.vy;
     };
     const down = (e: KeyboardEvent) => {
       if (e.code === "Escape") onAbort();
@@ -811,42 +805,16 @@ export function BowlGame({ onDone, onAbort }: { onDone: (score: number) => void;
           /* aim from keys already applied */
         }
       } else {
-        bx += bvx * dt;
-        by += bvy * dt;
-        bvy += 8 * dt;
-        bvx *= Math.exp(-0.4 * dt);
-        if (bx < 70 || bx > 250) bvx *= -0.7;
-        for (const p of pins) {
-          if (!p.up) {
-            p.x += p.vx * dt;
-            p.y += p.vy * dt;
-            continue;
-          }
-          const d2 = (p.x - bx) ** 2 + (p.y - by) ** 2;
-          if (d2 < 80) {
-            p.up = false;
-            p.vx = (p.x - bx) * 8;
-            p.vy = (p.y - by) * 8;
-            bvx *= 0.7;
-            bvy *= 0.7;
-          }
-        }
-        for (let i = 0; i < pins.length; i++) {
-          if (pins[i].up) continue;
-          for (let j = 0; j < pins.length; j++) {
-            if (i === j || !pins[j].up) continue;
-            const d2 = (pins[i].x - pins[j].x) ** 2 + (pins[i].y - pins[j].y) ** 2;
-            if (d2 < 70) {
-              pins[j].up = false;
-              pins[j].vx = pins[i].vx * 0.6;
-              pins[j].vy = pins[i].vy * 0.6;
-            }
-          }
-        }
-        if (by < 12 || (Math.hypot(bvx, bvy) < 8 && by < 120)) {
+        const ball = { x: bx, y: by, vx: bvx, vy: bvy };
+        const stopped = stepRoll(pins, ball, dt);
+        bx = ball.x;
+        by = ball.y;
+        bvx = ball.vx;
+        bvy = ball.vy;
+        if (stopped) {
           const knocked = pins.filter((p) => !p.up).length;
           const falls = Math.max(0, knocked - downAtFire);
-          kLive = prevFalls > 0 ? falls / prevFalls : null;
+          kLive = generationK(prevFalls, falls);
           prevFalls = falls;
           if (knocked === 10 || balls >= 2) resetFrame(knocked);
           else {

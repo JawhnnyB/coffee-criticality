@@ -1,0 +1,178 @@
+TAP version 13
+# Subtest: default PWR design matches the type constant at the 62% seed
+ok 1 - default PWR design matches the type constant at the 62% seed
+  ---
+  duration_ms: 0.821809
+  type: 'test'
+  ...
+# Subtest: a non-default design ΔT is the bench's unit, not the type constant
+ok 2 - a non-default design ΔT is the bench's unit, not the type constant
+  ---
+  duration_ms: 0.386588
+  type: 'test'
+  ...
+# Subtest: a frame that does not change the rounded power writes once, then not again
+ok 3 - a frame that does not change the rounded power writes once, then not again
+  ---
+  duration_ms: 1.091161
+  type: 'test'
+  ...
+# Subtest: moving the rods writes once for the new percent, and the next tiny frame does not
+ok 4 - moving the rods writes once for the new percent, and the next tiny frame does not
+  ---
+  duration_ms: 0.196496
+  type: 'test'
+  ...
+# Subtest: a scram is one write, and it carries the scram flag
+ok 5 - a scram is one write, and it carries the scram flag
+  ---
+  duration_ms: 0.123414
+  type: 'test'
+  ...
+# Subtest: holding the band passes once, and the next frame does not write a second pass
+ok 6 - holding the band passes once, and the next frame does not write a second pass
+  ---
+  duration_ms: 0.294241
+  type: 'test'
+  ...
+# Subtest: one snapshot per plant type, with fixed inputs
+ok 7 - one snapshot per plant type, with fixed inputs
+  ---
+  duration_ms: 7.419252
+  type: 'test'
+  ...
+# Subtest: every drawn colour is a listed token, or a step on the glow ramp
+ok 8 - every drawn colour is a listed token, or a step on the glow ramp
+  ---
+  duration_ms: 4.160199
+  type: 'test'
+  ...
+# Subtest: hard pixel edges: every rectangle sits on whole pixels
+ok 9 - hard pixel edges: every rectangle sits on whole pixels
+  ---
+  duration_ms: 1.673896
+  type: 'test'
+  ...
+# Subtest: no text on the canvas: the pen has no text call and drawing never needs one
+ok 10 - no text on the canvas: the pen has no text call and drawing never needs one
+  ---
+  duration_ms: 1.854659
+  type: 'test'
+  ...
+# Subtest: fullCore draws more assemblies than the 3×3 window
+ok 11 - fullCore draws more assemblies than the 3×3 window
+  ---
+  duration_ms: 0.541269
+  type: 'test'
+  ...
+# Subtest: reduced motion draws zero particles and zero bubbles
+ok 12 - reduced motion draws zero particles and zero bubbles
+  ---
+  duration_ms: 0.206789
+  type: 'test'
+  ...
+# Subtest: scram stops the particles and the bubbles
+ok 13 - scram stops the particles and the bubbles
+  ---
+  duration_ms: 0.114488
+  type: 'test'
+  ...
+# Subtest: the mapping is monotone: more power, more glow and particles; more flow, faster particles
+ok 14 - the mapping is monotone: more power, more glow and particles; more flow, faster particles
+  ---
+  duration_ms: 0.313828
+  type: 'test'
+  ...
+# Subtest: the boiling proxy is monotone: more void, more bubbles and faster rise
+ok 15 - the boiling proxy is monotone: more void, more bubbles and faster rise
+  ---
+  duration_ms: 0.343063
+  type: 'test'
+  ...
+# Subtest: the drawings carry their geometry: pebbles are circles with helium, BWR has bubbles, PWR and MSR have arrows
+ok 16 - the drawings carry their geometry: pebbles are circles with helium, BWR has bubbles, PWR and MSR have arrows
+  ---
+  duration_ms: 1.16057
+  type: 'test'
+  ...
+# Subtest: camScale is an integer from 1 to 4, from the window width
+ok 17 - camScale is an integer from 1 to 4, from the window width
+  ---
+  duration_ms: 0.188896
+  type: 'test'
+  ...
+# Subtest: the glow moves only past a 5 percent change under reduced motion, and always under normal motion
+ok 18 - the glow moves only past a 5 percent change under reduced motion, and always under normal motion
+  ---
+  duration_ms: 0.109282
+  type: 'test'
+  ...
+# Subtest: PWR bench values match the trainer's own readout
+ok 19 - PWR bench values match the trainer's own readout
+  ---
+  duration_ms: 1.068382
+  type: 'test'
+  ...
+# Subtest: ΔT is in band at 100% power and 100% flow for PWR
+ok 20 - ΔT is in band at 100% power and 100% flow for PWR
+  ---
+  duration_ms: 0.138581
+  type: 'test'
+  ...
+# Subtest: ΔT rises with power and falls with flow, for every plant type
+ok 21 - ΔT rises with power and falls with flow, for every plant type
+  ---
+  duration_ms: 0.188287
+  type: 'test'
+  ...
+# Subtest: fuel is hotter than the hot leg, which is hotter than the cold leg, whenever power is above zero
+ok 22 - fuel is hotter than the hot leg, which is hotter than the cold leg, whenever power is above zero
+  ---
+  duration_ms: 0.39676
+  type: 'test'
+  ...
+# Subtest: zero power gives no ΔT and no fuel rise
+ok 23 - zero power gives no ΔT and no fuel rise
+  ---
+  duration_ms: 0.124892
+  type: 'test'
+  ...
+# Subtest: a PlantDesign and its type give the same answer
+ok 24 - a PlantDesign and its type give the same answer
+  ---
+  duration_ms: 0.65257
+  type: 'test'
+  ...
+# Subtest: the flow floor keeps ΔT finite at very low flow
+ok 25 - the flow floor keeps ΔT finite at very low flow
+  ---
+  duration_ms: 0.192929
+  type: 'test'
+  ...
+# Subtest: the shared run seeds at the 62% drill, and flow still comes from the design
+ok 26 - the shared run seeds at the 62% drill, and flow still comes from the design
+  ---
+  duration_ms: 0.148303
+  type: 'test'
+  ...
+# Subtest: history is per minute while open and per hour while closed, and it caps
+ok 27 - history is per minute while open and per hour while closed, and it caps
+  ---
+  duration_ms: 0.568248
+  type: 'test'
+  ...
+# Subtest: fuel mass stays pending until someone cites an inventory
+ok 28 - fuel mass stays pending until someone cites an inventory
+  ---
+  duration_ms: 0.350206
+  type: 'test'
+  ...
+1..28
+# tests 28
+# suites 0
+# pass 28
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 454.888478

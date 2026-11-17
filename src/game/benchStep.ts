@@ -1,4 +1,4 @@
-import { DT_BAND, thermalState, type PlantType } from "./plant";
+import { DT_BAND, benchThermal, type PlantDesign, type PlantType } from "./plant";
 
 /** Seconds the ΔT band must be held. Same number the bench shows. */
 export const BENCH_HOLD: Record<PlantType, number> = { pwr: 8, bwr: 8, pebble: 8, msr: 8 };
@@ -11,7 +11,7 @@ export interface BenchFrame {
   flow: number;
   hold: number;
   dt: number;
-  plant: PlantType;
+  plant: PlantType | PlantDesign;
   /** Last power written to the shared run. Null until the first write of this visit. */
   lastWritten: number | null;
 }
@@ -38,10 +38,11 @@ export interface BenchResult {
  * and once on a scram. A frame that stays on the same rounded percent writes nothing.
  */
 export function stepBench(frame: BenchFrame): BenchResult {
+  const type: PlantType = typeof frame.plant === "string" ? frame.plant : frame.plant.type;
   const next = frame.power + (frame.rods - frame.power) * frame.dt * 0.45;
-  const band = DT_BAND[frame.plant];
-  const ts = thermalState(frame.plant, { powerPct: next, flowPct: frame.flow });
-  if (ts.dT > band.hi * 1.45 || ts.tHot > SCRAM_HOT[frame.plant] || next > 114) {
+  const band = DT_BAND[type];
+  const ts = benchThermal(frame.plant, { powerPct: next, flowPct: frame.flow });
+  if (ts.dT > band.hi * 1.45 || ts.tHot > SCRAM_HOT[type] || next > 114) {
     return {
       power: next,
       hold: frame.hold,
@@ -54,7 +55,7 @@ export function stepBench(frame: BenchFrame): BenchResult {
   }
   const inBand = ts.dT >= band.lo && ts.dT <= band.hi;
   const hold = inBand ? frame.hold + frame.dt : 0;
-  const justPassed = hold >= BENCH_HOLD[frame.plant] && frame.hold < BENCH_HOLD[frame.plant];
+  const justPassed = hold >= BENCH_HOLD[type] && frame.hold < BENCH_HOLD[type];
   const changed = frame.lastWritten === null || Math.round(frame.lastWritten) !== Math.round(next);
   return {
     power: next,
