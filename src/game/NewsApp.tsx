@@ -3,8 +3,9 @@ import { PAL } from "./palette";
 import { pickLocal, SHIPPED_LOCAL_POOL, localLabel, type LocalItem } from "./localNews";
 import type { GameState } from "./sim";
 
-const FIELD = { fontFamily: "CCPixel3x5, monospace", color: PAL.ink } as const;
-const NOT_BUILT = "Not in this build.";
+const FIELD = { fontFamily: "var(--font-body)", fontSize: "var(--text-body)", color: PAL.ink, lineHeight: 1.5 } as const;
+const QUIET_WORLD = "The wire is quiet. Nothing has come in for this shift.";
+const QUIET_LOCAL = "The plant paper is blank today.";
 
 interface WorldItem {
   id: string;
@@ -36,8 +37,8 @@ export function NewsApp({ s }: { s: GameState }) {
     residueHides,
   });
   return (
-    <div className="p-3" style={FIELD} data-testid="app-news">
-      <p style={{ margin: 0, fontSize: 14 }}>News</p>
+    <div className="app-pad" style={FIELD} data-testid="app-news">
+      <p style={{ margin: 0, fontFamily: "var(--font-title)", fontSize: "var(--text-title-sm)" }}>News</p>
       <div className="mt-2 flex gap-2" role="tablist">
         {(["world", "local"] as const).map((t) => (
           <button
@@ -47,20 +48,20 @@ export function NewsApp({ s }: { s: GameState }) {
             aria-selected={tab === t}
             data-testid={`news-tab-${t}`}
             onClick={() => setTab(t)}
-            style={{ fontFamily: "inherit", fontSize: 12, border: `1px solid ${PAL.ink}`, padding: "2px 8px", background: tab === t ? PAL.cream : "transparent", color: PAL.ink }}
+            style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-body)", minHeight: 44, border: `1px solid ${PAL.ink}`, padding: "2px 8px", background: tab === t ? PAL.cream : "transparent", color: PAL.ink }}
           >
             {t === "world" ? "World" : "Local"}
           </button>
         ))}
       </div>
       {tab === "world" ? (
-        <div style={{ marginTop: 10, fontSize: 12 }} data-testid="news-world">
-          {world === null ? null : world.length === 0 ? <p>{NOT_BUILT}</p> : world.map((w) => <p key={w.id}>{`${w.headline} · ${w.source} · ${w.date}`}</p>)}
+        <div style={{ marginTop: 10, fontSize: "var(--text-body)" }} data-testid="news-world">
+          {world === null ? null : world.length === 0 ? <p>{QUIET_WORLD}</p> : world.map((w) => <p key={w.id}>{`${w.headline} · ${w.source} · ${w.date}`}</p>)}
         </div>
       ) : (
-        <div style={{ marginTop: 10, fontSize: 12 }} data-testid="news-local">
+        <div style={{ marginTop: 10, fontSize: "var(--text-body)" }} data-testid="news-local">
           {local.length === 0 ? (
-            <p>{NOT_BUILT}</p>
+            <p>{QUIET_LOCAL}</p>
           ) : (
             local.map((item) => (
               <p key={item.id}>

@@ -1,0 +1,16 @@
+{
+  "before": {
+    "x": 152,
+    "y": 220,
+    "mode": "play"
+  },
+  "opened": "delay",
+  "during": {
+    "x": 152,
+    "y": 220,
+    "mode": "delay"
+  },
+  "pageErrors": 0,
+  "dx": 0,
+  "dy": 0
+}

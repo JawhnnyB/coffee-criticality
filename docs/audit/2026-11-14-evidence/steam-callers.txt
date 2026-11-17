@@ -1,0 +1,7 @@
+src/game/pixel.ts:831:export function steam(ctx: CanvasRenderingContext2D, x: number, y: number, now: number, big = false) {
+src/game/render.ts:5:import { maintenanceSteamOn } from "./steamRule";
+src/game/render.ts:176:  if (s.room === "maintenance" && maintenanceSteamOn(s.day, s.residue.valve)) {
+src/game/render.ts:180:    steam(g, vx, vy, now, true);
+src/game/steamRule.ts:4:export function maintenanceSteamOn(day: number, valve: "open" | "caught" | "hid"): boolean {
+src/game/GameApp.tsx:40:import { maintenanceSteamOn } from "./steamRule";
+src/game/GameApp.tsx:585:        valveSteam: s.room === "maintenance" && maintenanceSteamOn(s.day, s.residue.valve),

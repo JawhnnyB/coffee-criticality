@@ -1,0 +1,6 @@
+url http://127.0.0.1:8094/
+phone-img {"w":1536,"h":864,"x":-573,"y":-10} pageErrors 0
+title-1280 pageErrors 0
+why-1280 {"x":690.5,"y":376,"width":320.5,"height":68.25} pageErrors 0
+why-390 {"x":29,"y":650.78125,"width":332,"height":68.25} pageErrors 0
+title-390 390x844 top45-non-ink 16510 of 16510 fraction 1.000

@@ -12,8 +12,8 @@ const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 test("full-core and depletion change k and the OpenMC letter", () => {
   const out = join(mkdtempSync(join(tmpdir(), "cc-lab-")), "lab.mjs");
   const bundled = spawnSync(
-    "npx",
-    ["esbuild", join(root, "src/game/nuclearLab.ts"), "--bundle", "--platform=node", "--format=esm", `--outfile=${out}`],
+    process.env.ESBUILD ?? "npx",
+    [...(process.env.ESBUILD ? [] : ["esbuild"]), join(root, "src/game/nuclearLab.ts"), "--bundle", "--platform=node", "--format=esm", `--outfile=${out}`],
     { encoding: "utf8", cwd: root },
   );
   if (bundled.status !== 0) throw new Error(bundled.stderr || bundled.stdout || "esbuild failed");

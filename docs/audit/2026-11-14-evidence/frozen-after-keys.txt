@@ -1,0 +1,14 @@
+other files: sim.ts shuffleModel.ts schematicMath.ts save.ts
+other_frozen_exit:0
+DelayGame value lines on HEAD:
+HEAD:src/game/DelayGame.tsx:11:const LAMBDA = 0.005;
+HEAD:src/game/DelayGame.tsx:12:const N_MAX = 40;
+DelayGame value lines on origin/c/walk-unblock:
+origin/c/walk-unblock:src/game/DelayGame.tsx:11:const LAMBDA = 0.005;
+origin/c/walk-unblock:src/game/DelayGame.tsx:12:const N_MAX = 40;
+lambda_line_same True
+nmax_line_same True
+frozen_delay_values_exit:0
+DelayGame diff stat against the base:
+ src/game/DelayGame.tsx | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)

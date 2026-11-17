@@ -1,0 +1,1415 @@
+TAP version 13
+# Subtest: a frame that does not change the rounded power writes once, then not again
+ok 1 - a frame that does not change the rounded power writes once, then not again
+  ---
+  duration_ms: 1.098549
+  type: 'test'
+  ...
+# Subtest: moving the rods writes once for the new percent, and the next tiny frame does not
+ok 2 - moving the rods writes once for the new percent, and the next tiny frame does not
+  ---
+  duration_ms: 0.231204
+  type: 'test'
+  ...
+# Subtest: a scram is one write, and it carries the scram flag
+ok 3 - a scram is one write, and it carries the scram flag
+  ---
+  duration_ms: 0.130301
+  type: 'test'
+  ...
+# Subtest: holding the band passes once, and the next frame does not write a second pass
+ok 4 - holding the band passes once, and the next frame does not write a second pass
+  ---
+  duration_ms: 0.351209
+  type: 'test'
+  ...
+# Subtest: days 1 to 4 tell open, caught, and hid apart, and a hide is never a catch
+ok 5 - days 1 to 4 tell open, caught, and hid apart, and a hide is never a catch
+  ---
+  duration_ms: 1.099985
+  type: 'test'
+  ...
+# Subtest: day 5 is the same picture for open, caught, and hid
+ok 6 - day 5 is the same picture for open, caught, and hid
+  ---
+  duration_ms: 0.879294
+  type: 'test'
+  ...
+# Subtest: the four residue fields are the four days, and day 5 has none
+ok 7 - the four residue fields are the four days, and day 5 has none
+  ---
+  duration_ms: 2234.078742
+  type: 'test'
+  ...
+# Subtest: non-canvas app with placeholder gets a soft BRAND NOTE (utility exception)
+ok 8 - non-canvas app with placeholder gets a soft BRAND NOTE (utility exception)
+  ---
+  duration_ms: 1.683211
+  type: 'test'
+  ...
+# Subtest: non-canvas app with a compliant card is silent
+ok 9 - non-canvas app with a compliant card is silent
+  ---
+  duration_ms: 1.158255
+  type: 'test'
+  ...
+# Subtest: non-canvas app with no og:image at all is silent
+ok 10 - non-canvas app with no og:image at all is silent
+  ---
+  duration_ms: 0.349805
+  type: 'test'
+  ...
+# Subtest: oversized card warns for non-canvas apps too
+ok 11 - oversized card warns for non-canvas apps too
+  ---
+  duration_ms: 13.167143
+  type: 'test'
+  ...
+# Subtest: canvas app with no card warns 'missing' and missing og:type
+ok 12 - canvas app with no card warns 'missing' and missing og:type
+  ---
+  duration_ms: 1.12366
+  type: 'test'
+  ...
+# Subtest: card present but placeholder still wired warns 'wire og:image' and missing og:type
+ok 13 - card present but placeholder still wired warns 'wire og:image' and missing og:type
+  ---
+  duration_ms: 20.059917
+  type: 'test'
+  ...
+# Subtest: oversized card warns on the scraper budget (jpg and legacy png)
+ok 14 - oversized card warns on the scraper budget (jpg and legacy png)
+  ---
+  duration_ms: 7.252798
+  type: 'test'
+  ...
+# Subtest: compliant jpg card under budget still warns without og:type for canvas apps
+ok 15 - compliant jpg card under budget still warns without og:type for canvas apps
+  ---
+  duration_ms: 0.778348
+  type: 'test'
+  ...
+# Subtest: compliant game (custom card + og:type + x:game:image + narrow card) is silent
+ok 16 - compliant game (custom card + og:type + x:game:image + narrow card) is silent
+  ---
+  duration_ms: 9.930833
+  type: 'test'
+  ...
+# Subtest: oversized x-banner warns on the same scraper budget as og.jpg
+ok 17 - oversized x-banner warns on the same scraper budget as og.jpg
+  ---
+  duration_ms: 1.612549
+  type: 'test'
+  ...
+# Subtest: legacy png under budget with custom wiring still requires og:type for canvas
+ok 18 - legacy png under budget with custom wiring still requires og:type for canvas
+  ---
+  duration_ms: 4.481273
+  type: 'test'
+  ...
+# Subtest: legacy png + og:type game still needs the X feed card
+ok 19 - legacy png + og:type game still needs the X feed card
+  ---
+  duration_ms: 0.544663
+  type: 'test'
+  ...
+# Subtest: rootDeclaresOgTypeGame accepts property/content order variants
+ok 20 - rootDeclaresOgTypeGame accepts property/content order variants
+  ---
+  duration_ms: 0.122331
+  type: 'test'
+  ...
+# Subtest: rootDeclaresOgTypeGame ignores comment-only scaffold examples
+ok 21 - rootDeclaresOgTypeGame ignores comment-only scaffold examples
+  ---
+  duration_ms: 0.440192
+  type: 'test'
+  ...
+# Subtest: canvas app with comment-only og:type still warns
+ok 22 - canvas app with comment-only og:type still warns
+  ---
+  duration_ms: 4.63692
+  type: 'test'
+  ...
+# Subtest: rootDeclaresGameImage requires a live x:game:image property
+ok 23 - rootDeclaresGameImage requires a live x:game:image property
+  ---
+  duration_ms: 0.116095
+  type: 'test'
+  ...
+# node:internal/modules/package_json_reader:314
+#   throw new ERR_MODULE_NOT_FOUND(packageName, fileURLToPath(base), null);
+#         ^
+# Error [ERR_MODULE_NOT_FOUND]: Cannot find package 'esbuild' imported from /root/work/coffee/scripts/cabinet-rewards.test.mjs
+#     at Object.getPackageJSONURL (node:internal/modules/package_json_reader:314:9)
+#     at packageResolve (node:internal/modules/esm/resolve:772:81)
+#     at moduleResolve (node:internal/modules/esm/resolve:859:18)
+#     at defaultResolve (node:internal/modules/esm/resolve:989:11)
+#     at \#cachedDefaultResolve (node:internal/modules/esm/loader:747:20)
+#     at ModuleLoader.resolve (node:internal/modules/esm/loader:724:38)
+#     at ModuleLoader.getModuleJobForImport (node:internal/modules/esm/loader:320:38)
+#     at onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:680:36)
+#     at TracingChannel.tracePromise (node:diagnostics_channel:350:14)
+#     at ModuleLoader.import (node:internal/modules/esm/loader:679:21) {
+#   code: 'ERR_MODULE_NOT_FOUND'
+# }
+# Node.js v22.23.3
+# Subtest: scripts/cabinet-rewards.test.mjs
+not ok 4 - scripts/cabinet-rewards.test.mjs
+  ---
+  duration_ms: 143.0727
+  type: 'test'
+  location: '/root/work/coffee/scripts/cabinet-rewards.test.mjs:1:1'
+  failureType: 'testCodeFailure'
+  exitCode: 1
+  signal: ~
+  error: 'test failed'
+  code: 'ERR_TEST_FAILURE'
+  ...
+# Subtest: one snapshot per plant type, with fixed inputs
+ok 25 - one snapshot per plant type, with fixed inputs
+  ---
+  duration_ms: 20.456716
+  type: 'test'
+  ...
+# Subtest: every drawn colour is a listed token, or a step on the glow ramp
+ok 26 - every drawn colour is a listed token, or a step on the glow ramp
+  ---
+  duration_ms: 8.220721
+  type: 'test'
+  ...
+# Subtest: hard pixel edges: every rectangle sits on whole pixels
+ok 27 - hard pixel edges: every rectangle sits on whole pixels
+  ---
+  duration_ms: 4.420965
+  type: 'test'
+  ...
+# Subtest: no text on the canvas: the pen has no text call and drawing never needs one
+ok 28 - no text on the canvas: the pen has no text call and drawing never needs one
+  ---
+  duration_ms: 8.84371
+  type: 'test'
+  ...
+# Subtest: fullCore draws more assemblies than the 3×3 window
+ok 29 - fullCore draws more assemblies than the 3×3 window
+  ---
+  duration_ms: 6.527903
+  type: 'test'
+  ...
+# Subtest: reduced motion draws zero particles and zero bubbles
+ok 30 - reduced motion draws zero particles and zero bubbles
+  ---
+  duration_ms: 0.301164
+  type: 'test'
+  ...
+# Subtest: scram stops the particles and the bubbles
+ok 31 - scram stops the particles and the bubbles
+  ---
+  duration_ms: 0.174712
+  type: 'test'
+  ...
+# Subtest: the mapping is monotone: more power, more glow and particles; more flow, faster particles
+ok 32 - the mapping is monotone: more power, more glow and particles; more flow, faster particles
+  ---
+  duration_ms: 0.308935
+  type: 'test'
+  ...
+# Subtest: the boiling proxy is monotone: more void, more bubbles and faster rise
+ok 33 - the boiling proxy is monotone: more void, more bubbles and faster rise
+  ---
+  duration_ms: 1.535351
+  type: 'test'
+  ...
+# Subtest: the drawings carry their geometry: pebbles are circles with helium, BWR has bubbles, PWR and MSR have arrows
+ok 34 - the drawings carry their geometry: pebbles are circles with helium, BWR has bubbles, PWR and MSR have arrows
+  ---
+  duration_ms: 6.528043
+  type: 'test'
+  ...
+# Subtest: camScale is an integer from 1 to 4, from the window width
+ok 35 - camScale is an integer from 1 to 4, from the window width
+  ---
+  duration_ms: 0.304853
+  type: 'test'
+  ...
+# Subtest: the glow moves only past a 5 percent change under reduced motion, and always under normal motion
+ok 36 - the glow moves only past a 5 percent change under reduced motion, and always under normal motion
+  ---
+  duration_ms: 0.151074
+  type: 'test'
+  ...
+# Subtest: the control-room chair blocks the player, and a cafe chair does not
+ok 37 - the control-room chair blocks the player, and a cafe chair does not
+  ---
+  duration_ms: 1.578842
+  type: 'test'
+  ...
+# Subtest: parses frontmatter keys
+ok 38 - parses frontmatter keys
+  ---
+  duration_ms: 2.559982
+  type: 'test'
+  ...
+# Subtest: passes when the other AI approved and only the record changed since
+ok 39 - passes when the other AI approved and only the record changed since
+  ---
+  duration_ms: 0.614857
+  type: 'test'
+  ...
+# Subtest: fails when one AI reviews its own work
+ok 40 - fails when one AI reviews its own work
+  ---
+  duration_ms: 0.259121
+  type: 'test'
+  ...
+# Subtest: fails on an unknown code, not G or C
+ok 41 - fails on an unknown code, not G or C
+  ---
+  duration_ms: 0.157017
+  type: 'test'
+  ...
+# Subtest: fails without an approve verdict
+ok 42 - fails without an approve verdict
+  ---
+  duration_ms: 0.13732
+  type: 'test'
+  ...
+# Subtest: fails if code changed after the reviewed commit
+ok 43 - fails if code changed after the reviewed commit
+  ---
+  duration_ms: 0.144623
+  type: 'test'
+  ...
+# Subtest: fails if the reviewed commit is not in the head's history
+ok 44 - fails if the reviewed commit is not in the head's history
+  ---
+  duration_ms: 0.255372
+  type: 'test'
+  ...
+# Subtest: fails when the record is for another PR
+ok 45 - fails when the record is for another PR
+  ---
+  duration_ms: 0.127472
+  type: 'test'
+  ...
+# node:internal/modules/package_json_reader:314
+#   throw new ERR_MODULE_NOT_FOUND(packageName, fileURLToPath(base), null);
+#         ^
+# Error [ERR_MODULE_NOT_FOUND]: Cannot find package 'esbuild' imported from /root/work/coffee/scripts/desk-verdict.test.mjs
+#     at Object.getPackageJSONURL (node:internal/modules/package_json_reader:314:9)
+#     at packageResolve (node:internal/modules/esm/resolve:772:81)
+#     at moduleResolve (node:internal/modules/esm/resolve:859:18)
+#     at defaultResolve (node:internal/modules/esm/resolve:989:11)
+#     at \#cachedDefaultResolve (node:internal/modules/esm/loader:747:20)
+#     at ModuleLoader.resolve (node:internal/modules/esm/loader:724:38)
+#     at ModuleLoader.getModuleJobForImport (node:internal/modules/esm/loader:320:38)
+#     at onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:680:36)
+#     at TracingChannel.tracePromise (node:diagnostics_channel:350:14)
+#     at ModuleLoader.import (node:internal/modules/esm/loader:679:21) {
+#   code: 'ERR_MODULE_NOT_FOUND'
+# }
+# Node.js v22.23.3
+# Subtest: scripts/desk-verdict.test.mjs
+not ok 8 - scripts/desk-verdict.test.mjs
+  ---
+  duration_ms: 47.879255
+  type: 'test'
+  location: '/root/work/coffee/scripts/desk-verdict.test.mjs:1:1'
+  failureType: 'testCodeFailure'
+  exitCode: 1
+  signal: ~
+  error: 'test failed'
+  code: 'ERR_TEST_FAILURE'
+  ...
+# Subtest: every spoken line is quoted speech
+ok 47 - every spoken line is quoted speech
+  ---
+  duration_ms: 0.994261
+  type: 'test'
+  ...
+# Subtest: spoken lines fit the box and are whole sentences
+ok 48 - spoken lines fit the box and are whole sentences
+  ---
+  duration_ms: 0.493468
+  type: 'test'
+  ...
+# Subtest: no stage directions inside spoken lines
+ok 49 - no stage directions inside spoken lines
+  ---
+  duration_ms: 0.695028
+  type: 'test'
+  ...
+# Subtest: no line repeats another character's line word-for-word
+ok 50 - no line repeats another character's line word-for-word
+  ---
+  duration_ms: 0.240052
+  type: 'test'
+  ...
+# Subtest: injects before </head>
+ok 51 - injects before </head>
+  ---
+  duration_ms: 2.628246
+  type: 'test'
+  ...
+# Subtest: injects the extensions script without a project id
+ok 52 - injects the extensions script without a project id
+  ---
+  duration_ms: 0.429398
+  type: 'test'
+  ...
+# Subtest: injects project id on the script and meta when provided
+not ok 53 - injects project id on the script and meta when provided
+  ---
+  duration_ms: 0.817946
+  type: 'test'
+  location: '/root/work/coffee/scripts/grok-pwa-plugin.test.mjs:36:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    The input did not match the regular expression /name="grok-project-id" content="proj-123"/. Input:
+    
+    '<html><head><meta name="twitter:card" content="summary_large_image"><meta property="og:title" content="Grok App"><link rel="manifest" href="/__grok/manifest.webmanifest"><link rel="apple-touch-icon" href="/__grok/icon-180.png"><meta name="apple-mobile-web-app-title" content="Grok App"><meta name="apple-mobile-web-app-status-bar-style" content="black"><meta name="theme-color" content="#000000"><script src="https://grok.com/grok-app-builder/extensions.js" defer></script></head></html>'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  actual: '<html><head><meta name="twitter:card" content="summary_large_image"><meta property="og:title" content="Grok App"><link rel="manifest" href="/__grok/manifest.webmanifest"><link rel="apple-touch-icon" href="/__grok/icon-180.png"><meta name="apple-mobile-web-app-title" content="Grok App"><meta name="apple-mobile-web-app-status-bar-style" content="black"><meta name="theme-color" content="#000000"><script src="https://grok.com/grok-app-builder/extensions.js" defer></script></head></html>'
+  operator: 'match'
+  stack: |-
+    TestContext.<anonymous> (file:///root/work/coffee/scripts/grok-pwa-plugin.test.mjs:38:10)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: does not duplicate grok:app_id
+not ok 54 - does not duplicate grok:app_id
+  ---
+  duration_ms: 0.941964
+  type: 'test'
+  location: '/root/work/coffee/scripts/grok-pwa-plugin.test.mjs:43:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    
+    0 !== 1
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 1
+  actual: 0
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///root/work/coffee/scripts/grok-pwa-plugin.test.mjs:47:10)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: omits x:creator tags without both creator values
+ok 55 - omits x:creator tags without both creator values
+  ---
+  duration_ms: 0.912894
+  type: 'test'
+  ...
+# Subtest: injects x:creator tags when both creator values are set
+not ok 56 - injects x:creator tags when both creator values are set
+  ---
+  duration_ms: 1.793027
+  type: 'test'
+  location: '/root/work/coffee/scripts/grok-pwa-plugin.test.mjs:57:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    The input did not match the regular expression /property="x:creator" content="@alice"/. Input:
+    
+    '<html><head><meta name="twitter:card" content="summary_large_image"><meta property="og:title" content="Grok App"><link rel="manifest" href="/__grok/manifest.webmanifest"><link rel="apple-touch-icon" href="/__grok/icon-180.png"><meta name="apple-mobile-web-app-title" content="Grok App"><meta name="apple-mobile-web-app-status-bar-style" content="black"><meta name="theme-color" content="#000000"><script src="https://grok.com/grok-app-builder/extensions.js" defer></script></head></html>'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  actual: '<html><head><meta name="twitter:card" content="summary_large_image"><meta property="og:title" content="Grok App"><link rel="manifest" href="/__grok/manifest.webmanifest"><link rel="apple-touch-icon" href="/__grok/icon-180.png"><meta name="apple-mobile-web-app-title" content="Grok App"><meta name="apple-mobile-web-app-status-bar-style" content="black"><meta name="theme-color" content="#000000"><script src="https://grok.com/grok-app-builder/extensions.js" defer></script></head></html>'
+  operator: 'match'
+  stack: |-
+    TestContext.<anonymous> (file:///root/work/coffee/scripts/grok-pwa-plugin.test.mjs:59:10)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: escapes x:creator values
+ok 57 - escapes x:creator values
+  ---
+  duration_ms: 0.16493
+  type: 'test'
+  ...
+# Subtest: does not duplicate x:creator tags
+not ok 58 - does not duplicate x:creator tags
+  ---
+  duration_ms: 0.721114
+  type: 'test'
+  location: '/root/work/coffee/scripts/grok-pwa-plugin.test.mjs:75:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    
+    0 !== 1
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 1
+  actual: 0
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///root/work/coffee/scripts/grok-pwa-plugin.test.mjs:79:10)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: platform chrome injects twitter:card when the document has none
+not ok 59 - platform chrome injects twitter:card when the document has none
+  ---
+  duration_ms: 0.527556
+  type: 'test'
+  location: '/root/work/coffee/scripts/grok-pwa-plugin.test.mjs:83:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    The input was expected to not match the regular expression /property="og:title"/. Input:
+    
+    '<html><head><meta name="twitter:card" content="summary_large_image"><meta property="og:title" content="Hello World"><title>Hello World</title><link rel="manifest" href="/__grok/manifest.webmanifest"><link rel="apple-touch-icon" href="/__grok/icon-180.png"><meta name="apple-mobile-web-app-title" content="Hello World"><meta name="apple-mobile-web-app-status-bar-style" content="black"><meta name="theme-color" content="#000000"><script src="https://grok.com/grok-app-builder/extensions.js" defer></script></head></html>'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  actual: '<html><head><meta name="twitter:card" content="summary_large_image"><meta property="og:title" content="Hello World"><title>Hello World</title><link rel="manifest" href="/__grok/manifest.webmanifest"><link rel="apple-touch-icon" href="/__grok/icon-180.png"><meta name="apple-mobile-web-app-title" content="Hello World"><meta name="apple-mobile-web-app-status-bar-style" content="black"><meta name="theme-color" content="#000000"><script src="https://grok.com/grok-app-builder/extensions.js" defer></script></head></html>'
+  operator: 'doesNotMatch'
+  stack: |-
+    TestContext.<anonymous> (file:///root/work/coffee/scripts/grok-pwa-plugin.test.mjs:86:10)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: does not duplicate twitter:card
+ok 60 - does not duplicate twitter:card
+  ---
+  duration_ms: 0.670893
+  type: 'test'
+  ...
+# Subtest: leaves an existing twitter:card alone
+not ok 61 - leaves an existing twitter:card alone
+  ---
+  duration_ms: 0.406104
+  type: 'test'
+  location: '/root/work/coffee/scripts/grok-pwa-plugin.test.mjs:96:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    The input did not match the regular expression /name="twitter:card" content="summary"/. Input:
+    
+    '<html><head><meta name="twitter:card" content="summary_large_image"><meta property="og:title" content="Grok App"><link rel="manifest" href="/__grok/manifest.webmanifest"><link rel="apple-touch-icon" href="/__grok/icon-180.png"><meta name="apple-mobile-web-app-title" content="Grok App"><meta name="apple-mobile-web-app-status-bar-style" content="black"><meta name="theme-color" content="#000000"><script src="https://grok.com/grok-app-builder/extensions.js" defer></script></head></html>'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  actual: '<html><head><meta name="twitter:card" content="summary_large_image"><meta property="og:title" content="Grok App"><link rel="manifest" href="/__grok/manifest.webmanifest"><link rel="apple-touch-icon" href="/__grok/icon-180.png"><meta name="apple-mobile-web-app-title" content="Grok App"><meta name="apple-mobile-web-app-status-bar-style" content="black"><meta name="theme-color" content="#000000"><script src="https://grok.com/grok-app-builder/extensions.js" defer></script></head></html>'
+  operator: 'match'
+  stack: |-
+    TestContext.<anonymous> (file:///root/work/coffee/scripts/grok-pwa-plugin.test.mjs:99:10)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: does not duplicate the extensions script
+ok 62 - does not duplicate the extensions script
+  ---
+  duration_ms: 1.129787
+  type: 'test'
+  ...
+# Subtest: is idempotent
+ok 63 - is idempotent
+  ---
+  duration_ms: 0.337321
+  type: 'test'
+  ...
+# Subtest: uses the app name in the injected title tag
+not ok 64 - uses the app name in the injected title tag
+  ---
+  duration_ms: 0.29986
+  type: 'test'
+  location: '/root/work/coffee/scripts/grok-pwa-plugin.test.mjs:117:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    The input did not match the regular expression /apple-mobile-web-app-title" content="Wild Race"/. Input:
+    
+    '<html><head><meta name="twitter:card" content="summary_large_image"><meta property="og:title" content="Grok App"><link rel="manifest" href="/__grok/manifest.webmanifest"><link rel="apple-touch-icon" href="/__grok/icon-180.png"><meta name="apple-mobile-web-app-title" content="Grok App"><meta name="apple-mobile-web-app-status-bar-style" content="black"><meta name="theme-color" content="#000000"><script src="https://grok.com/grok-app-builder/extensions.js" defer></script></head></html>'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  actual: '<html><head><meta name="twitter:card" content="summary_large_image"><meta property="og:title" content="Grok App"><link rel="manifest" href="/__grok/manifest.webmanifest"><link rel="apple-touch-icon" href="/__grok/icon-180.png"><meta name="apple-mobile-web-app-title" content="Grok App"><meta name="apple-mobile-web-app-status-bar-style" content="black"><meta name="theme-color" content="#000000"><script src="https://grok.com/grok-app-builder/extensions.js" defer></script></head></html>'
+  operator: 'match'
+  stack: |-
+    TestContext.<anonymous> (file:///root/work/coffee/scripts/grok-pwa-plugin.test.mjs:119:10)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: streaming injector handles </head> split across chunks
+ok 65 - streaming injector handles </head> split across chunks
+  ---
+  duration_ms: 0.480094
+  type: 'test'
+  ...
+# Subtest: streaming injector passes post-head chunks through untouched
+ok 66 - streaming injector passes post-head chunks through untouched
+  ---
+  duration_ms: 0.448163
+  type: 'test'
+  ...
+# Subtest: streaming injector falls back when no </head> is seen
+ok 67 - streaming injector falls back when no </head> is seen
+  ---
+  duration_ms: 2.803444
+  type: 'test'
+  ...
+# Subtest: detects install query
+ok 68 - detects install query
+  ---
+  duration_ms: 0.314297
+  type: 'test'
+  ...
+# Subtest: filters non-document paths
+ok 69 - filters non-document paths
+  ---
+  duration_ms: 0.30083
+  type: 'test'
+  ...
+# Subtest: strips install params from the app link
+ok 70 - strips install params from the app link
+  ---
+  duration_ms: 0.148767
+  type: 'test'
+  ...
+# Subtest: names the install page from host slug
+ok 71 - names the install page from host slug
+  ---
+  duration_ms: 0.146539
+  type: 'test'
+  ...
+# Subtest: rejects hosts that are not plain slugs
+ok 72 - rejects hosts that are not plain slugs
+  ---
+  duration_ms: 0.12613
+  type: 'test'
+  ...
+# Subtest: renders install page markup
+ok 73 - renders install page markup
+  ---
+  duration_ms: 0.368732
+  type: 'test'
+  ...
+# Subtest: escapes host-derived values in the install page
+ok 74 - escapes host-derived values in the install page
+  ---
+  duration_ms: 0.125141
+  type: 'test'
+  ...
+# Subtest: renders the manifest with the per-app name
+ok 75 - renders the manifest with the per-app name
+  ---
+  duration_ms: 0.13634
+  type: 'test'
+  ...
+# Subtest: vite config keeps the nitro serverDir wiring
+ok 76 - vite config keeps the nitro serverDir wiring
+  ---
+  duration_ms: 0.151858
+  type: 'test'
+  ...
+# Subtest: nitro middleware and its bundled assets exist
+ok 77 - nitro middleware and its bundled assets exist
+  ---
+  duration_ms: 0.209795
+  type: 'test'
+  ...
+# Subtest: day 1 steam stays until the valve is caught, and later days draw none
+ok 78 - day 1 steam stays until the valve is caught, and later days draw none
+  ---
+  duration_ms: 0.69995
+  type: 'test'
+  ...
+# Subtest: the manifest lists one track per season, in calendar order
+ok 79 - the manifest lists one track per season, in calendar order
+  ---
+  duration_ms: 1.952533
+  type: 'test'
+  ...
+# Subtest: each manifest track matches the generator's track definition
+ok 80 - each manifest track matches the generator's track definition
+  ---
+  duration_ms: 0.408882
+  type: 'test'
+  ...
+# Subtest: the manifest says the music is original and generated, with no samples
+ok 81 - the manifest says the music is original and generated, with no samples
+  ---
+  duration_ms: 0.259132
+  type: 'test'
+  ...
+# Subtest: no audio file is shipped in public/music
+ok 82 - no audio file is shipped in public/music
+  ---
+  duration_ms: 0.263605
+  type: 'test'
+  ...
+# Subtest: the same track and bar give the same notes
+ok 83 - the same track and bar give the same notes
+  ---
+  duration_ms: 1.17827
+  type: 'test'
+  ...
+# Subtest: every note is inside a playable range and inside its bar
+ok 84 - every note is inside a playable range and inside its bar
+  ---
+  duration_ms: 0.31231
+  type: 'test'
+  ...
+# Subtest: timing and pitch helpers are correct
+ok 85 - timing and pitch helpers are correct
+  ---
+  duration_ms: 0.22394
+  type: 'test'
+  ...
+# Subtest: before the design, Reactor Control, Results, Core Map and CORE CAM are hidden; the design and academy show
+ok 86 - before the design, Reactor Control, Results, Core Map and CORE CAM are hidden; the design and academy show
+  ---
+  duration_ms: 1.175654
+  type: 'test'
+  ...
+# Subtest: the mini games are hidden until a cabinet is found, then they show
+ok 87 - the mini games are hidden until a cabinet is found, then they show
+  ---
+  duration_ms: 0.191829
+  type: 'test'
+  ...
+# Subtest: a design shows Reactor Control and the three design-gated apps
+ok 88 - a design shows Reactor Control and the three design-gated apps
+  ---
+  duration_ms: 0.179603
+  type: 'test'
+  ...
+# Subtest: Show all apps (dev only) shows everything
+ok 89 - Show all apps (dev only) shows everything
+  ---
+  duration_ms: 0.134977
+  type: 'test'
+  ...
+# Subtest: pinned icons keep the player's order, skip unknown ids, and hide apps that are not visible
+ok 90 - pinned icons keep the player's order, skip unknown ids, and hide apps that are not visible
+  ---
+  duration_ms: 0.808899
+  type: 'test'
+  ...
+# Subtest: every sim mode maps back to its registry app
+ok 91 - every sim mode maps back to its registry app
+  ---
+  duration_ms: 0.176598
+  type: 'test'
+  ...
+# Subtest: the clock shows 12 or 24 hours
+ok 92 - the clock shows 12 or 24 hours
+  ---
+  duration_ms: 0.204597
+  type: 'test'
+  ...
+# Subtest: the theme follows the setup season unless a season is picked for it
+ok 93 - the theme follows the setup season unless a season is picked for it
+  ---
+  duration_ms: 0.129525
+  type: 'test'
+  ...
+# Subtest: missing or unknown setup values fall back to the defaults, Fall and Steady
+ok 94 - missing or unknown setup values fall back to the defaults, Fall and Steady
+  ---
+  duration_ms: 0.353308
+  type: 'test'
+  ...
+# Subtest: the region is never a choice in this build, and says so
+ok 95 - the region is never a choice in this build, and says so
+  ---
+  duration_ms: 0.324521
+  type: 'test'
+  ...
+# Subtest: the registry uses no real site name and no radiation number
+ok 96 - the registry uses no real site name and no radiation number
+  ---
+  duration_ms: 0.277362
+  type: 'test'
+  ...
+# Subtest: a window is clamped so it stays on the screen above the taskbar
+ok 97 - a window is clamped so it stays on the screen above the taskbar
+  ---
+  duration_ms: 1.104191
+  type: 'test'
+  ...
+# Subtest: dragging cannot take a window off any edge
+ok 98 - dragging cannot take a window off any edge
+  ---
+  duration_ms: 0.274665
+  type: 'test'
+  ...
+# Subtest: a window never goes below the minimum size, and never wider than a small screen
+ok 99 - a window never goes below the minimum size, and never wider than a small screen
+  ---
+  duration_ms: 0.175391
+  type: 'test'
+  ...
+# Subtest: focus raises a window to the top and restores it from the taskbar
+ok 100 - focus raises a window to the top and restores it from the taskbar
+  ---
+  duration_ms: 0.236015
+  type: 'test'
+  ...
+# Subtest: opening a window that is already open focuses it instead of adding a second one
+ok 101 - opening a window that is already open focuses it instead of adding a second one
+  ---
+  duration_ms: 0.32445
+  type: 'test'
+  ...
+# Subtest: close removes the window
+ok 102 - close removes the window
+  ---
+  duration_ms: 0.676446
+  type: 'test'
+  ...
+# Subtest: a focused mini game gets game keys, and Escape closes nothing (the game handles it)
+ok 103 - a focused mini game gets game keys, and Escape closes nothing (the game handles it)
+  ---
+  duration_ms: 0.232564
+  type: 'test'
+  ...
+# Subtest: a focused sim app (Reactor Control, Academy) gets game keys, and Escape goes to the desktop
+ok 104 - a focused sim app (Reactor Control, Academy) gets game keys, and Escape goes to the desktop
+  ---
+  duration_ms: 0.100637
+  type: 'test'
+  ...
+# Subtest: with the desktop focused, game keys are blocked, and Escape belongs to the desktop
+ok 105 - with the desktop focused, game keys are blocked, and Escape belongs to the desktop
+  ---
+  duration_ms: 0.283474
+  type: 'test'
+  ...
+# Subtest: keys that are not game keys always reach the desktop shell
+ok 106 - keys that are not game keys always reach the desktop shell
+  ---
+  duration_ms: 0.367877
+  type: 'test'
+  ...
+# Subtest: the focus kind follows the focused window
+ok 107 - the focus kind follows the focused window
+  ---
+  duration_ms: 0.182032
+  type: 'test'
+  ...
+# Subtest: a new window cascades and always opens on the screen
+ok 108 - a new window cascades and always opens on the screen
+  ---
+  duration_ms: 0.208242
+  type: 'test'
+  ...
+# Subtest: reduced motion gets no particles at all
+ok 109 - reduced motion gets no particles at all
+  ---
+  duration_ms: 0.914804
+  type: 'test'
+  ...
+# Subtest: the pool never holds more than 160 particles, however big the view
+ok 110 - the pool never holds more than 160 particles, however big the view
+  ---
+  duration_ms: 0.470503
+  type: 'test'
+  ...
+# Subtest: an empty view has no particles
+ok 111 - an empty view has no particles
+  ---
+  duration_ms: 0.10557
+  type: 'test'
+  ...
+# Subtest: the same seed makes the same pool, so the layer is testable
+ok 112 - the same seed makes the same pool, so the layer is testable
+  ---
+  duration_ms: 0.951519
+  type: 'test'
+  ...
+# Subtest: stepping keeps the pool size and keeps particles near the view
+ok 113 - stepping keeps the pool size and keeps particles near the view
+  ---
+  duration_ms: 9.201503
+  type: 'test'
+  ...
+# Subtest: particles are palette colours and pixel squares
+ok 114 - particles are palette colours and pixel squares
+  ---
+  duration_ms: 0.354962
+  type: 'test'
+  ...
+# Subtest: pwr labels at 324/292 sit inside the drawing and clear of every object
+ok 115 - pwr labels at 324/292 sit inside the drawing and clear of every object
+  ---
+  duration_ms: 1.573204
+  type: 'test'
+  ...
+# Subtest: pwr labels at 350/285 sit inside the drawing and clear of every object
+ok 116 - pwr labels at 350/285 sit inside the drawing and clear of every object
+  ---
+  duration_ms: 0.218446
+  type: 'test'
+  ...
+# Subtest: pwr labels at 285/285 sit inside the drawing and clear of every object
+ok 117 - pwr labels at 285/285 sit inside the drawing and clear of every object
+  ---
+  duration_ms: 0.206246
+  type: 'test'
+  ...
+# Subtest: pwr labels do not overlap each other
+ok 118 - pwr labels do not overlap each other
+  ---
+  duration_ms: 1.253488
+  type: 'test'
+  ...
+# Subtest: pwr drawn objects stay inside the native grid
+ok 119 - pwr drawn objects stay inside the native grid
+  ---
+  duration_ms: 0.26814
+  type: 'test'
+  ...
+# Subtest: pwr carries the required facts: pressure, hot and cold, scale ends, and the footer
+ok 120 - pwr carries the required facts: pressure, hot and cold, scale ends, and the footer
+  ---
+  duration_ms: 0.194595
+  type: 'test'
+  ...
+# Subtest: pwr scale bar colours the operating points inside the seven bands
+ok 121 - pwr scale bar colours the operating points inside the seven bands
+  ---
+  duration_ms: 0.257148
+  type: 'test'
+  ...
+# Subtest: bwr labels at 287/275 sit inside the drawing and clear of every object
+ok 122 - bwr labels at 287/275 sit inside the drawing and clear of every object
+  ---
+  duration_ms: 0.221811
+  type: 'test'
+  ...
+# Subtest: bwr labels at 330/275 sit inside the drawing and clear of every object
+ok 123 - bwr labels at 330/275 sit inside the drawing and clear of every object
+  ---
+  duration_ms: 0.316891
+  type: 'test'
+  ...
+# Subtest: bwr labels at 200/200 sit inside the drawing and clear of every object
+ok 124 - bwr labels at 200/200 sit inside the drawing and clear of every object
+  ---
+  duration_ms: 0.374706
+  type: 'test'
+  ...
+# Subtest: bwr labels do not overlap each other
+ok 125 - bwr labels do not overlap each other
+  ---
+  duration_ms: 0.191859
+  type: 'test'
+  ...
+# Subtest: bwr drawn objects stay inside the native grid
+ok 126 - bwr drawn objects stay inside the native grid
+  ---
+  duration_ms: 0.072166
+  type: 'test'
+  ...
+# Subtest: bwr carries the required facts: pressure, hot and cold, scale ends, and the footer
+ok 127 - bwr carries the required facts: pressure, hot and cold, scale ends, and the footer
+  ---
+  duration_ms: 0.07119
+  type: 'test'
+  ...
+# Subtest: bwr scale bar colours the operating points inside the seven bands
+ok 128 - bwr scale bar colours the operating points inside the seven bands
+  ---
+  duration_ms: 0.131357
+  type: 'test'
+  ...
+# Subtest: pebble labels at 735/260 sit inside the drawing and clear of every object
+ok 129 - pebble labels at 735/260 sit inside the drawing and clear of every object
+  ---
+  duration_ms: 0.161592
+  type: 'test'
+  ...
+# Subtest: pebble labels at 750/250 sit inside the drawing and clear of every object
+ok 130 - pebble labels at 750/250 sit inside the drawing and clear of every object
+  ---
+  duration_ms: 0.109155
+  type: 'test'
+  ...
+# Subtest: pebble labels at 250/250 sit inside the drawing and clear of every object
+ok 131 - pebble labels at 250/250 sit inside the drawing and clear of every object
+  ---
+  duration_ms: 0.09907
+  type: 'test'
+  ...
+# Subtest: pebble labels do not overlap each other
+ok 132 - pebble labels do not overlap each other
+  ---
+  duration_ms: 0.070414
+  type: 'test'
+  ...
+# Subtest: pebble drawn objects stay inside the native grid
+ok 133 - pebble drawn objects stay inside the native grid
+  ---
+  duration_ms: 0.087422
+  type: 'test'
+  ...
+# Subtest: pebble carries the required facts: pressure, hot and cold, scale ends, and the footer
+ok 134 - pebble carries the required facts: pressure, hot and cold, scale ends, and the footer
+  ---
+  duration_ms: 0.070543
+  type: 'test'
+  ...
+# Subtest: pebble scale bar colours the operating points inside the seven bands
+ok 135 - pebble scale bar colours the operating points inside the seven bands
+  ---
+  duration_ms: 0.0654
+  type: 'test'
+  ...
+# Subtest: msr labels at 678/620 sit inside the drawing and clear of every object
+ok 136 - msr labels at 678/620 sit inside the drawing and clear of every object
+  ---
+  duration_ms: 0.74531
+  type: 'test'
+  ...
+# Subtest: msr labels at 680/620 sit inside the drawing and clear of every object
+ok 137 - msr labels at 680/620 sit inside the drawing and clear of every object
+  ---
+  duration_ms: 0.16319
+  type: 'test'
+  ...
+# Subtest: msr labels at 620/620 sit inside the drawing and clear of every object
+ok 138 - msr labels at 620/620 sit inside the drawing and clear of every object
+  ---
+  duration_ms: 0.131698
+  type: 'test'
+  ...
+# Subtest: msr labels do not overlap each other
+ok 139 - msr labels do not overlap each other
+  ---
+  duration_ms: 0.073252
+  type: 'test'
+  ...
+# Subtest: msr drawn objects stay inside the native grid
+ok 140 - msr drawn objects stay inside the native grid
+  ---
+  duration_ms: 0.049562
+  type: 'test'
+  ...
+# Subtest: msr carries the required facts: pressure, hot and cold, scale ends, and the footer
+ok 141 - msr carries the required facts: pressure, hot and cold, scale ends, and the footer
+  ---
+  duration_ms: 0.069272
+  type: 'test'
+  ...
+# Subtest: msr scale bar colours the operating points inside the seven bands
+ok 142 - msr scale bar colours the operating points inside the seven bands
+  ---
+  duration_ms: 0.05141
+  type: 'test'
+  ...
+# Subtest: PWR: control rods enter the core from the top
+ok 143 - PWR: control rods enter the core from the top
+  ---
+  duration_ms: 0.107298
+  type: 'test'
+  ...
+# Subtest: PWR: steam is drawn as dots on the secondary side, clear of the core and steam generator
+ok 144 - PWR: steam is drawn as dots on the secondary side, clear of the core and steam generator
+  ---
+  duration_ms: 0.071301
+  type: 'test'
+  ...
+# Subtest: MSR scale covers the model's full-power hot leg (620 + 58 = 678 °C)
+ok 145 - MSR scale covers the model's full-power hot leg (620 + 58 = 678 °C)
+  ---
+  duration_ms: 0.056866
+  type: 'test'
+  ...
+# Subtest: seven bands, coldest first, hottest last
+ok 146 - seven bands, coldest first, hottest last
+  ---
+  duration_ms: 0.85654
+  type: 'test'
+  ...
+# Subtest: values outside the scale are clamped to the end bands
+ok 147 - values outside the scale are clamped to the end bands
+  ---
+  duration_ms: 0.142444
+  type: 'test'
+  ...
+# Subtest: the designed plant's operating points land where the eye expects
+ok 148 - the designed plant's operating points land where the eye expects
+  ---
+  duration_ms: 0.118809
+  type: 'test'
+  ...
+# Subtest: the drawing carries the required labels: pressure, hot and cold, scale, and the footer
+ok 149 - the drawing carries the required labels: pressure, hot and cold, scale, and the footer
+  ---
+  duration_ms: 0.337235
+  type: 'test'
+  ...
+# Subtest: every label fits on the 160 × 80 native grid
+ok 150 - every label fits on the 160 × 80 native grid
+  ---
+  duration_ms: 0.239493
+  type: 'test'
+  ...
+# Subtest: core health is 100 when every part is full, and drops by the weight when one part is zero
+ok 151 - core health is 100 when every part is full, and drops by the weight when one part is zero
+  ---
+  duration_ms: 1.16396
+  type: 'test'
+  ...
+# Subtest: a part just under full prints 99.7, not 100, and the walk inputs still score 60
+ok 152 - a part just under full prints 99.7, not 100, and the walk inputs still score 60
+  ---
+  duration_ms: 0.219384
+  type: 'test'
+  ...
+# Subtest: a hide lowers the residue part, and a catch does not
+ok 153 - a hide lowers the residue part, and a catch does not
+  ---
+  duration_ms: 0.904
+  type: 'test'
+  ...
+# Subtest: more power means more glow and more particles, and more flow means faster particles
+ok 154 - more power means more glow and more particles, and more flow means faster particles
+  ---
+  duration_ms: 0.420892
+  type: 'test'
+  ...
+# Subtest: reduced motion asks for zero particles, and a full core draws more cells than the window
+ok 155 - reduced motion asks for zero particles, and a full core draws more cells than the window
+  ---
+  duration_ms: 0.15912
+  type: 'test'
+  ...
+# Subtest: burnup stays pending, and the daily row does not invent a mass
+ok 156 - burnup stays pending, and the daily row does not invent a mass
+  ---
+  duration_ms: 0.250691
+  type: 'test'
+  ...
+# Subtest: colour-safe marks use the listed palette, one per band, and no grey ramp
+ok 157 - colour-safe marks use the listed palette, one per band, and no grey ramp
+  ---
+  duration_ms: 0.312128
+  type: 'test'
+  ...
+# Subtest: band time is the last day, after the clock resets
+ok 158 - band time is the last day, after the clock resets
+  ---
+  duration_ms: 0.241038
+  type: 'test'
+  ...
+# Subtest: higher burnup dims the glow, and scram eases to 0.15 over three seconds
+ok 159 - higher burnup dims the glow, and scram eases to 0.15 over three seconds
+  ---
+  duration_ms: 0.405245
+  type: 'test'
+  ...
+# Subtest: scram clears the flow, vapor rises, and the downcomer falls
+ok 160 - scram clears the flow, vapor rises, and the downcomer falls
+  ---
+  duration_ms: 0.446411
+  type: 'test'
+  ...
+# Subtest: core map uses passes and does not set shuffleDone
+ok 161 - core map uses passes and does not set shuffleDone
+  ---
+  duration_ms: 0.28565
+  type: 'test'
+  ...
+# Subtest: server render has no window, so reduced motion is false and does not throw
+ok 162 - server render has no window, so reduced motion is false and does not throw
+  ---
+  duration_ms: 0.756613
+  type: 'test'
+  ...
+# Subtest: a new state starts outside the desktop, and the desktop has its defaults
+ok 163 - a new state starts outside the desktop, and the desktop has its defaults
+  ---
+  duration_ms: 1.782379
+  type: 'test'
+  ...
+# Subtest: opening the desktop freezes the clock, and leaving it returns to the world
+ok 164 - opening the desktop freezes the clock, and leaving it returns to the world
+  ---
+  duration_ms: 0.934034
+  type: 'test'
+  ...
+# Subtest: an overlay launched from the desktop returns to the desktop when it is closed
+ok 165 - an overlay launched from the desktop returns to the desktop when it is closed
+  ---
+  duration_ms: 0.347381
+  type: 'test'
+  ...
+# Subtest: Academy launched from the desktop sets its flag and goal, and returns to the desktop
+ok 166 - Academy launched from the desktop sets its flag and goal, and returns to the desktop
+  ---
+  duration_ms: 0.215228
+  type: 'test'
+  ...
+# Subtest: the setup is saved as the season and stance, with the region left unset
+ok 167 - the setup is saved as the season and stance, with the region left unset
+  ---
+  duration_ms: 0.998242
+  type: 'test'
+  ...
+# Subtest: a new shift keeps the setup and the desktop settings, and starts everything else over
+ok 168 - a new shift keeps the setup and the desktop settings, and starts everything else over
+  ---
+  duration_ms: 0.342476
+  type: 'test'
+  ...
+# Subtest: settings made in a shift survive a reload, with the setup and the desktop
+ok 169 - settings made in a shift survive a reload, with the setup and the desktop
+  ---
+  duration_ms: 1.0235
+  type: 'test'
+  ...
+# Subtest: with no shift started, settings are not written, so no save appears before a shift
+ok 170 - with no shift started, settings are not written, so no save appears before a shift
+  ---
+  duration_ms: 0.166488
+  type: 'test'
+  ...
+# Subtest: the version 2 save carries the fields the spec names
+ok 171 - the version 2 save carries the fields the spec names
+  ---
+  duration_ms: 0.459728
+  type: 'test'
+  ...
+# Subtest: a real version 1 fixture migrates without changing residue, flags, plant, academy, trust, or culture
+ok 172 - a real version 1 fixture migrates without changing residue, flags, plant, academy, trust, or culture
+  ---
+  duration_ms: 1.830923
+  type: 'test'
+  ...
+# Subtest: a version 2 save round-trips, and writing it does not change the version 1 key
+ok 173 - a version 2 save round-trips, and writing it does not change the version 1 key
+  ---
+  duration_ms: 1.300534
+  type: 'test'
+  ...
+# Subtest: a corrupt version 2 save is kept, and the version 1 save is not loaded
+ok 174 - a corrupt version 2 save is kept, and the version 1 save is not loaded
+  ---
+  duration_ms: 0.192732
+  type: 'test'
+  ...
+# Subtest: start map is not a plateau: a single swap can lower Fq
+ok 175 - start map is not a plateau: a single swap can lower Fq
+  ---
+  duration_ms: 11.458144
+  type: 'test'
+  ...
+# Subtest: start map does not already pass
+ok 176 - start map does not already pass
+  ---
+  duration_ms: 0.184096
+  type: 'test'
+  ...
+# Subtest: greedy play from the start map reaches the pass band at every enrichment
+ok 177 - greedy play from the start map reaches the pass band at every enrichment
+  ---
+  duration_ms: 42.690602
+  type: 'test'
+  ...
+# Subtest: pass band has real margin: guided play lands well under the limit
+ok 178 - pass band has real margin: guided play lands well under the limit
+  ---
+  duration_ms: 436.18202
+  type: 'test'
+  ...
+# Subtest: the trade-off is real: out-in is flat but leaks, in-out is quiet on the rim but peaks
+ok 179 - the trade-off is real: out-in is flat but leaks, in-out is quiet on the rim but peaks
+  ---
+  duration_ms: 0.506276
+  type: 'test'
+  ...
+# Subtest: full-core and depletion change k and the OpenMC letter
+ok 180 - full-core and depletion change k and the OpenMC letter
+  ---
+  duration_ms: 944.174336
+  type: 'test'
+  ...
+# Subtest: PWR bench values match the trainer's own readout
+ok 181 - PWR bench values match the trainer's own readout
+  ---
+  duration_ms: 1.813079
+  type: 'test'
+  ...
+# Subtest: ΔT is in band at 100% power and 100% flow for PWR
+ok 182 - ΔT is in band at 100% power and 100% flow for PWR
+  ---
+  duration_ms: 0.144804
+  type: 'test'
+  ...
+# Subtest: ΔT rises with power and falls with flow, for every plant type
+ok 183 - ΔT rises with power and falls with flow, for every plant type
+  ---
+  duration_ms: 0.184103
+  type: 'test'
+  ...
+# Subtest: fuel is hotter than the hot leg, which is hotter than the cold leg, whenever power is above zero
+ok 184 - fuel is hotter than the hot leg, which is hotter than the cold leg, whenever power is above zero
+  ---
+  duration_ms: 0.357067
+  type: 'test'
+  ...
+# Subtest: zero power gives no ΔT and no fuel rise
+ok 185 - zero power gives no ΔT and no fuel rise
+  ---
+  duration_ms: 0.125316
+  type: 'test'
+  ...
+# Subtest: a PlantDesign and its type give the same answer
+ok 186 - a PlantDesign and its type give the same answer
+  ---
+  duration_ms: 0.644974
+  type: 'test'
+  ...
+# Subtest: the flow floor keeps ΔT finite at very low flow
+ok 187 - the flow floor keeps ΔT finite at very low flow
+  ---
+  duration_ms: 0.225097
+  type: 'test'
+  ...
+# Subtest: the shared run seeds at the 62% drill, and flow still comes from the design
+ok 188 - the shared run seeds at the 62% drill, and flow still comes from the design
+  ---
+  duration_ms: 0.152656
+  type: 'test'
+  ...
+# Subtest: history is per minute while open and per hour while closed, and it caps
+ok 189 - history is per minute while open and per hour while closed, and it caps
+  ---
+  duration_ms: 0.539384
+  type: 'test'
+  ...
+# Subtest: fuel mass stays pending until someone cites an inventory
+ok 190 - fuel mass stays pending until someone cites an inventory
+  ---
+  duration_ms: 0.399793
+  type: 'test'
+  ...
+# Subtest: the Core Map keeps its grid and swap count, and never sets shuffleDone
+ok 191 - the Core Map keeps its grid and swap count, and never sets shuffleDone
+  ---
+  duration_ms: 1.955027
+  type: 'test'
+  ...
+# Subtest: a corrupt saved Core Map is ignored, not loaded
+ok 192 - a corrupt saved Core Map is ignored, not loaded
+  ---
+  duration_ms: 0.249624
+  type: 'test'
+  ...
+# Subtest: the shipped pool is empty, so the Local tab has nothing to show
+ok 193 - the shipped pool is empty, so the Local tab has nothing to show
+  ---
+  duration_ms: 0.184977
+  type: 'test'
+  ...
+# Subtest: same seed, same items; a different seed can change the order
+ok 194 - same seed, same items; a different seed can change the order
+  ---
+  duration_ms: 0.271528
+  type: 'test'
+  ...
+# Subtest: a pick is 3 to 5 items when the pool has enough eligible items
+ok 195 - a pick is 3 to 5 items when the pool has enough eligible items
+  ---
+  duration_ms: 1.285551
+  type: 'test'
+  ...
+# Subtest: conditions on season, stance, day and residue are respected
+ok 196 - conditions on season, stance, day and residue are respected
+  ---
+  duration_ms: 0.56564
+  type: 'test'
+  ...
+# Subtest: a residue hide is never labelled as a catch
+ok 197 - a residue hide is never labelled as a catch
+  ---
+  duration_ms: 0.417427
+  type: 'test'
+  ...
+# Subtest: the NRC search finds only what is on screen
+ok 198 - the NRC search finds only what is on screen
+  ---
+  duration_ms: 0.196344
+  type: 'test'
+  ...
+# Subtest: the background data has nine pending slots and no value or number
+ok 199 - the background data has nine pending slots and no value or number
+  ---
+  duration_ms: 0.597691
+  type: 'test'
+  ...
+# Subtest: the committed news list is empty
+ok 200 - the committed news list is empty
+  ---
+  duration_ms: 0.425964
+  type: 'test'
+  ...
+# Subtest: a wide cafe keeps the cover zoom
+ok 201 - a wide cafe keeps the cover zoom
+  ---
+  duration_ms: 0.871451
+  type: 'test'
+  ...
+# Subtest: a phone-width view is zoom 2, and the camera pans because the room is bigger than the view
+ok 202 - a phone-width view is zoom 2, and the camera pans because the room is bigger than the view
+  ---
+  duration_ms: 0.194457
+  type: 'test'
+  ...
+# Subtest: a phone at the PHONE_VIEW_W threshold is still zoom 2
+ok 203 - a phone at the PHONE_VIEW_W threshold is still zoom 2
+  ---
+  duration_ms: 0.138833
+  type: 'test'
+  ...
+1..203
+# tests 203
+# suites 0
+# pass 194
+# fail 9
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 37843.57127
+TEST_EXIT:1

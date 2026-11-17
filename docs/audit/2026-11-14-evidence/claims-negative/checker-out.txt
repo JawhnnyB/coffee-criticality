@@ -1,0 +1,16 @@
+rows 6
+PASS 5
+UNVERIFIED 1
+FAIL 10
+failures:
+- Wrong number: result number 999 is not a whole token in the artifact
+- Wrong number: artifact EXIT:1 is not 0, and the result does not say the nonzero exit is expected because ...
+- Short number inside a longer one: result number 9 is not a whole token in the artifact
+- Short number inside a longer one: artifact EXIT:1 is not 0, and the result does not say the nonzero exit is expected because ...
+- Title still: artifact EXIT:1 is not 0, and the result does not say the nonzero exit is expected because ...
+- Title still: visual PASS does not name a PNG
+- Steam has no caller: artifact EXIT:1 is not 0, and the result does not say the nonzero exit is expected because ...
+- Steam has no caller: PASS says "no caller" without a whole-tree grep or measurement
+- Blank reason: UNVERIFIED row does not say why
+- Nonzero exit unexplained: artifact EXIT:1 is not 0, and the result does not say the nonzero exit is expected because ...
+NEG_EXIT:1

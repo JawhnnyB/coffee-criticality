@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Bezel } from "./Arcade";
 import { playHuntHit, playHuntMiss } from "./audio";
+import { hostOwnsKey } from "./keyGate";
 
 const W = 320;
 const H = 180;
@@ -101,6 +102,7 @@ export function MaintGame({
       if (t) hit(t.clientX, t.clientY);
     };
     const key = (e: KeyboardEvent) => {
+      if (!hostOwnsKey("mini", e.code)) return;
       if (e.code === "Escape") onAbort();
     };
     canvas.addEventListener("mousedown", click);

@@ -2,6 +2,7 @@
 
 import { type ReactNode, useEffect, useRef, useState } from "react";
 import { playHuntHit, playHuntMiss } from "./audio";
+import { hostOwnsKey } from "./keyGate";
 
 export type CabId = "catch" | "fish" | "plot" | "horde" | "delay" | "golf" | "rods" | "pebble" | "bowl" | "phys" | "load";
 
@@ -650,6 +651,7 @@ export function Arcade({
       if (t) hit(t.clientX, t.clientY);
     };
     const key = (e: KeyboardEvent) => {
+      if (!hostOwnsKey("mini", e.code)) return;
       if (e.code === "Escape") onAbort();
       if (e.code === "Space" && !over && board.clean) {
         // Signing a clean board is a catch too: you did not cry wolf and you still read it.

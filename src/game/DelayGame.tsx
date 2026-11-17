@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Bezel } from "./Arcade";
 import { duckHit, playPeriodTick } from "./audio";
+import { hostOwnsKey, readHeld } from "./keyGate";
 
 /** Classroom Keepin U-235 thermal 6-group. Lambdas sped ~8× so a cabinet can feel them. Not a license.
  * LAMBDA is the generation time. Smaller means power responds faster, so a $0.5 step climbs from n 1.0
@@ -81,6 +82,7 @@ export function DelayGame({ onDone, onAbort }: { onDone: (score: number) => void
     const HOLD_TOTAL = 18;
 
     const down = (e: KeyboardEvent) => {
+      if (!hostOwnsKey("mini", e.code)) return;
       keys.add(e.code);
       if (e.code === "Escape") onAbort();
     };
@@ -177,10 +179,10 @@ export function DelayGame({ onDone, onAbort }: { onDone: (score: number) => void
       bannerT = Math.max(0, bannerT - dt);
       lockInsert = Math.max(0, lockInsert - dt);
 
-      if (keys.has("KeyA") || keys.has("ArrowLeft")) rodX -= 90 * dt;
-      if (keys.has("KeyD") || keys.has("ArrowRight")) rodX += 90 * dt;
-      if (keys.has("KeyW") || keys.has("ArrowUp")) insert = Math.min(1, insert + 0.55 * dt);
-      if (keys.has("KeyS") || keys.has("ArrowDown")) insert = Math.max(0, insert - 0.55 * dt);
+      if (readHeld("mini", keys, "KeyA") || readHeld("mini", keys, "ArrowLeft")) rodX -= 90 * dt;
+      if (readHeld("mini", keys, "KeyD") || readHeld("mini", keys, "ArrowRight")) rodX += 90 * dt;
+      if (readHeld("mini", keys, "KeyW") || readHeld("mini", keys, "ArrowUp")) insert = Math.min(1, insert + 0.55 * dt);
+      if (readHeld("mini", keys, "KeyS") || readHeld("mini", keys, "ArrowDown")) insert = Math.max(0, insert - 0.55 * dt);
       if (pointer && lockInsert <= 0) {
         rodX += (mx - rodX) * 6 * dt;
         insert = Math.max(0, Math.min(1, (my - 28) / 120));

@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Bezel } from "./Arcade";
 import { playBlip, playCatch, playHuntMiss } from "./audio";
+import { hostOwnsKey } from "./keyGate";
 import {
   CH,
   CW,
@@ -263,6 +264,7 @@ export function LoadGame({ onDone, onAbort }: { onDone: (score: number) => void;
       setEnd({ ok: false, score: Math.max(1, turn), line });
     };
     const down = (e: KeyboardEvent) => {
+      if (!hostOwnsKey("mini", e.code)) return;
       if (e.code === "Escape") onAbort();
       if (e.code === "KeyZ" || e.code === "Backspace") {
         e.preventDefault();

@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import { integerScale } from "./artScale";
+import { integerCover, integerScale } from "./artScale";
 import { isMuted, setMuted, unlockAudio } from "./audio";
+import { hostOwnsKey } from "./keyGate";
 
 /** Native layout from tools/artkit/menu.py. Do not redraw it. */
 const MW = 384;
@@ -47,7 +48,8 @@ export function PixelMenu({
   const host = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const box = useBox(host);
-  const scale = integerScale(box.w, box.h, MW, MH);
+  const phone = box.w > 0 && box.w < 720;
+  const scale = phone ? integerCover(box.w, box.h, MW, MH) : integerScale(box.w, box.h, MW, MH);
   const [sel, setSel] = useState(0);
   const [mute, setMute] = useState(isMuted());
   const [sheet, setSheet] = useState(false);
@@ -109,6 +111,7 @@ export function PixelMenu({
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
+      if (!hostOwnsKey("menu", e.code)) return;
       const tag = (e.target as HTMLElement | null)?.tagName;
       if (tag === "INPUT" || tag === "TEXTAREA") return;
       if (sheet) {
@@ -131,9 +134,9 @@ export function PixelMenu({
   };
 
   return (
-    <div ref={host} className="absolute inset-0 z-30 overflow-hidden" style={{ background: "#16110d" }} data-testid="pixel-menu">
+    <div ref={host} className="absolute inset-0 z-30" style={{ background: "#16110d", overflow: "clip" }} data-testid="pixel-menu">
       <img
-        src="/art/ui/menu.png"
+        src="/art/ui/menu-scene.png"
         alt=""
         width={MW}
         height={MH}
@@ -144,55 +147,40 @@ export function PixelMenu({
           top: scale.oy,
           width: scale.dw,
           height: scale.dh,
+          maxWidth: "none",
+          maxHeight: "none",
           imageRendering: "pixelated",
         }}
       />
-      <canvas
-        ref={canvasRef}
-        width={MW}
-        height={MH}
-        aria-hidden
-        style={{
-          position: "absolute",
-          left: scale.ox,
-          top: scale.oy,
-          width: scale.dw,
-          height: scale.dh,
-          imageRendering: "pixelated",
-          pointerEvents: "none",
-        }}
-      />
-      {ACTIONS.map((id, i) => (
-        <button
-          key={id}
-          type="button"
-          data-testid={id === "begin" ? "new-shift" : id === "continue" ? "continue-shift" : "menu-settings"}
-          aria-label={id}
-          className="cc-hit"
-          style={{
-            left: scale.ox + BTN_X * scale.zoom,
-            top: scale.oy + BTN_Y[i] * scale.zoom,
-            width: BTN_W * scale.zoom,
-            height: BTN_H * scale.zoom,
-          }}
-          onMouseEnter={() => setSel(i)}
-          onMouseLeave={() => setSel(0)}
-          onClick={() => activate(i)}
-        />
-      ))}
-      <button
-        type="button"
-        data-testid="mute"
-        aria-label={mute ? "Sound off" : "Sound on"}
-        className="cc-hit"
-        style={{
-          left: scale.ox + SOUND.x * scale.zoom,
-          top: scale.oy + SOUND.y * scale.zoom,
-          width: SOUND.w * scale.zoom,
-          height: SOUND.h * scale.zoom,
-        }}
-        onClick={toggleMute}
-      />
+      <div
+        className="absolute z-10 flex flex-col gap-2 p-2"
+        style={
+          phone
+            ? { left: 12, right: 12, bottom: 16, background: "#16110d" }
+            : {
+                left: scale.ox + Math.max(0, Math.round((scale.dw - 280) / 2)),
+                width: 280,
+                bottom: Math.max(12, box.h - (scale.oy + scale.dh) + 16),
+                background: "#16110d",
+              }
+        }
+      >
+        <button type="button" data-testid="new-shift" className="btn-primary" onClick={() => activate(0)}>
+          Begin
+        </button>
+        <button type="button" data-testid="continue-shift" className="btn-ghost" disabled={!saved} onClick={() => activate(1)}>
+          Continue
+        </button>
+        <button type="button" data-testid="menu-settings" className="btn-ghost" onClick={() => activate(2)}>
+          Settings
+        </button>
+        <button type="button" data-testid="mute" className="btn-ghost" onClick={toggleMute}>
+          {mute ? "Sound off" : "Sound on"}
+        </button>
+        <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-small)", color: "#f3e6d0", margin: 0 }}>
+          Teaching model, not a license
+        </p>
+      </div>
       {sheet ? (
         <div className="absolute inset-0 z-10 flex items-center justify-center" style={{ background: "rgba(22,17,13,0.72)" }}>
           <div className="cc-sheet">
@@ -218,7 +206,7 @@ export function PixelRead({ title, children, onBack }: { title: string; children
   const box = useBox(host);
   const scale = integerScale(box.w, box.h, MW, MH);
   return (
-    <div ref={host} className="absolute inset-0 z-30 overflow-hidden" style={{ background: "#16110d" }}>
+    <div ref={host} className="absolute inset-0 z-30" style={{ background: "#16110d", overflow: "clip" }}>
       <img
         src="/art/ui/menu-scene.png"
         alt=""
@@ -231,6 +219,8 @@ export function PixelRead({ title, children, onBack }: { title: string; children
           top: scale.oy,
           width: scale.dw,
           height: scale.dh,
+          maxWidth: "none",
+          maxHeight: "none",
           imageRendering: "pixelated",
         }}
       />

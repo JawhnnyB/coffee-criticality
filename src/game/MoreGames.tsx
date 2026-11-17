@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Bezel } from "./Arcade";
+import { hostOwnsKey, readHeld } from "./keyGate";
 
 const W = 320;
 const H = 180;
@@ -10,6 +11,7 @@ function useKeys(onEsc: () => void) {
   const keys = useRef(new Set<string>());
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
+      if (!hostOwnsKey("mini", e.code)) return;
       keys.current.add(e.code);
       if (e.code === "Escape") onEsc();
     };
@@ -138,10 +140,15 @@ export function GolfGame({ onDone, onAbort }: { onDone: (score: number) => void;
     let my = H / 2;
 
     const down = (e: KeyboardEvent) => {
+      if (!hostOwnsKey("mini", e.code)) return;
       if (e.code === "Escape") onAbort();
       if (e.code === "Space") charging = true;
     };
     const up = (e: KeyboardEvent) => {
+      if (!hostOwnsKey("mini", e.code)) {
+        charging = false;
+        return;
+      }
       if (e.code === "Space" && charging) fire();
     };
     const move = (e: MouseEvent) => {
@@ -382,8 +389,13 @@ export function RodsGame({ onDone, onAbort }: { onDone: (score: number) => void;
       const demand = 0.72 + 0.42 * Math.sin(t * freq);
       for (let i = 0; i < 4; i++) cool[i] = Math.max(0, cool[i] - dt);
 
-      const shift = keys.current.has("ShiftLeft") || keys.current.has("ShiftRight");
-      const want = [keys.current.has("Digit1"), keys.current.has("Digit2"), keys.current.has("Digit3"), keys.current.has("Digit4")];
+      const shift = readHeld("mini", keys.current, "ShiftLeft") || readHeld("mini", keys.current, "ShiftRight");
+      const want = [
+        readHeld("mini", keys.current, "Digit1"),
+        readHeld("mini", keys.current, "Digit2"),
+        readHeld("mini", keys.current, "Digit3"),
+        readHeld("mini", keys.current, "Digit4"),
+      ];
       if (click && hover >= 0) want[hover] = true;
       const withdrawing = pull || shift;
       click = false;
@@ -543,6 +555,7 @@ export function PebbleGame({ onDone, onAbort }: { onDone: (score: number) => voi
     const GATE_W = 54;
 
     const down = (e: KeyboardEvent) => {
+      if (!hostOwnsKey("mini", e.code)) return;
       if (e.code === "Escape") onAbort();
       if (e.code === "Space" || e.code === "KeyE") drop();
       if (e.code === "KeyA" || e.code === "ArrowLeft") dropX -= 16;
@@ -766,12 +779,17 @@ export function BowlGame({ onDone, onAbort }: { onDone: (score: number) => void;
       bvy = -Math.cos(aim) * (80 + power * 180);
     };
     const down = (e: KeyboardEvent) => {
+      if (!hostOwnsKey("mini", e.code)) return;
       if (e.code === "Escape") onAbort();
       if (e.code === "Space") charging = true;
       if (e.code === "KeyA" || e.code === "ArrowLeft") aim -= 0.08;
       if (e.code === "KeyD" || e.code === "ArrowRight") aim += 0.08;
     };
     const up = (e: KeyboardEvent) => {
+      if (!hostOwnsKey("mini", e.code)) {
+        charging = false;
+        return;
+      }
       if (e.code === "Space" && charging) fire();
     };
     const md = () => {

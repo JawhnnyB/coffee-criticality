@@ -1,0 +1,1756 @@
+{
+  "url": "http://127.0.0.1:8094/",
+  "viewports": [
+    {
+      "w": 1280,
+      "h": 720,
+      "screens": [
+        {
+          "screen": "title",
+          "w": 1280,
+          "h": 720,
+          "opened": true,
+          "clips": [],
+          "scrolls": [],
+          "windowFails": [],
+          "shortButtons": [],
+          "overlaps": [],
+          "wins": [],
+          "barTop": null
+        },
+        {
+          "screen": "setup",
+          "w": 1280,
+          "h": 720,
+          "opened": true,
+          "clips": [],
+          "scrolls": [],
+          "windowFails": [],
+          "shortButtons": [],
+          "overlaps": [],
+          "wins": [],
+          "barTop": null
+        },
+        {
+          "screen": "desktop",
+          "w": 1280,
+          "h": 720,
+          "opened": true,
+          "clips": [],
+          "scrolls": [],
+          "windowFails": [],
+          "shortButtons": [],
+          "overlaps": [],
+          "wins": [],
+          "barTop": 686
+        },
+        {
+          "screen": "settings",
+          "w": 1280,
+          "h": 720,
+          "opened": true,
+          "clips": [],
+          "scrolls": [
+            {
+              "tag": "div",
+              "testid": null,
+              "className": "relative min-h-0 flex-1 overflow-auto",
+              "overflow": "auto auto auto",
+              "scrollW": 918,
+              "clientW": 918,
+              "scrollH": 1048,
+              "clientH": 499
+            }
+          ],
+          "windowFails": [],
+          "shortButtons": [],
+          "overlaps": [],
+          "wins": [
+            {
+              "id": "window-settings",
+              "x": 136,
+              "y": 36,
+              "r": 1058,
+              "b": 571,
+              "under": false,
+              "off": false
+            }
+          ],
+          "barTop": 686
+        },
+        {
+          "screen": "music",
+          "w": 1280,
+          "h": 720,
+          "opened": true,
+          "clips": [],
+          "scrolls": [],
+          "windowFails": [],
+          "shortButtons": [],
+          "overlaps": [],
+          "wins": [
+            {
+              "id": "window-music",
+              "x": 136,
+              "y": 36,
+              "r": 1058,
+              "b": 571,
+              "under": false,
+              "off": false
+            }
+          ],
+          "barTop": 686
+        },
+        {
+          "screen": "news",
+          "w": 1280,
+          "h": 720,
+          "opened": true,
+          "clips": [],
+          "scrolls": [],
+          "windowFails": [],
+          "shortButtons": [],
+          "overlaps": [],
+          "wins": [
+            {
+              "id": "window-news",
+              "x": 136,
+              "y": 36,
+              "r": 1058,
+              "b": 571,
+              "under": false,
+              "off": false
+            }
+          ],
+          "barTop": 686
+        },
+        {
+          "screen": "radiation",
+          "w": 1280,
+          "h": 720,
+          "opened": true,
+          "clips": [],
+          "scrolls": [
+            {
+              "tag": "div",
+              "testid": null,
+              "className": "relative min-h-0 flex-1 overflow-auto",
+              "overflow": "auto auto auto",
+              "scrollW": 918,
+              "clientW": 918,
+              "scrollH": 533,
+              "clientH": 499
+            }
+          ],
+          "windowFails": [],
+          "shortButtons": [],
+          "overlaps": [],
+          "wins": [
+            {
+              "id": "window-radiation",
+              "x": 136,
+              "y": 36,
+              "r": 1058,
+              "b": 571,
+              "under": false,
+              "off": false
+            }
+          ],
+          "barTop": 686
+        },
+        {
+          "screen": "nrc",
+          "w": 1280,
+          "h": 720,
+          "opened": true,
+          "clips": [],
+          "scrolls": [],
+          "windowFails": [],
+          "shortButtons": [],
+          "overlaps": [],
+          "wins": [
+            {
+              "id": "window-nrc",
+              "x": 136,
+              "y": 36,
+              "r": 1058,
+              "b": 571,
+              "under": false,
+              "off": false
+            }
+          ],
+          "barTop": 686
+        },
+        {
+          "screen": "academy",
+          "w": 1280,
+          "h": 720,
+          "opened": true,
+          "clips": [],
+          "scrolls": [
+            {
+              "tag": "div",
+              "testid": "academy-stage",
+              "className": "absolute inset-0 z-30 overflow-y-auto bg-bg px-4 pb-28 pt-16 sm:px-8",
+              "overflow": "auto auto auto",
+              "scrollW": 956,
+              "clientW": 956,
+              "scrollH": 766,
+              "clientH": 604
+            }
+          ],
+          "windowFails": [],
+          "shortButtons": [],
+          "overlaps": [],
+          "wins": [
+            {
+              "id": "window-academy",
+              "x": 136,
+              "y": 16,
+              "r": 1096,
+              "b": 656,
+              "under": false,
+              "off": false
+            }
+          ],
+          "barTop": 686
+        },
+        {
+          "screen": "design",
+          "w": 1280,
+          "h": 720,
+          "opened": true,
+          "clips": [],
+          "scrolls": [
+            {
+              "tag": "div",
+              "testid": "reactor-builder",
+              "className": "absolute inset-0 z-30 overflow-x-hidden overflow-y-auto bg-bg px-4 pb-28 pt-12 s",
+              "overflow": "hidden auto hidden auto",
+              "scrollW": 918,
+              "clientW": 918,
+              "scrollH": 760,
+              "clientH": 499
+            }
+          ],
+          "windowFails": [],
+          "shortButtons": [],
+          "overlaps": [],
+          "wins": [
+            {
+              "id": "window-design",
+              "x": 136,
+              "y": 36,
+              "r": 1058,
+              "b": 571,
+              "under": false,
+              "off": false
+            }
+          ],
+          "barTop": 686
+        },
+        {
+          "screen": "control",
+          "w": 1280,
+          "h": 720,
+          "opened": false,
+          "reason": "not opened: the icon needs a signed design, and this audit does not sign one"
+        },
+        {
+          "screen": "results",
+          "w": 1280,
+          "h": 720,
+          "opened": false,
+          "reason": "not opened: the icon needs a signed design, and this audit does not sign one"
+        },
+        {
+          "screen": "coremap",
+          "w": 1280,
+          "h": 720,
+          "opened": false,
+          "reason": "not opened: the icon needs a signed design, and this audit does not sign one"
+        },
+        {
+          "screen": "cam",
+          "w": 1280,
+          "h": 720,
+          "opened": false,
+          "reason": "not opened: the icon needs a signed design, and this audit does not sign one"
+        },
+        {
+          "screen": "cafe",
+          "w": 1280,
+          "h": 720,
+          "opened": false,
+          "reason": "not opened: this audit does not walk the world"
+        },
+        {
+          "screen": "load-cab",
+          "w": 1280,
+          "h": 720,
+          "opened": false,
+          "reason": "not opened: this audit does not walk the world"
+        },
+        {
+          "screen": "catch",
+          "w": 1280,
+          "h": 720,
+          "opened": false,
+          "reason": "not opened: this audit does not walk the world"
+        },
+        {
+          "screen": "hide",
+          "w": 1280,
+          "h": 720,
+          "opened": false,
+          "reason": "not opened: this audit does not walk the world"
+        },
+        {
+          "screen": "dusk-lot",
+          "w": 1280,
+          "h": 720,
+          "opened": false,
+          "reason": "not opened: this audit does not walk the world"
+        },
+        {
+          "screen": "maintenance",
+          "w": 1280,
+          "h": 720,
+          "opened": false,
+          "reason": "not opened: this audit does not walk the world"
+        }
+      ]
+    },
+    {
+      "w": 1440,
+      "h": 900,
+      "screens": [
+        {
+          "screen": "title",
+          "w": 1440,
+          "h": 900,
+          "opened": true,
+          "clips": [],
+          "scrolls": [],
+          "windowFails": [],
+          "shortButtons": [],
+          "overlaps": [],
+          "wins": [],
+          "barTop": null
+        },
+        {
+          "screen": "setup",
+          "w": 1440,
+          "h": 900,
+          "opened": true,
+          "clips": [],
+          "scrolls": [],
+          "windowFails": [],
+          "shortButtons": [],
+          "overlaps": [],
+          "wins": [],
+          "barTop": null
+        },
+        {
+          "screen": "desktop",
+          "w": 1440,
+          "h": 900,
+          "opened": true,
+          "clips": [],
+          "scrolls": [],
+          "windowFails": [],
+          "shortButtons": [],
+          "overlaps": [],
+          "wins": [],
+          "barTop": 866
+        },
+        {
+          "screen": "settings",
+          "w": 1440,
+          "h": 900,
+          "opened": true,
+          "clips": [],
+          "scrolls": [
+            {
+              "tag": "div",
+              "testid": null,
+              "className": "relative min-h-0 flex-1 overflow-auto",
+              "overflow": "auto auto auto",
+              "scrollW": 1033,
+              "clientW": 1033,
+              "scrollH": 1048,
+              "clientH": 639
+            }
+          ],
+          "windowFails": [],
+          "shortButtons": [],
+          "overlaps": [],
+          "wins": [
+            {
+              "id": "window-settings",
+              "x": 136,
+              "y": 36,
+              "r": 1173,
+              "b": 711,
+              "under": false,
+              "off": false
+            }
+          ],
+          "barTop": 866
+        },
+        {
+          "screen": "music",
+          "w": 1440,
+          "h": 900,
+          "opened": true,
+          "clips": [],
+          "scrolls": [],
+          "windowFails": [],
+          "shortButtons": [],
+          "overlaps": [],
+          "wins": [
+            {
+              "id": "window-music",
+              "x": 136,
+              "y": 36,
+              "r": 1173,
+              "b": 711,
+              "under": false,
+              "off": false
+            }
+          ],
+          "barTop": 866
+        },
+        {
+          "screen": "news",
+          "w": 1440,
+          "h": 900,
+          "opened": true,
+          "clips": [],
+          "scrolls": [],
+          "windowFails": [],
+          "shortButtons": [],
+          "overlaps": [],
+          "wins": [
+            {
+              "id": "window-news",
+              "x": 136,
+              "y": 36,
+              "r": 1173,
+              "b": 711,
+              "under": false,
+              "off": false
+            }
+          ],
+          "barTop": 866
+        },
+        {
+          "screen": "radiation",
+          "w": 1440,
+          "h": 900,
+          "opened": true,
+          "clips": [],
+          "scrolls": [],
+          "windowFails": [],
+          "shortButtons": [],
+          "overlaps": [],
+          "wins": [
+            {
+              "id": "window-radiation",
+              "x": 136,
+              "y": 36,
+              "r": 1173,
+              "b": 711,
+              "under": false,
+              "off": false
+            }
+          ],
+          "barTop": 866
+        },
+        {
+          "screen": "nrc",
+          "w": 1440,
+          "h": 900,
+          "opened": true,
+          "clips": [],
+          "scrolls": [],
+          "windowFails": [],
+          "shortButtons": [],
+          "overlaps": [],
+          "wins": [
+            {
+              "id": "window-nrc",
+              "x": 136,
+              "y": 36,
+              "r": 1173,
+              "b": 711,
+              "under": false,
+              "off": false
+            }
+          ],
+          "barTop": 866
+        },
+        {
+          "screen": "academy",
+          "w": 1440,
+          "h": 900,
+          "opened": true,
+          "clips": [],
+          "scrolls": [
+            {
+              "tag": "div",
+              "testid": "academy-stage",
+              "className": "absolute inset-0 z-30 overflow-y-auto bg-bg px-4 pb-28 pt-16 sm:px-8",
+              "overflow": "auto auto auto",
+              "scrollW": 956,
+              "clientW": 956,
+              "scrollH": 766,
+              "clientH": 604
+            }
+          ],
+          "windowFails": [],
+          "shortButtons": [],
+          "overlaps": [],
+          "wins": [
+            {
+              "id": "window-academy",
+              "x": 136,
+              "y": 36,
+              "r": 1096,
+              "b": 676,
+              "under": false,
+              "off": false
+            }
+          ],
+          "barTop": 866
+        },
+        {
+          "screen": "design",
+          "w": 1440,
+          "h": 900,
+          "opened": true,
+          "clips": [],
+          "scrolls": [
+            {
+              "tag": "div",
+              "testid": "reactor-builder",
+              "className": "absolute inset-0 z-30 overflow-x-hidden overflow-y-auto bg-bg px-4 pb-28 pt-12 s",
+              "overflow": "hidden auto hidden auto",
+              "scrollW": 1033,
+              "clientW": 1033,
+              "scrollH": 760,
+              "clientH": 639
+            }
+          ],
+          "windowFails": [],
+          "shortButtons": [],
+          "overlaps": [],
+          "wins": [
+            {
+              "id": "window-design",
+              "x": 136,
+              "y": 36,
+              "r": 1173,
+              "b": 711,
+              "under": false,
+              "off": false
+            }
+          ],
+          "barTop": 866
+        },
+        {
+          "screen": "control",
+          "w": 1440,
+          "h": 900,
+          "opened": false,
+          "reason": "not opened: the icon needs a signed design, and this audit does not sign one"
+        },
+        {
+          "screen": "results",
+          "w": 1440,
+          "h": 900,
+          "opened": false,
+          "reason": "not opened: the icon needs a signed design, and this audit does not sign one"
+        },
+        {
+          "screen": "coremap",
+          "w": 1440,
+          "h": 900,
+          "opened": false,
+          "reason": "not opened: the icon needs a signed design, and this audit does not sign one"
+        },
+        {
+          "screen": "cam",
+          "w": 1440,
+          "h": 900,
+          "opened": false,
+          "reason": "not opened: the icon needs a signed design, and this audit does not sign one"
+        },
+        {
+          "screen": "cafe",
+          "w": 1440,
+          "h": 900,
+          "opened": false,
+          "reason": "not opened: this audit does not walk the world"
+        },
+        {
+          "screen": "load-cab",
+          "w": 1440,
+          "h": 900,
+          "opened": false,
+          "reason": "not opened: this audit does not walk the world"
+        },
+        {
+          "screen": "catch",
+          "w": 1440,
+          "h": 900,
+          "opened": false,
+          "reason": "not opened: this audit does not walk the world"
+        },
+        {
+          "screen": "hide",
+          "w": 1440,
+          "h": 900,
+          "opened": false,
+          "reason": "not opened: this audit does not walk the world"
+        },
+        {
+          "screen": "dusk-lot",
+          "w": 1440,
+          "h": 900,
+          "opened": false,
+          "reason": "not opened: this audit does not walk the world"
+        },
+        {
+          "screen": "maintenance",
+          "w": 1440,
+          "h": 900,
+          "opened": false,
+          "reason": "not opened: this audit does not walk the world"
+        }
+      ]
+    },
+    {
+      "w": 1920,
+      "h": 1080,
+      "screens": [
+        {
+          "screen": "title",
+          "w": 1920,
+          "h": 1080,
+          "opened": true,
+          "clips": [],
+          "scrolls": [],
+          "windowFails": [],
+          "shortButtons": [],
+          "overlaps": [],
+          "wins": [],
+          "barTop": null
+        },
+        {
+          "screen": "setup",
+          "w": 1920,
+          "h": 1080,
+          "opened": true,
+          "clips": [],
+          "scrolls": [],
+          "windowFails": [],
+          "shortButtons": [],
+          "overlaps": [],
+          "wins": [],
+          "barTop": null
+        },
+        {
+          "screen": "desktop",
+          "w": 1920,
+          "h": 1080,
+          "opened": true,
+          "clips": [],
+          "scrolls": [],
+          "windowFails": [],
+          "shortButtons": [],
+          "overlaps": [],
+          "wins": [],
+          "barTop": 1046
+        },
+        {
+          "screen": "settings",
+          "w": 1920,
+          "h": 1080,
+          "opened": true,
+          "clips": [],
+          "scrolls": [
+            {
+              "tag": "div",
+              "testid": null,
+              "className": "relative min-h-0 flex-1 overflow-auto",
+              "overflow": "auto auto auto",
+              "scrollW": 1378,
+              "clientW": 1378,
+              "scrollH": 1008,
+              "clientH": 780
+            }
+          ],
+          "windowFails": [],
+          "shortButtons": [],
+          "overlaps": [],
+          "wins": [
+            {
+              "id": "window-settings",
+              "x": 136,
+              "y": 36,
+              "r": 1518,
+              "b": 852,
+              "under": false,
+              "off": false
+            }
+          ],
+          "barTop": 1046
+        },
+        {
+          "screen": "music",
+          "w": 1920,
+          "h": 1080,
+          "opened": true,
+          "clips": [],
+          "scrolls": [],
+          "windowFails": [],
+          "shortButtons": [],
+          "overlaps": [],
+          "wins": [
+            {
+              "id": "window-music",
+              "x": 136,
+              "y": 36,
+              "r": 1518,
+              "b": 852,
+              "under": false,
+              "off": false
+            }
+          ],
+          "barTop": 1046
+        },
+        {
+          "screen": "news",
+          "w": 1920,
+          "h": 1080,
+          "opened": true,
+          "clips": [],
+          "scrolls": [],
+          "windowFails": [],
+          "shortButtons": [],
+          "overlaps": [],
+          "wins": [
+            {
+              "id": "window-news",
+              "x": 136,
+              "y": 36,
+              "r": 1518,
+              "b": 852,
+              "under": false,
+              "off": false
+            }
+          ],
+          "barTop": 1046
+        },
+        {
+          "screen": "radiation",
+          "w": 1920,
+          "h": 1080,
+          "opened": true,
+          "clips": [],
+          "scrolls": [],
+          "windowFails": [],
+          "shortButtons": [],
+          "overlaps": [],
+          "wins": [
+            {
+              "id": "window-radiation",
+              "x": 136,
+              "y": 36,
+              "r": 1518,
+              "b": 852,
+              "under": false,
+              "off": false
+            }
+          ],
+          "barTop": 1046
+        },
+        {
+          "screen": "nrc",
+          "w": 1920,
+          "h": 1080,
+          "opened": true,
+          "clips": [],
+          "scrolls": [],
+          "windowFails": [],
+          "shortButtons": [],
+          "overlaps": [],
+          "wins": [
+            {
+              "id": "window-nrc",
+              "x": 136,
+              "y": 36,
+              "r": 1518,
+              "b": 852,
+              "under": false,
+              "off": false
+            }
+          ],
+          "barTop": 1046
+        },
+        {
+          "screen": "academy",
+          "w": 1920,
+          "h": 1080,
+          "opened": true,
+          "clips": [],
+          "scrolls": [
+            {
+              "tag": "div",
+              "testid": "academy-stage",
+              "className": "absolute inset-0 z-30 overflow-y-auto bg-bg px-4 pb-28 pt-16 sm:px-8",
+              "overflow": "auto auto auto",
+              "scrollW": 956,
+              "clientW": 956,
+              "scrollH": 766,
+              "clientH": 604
+            }
+          ],
+          "windowFails": [],
+          "shortButtons": [],
+          "overlaps": [],
+          "wins": [
+            {
+              "id": "window-academy",
+              "x": 136,
+              "y": 36,
+              "r": 1096,
+              "b": 676,
+              "under": false,
+              "off": false
+            }
+          ],
+          "barTop": 1046
+        },
+        {
+          "screen": "design",
+          "w": 1920,
+          "h": 1080,
+          "opened": true,
+          "clips": [],
+          "scrolls": [],
+          "windowFails": [],
+          "shortButtons": [],
+          "overlaps": [],
+          "wins": [
+            {
+              "id": "window-design",
+              "x": 136,
+              "y": 36,
+              "r": 1518,
+              "b": 852,
+              "under": false,
+              "off": false
+            }
+          ],
+          "barTop": 1046
+        },
+        {
+          "screen": "control",
+          "w": 1920,
+          "h": 1080,
+          "opened": false,
+          "reason": "not opened: the icon needs a signed design, and this audit does not sign one"
+        },
+        {
+          "screen": "results",
+          "w": 1920,
+          "h": 1080,
+          "opened": false,
+          "reason": "not opened: the icon needs a signed design, and this audit does not sign one"
+        },
+        {
+          "screen": "coremap",
+          "w": 1920,
+          "h": 1080,
+          "opened": false,
+          "reason": "not opened: the icon needs a signed design, and this audit does not sign one"
+        },
+        {
+          "screen": "cam",
+          "w": 1920,
+          "h": 1080,
+          "opened": false,
+          "reason": "not opened: the icon needs a signed design, and this audit does not sign one"
+        },
+        {
+          "screen": "cafe",
+          "w": 1920,
+          "h": 1080,
+          "opened": false,
+          "reason": "not opened: this audit does not walk the world"
+        },
+        {
+          "screen": "load-cab",
+          "w": 1920,
+          "h": 1080,
+          "opened": false,
+          "reason": "not opened: this audit does not walk the world"
+        },
+        {
+          "screen": "catch",
+          "w": 1920,
+          "h": 1080,
+          "opened": false,
+          "reason": "not opened: this audit does not walk the world"
+        },
+        {
+          "screen": "hide",
+          "w": 1920,
+          "h": 1080,
+          "opened": false,
+          "reason": "not opened: this audit does not walk the world"
+        },
+        {
+          "screen": "dusk-lot",
+          "w": 1920,
+          "h": 1080,
+          "opened": false,
+          "reason": "not opened: this audit does not walk the world"
+        },
+        {
+          "screen": "maintenance",
+          "w": 1920,
+          "h": 1080,
+          "opened": false,
+          "reason": "not opened: this audit does not walk the world"
+        }
+      ]
+    },
+    {
+      "w": 768,
+      "h": 1024,
+      "screens": [
+        {
+          "screen": "title",
+          "w": 768,
+          "h": 1024,
+          "opened": true,
+          "clips": [],
+          "scrolls": [],
+          "windowFails": [],
+          "shortButtons": [],
+          "overlaps": [],
+          "wins": [],
+          "barTop": null
+        },
+        {
+          "screen": "setup",
+          "w": 768,
+          "h": 1024,
+          "opened": true,
+          "clips": [],
+          "scrolls": [],
+          "windowFails": [],
+          "shortButtons": [],
+          "overlaps": [],
+          "wins": [],
+          "barTop": null
+        },
+        {
+          "screen": "desktop",
+          "w": 768,
+          "h": 1024,
+          "opened": true,
+          "clips": [],
+          "scrolls": [],
+          "windowFails": [],
+          "shortButtons": [],
+          "overlaps": [],
+          "wins": [],
+          "barTop": 990
+        },
+        {
+          "screen": "settings",
+          "w": 768,
+          "h": 1024,
+          "opened": true,
+          "clips": [],
+          "scrolls": [
+            {
+              "tag": "div",
+              "testid": null,
+              "className": "relative min-h-0 flex-1 overflow-auto",
+              "overflow": "auto auto auto",
+              "scrollW": 549,
+              "clientW": 549,
+              "scrollH": 1116,
+              "clientH": 736
+            }
+          ],
+          "windowFails": [],
+          "shortButtons": [],
+          "overlaps": [],
+          "wins": [
+            {
+              "id": "window-settings",
+              "x": 136,
+              "y": 36,
+              "r": 689,
+              "b": 808,
+              "under": false,
+              "off": false
+            }
+          ],
+          "barTop": 990
+        },
+        {
+          "screen": "music",
+          "w": 768,
+          "h": 1024,
+          "opened": true,
+          "clips": [],
+          "scrolls": [],
+          "windowFails": [],
+          "shortButtons": [],
+          "overlaps": [],
+          "wins": [
+            {
+              "id": "window-music",
+              "x": 136,
+              "y": 36,
+              "r": 689,
+              "b": 808,
+              "under": false,
+              "off": false
+            }
+          ],
+          "barTop": 990
+        },
+        {
+          "screen": "news",
+          "w": 768,
+          "h": 1024,
+          "opened": true,
+          "clips": [],
+          "scrolls": [],
+          "windowFails": [],
+          "shortButtons": [],
+          "overlaps": [],
+          "wins": [
+            {
+              "id": "window-news",
+              "x": 136,
+              "y": 36,
+              "r": 689,
+              "b": 808,
+              "under": false,
+              "off": false
+            }
+          ],
+          "barTop": 990
+        },
+        {
+          "screen": "radiation",
+          "w": 768,
+          "h": 1024,
+          "opened": true,
+          "clips": [],
+          "scrolls": [],
+          "windowFails": [],
+          "shortButtons": [],
+          "overlaps": [],
+          "wins": [
+            {
+              "id": "window-radiation",
+              "x": 136,
+              "y": 36,
+              "r": 689,
+              "b": 808,
+              "under": false,
+              "off": false
+            }
+          ],
+          "barTop": 990
+        },
+        {
+          "screen": "nrc",
+          "w": 768,
+          "h": 1024,
+          "opened": true,
+          "clips": [],
+          "scrolls": [],
+          "windowFails": [],
+          "shortButtons": [],
+          "overlaps": [],
+          "wins": [
+            {
+              "id": "window-nrc",
+              "x": 136,
+              "y": 36,
+              "r": 689,
+              "b": 808,
+              "under": false,
+              "off": false
+            }
+          ],
+          "barTop": 990
+        },
+        {
+          "screen": "academy",
+          "w": 768,
+          "h": 1024,
+          "opened": true,
+          "clips": [],
+          "scrolls": [
+            {
+              "tag": "div",
+              "testid": "academy-stage",
+              "className": "absolute inset-0 z-30 overflow-y-auto bg-bg px-4 pb-28 pt-16 sm:px-8",
+              "overflow": "auto auto auto",
+              "scrollW": 740,
+              "clientW": 740,
+              "scrollH": 1231,
+              "clientH": 604
+            }
+          ],
+          "windowFails": [],
+          "shortButtons": [],
+          "overlaps": [
+            {
+              "a": "Reactor Design",
+              "b": "Academy",
+              "iw": 83,
+              "ih": 17
+            }
+          ],
+          "wins": [
+            {
+              "id": "window-academy",
+              "x": 24,
+              "y": 36,
+              "r": 768,
+              "b": 676,
+              "under": false,
+              "off": false
+            }
+          ],
+          "barTop": 990
+        },
+        {
+          "screen": "design",
+          "w": 768,
+          "h": 1024,
+          "opened": true,
+          "clips": [],
+          "scrolls": [
+            {
+              "tag": "div",
+              "testid": "reactor-builder",
+              "className": "absolute inset-0 z-30 overflow-x-hidden overflow-y-auto bg-bg px-4 pb-28 pt-12 s",
+              "overflow": "hidden auto hidden auto",
+              "scrollW": 549,
+              "clientW": 549,
+              "scrollH": 1024,
+              "clientH": 736
+            }
+          ],
+          "windowFails": [],
+          "shortButtons": [],
+          "overlaps": [],
+          "wins": [
+            {
+              "id": "window-design",
+              "x": 136,
+              "y": 36,
+              "r": 689,
+              "b": 808,
+              "under": false,
+              "off": false
+            }
+          ],
+          "barTop": 990
+        },
+        {
+          "screen": "control",
+          "w": 768,
+          "h": 1024,
+          "opened": false,
+          "reason": "not opened: the icon needs a signed design, and this audit does not sign one"
+        },
+        {
+          "screen": "results",
+          "w": 768,
+          "h": 1024,
+          "opened": false,
+          "reason": "not opened: the icon needs a signed design, and this audit does not sign one"
+        },
+        {
+          "screen": "coremap",
+          "w": 768,
+          "h": 1024,
+          "opened": false,
+          "reason": "not opened: the icon needs a signed design, and this audit does not sign one"
+        },
+        {
+          "screen": "cam",
+          "w": 768,
+          "h": 1024,
+          "opened": false,
+          "reason": "not opened: the icon needs a signed design, and this audit does not sign one"
+        },
+        {
+          "screen": "cafe",
+          "w": 768,
+          "h": 1024,
+          "opened": false,
+          "reason": "not opened: this audit does not walk the world"
+        },
+        {
+          "screen": "load-cab",
+          "w": 768,
+          "h": 1024,
+          "opened": false,
+          "reason": "not opened: this audit does not walk the world"
+        },
+        {
+          "screen": "catch",
+          "w": 768,
+          "h": 1024,
+          "opened": false,
+          "reason": "not opened: this audit does not walk the world"
+        },
+        {
+          "screen": "hide",
+          "w": 768,
+          "h": 1024,
+          "opened": false,
+          "reason": "not opened: this audit does not walk the world"
+        },
+        {
+          "screen": "dusk-lot",
+          "w": 768,
+          "h": 1024,
+          "opened": false,
+          "reason": "not opened: this audit does not walk the world"
+        },
+        {
+          "screen": "maintenance",
+          "w": 768,
+          "h": 1024,
+          "opened": false,
+          "reason": "not opened: this audit does not walk the world"
+        }
+      ]
+    },
+    {
+      "w": 390,
+      "h": 844,
+      "screens": [
+        {
+          "screen": "title",
+          "w": 390,
+          "h": 844,
+          "opened": true,
+          "clips": [],
+          "scrolls": [],
+          "windowFails": [],
+          "shortButtons": [],
+          "overlaps": [],
+          "wins": [],
+          "barTop": null
+        },
+        {
+          "screen": "setup",
+          "w": 390,
+          "h": 844,
+          "opened": true,
+          "clips": [],
+          "scrolls": [],
+          "windowFails": [],
+          "shortButtons": [],
+          "overlaps": [],
+          "wins": [],
+          "barTop": null
+        },
+        {
+          "screen": "desktop",
+          "w": 390,
+          "h": 844,
+          "opened": true,
+          "clips": [],
+          "scrolls": [],
+          "windowFails": [],
+          "shortButtons": [],
+          "overlaps": [],
+          "wins": [],
+          "barTop": 810
+        },
+        {
+          "screen": "settings",
+          "w": 390,
+          "h": 844,
+          "opened": true,
+          "clips": [],
+          "scrolls": [
+            {
+              "tag": "div",
+              "testid": null,
+              "className": "relative min-h-0 flex-1 overflow-auto",
+              "overflow": "auto auto auto",
+              "scrollW": 390,
+              "clientW": 390,
+              "scrollH": 1260,
+              "clientH": 794
+            }
+          ],
+          "windowFails": [],
+          "shortButtons": [
+            {
+              "testid": "wall-season",
+              "text": "Season",
+              "h": 36,
+              "w": 72
+            },
+            {
+              "testid": "wall-spring",
+              "text": "Spring",
+              "h": 36,
+              "w": 65
+            },
+            {
+              "testid": "wall-summer",
+              "text": "Summer",
+              "h": 36,
+              "w": 76
+            },
+            {
+              "testid": "wall-fall",
+              "text": "Fall",
+              "h": 36,
+              "w": 42
+            },
+            {
+              "testid": "wall-winter",
+              "text": "Winter",
+              "h": 36,
+              "w": 69
+            },
+            {
+              "testid": "theme-follow",
+              "text": "Follow season",
+              "h": 36,
+              "w": 120
+            },
+            {
+              "testid": "theme-spring",
+              "text": "Spring",
+              "h": 36,
+              "w": 65
+            },
+            {
+              "testid": "theme-summer",
+              "text": "Summer",
+              "h": 36,
+              "w": 76
+            },
+            {
+              "testid": "theme-fall",
+              "text": "Fall",
+              "h": 36,
+              "w": 42
+            },
+            {
+              "testid": "theme-winter",
+              "text": "Winter",
+              "h": 36,
+              "w": 69
+            },
+            {
+              "testid": "accent-copper",
+              "text": "Copper",
+              "h": 36,
+              "w": 70
+            },
+            {
+              "testid": "accent-leaf",
+              "text": "Leaf",
+              "h": 36,
+              "w": 53
+            },
+            {
+              "testid": "accent-gold",
+              "text": "Gold",
+              "h": 36,
+              "w": 47
+            },
+            {
+              "testid": "pin-settings",
+              "text": "Pinned Settings",
+              "h": 36,
+              "w": 138
+            },
+            {
+              "testid": "up-settings",
+              "text": "↑",
+              "h": 36,
+              "w": 24
+            },
+            {
+              "testid": "down-settings",
+              "text": "↓",
+              "h": 36,
+              "w": 24
+            },
+            {
+              "testid": "pin-music",
+              "text": "Pinned Music",
+              "h": 36,
+              "w": 111
+            },
+            {
+              "testid": "up-music",
+              "text": "↑",
+              "h": 36,
+              "w": 24
+            },
+            {
+              "testid": "down-music",
+              "text": "↓",
+              "h": 36,
+              "w": 24
+            },
+            {
+              "testid": "pin-design",
+              "text": "Pinned Reactor Design",
+              "h": 36,
+              "w": 185
+            },
+            {
+              "testid": "up-design",
+              "text": "↑",
+              "h": 36,
+              "w": 24
+            },
+            {
+              "testid": "down-design",
+              "text": "↓",
+              "h": 36,
+              "w": 24
+            },
+            {
+              "testid": "pin-academy",
+              "text": "Pinned Academy",
+              "h": 36,
+              "w": 135
+            },
+            {
+              "testid": "up-academy",
+              "text": "↑",
+              "h": 36,
+              "w": 24
+            },
+            {
+              "testid": "down-academy",
+              "text": "↓",
+              "h": 36,
+              "w": 24
+            },
+            {
+              "testid": "pin-news",
+              "text": "Pin News",
+              "h": 36,
+              "w": 80
+            },
+            {
+              "testid": "pin-radiation",
+              "text": "Pin Radiation",
+              "h": 36,
+              "w": 115
+            },
+            {
+              "testid": "pin-nrc",
+              "text": "Pin NRC Regulations",
+              "h": 36,
+              "w": 162
+            },
+            {
+              "testid": "text-small",
+              "text": "Small",
+              "h": 36,
+              "w": 56
+            },
+            {
+              "testid": "text-medium",
+              "text": "Medium",
+              "h": 36,
+              "w": 71
+            },
+            {
+              "testid": "text-large",
+              "text": "Large",
+              "h": 36,
+              "w": 63
+            },
+            {
+              "testid": "reduced-motion",
+              "text": "Reduced motion off",
+              "h": 36,
+              "w": 163
+            }
+          ],
+          "overlaps": [],
+          "wins": [],
+          "barTop": null
+        },
+        {
+          "screen": "music",
+          "w": 390,
+          "h": 844,
+          "opened": true,
+          "clips": [],
+          "scrolls": [],
+          "windowFails": [],
+          "shortButtons": [
+            {
+              "testid": "music-play",
+              "text": "Play",
+              "h": 36,
+              "w": 48
+            },
+            {
+              "testid": "music-skip",
+              "text": "Skip",
+              "h": 36,
+              "w": 47
+            }
+          ],
+          "overlaps": [],
+          "wins": [],
+          "barTop": null
+        },
+        {
+          "screen": "news",
+          "w": 390,
+          "h": 844,
+          "opened": true,
+          "clips": [],
+          "scrolls": [],
+          "windowFails": [],
+          "shortButtons": [],
+          "overlaps": [],
+          "wins": [],
+          "barTop": null
+        },
+        {
+          "screen": "radiation",
+          "w": 390,
+          "h": 844,
+          "opened": true,
+          "clips": [],
+          "scrolls": [],
+          "windowFails": [],
+          "shortButtons": [
+            {
+              "testid": "radiation-alara",
+              "text": "ALARA with eyes open",
+              "h": 21,
+              "w": 144
+            }
+          ],
+          "overlaps": [],
+          "wins": [],
+          "barTop": null
+        },
+        {
+          "screen": "nrc",
+          "w": 390,
+          "h": 844,
+          "opened": true,
+          "clips": [],
+          "scrolls": [],
+          "windowFails": [],
+          "shortButtons": [],
+          "overlaps": [],
+          "wins": [],
+          "barTop": null
+        },
+        {
+          "screen": "academy",
+          "w": 390,
+          "h": 844,
+          "opened": true,
+          "clips": [],
+          "scrolls": [
+            {
+              "tag": "div",
+              "testid": "academy-stage",
+              "className": "absolute inset-0 z-30 overflow-y-auto bg-bg px-4 pb-28 pt-16 sm:px-8",
+              "overflow": "auto auto auto",
+              "scrollW": 390,
+              "clientW": 390,
+              "scrollH": 1131,
+              "clientH": 794
+            }
+          ],
+          "windowFails": [],
+          "shortButtons": [
+            {
+              "testid": null,
+              "text": "Culture",
+              "h": 31,
+              "w": 70
+            },
+            {
+              "testid": null,
+              "text": "Heat",
+              "h": 31,
+              "w": 50
+            },
+            {
+              "testid": null,
+              "text": "Safety",
+              "h": 31,
+              "w": 66
+            },
+            {
+              "testid": null,
+              "text": "Physics",
+              "h": 31,
+              "w": 69
+            },
+            {
+              "testid": null,
+              "text": "Fuel",
+              "h": 31,
+              "w": 44
+            },
+            {
+              "testid": "academy-filter-1",
+              "text": "Tier 1",
+              "h": 31,
+              "w": 54
+            },
+            {
+              "testid": "academy-filter-2",
+              "text": "Tier 2",
+              "h": 31,
+              "w": 56
+            },
+            {
+              "testid": "academy-filter-3",
+              "text": "Tier 3",
+              "h": 31,
+              "w": 56
+            },
+            {
+              "testid": null,
+              "text": "Heat has to leave",
+              "h": 21,
+              "w": 117
+            }
+          ],
+          "overlaps": [],
+          "wins": [],
+          "barTop": null
+        },
+        {
+          "screen": "design",
+          "w": 390,
+          "h": 844,
+          "opened": true,
+          "clips": [],
+          "scrolls": [
+            {
+              "tag": "div",
+              "testid": "reactor-builder",
+              "className": "absolute inset-0 z-30 overflow-x-hidden overflow-y-auto bg-bg px-4 pb-28 pt-12 s",
+              "overflow": "hidden auto hidden auto",
+              "scrollW": 390,
+              "clientW": 390,
+              "scrollH": 1083,
+              "clientH": 794
+            }
+          ],
+          "windowFails": [],
+          "shortButtons": [],
+          "overlaps": [],
+          "wins": [],
+          "barTop": null
+        },
+        {
+          "screen": "control",
+          "w": 390,
+          "h": 844,
+          "opened": false,
+          "reason": "not opened: the icon needs a signed design, and this audit does not sign one"
+        },
+        {
+          "screen": "results",
+          "w": 390,
+          "h": 844,
+          "opened": false,
+          "reason": "not opened: the icon needs a signed design, and this audit does not sign one"
+        },
+        {
+          "screen": "coremap",
+          "w": 390,
+          "h": 844,
+          "opened": false,
+          "reason": "not opened: the icon needs a signed design, and this audit does not sign one"
+        },
+        {
+          "screen": "cam",
+          "w": 390,
+          "h": 844,
+          "opened": false,
+          "reason": "not opened: the icon needs a signed design, and this audit does not sign one"
+        },
+        {
+          "screen": "cafe",
+          "w": 390,
+          "h": 844,
+          "opened": false,
+          "reason": "not opened: this audit does not walk the world"
+        },
+        {
+          "screen": "load-cab",
+          "w": 390,
+          "h": 844,
+          "opened": false,
+          "reason": "not opened: this audit does not walk the world"
+        },
+        {
+          "screen": "catch",
+          "w": 390,
+          "h": 844,
+          "opened": false,
+          "reason": "not opened: this audit does not walk the world"
+        },
+        {
+          "screen": "hide",
+          "w": 390,
+          "h": 844,
+          "opened": false,
+          "reason": "not opened: this audit does not walk the world"
+        },
+        {
+          "screen": "dusk-lot",
+          "w": 390,
+          "h": 844,
+          "opened": false,
+          "reason": "not opened: this audit does not walk the world"
+        },
+        {
+          "screen": "maintenance",
+          "w": 390,
+          "h": 844,
+          "opened": false,
+          "reason": "not opened: this audit does not walk the world"
+        }
+      ]
+    }
+  ],
+  "violationCount": 45
+}

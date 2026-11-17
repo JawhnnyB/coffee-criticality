@@ -176,7 +176,7 @@ export function ReactorBuilder({
                 <Nav i={i} last={last} plant={plant} onBack={() => setI(i - 1)} onNext={() => setI(i + 1)} onDone={onDone} />
               </div>
             </div>
-            <div className="teach-span-5">
+            <div className="teach-span-5 min-h-0 overflow-y-auto">
               <PlantHud plant={plant} />
             </div>
           </>

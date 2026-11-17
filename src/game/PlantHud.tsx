@@ -70,7 +70,7 @@ export function PlantHud({ plant }: { plant: PlantDesign }) {
   return (
     <div className="teach-ink" data-testid="plant-hud">
       <p className="teach-kicker">This site · {SITE[plant.type]} · teaching only</p>
-      <CutawayLoop type={plant.type} hot={hot} className="mt-2 aspect-video w-full object-contain teach-pixel" />
+      <CutawayLoop type={plant.type} hot={hot} className="mt-2 max-h-32 w-full object-contain teach-pixel" />
       <div className="mt-3 grid grid-cols-2 gap-2">
         <TeachReadout k="ΔT" v={`${plant.dT} °C`} />
         <TeachReadout k="Flow" v={`${plant.flow} %`} />
@@ -80,13 +80,13 @@ export function PlantHud({ plant }: { plant: PlantDesign }) {
           v={`${q}${plant.type === "pwr" || plant.type === "bwr" ? " kW/m" : ""}`}
         />
       </div>
-      <p className="teach-kicker mt-3">Why this drawing</p>
-      <ul className="mt-1 space-y-0.5 font-mono text-[12px] leading-relaxed text-[#f3e6d0]">
+      <p className="teach-kicker mt-3" data-testid="why-drawing">Why this drawing</p>
+      <ul className="mt-1 space-y-0.5 text-[14px] leading-relaxed text-[#f3e6d0]" style={{ fontFamily: "var(--font-body)" }}>
         {LEGEND[plant.type].map((line) => (
           <li key={line}>· {line}</li>
         ))}
       </ul>
-      <p className="mt-2 text-[12px] leading-relaxed text-[#b5a48c]">
+      <p className="mt-2 text-[14px] leading-relaxed text-[#b5a48c]" data-testid="why-drawing-body" style={{ fontFamily: "var(--font-body)" }}>
         {plant.type === "pwr" ? (hot ? "Core HOT — Cherenkov blue. " : "Core COOL — stainless. ") : null}
         {COPY[plant.type]}
       </p>

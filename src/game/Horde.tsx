@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Bezel } from "./Arcade";
 import { HORDE_MAPS } from "./hordeMaps";
+import { hostOwnsKey, readHeld } from "./keyGate";
 
 type GunId = "pistol" | "pump" | "db" | "ak" | "m16" | "lmg";
 type ZedKind = "chase" | "flank" | "rush" | "wander";
@@ -219,6 +220,7 @@ export function HordeGame({ onDone, onAbort }: { onDone: (score: number) => void
     let firing = false;
     const wantGun = { current: "pistol" as GunId };
     const down = (e: KeyboardEvent) => {
+      if (!hostOwnsKey("mini", e.code)) return;
       keys.add(e.code);
       if (e.code === "Escape") onAbort();
       const n = e.code.startsWith("Digit") ? Number(e.code.slice(5)) : 0;
@@ -312,15 +314,15 @@ export function HordeGame({ onDone, onAbort }: { onDone: (score: number) => void
       const g = GUNS[gun];
       let vx = 0;
       let vy = 0;
-      if (keys.has("KeyA") || keys.has("ArrowLeft")) vx -= 1;
-      if (keys.has("KeyD") || keys.has("ArrowRight")) vx += 1;
-      if (keys.has("KeyW") || keys.has("ArrowUp")) vy -= 1;
-      if (keys.has("KeyS") || keys.has("ArrowDown")) vy += 1;
+      if (readHeld("mini", keys, "KeyA") || readHeld("mini", keys, "ArrowLeft")) vx -= 1;
+      if (readHeld("mini", keys, "KeyD") || readHeld("mini", keys, "ArrowRight")) vx += 1;
+      if (readHeld("mini", keys, "KeyW") || readHeld("mini", keys, "ArrowUp")) vy -= 1;
+      if (readHeld("mini", keys, "KeyS") || readHeld("mini", keys, "ArrowDown")) vy += 1;
       const len = Math.hypot(vx, vy) || 1;
       const moved = stepPlayer(x, y, (vx / len) * 78 * g.speed * dt, (vy / len) * 78 * g.speed * dt);
       x = moved.x;
       y = moved.y;
-      if (firing || keys.has("Space")) fire();
+      if (firing || readHeld("mini", keys, "Space")) fire();
 
       flowT -= dt;
       if (flowT <= 0) {

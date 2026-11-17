@@ -1,0 +1,52 @@
+TAP version 13
+# gate-calls 15
+# static-focus moved 0
+# mini-focus world-x stay 40
+# mini-focus mini-x 41
+# KEY_GATE_CASES 4
+# Subtest: a game key does not move the game while a desktop app is focused
+ok 1 - a game key does not move the game while a desktop app is focused
+  ---
+  duration_ms: 1.283285
+  type: 'test'
+  ...
+# Subtest: the focused mini game still moves, and the world under that window does not
+ok 2 - the focused mini game still moves, and the world under that window does not
+  ---
+  duration_ms: 0.171485
+  type: 'test'
+  ...
+# Subtest: a full-screen cabinet still hears keys when the desktop is closed
+ok 3 - a full-screen cabinet still hears keys when the desktop is closed
+  ---
+  duration_ms: 0.162942
+  type: 'test'
+  ...
+# Subtest: a focused sim window does not take Escape, and it does not move the world
+ok 4 - a focused sim window does not take Escape, and it does not move the world
+  ---
+  duration_ms: 0.157114
+  type: 'test'
+  ...
+# Subtest: every listed key listener asks the gate before it handles a key
+ok 5 - every listed key listener asks the gate before it handles a key
+  ---
+  duration_ms: 3.449151
+  type: 'test'
+  ...
+# Subtest: listeners named in the trap are the ones this gate covers
+ok 6 - listeners named in the trap are the ones this gate covers
+  ---
+  duration_ms: 2.08385
+  type: 'test'
+  ...
+1..6
+# tests 6
+# suites 0
+# pass 6
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 949.49691
+KEY_GATE_EXIT:0

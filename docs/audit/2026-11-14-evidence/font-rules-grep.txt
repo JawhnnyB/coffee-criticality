@@ -1,0 +1,7 @@
+command: grep -R -n --include='*.css' --include='*.tsx' --include='*.ts' 'font-size: 12px' src
+font-size-12px-matches: 0
+command: grep -n font-display src/styles.css
+8:  font-display: block;
+16:  font-display: block;
+24:  font-display: block;
+33:  font-display: block;

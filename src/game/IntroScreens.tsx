@@ -7,6 +7,7 @@ import { Chatter } from "./ChatterLine";
 import { isRevealing, subscribeReveal } from "./chatter";
 import type { IntroBeat, RoleId } from "./content";
 import { NPCS, ROLES } from "./content";
+import { hostOwnsKey } from "./keyGate";
 import {
   BEAT_SCENE,
   BEAT_WHO,
@@ -141,6 +142,7 @@ export function PixelBadge({
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
+      if (!hostOwnsKey("menu", e.code)) return;
       const tag = (e.target as HTMLElement | null)?.tagName;
       if (tag === "INPUT" || tag === "TEXTAREA") return;
       if (e.code === "Escape") onBack();
