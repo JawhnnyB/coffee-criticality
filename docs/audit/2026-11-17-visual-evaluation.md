@@ -24,6 +24,8 @@ The screens were reached with `window.__controlsTest`. This was not a playthroug
 | The corridor was an empty floor. | Partly | A carpet runner joins the four doors. It still has few props. |
 | Bench power followed the rod slider. | Fixed | Earlier commit: point kinetics with feedback. |
 
+Also done, on the owner's instruction: the 29 painted JPEGs that no source file loads moved from `public/art/gen/stills/` to `reference/painted/stills/` (12 MB). They no longer ship. `cutaway_pwr_loop.jpg` is still loaded and stays. The owner approved the redrawn plates.
+
 ## Still wrong, and what each needs
 
 | Problem | Needs |
@@ -37,7 +39,6 @@ The screens were reached with `window.__controlsTest`. This was not a playthroug
 | The plate for Just Culture has letters in the picture. The pixel rules say no letters on art. | A redrawn plate, or the owner accepts it. |
 | Settings lists every app as a row of pin buttons. | A layout for pinned apps. |
 | The menu scene, the wallpaper and the redrawn plates are three different skies. | One reference picture of the plant that all three follow. |
-| 12 MB of painted JPEGs under `public/art/gen/stills/` are not loaded by any source file. | Delete them, or move them to `reference/`. They ship in the build today. |
 
 ## Not verified
 
