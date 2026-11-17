@@ -38,7 +38,7 @@ import { FuelShuffle } from "./FuelShuffle";
 import { MaintGame } from "./MaintGame";
 import { Desktop } from "./Desktop";
 import { maintenanceSteamOn } from "./steamRule";
-import { getKeyOwner, hostOwnsKey, setKeyOwner } from "./keyGate";
+import { applyWorldKey, CABINET_MODES, getKeyOwner, setKeyOwner } from "./keyGate";
 import { BootLog, SetupScreen } from "./ParlorApps";
 import { isMuted, playBed, playBlip, setMuted, unlockAudio, syncWorld, getAudioProbe, bedForRoom } from "./audio";
 import { isRevealing, requestSkip } from "./chatter";
@@ -251,12 +251,7 @@ export function GameApp() {
     const edges = edgesRef.current;
 
     const down = (e: KeyboardEvent) => {
-      const tag = (e.target as HTMLElement | null)?.tagName;
-      if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
-      if (!hostOwnsKey("world", e.code)) return;
-      if (GAME_CODES.has(e.code)) e.preventDefault();
-      if (!keys.has(e.code)) edges.add(e.code);
-      keys.add(e.code);
+      applyWorldKey(e, modeRef.current, keys, edges, GAME_CODES);
     };
     const up = (e: KeyboardEvent) => keys.delete(e.code);
     const clear = () => keys.clear();
@@ -582,6 +577,11 @@ export function GameApp() {
       if (getKeyOwner() !== "world") {
         keys.clear();
         edges.clear();
+      }
+      if (CABINET_MODES.has(s.mode)) {
+        for (const code of ["KeyW", "KeyA", "KeyS", "KeyD", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "Space", "Enter"]) {
+          keys.delete(code);
+        }
       }
       const a = collectActions(keys, edges, stickRef.current);
       if (edges.has("KeyK")) tryCloseShift(s);

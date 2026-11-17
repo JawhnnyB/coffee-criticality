@@ -57,3 +57,57 @@ export function hostOwnsKey(host: KeyHost, code: string): boolean {
 export function readHeld(host: KeyHost, keys: { has(code: string): boolean }, code: string): boolean {
   return hostOwnsKey(host, code) && keys.has(code);
 }
+
+/**
+ * Cabinets that run with the desk closed. The cabinet hears the keys.
+ * The walking listener does not, except Escape, which leaves the cabinet.
+ */
+export const CABINET_MODES: ReadonlySet<string> = new Set([
+  "arcade",
+  "cabs",
+  "fish",
+  "plot",
+  "floor",
+  "horde",
+  "delay",
+  "golf",
+  "rods",
+  "pebble",
+  "bowl",
+  "phys",
+  "load",
+  "maint",
+  "shuffle",
+]);
+
+/** Movement stays off while a cabinet is the screen. Escape still leaves it. */
+export function takeWorldKey(mode: string, code: string): boolean {
+  if (CABINET_MODES.has(mode) && code !== "Escape") return false;
+  return hostOwnsKey("world", code);
+}
+
+type KeyEvent = {
+  code: string;
+  target?: { tagName?: string } | null;
+  preventDefault?: () => void;
+};
+
+/**
+ * The world key listener. GameApp calls this and nothing else.
+ * Returns whether the key was stored.
+ */
+export function applyWorldKey(
+  e: KeyEvent,
+  mode: string,
+  keys: { has(code: string): boolean; add(code: string): void },
+  edges: { add(code: string): void },
+  gameCodes: { has(code: string): boolean },
+): boolean {
+  const tag = e.target?.tagName;
+  if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return false;
+  if (!takeWorldKey(mode, e.code)) return false;
+  if (gameCodes.has(e.code)) e.preventDefault?.();
+  if (!keys.has(e.code)) edges.add(e.code);
+  keys.add(e.code);
+  return true;
+}

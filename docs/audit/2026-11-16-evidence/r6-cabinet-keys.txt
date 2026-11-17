@@ -1,0 +1,33 @@
+TAP version 13
+# {"check":"cabinet-keydown","mode":"delay","code":"KeyD","owner":"world","took":false,"keyCount":0,"prevented":false}
+# {"check":"cabinet-escape","mode":"delay","code":"Escape","took":true,"keyCount":1,"prevented":true}
+# {"check":"walk-keydown","mode":"play","code":"KeyD","owner":"world","took":true,"keyCount":1,"prevented":true}
+# {"check":"update-cabinet","mode":"delay","x":80,"y":90}
+# Subtest: a movement key is not stored while a cabinet is open and the desk is closed
+ok 1 - a movement key is not stored while a cabinet is open and the desk is closed
+  ---
+  duration_ms: 1.518353
+  type: 'test'
+  ...
+# Subtest: the same key is stored while walking
+ok 2 - the same key is stored while walking
+  ---
+  duration_ms: 0.332484
+  type: 'test'
+  ...
+# Subtest: update does not change x while the mode is a cabinet
+ok 3 - update does not change x while the mode is a cabinet
+  ---
+  duration_ms: 0.888838
+  type: 'test'
+  ...
+1..3
+# tests 3
+# suites 0
+# pass 3
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1848.015168
+R6_EXIT:0
