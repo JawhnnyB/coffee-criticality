@@ -180,7 +180,7 @@ export function NuclearDesk({
               <div className="teach-kicker">{sc.title}</div>
               {sc.id === "core" ? (
                 <img
-                  src={sc.art}
+                  src={sc.id === "core" ? `/art/gen/stills/plate_${plant.type}.png?v=loops` : sc.art}
                   alt=""
                   className="mt-1 h-[120px] w-full bg-[#f3e6d0] object-contain teach-pixel"
                   style={{ imageRendering: "pixelated" }}

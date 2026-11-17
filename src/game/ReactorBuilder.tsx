@@ -45,11 +45,14 @@ const STEPS = [
 
 export function ReactorBuilder({
   onDone,
+  lockType,
 }: {
   onDone: (plant: PlantDesign) => void;
+  /** Once Unit 1 is built, a rebuild keeps its type. Power, flow and fuel can still change. */
+  lockType?: PlantType;
 }) {
   const [i, setI] = useState(0);
-  const [plant, setPlant] = useState<PlantDesign>(DEFAULT_PLANT);
+  const [plant, setPlant] = useState<PlantDesign>(lockType ? withTypeDefaults(DEFAULT_PLANT, lockType) : DEFAULT_PLANT);
 
   const step = STEPS[i];
   const last = i === STEPS.length - 1;
@@ -81,14 +84,22 @@ export function ReactorBuilder({
               <p className="teach-kicker">At a glance · pick the courier</p>
               <Picker
                 value={plant.type}
-                onChange={(type) => setPlant(withTypeDefaults(plant, type as PlantType))}
+                locked={Boolean(lockType)}
+                onChange={(type) => {
+                  if (!lockType) setPlant(withTypeDefaults(plant, type as PlantType));
+                }}
                 options={[
-                  { id: "pwr", label: "PWR — this site", note: "CRDMs on top. Liquid primary ~16 MPa. Steam generator. Pressurizer." },
-                  { id: "bwr", label: "BWR — comparison", note: "Boils in the vessel. Rods from below. Steam to turbine. No SG. ~7 MPa." },
+                  { id: "pwr", label: "PWR", note: "CRDMs on top. Liquid primary ~16 MPa. Steam generator. Pressurizer." },
+                  { id: "bwr", label: "BWR", note: "Boils in the vessel. Rods from below. Steam to turbine. No SG. ~7 MPa." },
                   { id: "pebble", label: "Pebble / TRISO", note: "Helium courier ~6 MPa. Packed pebbles, graphite reflector, TRISO onion." },
                   { id: "msr", label: "MSR / salt", note: "Fuel dissolved in salt. Graphite channels. Freeze plug / drain tank. Near-atm." },
-                ]}
+                ].map((o) => (o.id === plant.type ? { ...o, label: `${o.label} — this site` } : o))}
               />
+              {lockType ? (
+                <p className="mt-3 text-sm text-[#e8a860]" data-testid="type-locked">
+                  Unit 1 is built. The type stays.
+                </p>
+              ) : null}
               <p className="mt-3 break-words text-sm leading-relaxed text-muted">
                 Small cards compare silhouettes. The panel to the right is the only labeled drawing for this site.
                 Teaching only — not a license.
@@ -231,10 +242,12 @@ function Picker({
   value,
   onChange,
   options,
+  locked = false,
 }: {
   value: string;
   onChange: (v: string) => void;
   options: { id: string; label: string; note: string }[];
+  locked?: boolean;
 }) {
   const pictured = options.every((o) => o.id in TYPE_THUMB);
   return (
@@ -243,9 +256,10 @@ function Picker({
         <button
           key={o.id}
           type="button"
+          disabled={locked && value !== o.id}
           onClick={() => onChange(o.id)}
           className={
-            "flex flex-col items-stretch border px-2 py-2 text-left text-sm " +
+            "flex flex-col items-stretch border px-2 py-2 text-left text-sm disabled:opacity-40 " +
             (value === o.id ? "border-accent bg-[#f3e6d0] text-[#16110d]" : "border-border bg-surface text-fg hover:border-border-strong")
           }
         >

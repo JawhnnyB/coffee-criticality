@@ -623,6 +623,7 @@ function DesignApp({ ctx }: { ctx: AppCtx }) {
     return (
       <div data-testid="design-builder" className="relative h-full w-full overflow-hidden">
         <ReactorBuilder
+          lockType={plant?.type}
           onDone={(p) => {
             ctx.onDesign(p);
             setRebuild(false);

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { CUTAWAY_H, CUTAWAY_W, paintCutaway } from "./cutawayPaint";
+import { CUTAWAY_H, CUTAWAY_W, paintCutaway, type LiveRun } from "./cutawayPaint";
 import type { CutawayKind } from "./plantLoops";
 
 /** The still ids that show a plant cutaway, and which plant each one shows. */
@@ -29,15 +29,23 @@ export function PlantCutaway({
   fit = "width",
   className = "",
   testId = "plant-cutaway",
+  live,
+  maxScale = 6,
 }: {
   kind: CutawayKind;
   hot?: boolean;
+  /** A run to follow. Read on every frame, so changing it does not restart the drawing. */
+  live?: LiveRun;
+  /** The largest whole-number scale to draw at. */
+  maxScale?: number;
   fit?: "width" | "contain";
   className?: string;
   testId?: string;
 }) {
   const hostRef = useRef<HTMLDivElement>(null);
   const ref = useRef<HTMLCanvasElement>(null);
+  const liveRef = useRef(live);
+  liveRef.current = live;
   useEffect(() => {
     const c = ref.current;
     const host = hostRef.current;
@@ -49,7 +57,7 @@ export function PlantCutaway({
     const size = () => {
       const byW = host.clientWidth / CUTAWAY_W;
       const byH = fit === "contain" ? host.clientHeight / CUTAWAY_H : byW;
-      const scale = Math.max(1, Math.floor(Math.min(byW, byH)));
+      const scale = Math.max(1, Math.min(maxScale, Math.floor(Math.min(byW, byH))));
       c.style.width = `${CUTAWAY_W * scale}px`;
       c.style.height = `${CUTAWAY_H * scale}px`;
     };
@@ -69,17 +77,23 @@ export function PlantCutaway({
       const frame = Math.floor(((now - start) / 1000) * FPS);
       if (frame !== last) {
         last = frame;
-        paintCutaway(g, kind, { hot, t: frame / FPS });
+        paintCutaway(g, kind, { hot, t: frame / FPS, live: liveRef.current });
       }
       raf = requestAnimationFrame(tick);
     };
-    if (still) paintCutaway(g, kind, { hot, t: 0.7 });
-    else raf = requestAnimationFrame(tick);
+    let stillTimer = 0;
+    if (still) {
+      // Reduced motion: one frame, repainted twice a second so a live run still shows its state.
+      const once = () => paintCutaway(g, kind, { hot, t: 0.7, live: liveRef.current });
+      once();
+      stillTimer = window.setInterval(once, 500);
+    } else raf = requestAnimationFrame(tick);
     return () => {
       cancelAnimationFrame(raf);
+      window.clearInterval(stillTimer);
       ro.disconnect();
     };
-  }, [kind, hot, fit]);
+  }, [kind, hot, fit, maxScale]);
   return (
     <div ref={hostRef} className={"flex items-center justify-center overflow-hidden " + className}>
       <canvas ref={ref} aria-hidden data-testid={testId} data-kind={kind} data-hot={hot ? "1" : "0"} style={{ imageRendering: "pixelated", maxWidth: "none" }} />

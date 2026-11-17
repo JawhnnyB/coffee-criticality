@@ -18,11 +18,12 @@ const LEGEND: Record<PlantType, string[]> = {
   msr: ["Fuel is the salt", "Graphite channels", "Freeze plug / drain", "Near-atm"],
 };
 
+/** The plant on this panel is the one the player picked, so it is always this site. */
 const SITE: Record<PlantType, string> = {
   pwr: "PWR — this site",
-  bwr: "BWR — comparison",
-  pebble: "Pebble / TRISO — comparison",
-  msr: "MSR / salt — comparison",
+  bwr: "BWR — this site",
+  pebble: "Pebble / TRISO — this site",
+  msr: "MSR / salt — this site",
 };
 
 /** Classroom: ΔT in the hold band means the core is making heat. */

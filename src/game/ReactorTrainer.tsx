@@ -3,11 +3,12 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { DT_BAND, thermalState, type PlantDesign, type PlantType, type RunState } from "./plant";
 import { PixelSchematic } from "./PixelSchematic";
+import { PlantCutaway } from "./PlantCutaway";
 import { BENCH_HOLD, stepBench } from "./benchStep";
 
 const PLANTS: { id: PlantType; title: string; note: string }[] = [
-  { id: "pwr", title: "PWR — this site", note: "Pressurized primary. Steam generators. Rods from above. Heat leaves with flow." },
-  { id: "bwr", title: "BWR — comparison", note: "Boils in the vessel. Steam to the turbine. Rods from below." },
+  { id: "pwr", title: "PWR", note: "Pressurized primary. Steam generators. Rods from above. Heat leaves with flow." },
+  { id: "bwr", title: "BWR", note: "Boils in the vessel. Steam to the turbine. Rods from below." },
   { id: "pebble", title: "Pebble / TRISO", note: "Helium courier. Packed pebbles. Graphite reflector. Teaching only." },
   { id: "msr", title: "MSR / salt", note: "Fuel is the salt. Graphite channels. Freeze plug. Near-atm. Teaching only." },
 ];
@@ -161,7 +162,7 @@ export function ReactorTrainer({
       <div className="flex items-start justify-between gap-3">
         <div>
           <p className="font-mono text-xs tracking-widest text-good">
-            {PLANTS.find((p) => p.id === plant)?.title} · teaching only
+            {PLANTS.find((p) => p.id === plant)?.title} — this site · teaching only
           </p>
           <h2 className="font-mono mt-1 text-xl text-good">Hold the band</h2>
         </div>
@@ -174,6 +175,13 @@ export function ReactorTrainer({
           </button>
         </div>
       </div>
+      <PlantCutaway
+        kind={plant}
+        testId="control-cutaway"
+        maxScale={1}
+        className="mt-3 w-full border border-[#c4783a]/40 bg-[#f3e6d0]"
+        live={{ power: scram ? 0 : power / 100, flow: flow / 100, rods: rods / 100, scram, tHot, tCold }}
+      />
       <Schematic plant={plant} tHot={tHot} tCold={tCold} colorSafe={colorSafe} />
       <p className="mt-2 text-sm text-muted">{msg}</p>
       <div className="mt-4 grid grid-cols-2 gap-2 text-sm sm:grid-cols-5">
