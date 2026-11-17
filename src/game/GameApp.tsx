@@ -2795,7 +2795,7 @@ function Hud({
   const wash =
     period === "afternoon" ? "rgba(90,48,28,0.28)" : period === "morning" ? "rgba(243,214,170,0.22)" : "rgba(170,200,220,0.16)";
   const when = `${time} D${day} ${dusk ? "DUSK" : periodLabel(period)}`;
-  const obj = objective.length > 24 ? `${objective.slice(0, 23)}.` : objective;
+  const obj = objective;
   const label = (text: string, small = false) =>
     ART.hud ? (
       <span className={small ? "cc-label-sm" : "cc-label"}>{text}</span>
@@ -2824,7 +2824,7 @@ function Hud({
         <div className="mt-1">{label(room)}</div>
         {open ? (
           <>
-            <div className="relative mt-1 h-8 w-16 border border-[#1a1410]" data-testid="site-plan">
+            <div className="relative mt-2 aspect-[2/1] w-full border border-[#1a1410]" data-testid="site-plan">
               <img
                 src="/art/gen/ui/site_plan.png?v=plan3"
                 alt=""
@@ -2835,18 +2835,18 @@ function Hud({
               />
               <span className="pointer-events-none absolute inset-0" style={{ background: wash }} />
               <span
-                className="absolute h-1 w-1 -translate-x-1/2 -translate-y-1/2 bg-[#c4783a]"
+                className="absolute h-2 w-2 -translate-x-1/2 -translate-y-1/2 border border-[#16110d] bg-[#c4783a]"
                 style={{ left: `${hud.x}%`, top: `${hud.y}%` }}
               />
             </div>
-            <div className="mt-1 flex items-center gap-1">
+            <div className="mt-2 flex items-center gap-2">
               {ART.hud ? <span className="cc-label-sm">{stage}</span> : <PixelLine text={stage} color="#16110d" scale={1} />}
               <div className="pixel-meter" aria-hidden>
                 <span style={{ width: `${Math.max(4, Math.min(100, culture))}%` }} />
               </div>
             </div>
-            <div className="mt-1">
-              <span style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-small)", lineHeight: 1.4, color: "#3a2818" }}>{obj}</span>
+            <div className="mt-2 border-t border-[#3b2318]/30 pt-1">
+              <span style={{ display: "block", fontFamily: "var(--font-body)", fontSize: "var(--text-small)", lineHeight: 1.4, color: "#3a2818" }}>{obj}</span>
             </div>
           </>
         ) : null}

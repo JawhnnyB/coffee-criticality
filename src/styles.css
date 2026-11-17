@@ -207,8 +207,11 @@
   border-image-repeat: stretch;
   border-radius: 0;
   background: transparent;
-  padding: 4px 6px 5px;
-  max-width: 11rem;
+  padding: 6px 8px 7px;
+  width: 13.5rem;
+  max-width: calc(100vw - 24px);
+  /* The panel art is cream. Text inherits cream from the page, so set ink here. */
+  color: #3b2318;
 }
 .pixel-chip {
   display: inline-flex;
@@ -219,13 +222,15 @@
   border-radius: 0;
   border: 1px solid #3b2318;
   background: #f3e6d0;
+  color: #3b2318;
   line-height: normal;
 }
 .pixel-fold {
   border: 1px solid #3b2318;
   background: #f3e6d0;
+  color: #3b2318;
   border-radius: 0;
-  padding: 1px 2px;
+  padding: 2px 4px;
   line-height: 1;
 }
 @media (max-width: 719px) {
@@ -249,8 +254,9 @@
   image-rendering: crisp-edges;
 }
 .pixel-meter {
-  width: 40px;
-  height: 4px;
+  flex: 1 1 auto;
+  min-width: 40px;
+  height: 6px;
   border: 1px solid #1a1410;
   background: #6a4a32;
 }
