@@ -88,7 +88,7 @@ export function takeWorldKey(mode: string, code: string): boolean {
 
 type KeyEvent = {
   code: string;
-  target?: { tagName?: string } | null;
+  target?: (EventTarget & { tagName?: string }) | { tagName?: string } | null;
   preventDefault?: () => void;
 };
 
@@ -103,7 +103,8 @@ export function applyWorldKey(
   edges: { add(code: string): void },
   gameCodes: { has(code: string): boolean },
 ): boolean {
-  const tag = e.target?.tagName;
+  const target = e.target as { tagName?: string } | null | undefined;
+  const tag = target?.tagName;
   if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return false;
   if (!takeWorldKey(mode, e.code)) return false;
   if (gameCodes.has(e.code)) e.preventDefault?.();
