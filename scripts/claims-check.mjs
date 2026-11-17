@@ -5,8 +5,9 @@
  * Default table: docs/audit/2026-11-14-dream-pass-4.md
  *
  * A number matches only as a whole token. 9 does not match 194.
- * A cited artifact whose last EXIT: line is not 0 must be explained
- * in the result with the words "expected" and "because".
+ * A cited artifact whose last EXIT: line is not 0 must say why.
+ * A real failure says the audit is red because of the counts.
+ * A fixture or a known baseline says the nonzero exit is expected because ...
  */
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
@@ -85,9 +86,10 @@ for (const row of rows) {
   }
   const exitCode = lastExit(blob);
   if (exitCode != null && exitCode !== "0") {
-    const why = /expected/i.test(row.result) && /because/i.test(row.result);
-    if (!why) {
-      failures.push(`${row.claim}: artifact EXIT:${exitCode} is not 0, and the result does not say the nonzero exit is expected because ...`);
+    const explained = /expected/i.test(row.result) && /because/i.test(row.result);
+    const red = /red/i.test(row.result) && /because/i.test(row.result);
+    if (!explained && !red) {
+      failures.push(`${row.claim}: artifact EXIT:${exitCode} is not 0. Say the audit is red because of the counts, or say the nonzero exit is expected because ...`);
     }
   }
   const visual = cited.some((p) => p.endsWith(".png")) || /still/i.test(row.claim);
