@@ -1,0 +1,33 @@
+head: dda6e4150171602a7331735f2dc18579d1543497 plus the readout sign fix in the same commit as this file
+command: ESBUILD=<local esbuild> node --test 'scripts/**/*.test.mjs'
+# tests 219
+# pass 210
+# fail 9
+failing names:
+does not duplicate grok:app_id
+does not duplicate x:creator tags
+injects project id on the script and meta when provided
+injects x:creator tags when both creator values are set
+leaves an existing twitter:card alone
+platform chrome injects twitter:card when the document has none
+scripts/cabinet-rewards.test.mjs
+scripts/desk-verdict.test.mjs
+uses the app name in the injected title tag
+same names as docs/audit/2026-11-14-evidence/fail-baseline.txt: true
+
+bench-kinetics output:
+# {"check":"rest","plant":"pwr","power":80,"rhoPcm":0}
+# {"check":"rest","plant":"bwr","power":80,"rhoPcm":0}
+# {"check":"rest","plant":"pebble","power":80,"rhoPcm":0}
+# {"check":"rest","plant":"msr","power":80,"rhoPcm":0}
+# {"check":"seed-holds","power":62,"peak":62,"low":62}
+# {"check":"no-overshoot","plant":"pwr","peak":85}
+# {"check":"no-overshoot","plant":"bwr","peak":85}
+# {"check":"no-overshoot","plant":"pebble","peak":85}
+# {"check":"no-overshoot","plant":"msr","peak":85}
+# {"check":"rod-walk","rodPos":74,"power":69.053,"rhoPcm":59.4}
+# {"check":"prompt-jump","power":66.406,"expected":66.406,"rhoPcm":43.13}
+# {"check":"flow-feedback","plant":"pwr","slow":64.64,"base":70,"fast":74.82}
+# {"check":"flow-feedback","plant":"bwr","slow":61.72,"base":70,"fast":77.95}
+# {"check":"flow-feedback","plant":"pebble","slow":65.92,"base":70,"fast":73.43}
+# {"check":"flow-feedback","plant":"msr","slow":67.52,"base":70,"fast":72.11}

@@ -178,7 +178,7 @@ export function ReactorTrainer({
       <p className="mt-2 text-sm text-muted">{msg}</p>
       <div className="mt-4 grid grid-cols-2 gap-2 text-sm sm:grid-cols-5">
         <Stat k="Power" v={`${power.toFixed(0)} %`} />
-        <Stat k="ρ" v={`${rhoPcm > 0.5 ? "+" : ""}${rhoPcm.toFixed(0)} pcm`} />
+        <Stat k="ρ" v={`${Math.round(rhoPcm) > 0 ? "+" : ""}${Math.round(rhoPcm) || 0} pcm`} />
         <Stat k="T-hot" v={`${tHot.toFixed(1)} °C`} />
         <Stat k="T-cold" v={`${tCold.toFixed(1)} °C`} />
         <Stat k="ΔT" v={`${dT.toFixed(1)} °C`} warn={!inBand} />
