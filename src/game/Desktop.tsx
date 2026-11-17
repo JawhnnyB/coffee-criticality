@@ -38,7 +38,7 @@ import {
 } from "./deskWindows";
 import { particleCount, makePool, stepPool, type Particle } from "./particles";
 import { setKeyOwner } from "./keyGate";
-import { WALL_NATIVE_H, paintWallpaper } from "./wallpaper";
+import { WALL_NATIVE_H, WALL_NATIVE_W, paintWallpaper } from "./wallpaper";
 import { AppBody, type AppCtx } from "./ParlorApps";
 import { AppGlyph } from "./icons/glyphs";
 import type { DesktopSave, GameState, Mode, ResultsSave } from "./sim";
@@ -397,11 +397,11 @@ function WallPaper({ season }: { season: Season }) {
     const host = c?.parentElement;
     if (!c || !host) return;
     const paint = () => {
-      const r = host.getBoundingClientRect();
-      const w = Math.max(1, Math.floor(r.width));
-      const hgt = Math.max(1, Math.floor(r.height));
+      // Layout size, not the on-screen box: the desk can be mid-transition when this runs.
+      const w = Math.max(1, host.clientWidth);
+      const hgt = Math.max(1, host.clientHeight);
       // Whole-number scale: every painted pixel covers the same number of screen pixels.
-      const scale = Math.max(1, Math.round(hgt / WALL_NATIVE_H));
+      const scale = Math.max(1, Math.round(Math.min(hgt / WALL_NATIVE_H, w / WALL_NATIVE_W)));
       const nw = Math.ceil(w / scale);
       const nh = Math.ceil(hgt / scale);
       c.width = nw;
@@ -594,7 +594,7 @@ function WindowFrame({
           </button>
         </span>
       </header>
-      <div className="relative min-h-0 flex-1 overflow-auto" style={{ background: PAL.cream }}>
+      <div className={"relative min-h-0 flex-1 overflow-auto" + (win.sim ? " desk-sim-body" : "")} style={{ background: PAL.cream }}>
         {children}
       </div>
     </section>

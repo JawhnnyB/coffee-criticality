@@ -30,7 +30,7 @@ const WALLS: { id: CabWall; title: string; line: string }[] = [
 
 export function Bezel({ children }: { children: ReactNode }) {
   return (
-    <div className="absolute inset-0 z-30 flex items-stretch justify-center bg-[#2a1c14]/80 p-2 sm:p-4">
+    <div className="cab-shell absolute inset-0 z-30 flex items-stretch justify-center bg-[#2a1c14]/80 p-2 sm:p-4">
       <div className="cabinet w-full max-w-6xl">
         <div className="cabinet-marquee">
           <span>Mabel’s parlor</span>

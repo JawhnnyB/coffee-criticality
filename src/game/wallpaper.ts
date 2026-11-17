@@ -9,6 +9,8 @@ import type { Season } from "./parlorOS";
 
 /** Native rows the scene is designed for. The caller picks the scale so the canvas is about this tall. */
 export const WALL_NATIVE_H = 180;
+/** Native columns a narrow screen should still show. Keeps a phone from zooming in on the tower. */
+export const WALL_NATIVE_W = 200;
 
 interface Look {
   /** Sky bands, top to horizon. */
@@ -120,6 +122,8 @@ function towerHalf(row: number, rows: number, base: number): number {
 export function paintWallpaper(g: CanvasRenderingContext2D, w: number, h: number, season: Season): void {
   const L = LOOKS[season];
   const horizon = Math.round(h * 0.56);
+  // Feature size follows the shorter side, so a tall phone canvas keeps the plant small and clear of the icons.
+  const u = Math.min(h, Math.round(w * 0.5625));
   const px = (x: number, y: number, ww: number, hh: number, color: string) => {
     g.fillStyle = color;
     g.fillRect(x, y, ww, hh);
@@ -137,8 +141,8 @@ export function paintWallpaper(g: CanvasRenderingContext2D, w: number, h: number
   // Sun, low on the left third. Winter gets a few stars above it.
   if (L.sun) {
     const cx = Math.round(w * 0.3);
-    const cy = horizon - Math.round(h * 0.13);
-    const r = Math.max(5, Math.round(h * 0.045));
+    const cy = horizon - Math.round(u * 0.13);
+    const r = Math.max(5, Math.round(u * 0.045));
     for (let dy = -r; dy <= r; dy++) {
       const half = Math.round(Math.sqrt(r * r - dy * dy));
       px(cx - half, cy + dy, half * 2 + 1, 1, L.sun);
@@ -154,11 +158,11 @@ export function paintWallpaper(g: CanvasRenderingContext2D, w: number, h: number
 
   // Two ridges behind the far shore.
   for (let x = 0; x < w; x++) {
-    const far = ridge(x, 1.7, Math.round(h * 0.13));
+    const far = ridge(x, 1.7, Math.round(u * 0.13));
     px(x, horizon - 6 - far, 1, far + 6, L.far);
   }
   for (let x = 0; x < w; x++) {
-    const near = ridge(x, 4.1, Math.round(h * 0.07));
+    const near = ridge(x, 4.1, Math.round(u * 0.07));
     px(x, horizon - 2 - near, 1, near + 2, L.near);
   }
 
@@ -171,7 +175,7 @@ export function paintWallpaper(g: CanvasRenderingContext2D, w: number, h: number
   // The plant, right of centre on the far shore.
   const base = horizon - 1;
   const tx = Math.round(w * 0.68);
-  const rows = Math.round(h * 0.23);
+  const rows = Math.round(u * 0.23);
   const halfBase = Math.round(rows * 0.46);
   for (let r = 0; r < rows; r++) {
     const half = towerHalf(r, rows, halfBase);
@@ -235,7 +239,7 @@ export function paintWallpaper(g: CanvasRenderingContext2D, w: number, h: number
   }
   if (L.sun) {
     const cx = Math.round(w * 0.3);
-    for (let r = 0; r < Math.round(lakeH * 0.6); r += r < 12 ? 2 : 3) {
+    for (let r = 0; r < Math.round(Math.min(lakeH, u * 0.44) * 0.6); r += r < 12 ? 2 : 3) {
       const half = 2 + Math.round(hash(r, 41) * 3) + Math.round(r / 10);
       px(cx - half + Math.round((hash(r, 42) - 0.5) * 4), horizon + 3 + r, half * 2, 1, L.glint);
     }
@@ -248,7 +252,7 @@ export function paintWallpaper(g: CanvasRenderingContext2D, w: number, h: number
   }
 
   // Near bank along the bottom, with reeds.
-  const bankH = Math.max(4, Math.round(h * 0.045));
+  const bankH = Math.max(4, Math.round(u * 0.045));
   for (let x = 0; x < w; x++) {
     const lift = Math.round(Math.sin(x * 0.05) * 1.5 + hash(Math.floor(x / 2), 61) * 2);
     px(x, h - bankH - lift, 1, bankH + lift, L.bank);

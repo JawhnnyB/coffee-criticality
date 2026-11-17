@@ -824,6 +824,38 @@
   background: #b85c4a;
   box-shadow: 16px 0 0 #c9a227, 32px 0 0 #6b8f71;
 }
+/* Inside a desktop window the window is the frame. The cabinet and the bench drop their own. */
+.desk-sim-body .cab-shell {
+  padding: 0;
+  background: #2a1c14;
+}
+.desk-sim-body .cabinet {
+  max-width: none;
+  border: 0;
+  box-shadow: none;
+}
+.desk-sim-body .cabinet-marquee,
+.desk-sim-body .cabinet-deck {
+  display: none;
+}
+.desk-sim-body .bench-shell {
+  place-items: stretch;
+  padding: 0;
+  background: #2a2218;
+}
+.desk-sim-body .bench-frame {
+  max-width: none;
+  border: 0;
+  padding: 0;
+  box-shadow: none;
+  background: #2a2218;
+}
+.desk-sim-body .bench-screen {
+  min-height: 100%;
+  border: 0;
+  margin: 0 auto;
+  max-width: 52rem;
+}
 .cab-play {
   display: block;
   width: 100%;
