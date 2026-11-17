@@ -1,0 +1,44 @@
+TAP version 13
+# {"check":"static-world","owner":"static","mode":"play","code":"KeyW","took":false,"keyCount":0}
+# {"check":"static-world","owner":"static","mode":"play","code":"KeyA","took":false,"keyCount":0}
+# {"check":"static-world","owner":"static","mode":"play","code":"KeyS","took":false,"keyCount":0}
+# {"check":"static-world","owner":"static","mode":"play","code":"KeyD","took":false,"keyCount":0}
+# {"check":"static-world","owner":"static","mode":"play","code":"Space","took":false,"keyCount":0}
+# {"check":"static-world","owner":"static","mode":"play","code":"Digit1","took":false,"keyCount":0}
+# {"check":"static-world","owner":"none","mode":"play","code":"KeyW","took":false,"keyCount":0}
+# {"check":"static-world","owner":"none","mode":"play","code":"KeyA","took":false,"keyCount":0}
+# {"check":"static-world","owner":"none","mode":"play","code":"KeyS","took":false,"keyCount":0}
+# {"check":"static-world","owner":"none","mode":"play","code":"KeyD","took":false,"keyCount":0}
+# {"check":"static-world","owner":"none","mode":"play","code":"Space","took":false,"keyCount":0}
+# {"check":"static-world","owner":"none","mode":"play","code":"Digit1","took":false,"keyCount":0}
+# {"check":"static-held","owner":"static","miniD":false,"worldD":false,"miniDigit":false}
+# {"check":"mini-focus","mini":true,"worldTook":false,"worldKeys":0}
+# {"check":"input","took":false,"keyCount":0}
+# Subtest: a desktop app focused does not store a world movement key
+ok 1 - a desktop app focused does not store a world movement key
+  ---
+  duration_ms: 2.857955
+  type: 'test'
+  ...
+# Subtest: a focused cabinet stores its own held key and the world listener does not
+ok 2 - a focused cabinet stores its own held key and the world listener does not
+  ---
+  duration_ms: 0.233285
+  type: 'test'
+  ...
+# Subtest: an input inside a desktop app does not store the key
+ok 3 - an input inside a desktop app does not store the key
+  ---
+  duration_ms: 0.198726
+  type: 'test'
+  ...
+1..3
+# tests 3
+# suites 0
+# pass 3
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 948.175479
+R3_EXIT:0
