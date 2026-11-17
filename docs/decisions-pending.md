@@ -56,3 +56,12 @@ Other option: teach BWR flow only as a caption and leave power on the bench kine
 
 The day-incident machine in `sim.ts` was not used for these controls. It is part of the frozen shift story.
 
+## Shift events
+
+Chosen: the twelve events live on Reactor Control as "A call from the plant". They do not join the week incident list in `sim.ts`. That list has its own rates, and those files are frozen.
+
+A right response ends the call. A wrong response sets `ended`, which the panel prints as "Worse." A tripped pump writes flow to 0. A scram writes scram. The tube mark stays on the hall face after you leave the bench.
+
+Other option: roll the events on the game clock inside `sim.ts`. Not chosen.
+
+

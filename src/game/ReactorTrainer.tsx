@@ -6,6 +6,7 @@ import { PixelSchematic } from "./PixelSchematic";
 import { PlantCutaway } from "./PlantCutaway";
 import { BENCH_HOLD, stepBench } from "./benchStep";
 import { commandFor, panelFor, pebblePass, type OperatorMove } from "./siteControls";
+import { paintEvent, pickEvent, resolveEvent, type EventView, type ShiftEvent } from "./siteEvents";
 import { publishFace } from "./siteFace";
 
 const PLANTS: { id: PlantType; title: string; note: string }[] = [
@@ -60,6 +61,10 @@ export function ReactorTrainer({
   const [drainSeconds, setDrainSeconds] = useState(0);
   const [passes, setPasses] = useState(0);
   const [burnup, setBurnup] = useState(0);
+  const [call, setCall] = useState<ShiftEvent | null>(null);
+  const [view, setView] = useState<EventView | null>(null);
+  const viewRef = useRef<EventView | null>(null);
+  viewRef.current = view;
   const drainRef = useRef(drain);
   const drainSecRef = useRef(drainSeconds);
   const passesRef = useRef(passes);
@@ -88,11 +93,17 @@ export function ReactorTrainer({
     if (!plant) return;
     const move: OperatorMove = { rodsWithdrawnPct: rods, flowPct: flow, drain, drainSeconds, passes };
     const sim = commandFor(plant, power, move, scram);
-    const panel = panelFor(plant, move, sim, burnup);
+    const base = panelFor(plant, move, sim, burnup);
+    const panel = view ? paintEvent(base, view) : base;
     publishFace({ flowMul: panel.arrows ? 1 : 0, tubeMark: panel.tubeMark });
-  }, [plant, rods, flow, drain, drainSeconds, passes, power, scram, burnup]);
+  }, [plant, rods, flow, drain, drainSeconds, passes, power, scram, burnup, view]);
 
-  useEffect(() => () => publishFace({ flowMul: 1, tubeMark: false }), []);
+  useEffect(
+    () => () => {
+      if (!viewRef.current) publishFace({ flowMul: 1, tubeMark: false });
+    },
+    [],
+  );
 
   useEffect(() => {
     if (!plant || passed || scram) return;
@@ -189,7 +200,23 @@ export function ReactorTrainer({
   const inBand = dT >= band.lo && dT <= band.hi && !scram;
   const moveNow: OperatorMove = { rodsWithdrawnPct: rods, flowPct: flow, drain, drainSeconds, passes };
   const simCmd = commandFor(plant, power, moveNow, scram);
-  const panel = panelFor(plant, moveNow, simCmd, burnup);
+  const panel = view ? paintEvent(panelFor(plant, moveNow, simCmd, burnup), view) : panelFor(plant, moveNow, simCmd, burnup);
+  const answer = (right: boolean) => {
+    if (!call) return;
+    const next = resolveEvent(call, right);
+    setView(next);
+    viewRef.current = next;
+    if (next.scram) {
+      setScram(true);
+      setPower(0);
+      powerRef.current = 0;
+      writeRun({ scram: true, powerPct: 0 });
+    } else if (next.flow === 0) {
+      setFlow(0);
+      flowRef.current = 0;
+      writeRun({ flowPct: 0 });
+    }
+  };
 
   if (passed) {
     return (
@@ -285,6 +312,10 @@ export function ReactorTrainer({
             setDrainSeconds(0);
             drainRef.current = false;
             drainSecRef.current = 0;
+            setCall(null);
+            setView(null);
+            viewRef.current = null;
+            publishFace({ flowMul: 1, tubeMark: false });
             writeRun({ scram: false, powerPct: 40, rodsWithdrawnPct: 40, flowPct: 100 });
             setMsg("Reset. Slower on the rods. Match the pump.");
           }}
@@ -353,6 +384,36 @@ export function ReactorTrainer({
             </button>
           ) : null}
         </div>
+      )}
+      {!call ? (
+        scram ? null : (
+          <button type="button" className="btn-ghost mt-4" data-testid="plant-call" onClick={() => setCall(pickEvent(plant, Math.random()))}>
+            A call from the plant
+          </button>
+        )
+      ) : !view ? (
+        <div className="mt-4 border border-warn/50 px-3 py-2 text-xs text-fg" data-testid="plant-event">
+          <p className="font-mono tracking-widest text-warn">{call.title}</p>
+          <p className="mt-1">{call.panel}</p>
+          <p className="mt-1 text-muted">{call.hall}</p>
+          <div className="mt-2 flex flex-col gap-2">
+            <button
+              type="button"
+              className="btn-primary"
+              data-testid="event-right"
+              onClick={() => answer(true)}
+            >
+              {call.right}
+            </button>
+            <button type="button" className="btn-ghost" data-testid="event-wrong" onClick={() => answer(false)}>
+              {call.wrong}
+            </button>
+          </div>
+        </div>
+      ) : (
+        <p className="mt-4 font-mono text-xs text-warn" data-testid="event-result">
+          {view.ended ? "Worse." : "Held."} {view.panel}
+        </p>
       )}
     </Term>
   );
