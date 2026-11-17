@@ -15,6 +15,8 @@ import {
   verdictWords,
   type TermLesson,
 } from "./nuclearLab";
+import { siteKind } from "./plantLoops";
+import { speak } from "./siteText";
 
 const SCALES: { id: DesignScale; title: string; sub: string; art: string }[] = [
   { id: "rod", title: "Fuel rod", sub: "Infinite pin · reflective", art: "/art/gen/stills/term_pellet.png?v=pixel" },
@@ -88,7 +90,7 @@ export function OpenMCPane({ plant, tall = true }: { plant: PlantDesign; tall?: 
   );
 }
 
-function TermWindow({ lesson, onClose }: { lesson: TermLesson; onClose: () => void }) {
+function TermWindow({ lesson, kind, onClose }: { lesson: TermLesson; kind: ReturnType<typeof siteKind>; onClose: () => void }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#2a1c14]/80 p-3 sm:p-6" onClick={onClose}>
       <div
@@ -107,19 +109,19 @@ function TermWindow({ lesson, onClose }: { lesson: TermLesson; onClose: () => vo
         ) : null}
         <section className="mt-5">
           <h4 className="font-mono text-xs tracking-widest text-[#6a4a32]">IN ONE BREATH</h4>
-          <p className="mt-2 text-lg leading-8">{lesson.plain}</p>
+          <p className="mt-2 text-lg leading-8">{speak(kind, lesson.plain)}</p>
         </section>
         <section className="mt-6">
           <h4 className="font-mono text-xs tracking-widest text-[#6a4a32]">WHAT THE NEUTRON DOES</h4>
           <ol className="mt-2 list-decimal space-y-2 pl-6 text-base leading-7">
             {lesson.steps.map((s, i) => (
-              <li key={i}>{s}</li>
+              <li key={i}>{speak(kind, s)}</li>
             ))}
           </ol>
         </section>
         <section className="mt-6">
           <h4 className="font-mono text-xs tracking-widest text-[#6a4a32]">THE SYMBOL</h4>
-          <p className="mt-2 text-base leading-7">{lesson.what}</p>
+          <p className="mt-2 text-base leading-7">{speak(kind, lesson.what)}</p>
         </section>
         <section className="mt-6">
           <h4 className="font-mono text-xs tracking-widest text-[#6a4a32]">IN THE EQUATION</h4>
@@ -129,11 +131,11 @@ function TermWindow({ lesson, onClose }: { lesson: TermLesson; onClose: () => vo
         </section>
         <section className="mt-6">
           <h4 className="font-mono text-xs tracking-widest text-[#6a4a32]">WHERE IT SHOWS UP HERE</h4>
-          <p className="mt-2 text-base leading-7">{lesson.where}</p>
+          <p className="mt-2 text-base leading-7">{speak(kind, lesson.where)}</p>
         </section>
         <section className="mt-6">
           <h4 className="font-mono text-xs tracking-widest text-[#6a4a32]">WHY IT MATTERS ON THE FLOOR</h4>
-          <p className="mt-2 text-base leading-7">{lesson.why}</p>
+          <p className="mt-2 text-base leading-7">{speak(kind, lesson.why)}</p>
         </section>
         <p className="mt-6 text-sm text-[#6a4a32]">
           Classroom continuum. OpenMC transports. Catch {">"} heroics. Not a license.
@@ -294,7 +296,7 @@ export function NuclearDesk({
       </div>
       <p className="mt-2 text-[10px] text-subtle">Teaching model only — not a license. k is a classroom proxy.</p>
       {!hideCode ? <OpenMCPane plant={plant} tall={!compact} /> : null}
-      {lesson ? <TermWindow lesson={lesson} onClose={() => setTerm(null)} /> : null}
+      {lesson ? <TermWindow lesson={lesson} kind={siteKind(plant)} onClose={() => setTerm(null)} /> : null}
     </div>
   );
 }
