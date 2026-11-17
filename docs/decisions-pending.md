@@ -70,5 +70,14 @@ Chosen: Web Audio oscillators in `audio.ts`, driven by `hallTone()` in `siteAudi
 
 Other option: one shared hum for every type. Not chosen, because the brief asked for a different loop per type.
 
+## Character sheets
+
+Chosen: redraw the eight walk sheets by hand in `scripts/draw-cast.mjs`. Same frame, 128×192, four frames, three rows. Feet stay in the bottom of the cell, the same footprint the rooms already use. Faces are eyes, a one-pixel nose, and a mouth. No snout.
+
+The player sheet keeps the tintA6 key colours (`#5a9438`, `#98c860`, `#3a6824`, `#7a4028`, `#c47840`, `#f5c9a0`, `#2a1810`, `#3b2318`) so the hoodie picker still recolours the shirt and the hair. Those keys are not all in `palette.ts`. NPC sheets use palette colours only. Cherenkov blue is not on any person.
+
+Other options: leave the old sheets, or paint the player in palette colours and lose the hoodie picker. Not chosen. The old walk sheets are in `reference/old-sprites/`. The other sprite files (idle, loco) were not the sheets the walker draws, so they were left where they were.
+
+
 
 
