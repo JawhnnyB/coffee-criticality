@@ -58,6 +58,10 @@ export function ReactorTrainer({
   const powerRef = useRef(power);
   const holdRef = useRef(hold);
   const writtenRef = useRef<number | null>(null);
+  const precursorsRef = useRef<number | undefined>(undefined);
+  const rodPosRef = useRef<number | undefined>(undefined);
+  const [rhoPcm, setRhoPcm] = useState(0);
+  const flowDesign = design?.flow ?? 100;
   const writeRef = useRef(writeRun);
   const minuteRef = useRef(onMinute);
   rodsRef.current = rods;
@@ -90,7 +94,13 @@ export function ReactorTrainer({
         dt,
         plant,
         lastWritten: writtenRef.current,
+        precursors: precursorsRef.current,
+        rodPos: rodPosRef.current,
+        flowRef: flowDesign,
       });
+      precursorsRef.current = step.precursors;
+      rodPosRef.current = step.rodPos;
+      setRhoPcm(step.rhoPcm);
       powerRef.current = step.power;
       holdRef.current = step.hold;
       writtenRef.current = step.lastWritten;
@@ -108,7 +118,7 @@ export function ReactorTrainer({
     };
     raf = requestAnimationFrame(loop);
     return () => cancelAnimationFrame(raf);
-  }, [plant, passed, scram]);
+  }, [plant, passed, scram, flowDesign]);
 
   if (!design || !plant) {
     return (
@@ -166,8 +176,9 @@ export function ReactorTrainer({
       </div>
       <Schematic plant={plant} tHot={tHot} tCold={tCold} colorSafe={colorSafe} />
       <p className="mt-2 text-sm text-muted">{msg}</p>
-      <div className="mt-4 grid grid-cols-2 gap-2 text-sm sm:grid-cols-4">
+      <div className="mt-4 grid grid-cols-2 gap-2 text-sm sm:grid-cols-5">
         <Stat k="Power" v={`${power.toFixed(0)} %`} />
+        <Stat k="ρ" v={`${rhoPcm > 0.5 ? "+" : ""}${rhoPcm.toFixed(0)} pcm`} />
         <Stat k="T-hot" v={`${tHot.toFixed(1)} °C`} />
         <Stat k="T-cold" v={`${tCold.toFixed(1)} °C`} />
         <Stat k="ΔT" v={`${dT.toFixed(1)} °C`} warn={!inBand} />
@@ -190,6 +201,9 @@ export function ReactorTrainer({
             setFlow(100);
             setHold(0);
             powerRef.current = 40;
+            precursorsRef.current = undefined;
+            rodPosRef.current = undefined;
+            setRhoPcm(0);
             holdRef.current = 0;
             writtenRef.current = 40;
             writeRun({ scram: false, powerPct: 40, rodsWithdrawnPct: 40, flowPct: 100 });

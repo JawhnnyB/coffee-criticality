@@ -34,7 +34,7 @@ test("moving the rods writes once for the new percent, and the next tiny frame d
   const moved = M.stepBench(frame({ rods: 100, dt: 1, lastWritten: 62 }));
   assert.ok(moved.write);
   assert.ok(Math.round(moved.power) !== 62);
-  const coast = M.stepBench(frame({ power: moved.power, rods: 100, dt: 0.001, hold: moved.hold, lastWritten: moved.lastWritten }));
+  const coast = M.stepBench(frame({ power: moved.power, rods: 100, dt: 0.001, hold: moved.hold, lastWritten: moved.lastWritten, precursors: moved.precursors, rodPos: moved.rodPos }));
   assert.equal(coast.write, null);
 });
 
