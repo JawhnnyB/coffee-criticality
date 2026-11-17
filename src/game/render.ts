@@ -7,6 +7,7 @@ import { A6_ROOMS } from "./roomArt";
 import { ROOM_ATLAS, type AtlasStamp } from "./roomAtlas";
 import { HALL_PIPES, drawHallReactor, drawLaggedPipe, drawLotRoof, drawMimic, type HallState } from "./hallPlant";
 import { PLANTS, cherenkov, siteKind, sitePower } from "./plantLoops";
+import { readFace } from "./siteFace";
 import { worldZoom } from "./artScale";
 import { SEASON_INFO, seasonOrDefault } from "./parlorOS";
 import { npcsHere, type GameState } from "./sim";
@@ -150,11 +151,13 @@ export function drawWorld(
       const power = sitePower(s.run);
       const ran = s.run.history.length > 0 || s.run.powerPct > 0;
       const level = s.run.scram ? 0.08 : power;
+      const face = readFace();
       const st: HallState = {
         kind,
         glow: cherenkov(PLANTS[kind], level > 0.02) ? level : 0,
-        flow: ran ? Math.max(0, s.run.flowPct / 100) : 1,
+        flow: (ran ? Math.max(0, s.run.flowPct / 100) : 1) * face.flowMul,
         hot: level > 0.02,
+        tubeMark: face.tubeMark,
       };
       const t = now;
       const pipes = HALL_PIPES[kind];
@@ -174,11 +177,13 @@ export function drawWorld(
       const kind = siteKind(s.plant);
       const level = s.run.scram ? 0.08 : sitePower(s.run);
       const ran = s.run.history.length > 0 || s.run.powerPct > 0;
+      const face = readFace();
       const st: HallState = {
         kind,
         glow: cherenkov(PLANTS[kind], level > 0.02) ? level : 0,
-        flow: ran ? Math.max(0, s.run.flowPct / 100) : 1,
+        flow: (ran ? Math.max(0, s.run.flowPct / 100) : 1) * face.flowMul,
         hot: level > 0.02,
+        tubeMark: face.tubeMark,
       };
       // The wall panel beside the window becomes the plant mimic.
       drawables.push({ y: 30, draw: () => drawMimic(g, { x: 190, y: 6, w: 44, h: 22 }, PLANTS[kind], st, now) });

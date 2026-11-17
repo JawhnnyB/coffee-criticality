@@ -5,6 +5,8 @@ import { DT_BAND, thermalState, type PlantDesign, type PlantType, type RunState 
 import { PixelSchematic } from "./PixelSchematic";
 import { PlantCutaway } from "./PlantCutaway";
 import { BENCH_HOLD, stepBench } from "./benchStep";
+import { commandFor, panelFor, pebblePass, type OperatorMove } from "./siteControls";
+import { publishFace } from "./siteFace";
 
 const PLANTS: { id: PlantType; title: string; note: string }[] = [
   { id: "pwr", title: "PWR", note: "Pressurized primary. Steam generators. Rods from above. Heat leaves with flow." },
@@ -54,7 +56,19 @@ export function ReactorTrainer({
       ? "This is the plant you designed. Match flow to power. Hold the ΔT band. Teaching only."
       : "The bench runs the reactor you design. Finish the builder first.",
   );
+  const [drain, setDrain] = useState(false);
+  const [drainSeconds, setDrainSeconds] = useState(0);
+  const [passes, setPasses] = useState(0);
+  const [burnup, setBurnup] = useState(0);
+  const drainRef = useRef(drain);
+  const drainSecRef = useRef(drainSeconds);
+  const passesRef = useRef(passes);
+  const burnupRef = useRef(burnup);
   const rodsRef = useRef(rods);
+  drainRef.current = drain;
+  drainSecRef.current = drainSeconds;
+  passesRef.current = passes;
+  burnupRef.current = burnup;
   const flowRef = useRef(flow);
   const powerRef = useRef(power);
   const holdRef = useRef(hold);
@@ -69,6 +83,16 @@ export function ReactorTrainer({
   flowRef.current = flow;
   writeRef.current = writeRun;
   minuteRef.current = onMinute;
+
+  useEffect(() => {
+    if (!plant) return;
+    const move: OperatorMove = { rodsWithdrawnPct: rods, flowPct: flow, drain, drainSeconds, passes };
+    const sim = commandFor(plant, power, move, scram);
+    const panel = panelFor(plant, move, sim, burnup);
+    publishFace({ flowMul: panel.arrows ? 1 : 0, tubeMark: panel.tubeMark });
+  }, [plant, rods, flow, drain, drainSeconds, passes, power, scram, burnup]);
+
+  useEffect(() => () => publishFace({ flowMul: 1, tubeMark: false }), []);
 
   useEffect(() => {
     if (!plant || passed || scram) return;
@@ -87,10 +111,21 @@ export function ReactorTrainer({
         lastMin = openMin;
         minuteRef.current(openMin);
       }
+      if (plant === "msr" && drainRef.current) {
+        drainSecRef.current += dt;
+        setDrainSeconds(drainSecRef.current);
+      }
+      const move: OperatorMove = {
+        rodsWithdrawnPct: rodsRef.current,
+        flowPct: flowRef.current,
+        drain: drainRef.current,
+        drainSeconds: drainSecRef.current,
+        passes: passesRef.current,
+      };
       const step = stepBench({
         power: powerRef.current,
-        rods: rodsRef.current,
-        flow: flowRef.current,
+        rods: move.rodsWithdrawnPct,
+        flow: move.flowPct,
         hold: holdRef.current,
         dt,
         plant,
@@ -102,16 +137,28 @@ export function ReactorTrainer({
       precursorsRef.current = step.precursors;
       rodPosRef.current = step.rodPos;
       setRhoPcm(step.rhoPcm);
-      powerRef.current = step.power;
+      let powerOut = step.power;
+      let scramOut = step.scram;
+      if (!step.scram && plant === "bwr") {
+        powerOut = commandFor("bwr", step.power, move, false).powerPct;
+      } else if (!step.scram && plant === "msr" && move.drain) {
+        const cmd = commandFor("msr", step.power, move, false);
+        powerOut = cmd.powerPct;
+        scramOut = cmd.scram;
+      }
+      powerRef.current = powerOut;
+      setPower(powerOut);
       holdRef.current = step.hold;
       writtenRef.current = step.lastWritten;
-      setPower(step.power);
       setHold(step.hold);
       if (step.msg) setMsg(step.msg);
       if (step.write) writeRef.current(step.write);
-      if (step.scram) setScram(true);
+      if (!step.scram && (plant === "bwr" || (plant === "msr" && move.drain))) {
+        writeRef.current({ powerPct: powerOut, ...(scramOut ? { scram: true } : {}) });
+      }
+      if (scramOut) setScram(true);
       if (step.passed) setPassed(true);
-      if (step.scram || step.passed) {
+      if (scramOut || step.passed) {
         stopped = true;
         return;
       }
@@ -140,6 +187,9 @@ export function ReactorTrainer({
   const { dT, tCold, tHot } = ts;
   const band = BAND[plant];
   const inBand = dT >= band.lo && dT <= band.hi && !scram;
+  const moveNow: OperatorMove = { rodsWithdrawnPct: rods, flowPct: flow, drain, drainSeconds, passes };
+  const simCmd = commandFor(plant, power, moveNow, scram);
+  const panel = panelFor(plant, moveNow, simCmd, burnup);
 
   if (passed) {
     return (
@@ -180,7 +230,16 @@ export function ReactorTrainer({
         testId="control-cutaway"
         maxScale={1}
         className="mt-3 w-full border border-[#c4783a]/40 bg-[#f3e6d0]"
-        live={{ power: scram ? 0 : power / 100, flow: flow / 100, rods: rods / 100, scram, tHot, tCold }}
+        live={{
+          power: scram ? 0 : power / 100,
+          flow: panel.arrows ? flow / 100 : 0,
+          rods: rods / 100,
+          scram,
+          tHot,
+          tCold,
+          arrows: panel.arrows,
+          tubeMark: panel.tubeMark,
+        }}
       />
       <Schematic plant={plant} tHot={tHot} tCold={tCold} colorSafe={colorSafe} />
       <p className="mt-2 text-sm text-muted">{msg}</p>
@@ -194,6 +253,14 @@ export function ReactorTrainer({
       <p className="mt-2 font-mono text-xs text-subtle">
         Q = ṁ × cp × ΔT · {band.lo}–{band.hi} °C · hold {Math.min(band.hold, hold).toFixed(1)} / {band.hold} s
       </p>
+      <div className="mt-2 border border-good/30 px-3 py-2 font-mono text-xs text-good/90" data-testid="site-panel">
+        <p className="tracking-widest">{panel.title}</p>
+        {panel.lines.map((line) => (
+          <p key={line} className="mt-1 text-good/80">
+            {line}
+          </p>
+        ))}
+      </div>
       {compare && <CompareCard yours={plant} />}
       <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-surface">
         <div className="h-full bg-accent" style={{ width: `${Math.min(100, (hold / band.hold) * 100)}%` }} />
@@ -214,6 +281,10 @@ export function ReactorTrainer({
             setRhoPcm(0);
             holdRef.current = 0;
             writtenRef.current = 40;
+            setDrain(false);
+            setDrainSeconds(0);
+            drainRef.current = false;
+            drainSecRef.current = 0;
             writeRun({ scram: false, powerPct: 40, rodsWithdrawnPct: 40, flowPct: 100 });
             setMsg("Reset. Slower on the rods. Match the pump.");
           }}
@@ -223,7 +294,7 @@ export function ReactorTrainer({
       ) : (
         <div className="mt-5 space-y-4">
           <label className="block text-xs text-muted">
-            {plant === "msr" ? "Salt worth / rods" : plant === "pebble" ? "Reflector rods" : "Rods withdrawn"} {rods}%
+            {plant === "bwr" ? "Rods from below" : plant === "msr" ? "Salt worth / rods" : plant === "pebble" ? "Reflector rods" : "Rods withdrawn"} {rods}%
             <input
               type="range"
               min={20}
@@ -252,6 +323,35 @@ export function ReactorTrainer({
               className="mt-1 w-full"
             />
           </label>
+          {plant === "pebble" ? (
+            <button
+              type="button"
+              className="btn-ghost"
+              data-testid="pebble-pass"
+              onClick={() => {
+                const next = pebblePass(burnupRef.current);
+                burnupRef.current = next.burnupMWd;
+                passesRef.current += 1;
+                setBurnup(next.burnupMWd);
+                setPasses(passesRef.current);
+              }}
+            >
+              Pass a pebble
+            </button>
+          ) : null}
+          {plant === "msr" && !drain ? (
+            <button
+              type="button"
+              className="btn-ghost"
+              data-testid="freeze-valve"
+              onClick={() => {
+                drainRef.current = true;
+                setDrain(true);
+              }}
+            >
+              Open the freeze valve
+            </button>
+          ) : null}
         </div>
       )}
     </Term>

@@ -22,6 +22,8 @@ export interface HallState {
   flow: number;
   /** The salt or pebble core is hot: drawn warm in the port. */
   hot: boolean;
+  /** A weeping tube. Drawn as a mark, not as Cherenkov light. */
+  tubeMark?: boolean;
 }
 
 type G = CanvasRenderingContext2D;
@@ -76,7 +78,11 @@ export function trefoil(g: G, cx: number, cy: number) {
   }
 }
 
-/** The view through the port: Cherenkov blue for a water core, warm for gas or salt. */
+function hallMark(g: G, x: number, y: number, w: number, st: HallState) {
+  if (!st.tubeMark) return;
+  fill(g, x + w - 16, y + 12, 5, 7, PAL.bad);
+  fill(g, x + w - 14, y + 19, 2, 4, PAL.badD);
+}
 function port(g: G, cx: number, cy: number, r: number, st: HallState, t: number) {
   disc(g, cx, cy, r + 2, PAL.outline);
   disc(g, cx, cy, r + 1, PAL.steelL);
@@ -154,6 +160,7 @@ export function drawHallReactor(g: G, box: { x: number; y: number; w: number; h:
     fill(g, x + 9, y + h - 23, 10, 6, PAL.sky);
     fill(g, x + 11, y + h - 21, 6, 2, PAL.white);
     trefoil(g, x + w - 12, y + h - 20);
+    hallMark(g, x, y, w, st);
     return;
   }
 
@@ -174,6 +181,7 @@ export function drawHallReactor(g: G, box: { x: number; y: number; w: number; h:
     fill(g, cx - 1, py, 3, 3, PAL.ink);
     port(g, cx, cy, 6, st, t);
     trefoil(g, x + 10, y + h - 20);
+    hallMark(g, x, y, w, st);
     return;
   }
 
@@ -205,6 +213,7 @@ export function drawHallReactor(g: G, box: { x: number; y: number; w: number; h:
   }
   port(g, cx, cy, 6, st, t);
   trefoil(g, x + 10, y + h - 20);
+  hallMark(g, x, y, w, st);
 }
 
 /** What a pipe in the hall carries, for its band colour. */

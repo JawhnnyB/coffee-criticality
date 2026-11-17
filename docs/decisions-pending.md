@@ -42,3 +42,17 @@ Other options: leave the card saying chloride and change the drawing, or show bo
 - Reactor Design buttons in `ReactorBuilder.tsx` still name CRDMs, the steam generator, and the pressurizer on the PWR choice. Those lines label the choice. They are not a claim about a plant already signed.
 - `PlantHud.tsx` already had a line list per type. It was not copied into `siteText.ts`.
 - The Academy page "The vessel has names" still has the PWR sentence in `content.ts`. The screen reads `siteText` instead, so a non-PWR site does not show the PWR sentence. The content.ts sentence was not rewritten, so the PWR words stay the source.
+
+## Controls
+
+Chosen: `siteControls.ts` maps operator input onto the power, flow, and rods the bench already writes. The sim files were not edited.
+
+- PWR: the bench numbers pass through.
+- BWR: displayed power is `bwrPower(flow, rods)`, written onto the run after the bench step so the bench cannot overwrite it. Rods are labeled "from below". The drawing of rods from below was already in the hall and the cutaway.
+- Pebble: a "Pass a pebble" button raises burnup by 8 MWd/kg and discharges at 90. The panel outlet is 750 °C (Zhang et al., HTR-PM, Engineering 2016). The bench ΔT is still the sim's own number.
+- Salt: "Open the freeze valve" melts the plug, then the level falls, then fission heat is 0 and the run is scrammed. βeff is shown as 0.55 × β. Display only.
+
+Other option: teach BWR flow only as a caption and leave power on the bench kinetics. Not chosen, because the brief asked for power to rise with recirc flow.
+
+The day-incident machine in `sim.ts` was not used for these controls. It is part of the frozen shift story.
+

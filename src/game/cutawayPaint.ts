@@ -31,6 +31,10 @@ export interface LiveRun {
   /** Hot and cold leg temperatures in °C, from thermalState. */
   tHot: number;
   tCold: number;
+  /** False stops the pipe arrows. Omitted means the arrows follow flow. */
+  arrows?: boolean;
+  /** A mark on a steam-generator tube. */
+  tubeMark?: boolean;
 }
 
 export interface CutawayFrame {
@@ -85,6 +89,7 @@ interface Drive {
   glow: number;
   /** The steam side runs: turbine, condenser, feed pump. It trips on a scram. */
   steam: boolean;
+  tubeMark: boolean;
 }
 
 export function drive(kind: CutawayKind, frame: CutawayFrame): Drive {
@@ -92,7 +97,8 @@ export function drive(kind: CutawayKind, frame: CutawayFrame): Drive {
   if (frame.live) {
     const L = frame.live;
     const power = Math.max(0, Math.min(1.2, L.power));
-    const flow = Math.max(0, Math.min(1.6, L.flow));
+    const arrows = L.arrows !== false;
+    const flow = arrows ? Math.max(0, Math.min(1.6, L.flow)) : 0;
     const decay = L.scram ? 0.08 : 0;
     const level = L.scram ? decay : power;
     return {
@@ -104,12 +110,13 @@ export function drive(kind: CutawayKind, frame: CutawayFrame): Drive {
       tCold: L.tCold,
       glow: cherenkov(plant, level > 0.02) ? level : 0,
       steam: !L.scram && power > 0.03,
+      tubeMark: !!L.tubeMark,
     };
   }
   const d = DESIGN_TEMPS[kind];
   return frame.hot
-    ? { power: 1, flow: 1, rods: 0.85, scram: false, tHot: d.tHot, tCold: d.tCold, glow: cherenkov(plant, true) ? 1 : 0, steam: true }
-    : { power: 0, flow: 0.3, rods: 0, scram: false, tHot: d.tCold, tCold: d.tCold, glow: 0, steam: false };
+    ? { power: 1, flow: 1, rods: 0.85, scram: false, tHot: d.tHot, tCold: d.tCold, glow: cherenkov(plant, true) ? 1 : 0, steam: true, tubeMark: false }
+    : { power: 0, flow: 0.3, rods: 0, scram: false, tHot: d.tCold, tCold: d.tCold, glow: 0, steam: false, tubeMark: false };
 }
 
 const fill = (g: G, x: number, y: number, w: number, h: number, c: string) => {
@@ -263,6 +270,13 @@ function boil(g: G, x: number, y: number, w: number, h: number, t: number, rate 
     const rise = (t * (8 + hash(i, 5) * 8) + hash(i, 7) * h) % h;
     fill(g, bx, y + h - 1 - Math.floor(rise), 1, 1, PAL.white);
   }
+}
+
+function tubeLeak(g: G, c: Comp) {
+  const x = c.x + Math.floor(c.w / 2);
+  const y = c.y + Math.floor(c.h / 2);
+  fill(g, x, y, 3, 5, PAL.bad);
+  fill(g, x + 1, y + 5, 1, 4, PAL.badD);
 }
 
 function steamGen(g: G, c: Comp, plant: PlantDrawing, d: Drive, t: number) {
@@ -708,6 +722,7 @@ export function paintCutaway(g: G, kind: CutawayKind, frame: CutawayFrame) {
         break;
       case "sg":
         steamGen(g, c, plant, d, t);
+        if (d.tubeMark) tubeLeak(g, c);
         break;
       case "pump":
         pump(g, plant, c, t, bop ? (d.steam ? Math.max(0.3, d.power) : 0) : d.flow);

@@ -58,6 +58,7 @@ import { computeKeff } from "./nuclearLab";
 import { NuclearDesk } from "./NuclearDesk";
 import { anatomyLines, hallBlurb, siteLine } from "./siteText";
 import { LoopSchematic } from "./LoopSchematic";
+import { readFace } from "./siteFace";
 import { DEPARTMENTS, dayDef, eodNpcLine, incidentOwner, shoreLine, yesterdayLine } from "./week";
 import { DEFAULT_PLAYER_LOOK, type PlayerLook } from "./artSpec";
 import { MAP_HUD, ROOM_BLURB, roomLinks } from "./site";
@@ -1940,8 +1941,18 @@ function siteLive(s: GameState): LiveRun | undefined {
   const ran = s.run.history.length > 0 || s.run.powerPct > 0;
   const powerPct = ran ? s.run.powerPct : 100;
   const flowPct = ran ? s.run.flowPct : 100;
+  const face = readFace();
   const ts = thermalState(s.plant, { powerPct, flowPct });
-  return { power: s.run.scram ? 0 : powerPct / 100, flow: flowPct / 100, rods: ran ? s.run.rodsWithdrawnPct / 100 : 0.85, scram: s.run.scram, tHot: ts.tHot, tCold: ts.tCold };
+  return {
+    power: s.run.scram ? 0 : powerPct / 100,
+    flow: face.flowMul <= 0 ? 0 : flowPct / 100,
+    rods: ran ? s.run.rodsWithdrawnPct / 100 : 0.85,
+    scram: s.run.scram,
+    tHot: ts.tHot,
+    tCold: ts.tCold,
+    arrows: face.flowMul > 0,
+    tubeMark: face.tubeMark,
+  };
 }
 
 function StillStage({
