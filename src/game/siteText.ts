@@ -17,10 +17,14 @@ export type SiteLineKey =
   | "steamPath"
   | "fastSalt"
   | "hallFloor"
-  | "vesselNames";
+  | "vesselNames"
+  | "whyThermal"
+  | "voidStep";
 
 export const SITE_TEXT: Record<SiteKind, Record<SiteLineKey, string>> = {
   pwr: {
+    whyThermal: "It is why this site is a PWR and not a fast reactor, and why steam in a BWR is not just a heat story. The thing that carries heat is also the thing that slows neutrons. One law.",
+    voidStep: "BWR void is the same sentence in steam. This site is a PWR. Void is not a knob here.",
     heatLeaves:
       "On this site (PWR): Q = ṁ × cp × ΔT. Cold leg in, downcomer down, core up, hot leg out. Primary stays liquid at ~16 MPa classroom. Teaching model — not a license.",
     windowReactor: "The vessel has names. CRDMs from above.",
@@ -42,6 +46,8 @@ export const SITE_TEXT: Record<SiteKind, Record<SiteLineKey, string>> = {
       "A PWR pressure vessel holds the fuel, the water, and the control rods. Inlet nozzle, core barrel, downcomer, lower plenum, fuel, upper internals, outlet nozzle. Not a design basis.",
   },
   bwr: {
+    whyThermal: "It is why this site is a thermal BWR and not a fast reactor, and why steam in this core is not just a heat story. The thing that carries heat is also the thing that slows neutrons. One law.",
+    voidStep: "BWR void is the same sentence in steam. This site is a BWR. Void is the knob here: recirc flow sweeps voids out, k rises, power follows.",
     heatLeaves:
       "On this site (BWR): the core boils. Recirc flow sets the voids. Steam goes up the risers and out to the turbine. No steam generator. Rods come in from below. ~7 MPa classroom. Teaching model — not a license.",
     windowReactor: "The vessel has names. No CRDMs on the head. Rods from below.",
@@ -63,8 +69,10 @@ export const SITE_TEXT: Record<SiteKind, Record<SiteLineKey, string>> = {
       "A BWR vessel holds the fuel and the water that boils in it. No CRDMs on the head. Rods from below. Steam out the top, feedwater back. Not a design basis.",
   },
   pebble: {
+    whyThermal: "It is why this site is thermal: graphite slows the neutrons, and helium only carries the heat. Change the courier and this term barely moves. Change the graphite and it does.",
+    voidStep: "BWR void is the same sentence in steam. This site is a pebble bed. Helium has no void and barely moderates. The graphite's own temperature carries the feedback here.",
     heatLeaves:
-      "On this site (pebble bed): helium carries the heat. Blower speed is the flow. Core outlet stays near 750 °C. No boiling. No pressurizer. Pebbles pass through and leave when their burnup is high enough. Teaching model — not a license.",
+      "On this site (pebble bed): helium carries the heat. Blower speed is the flow. Core outlet near 750 °C at full power. No boiling. No pressurizer. Pebbles pass through and leave when their burnup is high enough. Teaching model — not a license.",
     windowReactor: "The vessel has names. A ring of rod drives. A pebble tube. Helium, not water.",
     loopHeader: "PRIMARY LOOP  ·  PEBBLE  ·  teaching only",
     loopCaption:
@@ -84,6 +92,8 @@ export const SITE_TEXT: Record<SiteKind, Record<SiteLineKey, string>> = {
       "A pebble vessel holds pebbles and helium. Rod drives sit in the side reflector. A loading tube and a discharge line. No water downcomer. Not a design basis.",
   },
   msr: {
+    whyThermal: "It is why this site is thermal: graphite in the core slows the neutrons, and the salt carries both the fuel and the heat. A fast salt reactor leaves the graphite out on purpose.",
+    voidStep: "BWR void is the same sentence in steam. This site is a salt reactor. The salt expands as it heats and pushes fuel out of the core. That is the fast feedback here.",
     heatLeaves:
       "On this site (salt): the fuel is in the salt. A pump moves it. Heat leaves in a heat exchanger, not a water downcomer. The emergency path is the freeze valve and the drain tank. Teaching model — not a license.",
     windowReactor: "The cell has names. Roof plugs. A freeze-valve hatch. No CRDM forest.",
@@ -125,6 +135,8 @@ export function speak(kind: SiteKind, text: string): string {
   if (text === pwr.windowReactor) return siteLine(kind, "windowReactor");
   if (text === pwr.fluids) return siteLine(kind, "fluids");
   if (text === pwr.hallFloor) return siteLine(kind, "hallFloor");
+  if (text === pwr.whyThermal) return siteLine(kind, "whyThermal");
+  if (text === pwr.voidStep) return siteLine(kind, "voidStep");
   return text;
 }
 

@@ -7,9 +7,15 @@
  *   In the power range, recirculation flow is the main power control. More flow
  *   sweeps steam voids out of the core, which adds reactivity, so power rises.
  *   Control rods are for large changes and for startup, and they enter from below.
+ *   The bench kinetics (benchStep.ts) already carry this: the BWR coolant coefficient
+ *   stands in for voids, so more flow runs the core cooler and power climbs to a new
+ *   rest point, with the delayed-neutron lag. This layer does not replace that power.
  * - Pebble outlet: Zhang et al., HTR-PM demonstration plant, Engineering (2016).
- *   Helium reactor outlet temperature is 750 °C. Online refuelling discharges a
- *   pebble when its burnup is high enough. Helium does not boil, so there is no pressurizer.
+ *   Helium enters near 250 °C and leaves near 750 °C at full power. The outlet is
+ *   inlet plus Q / (ṁ cp), so it rises with power and falls with blower flow. The
+ *   game's thermal model (plant.ts thermalState) gives that number. Online refuelling
+ *   discharges a pebble when its burnup is high enough. Helium does not boil, so there
+ *   is no pressurizer.
  * - Salt drain: Haubenreich and Engel, Experience with the Molten-Salt Reactor
  *   Experiment, ORNL (also ORNL-TM-728, MSRE design). Thawing the freeze valve
  *   drains the fuel salt to the drain tank and fission heat in the vessel ends.
@@ -17,6 +23,7 @@
  *   out of the core, so the effective delayed-neutron fraction is smaller than β.
  *   This layer only displays that. It does not change the sim's kinetics.
  */
+import { thermalState } from "./plant";
 import type { SiteKind } from "./plantLoops";
 
 export interface OperatorMove {
@@ -64,25 +71,15 @@ export function pwrCommand(powerPct: number, move: OperatorMove, scram: boolean)
   };
 }
 
-/**
- * More recirc flow, higher power, at the same rod position.
- * NRC BWR manual: flow sweeps voids, reactivity rises, power rises.
- */
-export function bwrPower(flowPct: number, rodsWithdrawnPct: number): number {
-  const flow = clamp(flowPct, 0, 140) / 100;
-  const out = clamp(rodsWithdrawnPct, 0, 100) / 100;
-  return clamp(100 * flow * (0.35 + 0.65 * out), 0, 130);
-}
-
 /** One pass through the pebble core. Burnup rises. High burnup discharges the pebble. */
 export function pebblePass(burnupMWd: number): { burnupMWd: number; discharged: boolean } {
   const burnup = burnupMWd + 8;
   return { burnupMWd: burnup, discharged: burnup >= 90 };
 }
 
-/** HTR-PM teaching outlet. The blower does not move this number off 750 in this layer. */
-export function pebbleOutletC(): number {
-  return 750;
+/** Helium outlet, °C: inlet plus the rise the heat gives at this blower flow. */
+export function pebbleOutletC(powerPct: number, flowPct: number): number {
+  return Math.round(thermalState("pebble", { powerPct, flowPct }).tHot);
 }
 
 /**
@@ -102,14 +99,6 @@ export function saltBetaEff(beta = 0.0065): { beta: number; betaEff: number } {
 }
 
 export function commandFor(kind: SiteKind, powerPct: number, move: OperatorMove, scram: boolean): SimCommand {
-  if (kind === "bwr") {
-    return {
-      powerPct: scram ? 0 : bwrPower(move.flowPct, move.rodsWithdrawnPct),
-      flowPct: move.flowPct,
-      rodsWithdrawnPct: move.rodsWithdrawnPct,
-      scram,
-    };
-  }
   if (kind === "msr" && move.drain) {
     const d = saltDrain(move.drainSeconds);
     return {
@@ -119,7 +108,7 @@ export function commandFor(kind: SiteKind, powerPct: number, move: OperatorMove,
       scram: scram || d.fission === 0,
     };
   }
-  if (kind === "pebble") {
+  if (kind === "pebble" || kind === "bwr") {
     return {
       powerPct: scram ? 0 : powerPct,
       flowPct: move.flowPct,
@@ -153,7 +142,7 @@ export function panelFor(kind: SiteKind, move: OperatorMove, sim: SimCommand, bu
       title: "Helium",
       lines: [
         `Blower ${move.flowPct.toFixed(0)}%`,
-        `Outlet ${pebbleOutletC()} °C`,
+        `Outlet ${pebbleOutletC(sim.powerPct, sim.flowPct)} °C`,
         `Passes ${move.passes}`,
         pass.discharged ? "Pebble discharged" : `Burnup ${burnupMWd.toFixed(0)} MWd/kg`,
       ],
@@ -189,4 +178,36 @@ export function panelFor(kind: SiteKind, move: OperatorMove, sim: SimCommand, bu
     arrows: flow > 0.02 && !sim.scram,
     tubeMark: false,
   };
+}
+
+/** What the bench step decided this frame, before the site layer. */
+export interface BenchOutcome {
+  power: number;
+  hold: number;
+  scram: boolean;
+  passed: boolean;
+  msg: string | null;
+}
+
+export interface SiteOutcome extends BenchOutcome {
+  /** Salt only. The fuel has left the core. */
+  drained: boolean;
+}
+
+/** Shown when the drain finishes. Listed for the owner in docs/decisions-pending.md. */
+export const DRAINED_MSG = "Fuel salt drained. Fission stopped. Decay heat goes to the drain tank. Teaching only.";
+
+/**
+ * One frame, after the bench kinetics. Every reader (band hold, panel, shared run) uses the power this returns.
+ * - PWR, BWR, pebble: the bench decides. BWR recirc already moves power through the bench's void feedback.
+ * - Salt with the freeze valve ordered open: this is a shutdown, so the band hold stops counting and cannot
+ *   pass. Fission heat in the vessel falls with the salt level. When the salt is gone, the run ends as a scram.
+ */
+export function siteStep(kind: SiteKind, bench: BenchOutcome, move: OperatorMove): SiteOutcome {
+  if (bench.scram || kind !== "msr" || !move.drain) return { ...bench, drained: false };
+  const d = saltDrain(move.drainSeconds);
+  if (d.fission === 0) {
+    return { power: 0, hold: 0, scram: true, passed: false, msg: DRAINED_MSG, drained: true };
+  }
+  return { power: bench.power * d.fission, hold: 0, scram: false, passed: false, msg: null, drained: false };
 }

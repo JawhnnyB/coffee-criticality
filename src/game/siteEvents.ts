@@ -20,10 +20,17 @@
  *   in helium is a chemical attack and a reactivity insert via graphite.
  * - Pebble jam: the discharge line stops. Online fuelling cannot clear a jammed
  *   sphere. IAEA TECDOC descriptions of pebble handling.
- * - Salt freeze-valve heater fault, off-gas pressure, a line cooling toward
- *   the liquidus: MSRE operating experience (ORNL). The freeze valve must stay
- *   thawed until a drain is ordered. Off-gas takes fission gas. A cold salt
- *   line can freeze and plug.
+ * - Salt freeze-valve cooling air lost, off-gas pressure, a line cooling toward
+ *   the liquidus: MSRE operating experience (ORNL-4658, Haubenreich and Engel).
+ *   The freeze valve is a plug of salt held frozen by cooling air. Heat opens it.
+ *   Lose the cooling air and the plug thaws and the fuel drains on its own: the
+ *   designed safe shutdown. Off-gas takes fission gas. A cold salt line can
+ *   freeze and plug, which stops the loop.
+ * - Trips at power: an RCP trip at full power trips the reactor on low flow
+ *   (NRC PWR manual, reactor protection). One pump of several leaves the others
+ *   running, so total flow falls, it does not go to zero. A BWR recirc trip
+ *   leaves one pump and natural circulation, about half flow, and power falls
+ *   with the voids (NRC BWR manual). An HTR-PM blower trip at power scrams.
  */
 import type { SiteKind } from "./plantLoops";
 import type { SitePanel } from "./siteControls";
@@ -144,15 +151,15 @@ export const SITE_EVENTS: ShiftEvent[] = [
     wrong: "Keep blowing wet helium through graphite.",
   },
   {
-    id: "freeze-heater",
+    id: "freeze-cooling",
     kind: "msr",
-    title: "Freeze-valve heater fault",
-    trigger: "The plant is supposed to stay critical, so the plug must stay frozen until ordered.",
+    title: "Freeze-valve cooling air lost",
+    trigger: "At power. The plug is held frozen by cooling air until a drain is ordered.",
     weight: 1,
-    panel: "Heater current low. Plug temperature falling.",
-    hall: "Heater tape on the valve is dark.",
-    right: "Restore the heater before the plug thaws on its own.",
-    wrong: "Ignore it. The plug opens and the salt starts to leave.",
+    panel: "Cooling air low. Plug temperature rising.",
+    hall: "The cooling air line on the freeze valve is still.",
+    right: "Restore the cooling air. If the plug opens anyway, the drain is the designed shutdown.",
+    wrong: "Pull rods to hold power while the plug thaws. The salt leaves anyway.",
   },
   {
     id: "offgas",
@@ -197,35 +204,54 @@ export function pickEvent(kind: SiteKind, roll: number): ShiftEvent {
 export interface EventView {
   panel: string;
   hall: string;
+  /** 0 to 1. Arrow speed in the hall and the cutaway. */
   flow: number;
   tubeMark: boolean;
   scram: boolean;
   ended: boolean;
+  /** New pump, recirc or blower command for the bench, percent. Absent: the operator's flow stands. */
+  benchFlow?: number;
 }
+
+type Outcome = Partial<Pick<EventView, "flow" | "tubeMark" | "scram" | "benchFlow">>;
+
+/**
+ * What each answer does to the plant. One row per event, so nothing falls through to a default by accident.
+ * Half flow is the floor of the bench's flow control (50%).
+ */
+const OUTCOMES: Record<string, { right: Outcome; wrong: Outcome }> = {
+  "sg-tube": { right: { tubeMark: true }, wrong: { tubeMark: true } },
+  "rcp-trip": { right: { flow: 0.5, benchFlow: 50 }, wrong: { flow: 0.5, scram: true } },
+  "spray-stuck": { right: {}, wrong: { scram: true } },
+  "recirc-trip": { right: { flow: 0.5, benchFlow: 50 }, wrong: { flow: 0.5, benchFlow: 50 } },
+  msiv: { right: { flow: 0, scram: true }, wrong: { flow: 0, scram: true } },
+  "heater-out": { right: {}, wrong: {} },
+  "blower-trip": { right: { flow: 0, scram: true }, wrong: { flow: 0, scram: true } },
+  "pebble-jam": { right: {}, wrong: {} },
+  "helium-moisture": { right: { tubeMark: true, scram: true }, wrong: { tubeMark: true } },
+  "freeze-cooling": { right: {}, wrong: { flow: 0, scram: true } },
+  offgas: { right: {}, wrong: {} },
+  "salt-freeze": { right: {}, wrong: { flow: 0, scram: true } },
+};
 
 /** What the player sees after the right or the wrong response. */
 export function resolveEvent(event: ShiftEvent, right: boolean): EventView {
-  const badFlow = event.id === "rcp-trip" || event.id === "recirc-trip" || event.id === "blower-trip" || event.id === "msiv";
-  const leak = event.id === "sg-tube" || event.id === "helium-moisture";
-  if (right) {
-    return {
-      panel: event.right,
-      hall: event.hall,
-      flow: badFlow ? 0 : 0.4,
-      tubeMark: leak,
-      scram: event.id === "msiv" || event.id === "blower-trip" || event.id === "helium-moisture",
-      ended: false,
-    };
-  }
+  const row = OUTCOMES[event.id];
+  if (!row) throw new Error(`No outcome for event ${event.id}`);
+  const o = right ? row.right : row.wrong;
   return {
-    panel: event.wrong,
+    panel: right ? event.right : event.wrong,
     hall: event.hall,
-    flow: badFlow || event.id === "salt-freeze" ? 0 : 1,
-    tubeMark: leak,
-    scram: event.id === "msiv" || event.id === "freeze-heater",
-    ended: true,
+    flow: o.flow ?? 1,
+    tubeMark: o.tubeMark ?? false,
+    scram: o.scram ?? false,
+    ended: !right,
+    ...(o.benchFlow !== undefined ? { benchFlow: o.benchFlow } : {}),
   };
 }
+
+/** Every event has an outcome row. Used by the tests. */
+export const OUTCOME_IDS = Object.keys(OUTCOMES);
 
 /** Apply a resolved event onto a panel the controls layer already built. */
 export function paintEvent(panel: SitePanel, view: EventView): SitePanel {

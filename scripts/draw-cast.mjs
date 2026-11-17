@@ -121,7 +121,7 @@ const CASTS = {
   mabel: {
     outline: PAL.outline,
     hair: PAL.ash,
-    hairL: PAL.cream,
+    hairL: PAL.muted,
     skin: PAL.skin,
     skinD: PAL.skin2,
     blush: PAL.skinBlush,
@@ -254,8 +254,7 @@ function paintDown(img, ox, oy, c, phase) {
   const step = [0, 1, 0, -1][phase];
   img.rect(x + 3, y, 8, 2, c.hair);
   img.rect(x + 2, y + 1, 10, 4, c.hair);
-  img.set(x + 3, y + 1, c.hairL);
-  img.set(x + 10, y + 1, c.hairL);
+  img.rect(x + 5, y + 1, 3, 1, c.hairL);
   img.rect(x + 3, y + 5, 8, 7, c.skin);
   img.rect(x + 2, y + 6, 1, 5, c.outline);
   img.rect(x + 11, y + 6, 1, 5, c.outline);
@@ -282,8 +281,9 @@ function paintDown(img, ox, oy, c, phase) {
   if (c.apron) img.rect(x + 5, y + 16, 4, 6, c.apron);
   if (c.tie) img.rect(x + 6, y + 14, 2, 6, c.tie);
   if (c.bun) {
+    img.rect(x + 5, y - 4, 4, 1, c.hair);
     img.rect(x + 4, y - 3, 6, 3, c.hair);
-    img.rect(x + 5, y - 4, 4, 2, c.hairL);
+    img.set(x + 5, y - 3, c.hairL);
   }
   if (c.cap) {
     img.rect(x + 2, y - 2, 10, 2, c.cap);
@@ -325,7 +325,10 @@ function paintSide(img, ox, oy, c, phase) {
   img.rect(x + 6, y + 29 - Math.min(step, 0), 3, 2, c.shoe);
   if (c.apron) img.rect(x + 5, y + 16, 3, 6, c.apron);
   if (c.tie) img.rect(x + 6, y + 14, 1, 6, c.tie);
-  if (c.bun) img.rect(x + 1, y - 1, 4, 3, c.hair);
+  if (c.bun) {
+    img.rect(x, y, 3, 3, c.hair);
+    img.rect(x + 1, y - 1, 2, 1, c.hair);
+  }
   if (c.cap) img.rect(x + 1, y - 1, 9, 2, c.cap);
   if (c.braid) img.rect(x + 2, y + 8, 1, 8, c.hair);
   if (c.extra === "glasses") img.set(x + 8, y + 6, c.glasses);
@@ -337,8 +340,7 @@ function paintUp(img, ox, oy, c, phase) {
   const arm = [0, 1, 0, -1][phase];
   const step = [0, 1, 0, -1][phase];
   img.rect(x + 2, y, 10, 8, c.hair);
-  img.set(x + 3, y + 1, c.hairL);
-  img.set(x + 10, y + 1, c.hairL);
+  img.rect(x + 5, y + 1, 4, 1, c.hairL);
   img.rect(x + 4, y + 8, 6, 3, c.skin);
   img.rect(x + 3, y + 11, 8, 8, c.shirt);
   img.rect(x + 3, y + 11, 2, 8, c.shirtD);
@@ -354,7 +356,10 @@ function paintUp(img, ox, oy, c, phase) {
   img.rect(x + 8, y + 27 + (step > 0 ? 0 : 0), 3, 2, c.shoe);
   img.rect(x + 3 - Math.max(step, 0), y + 29, 3, 2, c.shoe);
   img.rect(x + 8, y + 29, 3, 2, c.shoe);
-  if (c.bun) img.rect(x + 4, y - 3, 6, 3, c.hair);
+  if (c.bun) {
+    img.rect(x + 5, y - 4, 4, 1, c.hair);
+    img.rect(x + 4, y - 3, 6, 3, c.hair);
+  }
   if (c.cap) img.rect(x + 2, y - 2, 10, 3, c.cap);
   if (c.braid) img.rect(x + 11, y + 6, 1, 8, c.hair);
 }

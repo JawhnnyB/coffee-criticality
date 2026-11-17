@@ -5,7 +5,7 @@ import { DT_BAND, thermalState, type PlantDesign, type PlantType, type RunState 
 import { PixelSchematic } from "./PixelSchematic";
 import { PlantCutaway } from "./PlantCutaway";
 import { BENCH_HOLD, stepBench } from "./benchStep";
-import { commandFor, panelFor, pebblePass, type OperatorMove } from "./siteControls";
+import { commandFor, panelFor, pebblePass, siteStep, type OperatorMove } from "./siteControls";
 import { paintEvent, pickEvent, resolveEvent, type EventView, type ShiftEvent } from "./siteEvents";
 import { publishFace } from "./siteFace";
 
@@ -148,28 +148,25 @@ export function ReactorTrainer({
       precursorsRef.current = step.precursors;
       rodPosRef.current = step.rodPos;
       setRhoPcm(step.rhoPcm);
-      let powerOut = step.power;
-      let scramOut = step.scram;
-      if (!step.scram && plant === "bwr") {
-        powerOut = commandFor("bwr", step.power, move, false).powerPct;
-      } else if (!step.scram && plant === "msr" && move.drain) {
-        const cmd = commandFor("msr", step.power, move, false);
-        powerOut = cmd.powerPct;
-        scramOut = cmd.scram;
-      }
+      const site = siteStep(plant, step, move);
+      const powerOut = site.power;
+      const scramOut = site.scram;
       powerRef.current = powerOut;
       setPower(powerOut);
-      holdRef.current = step.hold;
-      writtenRef.current = step.lastWritten;
-      setHold(step.hold);
-      if (step.msg) setMsg(step.msg);
-      if (step.write) writeRef.current(step.write);
-      if (!step.scram && (plant === "bwr" || (plant === "msr" && move.drain))) {
+      holdRef.current = site.hold;
+      setHold(site.hold);
+      if (site.msg) setMsg(site.msg);
+      if (powerOut === step.power && scramOut === step.scram) {
+        writtenRef.current = step.lastWritten;
+        if (step.write) writeRef.current(step.write);
+      } else if (scramOut || writtenRef.current === null || Math.round(writtenRef.current) !== Math.round(powerOut)) {
+        // The site layer changed the power (a salt drain). Write what the panel shows, once per rounded change.
+        writtenRef.current = powerOut;
         writeRef.current({ powerPct: powerOut, ...(scramOut ? { scram: true } : {}) });
       }
       if (scramOut) setScram(true);
-      if (step.passed) setPassed(true);
-      if (scramOut || step.passed) {
+      if (site.passed) setPassed(true);
+      if (scramOut || site.passed) {
         stopped = true;
         return;
       }
@@ -211,10 +208,10 @@ export function ReactorTrainer({
       setPower(0);
       powerRef.current = 0;
       writeRun({ scram: true, powerPct: 0 });
-    } else if (next.flow === 0) {
-      setFlow(0);
-      flowRef.current = 0;
-      writeRun({ flowPct: 0 });
+    } else if (next.benchFlow !== undefined) {
+      setFlow(next.benchFlow);
+      flowRef.current = next.benchFlow;
+      writeRun({ flowPct: next.benchFlow });
     }
   };
 
