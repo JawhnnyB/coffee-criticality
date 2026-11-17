@@ -16,8 +16,23 @@ const built = spawnSync(
 if (built.status !== 0) throw new Error(built.stderr || built.stdout || "esbuild failed");
 const M = await import(out);
 
-test("a wide cafe keeps the cover zoom", () => {
-  assert.equal(M.worldZoom(1100, 720, 320, 256), 3);
+test("a wide cafe uses the smallest whole zoom that covers the view", () => {
+  // 1100 / 320 = 3.44. Zoom 3 would leave 70px bars on each side, so the cover zoom is 4.
+  assert.equal(M.worldZoom(1100, 720, 320, 256), 4);
+  assert.ok(320 * 4 >= 1100 && 256 * 4 >= 720);
+});
+
+test("rooms of different widths get the same zoom at one view size, so people do not change size between rooms", () => {
+  const cafe = M.worldZoom(1280, 720, 320, 256);
+  const control = M.worldZoom(1280, 720, 352, 256);
+  const parlor = M.worldZoom(1280, 720, 384, 256);
+  assert.equal(cafe, 4);
+  assert.equal(control, 4);
+  assert.equal(parlor, 4);
+});
+
+test("the cover zoom stops at 5", () => {
+  assert.equal(M.worldZoom(3840, 2160, 320, 256), 5);
 });
 
 test("a phone-width view is zoom 2, and the camera pans because the room is bigger than the view", () => {
@@ -28,6 +43,6 @@ test("a phone-width view is zoom 2, and the camera pans because the room is bigg
 
 test("a phone at the PHONE_VIEW_W threshold is still zoom 2", () => {
   assert.equal(M.worldZoom(M.PHONE_VIEW_W - 1, 720, 160, 256), 2);
-  // At exactly PHONE_VIEW_W the cover law applies again: 720 / 160 = 4.5, floored to 4.
-  assert.equal(M.worldZoom(M.PHONE_VIEW_W, 720, 160, 256), 4);
+  // At exactly PHONE_VIEW_W the cover law applies again: 720 / 160 = 4.5, and the next whole zoom is 5.
+  assert.equal(M.worldZoom(M.PHONE_VIEW_W, 720, 160, 256), 5);
 });

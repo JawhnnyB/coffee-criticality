@@ -31,13 +31,15 @@ export const PHONE_VIEW_W = 720;
 
 /**
  * Room camera zoom. Phones use a fixed 2×: the camera follows the player and clamps at the room
- * edges, so a walker reaches every edge and the player is never off screen. Wider views keep the
- * cover zoom (2–5). A wide view narrower than twice the room drops to 1 so the whole room fits.
+ * edges, so a walker reaches every edge and the player is never off screen. Wider views use the
+ * smallest whole zoom that covers the view (2–5), so there are no bars beside a room and people are
+ * the same size in every room. The camera pans over what is cropped.
+ * A wide view narrower than twice the room drops to 1 so the whole room fits.
  */
 export function worldZoom(viewW: number, viewH: number, roomW: number, roomH: number): number {
   if (viewW < PHONE_VIEW_W) return 2;
   const cover = Math.max(viewW / Math.max(1, roomW), viewH / Math.max(1, roomH));
-  const fitted = Math.max(2, Math.min(5, Math.floor(cover)));
+  const fitted = Math.max(2, Math.min(5, Math.ceil(cover)));
   if (viewW < roomW * 2) return 1;
   return fitted;
 }

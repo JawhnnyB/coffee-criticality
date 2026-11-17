@@ -87,12 +87,6 @@ export function drawWorld(
   const shakeY = s.shake > 0 ? Math.round(Math.cos(now * 41) * 2 * s.shake) : 0;
   let targetX = s.x;
   let targetY = s.y - 6;
-  if (s.moving && !s.sitting) {
-    if (s.facing === "right") targetX += 10;
-    else if (s.facing === "left") targetX -= 10;
-    else if (s.facing === "down") targetY += 8;
-    else targetY -= 8;
-  }
   if (room.w > bw) targetX = Math.max(bw / 2, Math.min(room.w - bw / 2, s.x));
   else targetX = room.w / 2;
   if (room.h > bh) targetY = Math.max(bh / 2, Math.min(room.h - bh / 2, s.y - 6));
@@ -105,8 +99,10 @@ export function drawWorld(
     camY = targetY;
     lastRoom = s.room;
   } else {
-    camX += (targetX - camX) * 0.28;
-    camY += (targetY - camY) * 0.28;
+    // The same glide at any frame rate. At 60 frames a second this is the old 0.28 a frame.
+    const ease = 1 - Math.pow(0.72, Math.max(0, Math.min(0.1, _dt)) * 60);
+    camX += (targetX - camX) * ease;
+    camY += (targetY - camY) * ease;
   }
 
   g.fillStyle = PAL.ink;
