@@ -64,4 +64,11 @@ A right response ends the call. A wrong response sets `ended`, which the panel p
 
 Other option: roll the events on the game clock inside `sim.ts`. Not chosen.
 
+## Hall sound
+
+Chosen: Web Audio oscillators in `audio.ts`, driven by `hallTone()` in `siteAudio.ts`. No samples. PWR and BWR are a pump hum plus a hiss. Pebble is a blower whine. Salt is a cooler drone plus a heater tick. A scram leaves a low decay-heat fan. Gain is 0 when sound is off, and 0 in the cafe (distance 1). The mute flag is the existing `cc.mute` setting.
+
+Other option: one shared hum for every type. Not chosen, because the brief asked for a different loop per type.
+
+
 

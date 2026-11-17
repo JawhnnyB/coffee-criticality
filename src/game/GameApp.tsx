@@ -600,6 +600,10 @@ export function GameApp() {
         mode: s.mode,
         valveSteam: s.room === "maintenance" && maintenanceSteamOn(s.day, s.residue.valve),
         dt,
+        site: siteKind(s.plant),
+        power: sitePower(s.run),
+        scram: s.run.scram,
+        soundOn: !isMuted(),
       });
       if (s.mode === "play") {
         saveAcc += dt;
