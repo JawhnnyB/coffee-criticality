@@ -1,5 +1,6 @@
 "use client";
 
+import { cabContext, cabFont } from "./cabCanvas";
 import { useEffect, useRef, useState } from "react";
 import { Bezel } from "./Arcade";
 import { playBlip, playCatch, playHuntMiss } from "./audio";
@@ -47,7 +48,7 @@ export function LoadGame({ onDone, onAbort }: { onDone: (score: number) => void;
     if (phase !== "play") return;
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const ctx = canvas.getContext("2d");
+    const ctx = cabContext(canvas);
     if (!ctx) return;
     ctx.imageSmoothingEnabled = false;
 
@@ -69,7 +70,7 @@ export function LoadGame({ onDone, onAbort }: { onDone: (score: number) => void;
       ctx.fillStyle = "#2a2218";
       ctx.fillRect(0, 0, W, H);
       ctx.fillStyle = "#f3e6d0";
-      ctx.font = "8px monospace";
+      ctx.font = cabFont(8);
       ctx.fillText(`turn ${turn + 1}/${TURNS}  catch ${caughtN}  Σp ${powerOf(cells)}`, 8, 12);
       ctx.fillStyle = "#c9a227";
       const who = telegraph.axis === "row" ? `ROW ${telegraph.i + 1}` : `COL ${String.fromCharCode(65 + telegraph.i)}`;

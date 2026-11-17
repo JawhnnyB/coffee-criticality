@@ -1,5 +1,6 @@
 "use client";
 
+import { cabContext, cabFont } from "./cabCanvas";
 import { useEffect, useRef, useState } from "react";
 import { Bezel } from "./Arcade";
 import { playHuntHit, playHuntMiss } from "./audio";
@@ -48,7 +49,7 @@ export function MaintGame({
     if (phase !== "play") return;
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const ctx = canvas.getContext("2d");
+    const ctx = cabContext(canvas);
     if (!ctx) return;
     ctx.imageSmoothingEnabled = false;
 
@@ -135,7 +136,7 @@ export function MaintGame({
       ctx.fillStyle = "#3d5c66";
       ctx.fillRect(132, 48, 56, 40);
       ctx.fillStyle = "#8a7864";
-      ctx.font = "7px monospace";
+      ctx.font = cabFont(8);
       ctx.fillText("PUMP 2A  ·  dead on purpose", 86, 34);
 
       for (const t of tags) {
@@ -149,7 +150,7 @@ export function MaintGame({
         ctx.closePath();
         ctx.fill();
         ctx.fillStyle = "#2a2218";
-        ctx.font = "8px monospace";
+        ctx.font = cabFont(8);
         ctx.fillText(t.lie ? "SVC" : t.label, t.x + 22, t.y + 24);
       }
 
@@ -160,7 +161,7 @@ export function MaintGame({
       ctx.fillStyle = "#2a2218";
       ctx.fillRect(0, 0, W, 16);
       ctx.fillStyle = clock < 8 ? "#b85c4a" : "#f3e6d0";
-      ctx.font = "8px monospace";
+      ctx.font = cabFont(8);
       ctx.fillText(`LOTOTO  hunt  ${clock.toFixed(1)}s  ·  catch the orange`, 6, 11);
       ctx.fillStyle = "#8a7864";
       ctx.fillText("IN SERVICE does not hang here.", 6, H - 6);

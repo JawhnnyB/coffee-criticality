@@ -1,5 +1,6 @@
 "use client";
 
+import { cabContext, cabFont } from "./cabCanvas";
 import { useEffect, useRef, useState } from "react";
 import { Bezel } from "./Arcade";
 import { duckHit, playHuntHit, playPeriodTick } from "./audio";
@@ -69,7 +70,7 @@ export function PhysicsGame({
     if (phase !== "play") return;
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const ctx = canvas.getContext("2d");
+    const ctx = cabContext(canvas);
     if (!ctx) return;
     ctx.imageSmoothingEnabled = false;
 
@@ -797,7 +798,7 @@ export function PhysicsGame({
         if (below) ctx.fillRect(rg.x, rg.y + rg.h, rg.w, 3);
         else ctx.fillRect(rg.x, rg.y - 3, rg.w, 3);
         ctx.fillStyle = "#8a7864";
-        ctx.font = "6px monospace";
+        ctx.font = cabFont(6);
         if (plantType === "msr") {
           ctx.fillText("SALT", CX - 10, CY);
           ctx.fillText("C", CX + 54, CY);
@@ -843,7 +844,7 @@ export function PhysicsGame({
         }
         ctx.stroke();
         ctx.fillStyle = "#8a7864";
-        ctx.font = "6px monospace";
+        ctx.font = cabFont(6);
         ctx.fillText("J = −D ∇φ", 8, 34);
         ctx.fillText(`D ${Dth(plantType, voidAmt).toFixed(2)}`, 8, 44);
       }
@@ -861,7 +862,7 @@ export function PhysicsGame({
       }
 
       ctx.fillStyle = "#f3e6d0";
-      ctx.font = "8px monospace";
+      ctx.font = cabFont(8);
       if (board === "fiss") {
         ctx.fillText(`k∞ ${kEma.toFixed(2)}   rod ${Math.round(insert * 100)}%   hold ${hold.toFixed(1)}/${HOLD_FISS}   n ${live}`, 6, 12);
         ctx.fillStyle = "#8a7864";
@@ -889,7 +890,7 @@ export function PhysicsGame({
       }
       if (bannerT > 0) {
         ctx.fillStyle = "#b85c4a";
-        ctx.font = "12px monospace";
+        ctx.font = cabFont(12);
         ctx.fillText(banner, Math.max(8, CX - 70), 44);
       }
       ctx.fillStyle = kEma > 1.2 ? "#b85c4a" : kEma > 0.88 && kEma < 1.14 ? "#6b8f71" : "#c9a227";

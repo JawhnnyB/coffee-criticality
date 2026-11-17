@@ -1,5 +1,6 @@
 "use client";
 
+import { cabContext, cabFont } from "./cabCanvas";
 import { type ReactNode, useEffect, useRef, useState } from "react";
 import { playHuntHit, playHuntMiss } from "./audio";
 import { hostOwnsKey } from "./keyGate";
@@ -378,7 +379,7 @@ function drawValve(ctx: CanvasRenderingContext2D, it: Item) {
   ctx.fillRect(-6, -16, 12, 4);
   ctx.restore();
   ctx.fillStyle = "#8a7864";
-  ctx.font = "7px monospace";
+  ctx.font = cabFont(8);
   ctx.fillText("14-R SHUT", it.x + 8, it.y + it.h - 6);
 }
 
@@ -397,7 +398,7 @@ function drawTag(ctx: CanvasRenderingContext2D, it: Item) {
   ctx.closePath();
   ctx.fill();
   ctx.fillStyle = "#2a2218";
-  ctx.font = "6px monospace";
+  ctx.font = cabFont(6);
   ctx.fillText(it.svc ? "SVC" : "LOTO", it.x + 20, it.y + 50);
 }
 
@@ -408,10 +409,10 @@ function drawDose(ctx: CanvasRenderingContext2D, it: Item, blink = false) {
   ctx.strokeStyle = glow ? "#f3e6d0" : it.hot ? "#b85c4a" : "#6b8f71";
   ctx.strokeRect(it.x + 4.5, it.y + 6.5, it.w - 11, it.h - 15);
   ctx.fillStyle = it.hot ? "#b85c4a" : "#c9a227";
-  ctx.font = "8px monospace";
+  ctx.font = cabFont(8);
   ctx.fillText(it.hot ? "40" : "0.04", it.x + (it.hot ? 18 : 12), it.y + 24);
   ctx.fillStyle = "#8a7864";
-  ctx.font = "6px monospace";
+  ctx.font = cabFont(6);
   ctx.fillText("mSv/h", it.x + 12, it.y + 36);
 }
 
@@ -419,7 +420,7 @@ function drawLog(ctx: CanvasRenderingContext2D, it: Item) {
   ctx.fillStyle = it.lie ? "#2a2218" : "#1a1814";
   ctx.fillRect(it.x, it.y, it.w, it.h - 2);
   ctx.fillStyle = it.unsigned ? "#b85c4a" : "#f3e6d0";
-  ctx.font = "8px monospace";
+  ctx.font = cabFont(8);
   const who = it.unsigned ? "—     " : "EV    ";
   ctx.fillText(`${who}07:${12 + (it.y % 7)}   14-R  SHUT`, it.x + 8, it.y + 12);
 }
@@ -455,7 +456,7 @@ function drawGauge(ctx: CanvasRenderingContext2D, it: Item, moving: boolean) {
   ctx.lineTo(cx + Math.cos(ang) * 14, cy + Math.sin(ang) * 14);
   ctx.stroke();
   ctx.fillStyle = "#8a7864";
-  ctx.font = "6px monospace";
+  ctx.font = cabFont(6);
   ctx.fillText("P2A", it.x + 24, it.y + it.h - 6);
 }
 
@@ -469,7 +470,7 @@ function drawBreaker(ctx: CanvasRenderingContext2D, it: Item) {
   ctx.fillStyle = it.on ? "#c9a227" : "#8a7864";
   ctx.fillRect(it.x + 22, it.y + (it.on ? 34 : 42), 10, 8);
   ctx.fillStyle = "#8a7864";
-  ctx.font = "6px monospace";
+  ctx.font = cabFont(6);
   ctx.fillText(it.on ? "ON" : "OFF", it.x + 16, it.y + it.h - 6);
 }
 
@@ -488,7 +489,7 @@ function drawSeal(ctx: CanvasRenderingContext2D, it: Item) {
     ctx.fill();
   }
   ctx.fillStyle = "#8a7864";
-  ctx.font = "6px monospace";
+  ctx.font = cabFont(6);
   ctx.fillText(it.broken ? "TEAR" : "SEAL", it.x + 22, it.y + it.h - 6);
 }
 
@@ -511,7 +512,7 @@ function drawWheel(ctx: CanvasRenderingContext2D, it: Item) {
   ctx.stroke();
   ctx.restore();
   ctx.fillStyle = "#8a7864";
-  ctx.font = "6px monospace";
+  ctx.font = cabFont(6);
   ctx.fillText(it.open ? "90°" : "SHUT", it.x + 28, it.y + it.h - 6);
 }
 
@@ -523,7 +524,7 @@ function drawSwitch(ctx: CanvasRenderingContext2D, it: Item) {
   ctx.fillStyle = it.on ? "#c9a227" : "#8a7864";
   ctx.fillRect(it.x + 22, it.y + (it.on ? 18 : 36), 10, 12);
   ctx.fillStyle = "#8a7864";
-  ctx.font = "6px monospace";
+  ctx.font = cabFont(6);
   ctx.fillText(it.on ? "UP" : "DN", it.x + 20, it.y + it.h - 6);
 }
 
@@ -533,7 +534,7 @@ function drawStamp(ctx: CanvasRenderingContext2D, it: Item) {
   ctx.strokeStyle = "#3d5c66";
   ctx.strokeRect(it.x + 4, it.y + 3, 70, 14);
   ctx.fillStyle = it.unsigned ? "#b85c4a" : "#f3e6d0";
-  ctx.font = "8px monospace";
+  ctx.font = cabFont(8);
   ctx.fillText(it.unsigned ? "TIME  —:—  2A" : `TIME  07:${10 + (it.y % 9)}  2A`, it.x + 10, it.y + 14);
 }
 
@@ -588,7 +589,7 @@ export function Arcade({
     if (phase !== "play") return;
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const ctx = canvas.getContext("2d");
+    const ctx = cabContext(canvas);
     if (!ctx) return;
     ctx.imageSmoothingEnabled = false;
 
@@ -697,7 +698,7 @@ export function Arcade({
       }
       for (const d of board.deco) {
         ctx.fillStyle = d.ink;
-        ctx.font = "6px monospace";
+        ctx.font = cabFont(6);
         ctx.fillText(d.label, d.x, d.y);
       }
       for (const it of board.items) drawItem(ctx, it, day, tPlay);
@@ -713,7 +714,7 @@ export function Arcade({
       ctx.fillStyle = "#2a2218";
       ctx.fillRect(0, 0, CW, 16);
       ctx.fillStyle = clock < 10 ? "#b85c4a" : "#f3e6d0";
-      ctx.font = "8px monospace";
+      ctx.font = cabFont(8);
       ctx.fillText(`CATCH  ${round + 1}/${BOARDS}   ${clock.toFixed(1)}s   caught ${caught}   miss ${miss}`, 6, 11);
       ctx.fillStyle = "#e8d8b8";
       ctx.fillText(board.prompt, 6, CH - 6);

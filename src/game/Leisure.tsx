@@ -1,5 +1,6 @@
 "use client";
 
+import { cabContext, cabFont } from "./cabCanvas";
 import { useEffect, useRef, useState } from "react";
 import { Bezel } from "./Arcade";
 
@@ -28,7 +29,7 @@ export function FishGame({ onDone, onAbort }: { onDone: (score: number) => void;
     if (done) return;
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const ctx = canvas.getContext("2d");
+    const ctx = cabContext(canvas);
     if (!ctx) return;
     ctx.imageSmoothingEnabled = false;
     const W = 320;
@@ -158,7 +159,7 @@ export function FishGame({ onDone, onAbort }: { onDone: (score: number) => void;
         ctx.fillRect(24, H - 10, 272 * lock, 4);
       } else {
         ctx.fillStyle = "#f3e6d0";
-        ctx.font = "10px monospace";
+        ctx.font = cabFont(10);
         ctx.fillText("Click the water", 110, 72);
       }
       raf = requestAnimationFrame(loop);

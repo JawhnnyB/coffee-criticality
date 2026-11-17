@@ -1,5 +1,6 @@
 "use client";
 
+import { cabContext, cabFont } from "./cabCanvas";
 import { useEffect, useRef, useState } from "react";
 import { Bezel } from "./Arcade";
 import { HORDE_MAPS } from "./hordeMaps";
@@ -196,7 +197,7 @@ export function HordeGame({ onDone, onAbort }: { onDone: (score: number) => void
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas || end) return;
-    const ctx = canvas.getContext("2d");
+    const ctx = cabContext(canvas);
     if (!ctx) return;
     ctx.imageSmoothingEnabled = false;
     const map = mapRef.current;
@@ -459,7 +460,7 @@ export function HordeGame({ onDone, onAbort }: { onDone: (score: number) => void
       ctx.fillRect(x + Math.cos(aim) * 7 - 1, y + Math.sin(aim) * 7 - 1, 5, 2);
 
       ctx.fillStyle = "#f3e6d0";
-      ctx.font = "8px monospace";
+      ctx.font = cabFont(8);
       ctx.fillText(`R${round}  ${map.name}  ${GUNS[gun].name}  ${reloadT > 0 ? "REL" : ammo + "/" + GUNS[gun].mag}  K${kills}`, 6, 16);
       for (let i = 0; i < 6; i++) {
         ctx.fillStyle = i < hp ? "#b85c4a" : "#3a322a";
@@ -469,7 +470,7 @@ export function HordeGame({ onDone, onAbort }: { onDone: (score: number) => void
       ctx.fillText("WASD  mouse  1-6  click", 150, H - 8);
       if (waveWait > 0.4 && zeds.length === 0) {
         ctx.fillStyle = "#c9a227";
-        ctx.font = "12px monospace";
+        ctx.font = cabFont(12);
         ctx.fillText(`ROUND ${round}`, W / 2 - 32, H / 2);
       }
 

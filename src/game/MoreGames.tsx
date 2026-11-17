@@ -1,5 +1,6 @@
 "use client";
 
+import { cabContext, cabFont } from "./cabCanvas";
 import { useEffect, useRef, useState } from "react";
 import { Bezel } from "./Arcade";
 import { hostOwnsKey, readHeld } from "./keyGate";
@@ -119,7 +120,7 @@ export function GolfGame({ onDone, onAbort }: { onDone: (score: number) => void;
     if (card) return;
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const ctx = canvas.getContext("2d");
+    const ctx = cabContext(canvas);
     if (!ctx) return;
     ctx.imageSmoothingEnabled = false;
 
@@ -273,7 +274,7 @@ export function GolfGame({ onDone, onAbort }: { onDone: (score: number) => void;
       ctx.fill();
 
       ctx.fillStyle = "#f3e6d0";
-      ctx.font = "8px monospace";
+      ctx.font = cabFont(8);
       const tot = cardStrokes.reduce((a, b) => a + b, 0) + strokes;
       const par = HOLES.reduce((a, h) => a + h.par, 0);
       ctx.fillText(`${holeI + 1}/5  ${hole.name}  par ${hole.par}  this ${strokes}  card ${tot}/${par}`, 8, 14);
@@ -348,7 +349,7 @@ export function RodsGame({ onDone, onAbort }: { onDone: (score: number) => void;
     if (end) return;
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const ctx = canvas.getContext("2d");
+    const ctx = cabContext(canvas);
     if (!ctx) return;
     ctx.imageSmoothingEnabled = false;
     const banks = [0, 0, 0, 0];
@@ -444,7 +445,7 @@ export function RodsGame({ onDone, onAbort }: { onDone: (score: number) => void;
       ctx.fillStyle = "#2a1c14";
       ctx.fillRect(0, 0, W, H);
       ctx.fillStyle = "#f3e6d0";
-      ctx.font = "8px monospace";
+      ctx.font = cabFont(8);
       ctx.fillText(`demand ${demand.toFixed(2)}  worth ${dWorth.toFixed(2)}  hold ${hold.toFixed(1)}/12`, 8, 12);
       const names = ["D", "C", "B", "A"];
       for (let i = 0; i < 4; i++) {
@@ -524,7 +525,7 @@ export function PebbleGame({ onDone, onAbort }: { onDone: (score: number) => voi
     if (end !== null) return;
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const ctx = canvas.getContext("2d");
+    const ctx = cabContext(canvas);
     if (!ctx) return;
     ctx.imageSmoothingEnabled = false;
 
@@ -656,7 +657,7 @@ export function PebbleGame({ onDone, onAbort }: { onDone: (score: number) => voi
         ctx.fillStyle = i === 3 ? "#6b8f71" : i === 0 || i === 6 ? "#3a2818" : "#c4783a";
         ctx.fillRect(i * (W / 7) + 2, 160, W / 7 - 4, 16);
         ctx.fillStyle = "#f3e6d0";
-        ctx.font = "7px monospace";
+        ctx.font = cabFont(8);
         ctx.fillText(labels[i], i * (W / 7) + 6, 172);
       }
       for (const b of balls) {
@@ -666,7 +667,7 @@ export function PebbleGame({ onDone, onAbort }: { onDone: (score: number) => voi
       }
       ctx.fillStyle = "#f3e6d0";
       ctx.fillRect(dropX - 4, 8, 8, 6);
-      ctx.font = "8px monospace";
+      ctx.font = cabFont(8);
       ctx.fillText(`TRISO  left ${left}  score ${score}  passes ${totalPasses}  hopper gate  click to drop`, 8, 10);
 
       raf = requestAnimationFrame(loop);
@@ -735,7 +736,7 @@ export function BowlGame({ onDone, onAbort }: { onDone: (score: number) => void;
     if (end !== null) return;
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const ctx = canvas.getContext("2d");
+    const ctx = cabContext(canvas);
     if (!ctx) return;
     ctx.imageSmoothingEnabled = false;
 
@@ -905,7 +906,7 @@ export function BowlGame({ onDone, onAbort }: { onDone: (score: number) => void;
         ctx.fillRect(12, H - 14, power * 80, 4);
       }
       ctx.fillStyle = "#f3e6d0";
-      ctx.font = "8px monospace";
+      ctx.font = cabFont(8);
       ctx.fillText(`frame ${frame + 1}/3  ball ${balls + (rolling ? 0 : 1)}  score ${score}  A/D aim  hold fire`, 8, 12);
       const kText = kLive === null ? "k —" : `k ${kLive.toFixed(2)}`;
       const kWord = kLive === null ? "first generation" : kLive > 1.05 ? "the falls multiply" : kLive < 0.95 ? "the falls die out" : "holding steady";

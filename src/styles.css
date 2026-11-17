@@ -788,10 +788,9 @@
 .cabinet-screen :where(p, h2, h3, li) {
   color: #e8d8b8;
 }
+/* cabCanvas.ts sets the size: the drawing's own shape, never a stretch. */
 .cabinet-screen canvas {
-  width: 94% !important;
-  height: 64vh !important;
-  max-height: none;
+  flex: none;
   margin: 8px auto;
   background: #2a1c14;
   border-color: #c4783a;
