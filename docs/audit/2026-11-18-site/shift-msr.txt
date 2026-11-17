@@ -1,0 +1,28 @@
+msr type clicked
+msr signed
+msr stuck 12  buttons 
+msr intro 12: 
+msr intro 18: 
+msr intro 24: 
+msr stuck 30  buttons 
+msr intro 30: 
+msr intro 36: 
+msr intro 42: 
+msr walked in
+msr-1280x720 cafe hud: 06:52 D1 MORNING LESS CRITICALITY CAFE HONEST Sit with Mabel. Don't rush the coffee. inPlay true
+msr-1280x720 mabel talk open after KeyW
+msr-1280x720 talk closed true
+msr-1280x720 after mabel: 06:54 D1 MORNING LESS CRITICALITY CAFE HONEST East to the lot, then east onto the floor. met true
+msr-1280x720 lot: true
+msr-1280x720 corridor: true
+msr-1280x720 control: true
+msr-1280x720 hall: true
+msr-1280x720 reactor control ranges 2
+msr-1280x720 site panel: Salt Pump 100% Plug frozen Salt level 100% β 0.0065 βeff 0.0036 Fission heat 100%
+msr-1280x720 event: Salt line cooling Line temperature falling toward the freeze point. That pipe's arrows slow. Heater tape should be on. Put the heat trace back on and keep the pump running. Let it 
+msr-1280x720 event-right: Held. Put the heat trace back on and keep the pump running.
+msr-1280x720 scram text: false
+msr-1280x720 clock before pace: 07:10 D1 MORNING LESS REACTOR HALL HONEST Control Room — Holt wants volume, not a speech.
+msr-1280x720 clock after 8s pace: 07:16 D1 MORNING LESS REACTOR HALL HONEST Control Room — Holt wants volume, not a speech.
+msr-1280x720 pageErrors 0
+msr-1280x720 404 0

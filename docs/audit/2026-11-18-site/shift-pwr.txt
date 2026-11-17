@@ -1,0 +1,29 @@
+pwr type clicked
+pwr signed
+pwr stuck 12  buttons 
+pwr intro 12: 
+pwr intro 18: 
+pwr intro 24: 
+pwr stuck 30  buttons 
+pwr intro 30: 
+pwr intro 36: 
+pwr intro 42: 
+pwr walked in
+pwr-1280x720 cafe hud: 06:52 D1 MORNING LESS CRITICALITY CAFE HONEST Sit with Mabel. Don't rush the coffee. inPlay true
+pwr-1280x720 mabel talk open after KeyW
+pwr-1280x720 talk closed true
+pwr-1280x720 after mabel: 06:54 D1 MORNING LESS CRITICALITY CAFE HONEST East to the lot, then east onto the floor. met true
+pwr-1280x720 looking for "Lot / Campus" room: CRITICALITY CAFE hud: 06:57 D1 MORNING LESS CRITICALITY CAFE HONEST East to the lot, then east onto the floor.
+pwr-1280x720 lot: true
+pwr-1280x720 corridor: true
+pwr-1280x720 control: true
+pwr-1280x720 hall: true
+pwr-1280x720 reactor control ranges 2
+pwr-1280x720 site panel: PWR Rods 62% out Flow 100% Power 62%
+pwr-1280x720 event: Pressurizer spray stuck open Pressure falling. Spray light stays on. Pressurizer spray line stays lit. Shut the spray valve by hand and watch saturation. Wait. Pressure keeps falli
+pwr-1280x720 event-right: Held. Shut the spray valve by hand and watch saturation.
+pwr-1280x720 scram text: true
+pwr-1280x720 clock before pace: 07:15 D1 MORNING LESS REACTOR HALL HONEST Control Room — Holt wants volume, not a speech.
+pwr-1280x720 clock after 8s pace: 07:21 D1 MORNING LESS REACTOR HALL HONEST Control Room — Holt wants volume, not a speech.
+pwr-1280x720 pageErrors 0
+pwr-1280x720 404 0

@@ -5,37 +5,37 @@
 [nitro:vercel] ℹ Using nodejs22.x runtime.
 [nitro:vercel] ℹ Using web entry format.
 vite v8.2.1 building client environment for production...
-[2Ktransforming...✓ 1994 modules transformed.
+[2Ktransforming...✓ 1999 modules transformed.
 rendering chunks...
 computing gzip size...
-.vercel/output/static/assets/styles-BztMQkbU.css   56.18 kB │ gzip:  11.60 kB
-.vercel/output/static/assets/login-DzUDYpYd.js      1.33 kB │ gzip:   0.69 kB
-.vercel/output/static/assets/client-Dvw0UZgm.js    31.66 kB │ gzip:  11.98 kB
-.vercel/output/static/assets/index-DbuoQXGG.js    402.72 kB │ gzip: 126.90 kB
-.vercel/output/static/assets/routes-sGKrpwrF.js   533.78 kB │ gzip: 166.89 kB
+.vercel/output/static/assets/styles-CQnzY0bY.css   56.41 kB │ gzip:  11.64 kB
+.vercel/output/static/assets/login-7l5o6hSr.js      1.33 kB │ gzip:   0.69 kB
+.vercel/output/static/assets/client-ColwJyrM.js    31.66 kB │ gzip:  11.98 kB
+.vercel/output/static/assets/index-C0T4cB61.js    402.72 kB │ gzip: 126.90 kB
+.vercel/output/static/assets/routes-Cq1FsDc7.js   554.83 kB │ gzip: 172.85 kB
 
-✓ built in 1.83s
+✓ built in 1.48s
 [plugin builtin:vite-reporter] 
 (!) Some chunks are larger than 500 kB after minification. Consider:
 - Using dynamic import() to code-split the application
 - Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
 - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
 vite v8.2.1 building ssr environment for production...
-[2Ktransforming...✓ 365 modules transformed.
+[2Ktransforming...✓ 370 modules transformed.
 rendering chunks...
 computing gzip size...
-node_modules/.nitro/vite/services/ssr/assets/styles-BztMQkbU.css                      56.18 kB │ gzip:  11.60 kB
+node_modules/.nitro/vite/services/ssr/assets/styles-CQnzY0bY.css                      56.41 kB │ gzip:  11.64 kB
 node_modules/.nitro/vite/services/ssr/assets/kysely-adapter-Cj_QZw5p.js                0.05 kB │ gzip:   0.07 kB
 node_modules/.nitro/vite/services/ssr/assets/start-5Z2QO8AU.js                         0.14 kB │ gzip:   0.13 kB
 node_modules/.nitro/vite/services/ssr/assets/empty-plugin-adapters-D9UWiqvJ.js         0.22 kB │ gzip:   0.16 kB
-node_modules/.nitro/vite/services/ssr/assets/_tanstack-start-manifest_v-D60INsC_.js    0.72 kB │ gzip:   0.35 kB
-node_modules/.nitro/vite/services/ssr/assets/login-BXEzXkkq.js                         1.74 kB │ gzip:   0.81 kB
-node_modules/.nitro/vite/services/ssr/assets/client-Cfe7KD6Y.js                       31.20 kB │ gzip:   9.45 kB
+node_modules/.nitro/vite/services/ssr/assets/_tanstack-start-manifest_v-Cao3ik5c.js    0.72 kB │ gzip:   0.35 kB
+node_modules/.nitro/vite/services/ssr/assets/login-K_IzKI0W.js                         1.74 kB │ gzip:   0.81 kB
+node_modules/.nitro/vite/services/ssr/assets/client-CaGNk1Xe.js                       31.20 kB │ gzip:   9.45 kB
 node_modules/.nitro/vite/services/ssr/index.js                                        70.33 kB │ gzip:  18.03 kB
-node_modules/.nitro/vite/services/ssr/assets/router-CP13PoBd.js                      368.27 kB │ gzip:  88.07 kB
-node_modules/.nitro/vite/services/ssr/assets/routes-CSW6DXrJ.js                      840.05 kB │ gzip: 218.06 kB
+node_modules/.nitro/vite/services/ssr/assets/router-qd_ocROz.js                      368.27 kB │ gzip:  88.07 kB
+node_modules/.nitro/vite/services/ssr/assets/routes-DqZcAsFo.js                      869.79 kB │ gzip: 225.59 kB
 
-✓ built in 674ms
+✓ built in 683ms
 
 [nitro] ◐ Building [Nitro] (preset: vercel, compatibility: 2026-11-17)
 [nitro] ✔ Generated public .vercel/output/static
@@ -48,11 +48,11 @@ computing gzip size...
 .vercel/output/functions/__server.func/_ssr/empty-plugin-adapters-D9UWiqvJ.mjs        0.23 kB │ gzip:   0.16 kB
 .vercel/output/functions/__server.func/_chunks/core.mjs                               0.25 kB │ gzip:   0.18 kB
 .vercel/output/functions/__server.func/_libs/zod.mjs                                  0.37 kB │ gzip:   0.22 kB
-.vercel/output/functions/__server.func/_tanstack-start-manifest_v-D60INsC_.mjs        0.77 kB │ gzip:   0.39 kB
+.vercel/output/functions/__server.func/_tanstack-start-manifest_v-Cao3ik5c.mjs        0.77 kB │ gzip:   0.38 kB
 .vercel/output/functions/__server.func/_chunks/ssr-renderer.mjs                       0.96 kB │ gzip:   0.49 kB
 .vercel/output/functions/__server.func/_libs/defu.mjs                                 1.41 kB │ gzip:   0.58 kB
 .vercel/output/functions/__server.func/_runtime.mjs                                   1.92 kB │ gzip:   0.87 kB
-.vercel/output/functions/__server.func/_ssr/login-BXEzXkkq.mjs                        2.01 kB │ gzip:   0.87 kB
+.vercel/output/functions/__server.func/_ssr/login-K_IzKI0W.mjs                        2.01 kB │ gzip:   0.87 kB
 .vercel/output/functions/__server.func/_libs/lucide-react.mjs                         3.57 kB │ gzip:   1.29 kB
 .vercel/output/functions/__server.func/_libs/better-auth__utils.mjs                   3.80 kB │ gzip:   1.31 kB
 .vercel/output/functions/__server.func/_libs/nanostores.mjs                           5.53 kB │ gzip:   1.80 kB
@@ -63,20 +63,20 @@ computing gzip size...
 .vercel/output/functions/__server.func/_libs/h3+rou3+srvx.mjs                        22.57 kB │ gzip:   6.12 kB
 .vercel/output/functions/__server.func/_libs/noble__hashes.mjs                       23.61 kB │ gzip:   7.86 kB
 .vercel/output/functions/__server.func/_libs/@tanstack/router-core+[...].mjs         29.60 kB │ gzip:   7.98 kB
-.vercel/output/functions/__server.func/_ssr/client-Cfe7KD6Y.mjs                      30.37 kB │ gzip:   9.41 kB
+.vercel/output/functions/__server.func/_ssr/client-CaGNk1Xe.mjs                      30.37 kB │ gzip:   9.41 kB
 .vercel/output/functions/__server.func/index.mjs                                     31.72 kB │ gzip:   9.92 kB
 .vercel/output/functions/__server.func/_libs/jose.mjs                                38.64 kB │ gzip:   8.60 kB
 .vercel/output/functions/__server.func/_libs/noble__ciphers.mjs                      46.58 kB │ gzip:  14.45 kB
 .vercel/output/functions/__server.func/_ssr/ssr.mjs                                  68.49 kB │ gzip:  17.91 kB
 .vercel/output/functions/__server.func/_libs/pg.mjs                                 148.64 kB │ gzip:  34.40 kB
-.vercel/output/functions/__server.func/_ssr/router-CP13PoBd.mjs                     362.76 kB │ gzip:  87.54 kB
+.vercel/output/functions/__server.func/_ssr/router-qd_ocROz.mjs                     362.76 kB │ gzip:  87.54 kB
 .vercel/output/functions/__server.func/_libs/@better-auth/kysely-adapter+[...].mjs  473.01 kB │ gzip:  78.51 kB
 .vercel/output/functions/__server.func/_libs/electric-sql__pglite.mjs               750.44 kB │ gzip: 153.04 kB
 .vercel/output/functions/__server.func/_libs/@tanstack/react-router+[...].mjs       778.17 kB │ gzip: 164.40 kB
 .vercel/output/functions/__server.func/_libs/@better-auth/core+[...].mjs            809.42 kB │ gzip: 159.87 kB
-.vercel/output/functions/__server.func/_ssr/routes-CSW6DXrJ.mjs                     868.96 kB │ gzip: 218.62 kB
+.vercel/output/functions/__server.func/_ssr/routes-DqZcAsFo.mjs                     899.13 kB │ gzip: 226.15 kB
 
-✓ built in 1.02s
+✓ built in 1.04s
 ℹ Generated .vercel/output/nitro.json
 
 [nitro] ✔ You can preview this build using npx vite preview
