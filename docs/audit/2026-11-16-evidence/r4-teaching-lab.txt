@@ -1,0 +1,17 @@
+TAP version 13
+# Subtest: full-core and depletion change k and the OpenMC letter
+ok 1 - full-core and depletion change k and the OpenMC letter
+  ---
+  duration_ms: 885.901139
+  type: 'test'
+  ...
+1..1
+# tests 1
+# suites 0
+# pass 1
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 947.845496
+R4_EXIT:0
