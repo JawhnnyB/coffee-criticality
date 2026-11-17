@@ -37,6 +37,8 @@ import { ReactorBuilder } from "./ReactorBuilder";
 import { FuelShuffle } from "./FuelShuffle";
 import { MaintGame } from "./MaintGame";
 import { Desktop } from "./Desktop";
+import { LakeScene } from "./LakeScene";
+import { seasonOrDefault, type Season } from "./parlorOS";
 import { maintenanceSteamOn } from "./steamRule";
 import { applyWorldKey, CABINET_MODES, getKeyOwner, setKeyOwner } from "./keyGate";
 import { BootLog, SetupScreen } from "./ParlorApps";
@@ -1110,7 +1112,7 @@ export function GameApp() {
 
       <div ref={wrapRef} className="relative min-h-0 flex-1">
         {!playing && !deskShown && !(ART.menu && (mode === "role" || mode === "intro" || mode === "brief")) && (
-          <MenuBackdrop />
+          <MenuBackdrop season={seasonOrDefault(s.setup.season)} />
         )}
 
         <canvas
@@ -2634,33 +2636,7 @@ function MiniMap({
   );
 }
 
-function MenuBackdrop({ scene, focus = "50% 50%", zoom = 1 }: { scene?: string; focus?: string; zoom?: number }) {
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const [reduce, setReduce] = useState(false);
-  const [live, setLive] = useState(false);
-  useEffect(() => {
-    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const sync = () => setReduce(mq.matches);
-    sync();
-    mq.addEventListener("change", sync);
-    return () => mq.removeEventListener("change", sync);
-  }, []);
-  useEffect(() => {
-    const v = videoRef.current;
-    if (!v || reduce) return;
-    const play = () => {
-      v.muted = true;
-      void v.play().catch(() => {});
-    };
-    play();
-    const unlock = () => play();
-    window.addEventListener("pointerdown", unlock, { once: true });
-    window.addEventListener("keydown", unlock, { once: true });
-    return () => {
-      window.removeEventListener("pointerdown", unlock);
-      window.removeEventListener("keydown", unlock);
-    };
-  }, [reduce]);
+function MenuBackdrop({ scene, focus = "50% 50%", zoom = 1, season = "fall" }: { scene?: string; focus?: string; zoom?: number; season?: Season }) {
   return (
     <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden bg-bg">
       {scene ? (
@@ -2672,31 +2648,7 @@ function MenuBackdrop({ scene, focus = "50% 50%", zoom = 1 }: { scene?: string; 
           style={{ objectPosition: focus, transform: `scale(${zoom})`, transformOrigin: focus }}
         />
       ) : (
-        <>
-          {(!live || reduce) && (
-            <img
-              src="/art/gen/stills/plate_lake.png?v=waveF"
-              alt=""
-              className="absolute inset-0 h-full w-full object-cover"
-            />
-          )}
-          {!reduce && (
-            <video
-              ref={videoRef}
-              className="absolute inset-0 h-full w-full object-cover"
-              autoPlay
-              loop
-              muted
-              playsInline
-              preload="auto"
-              poster="/art/menu-still.jpg"
-              onPlaying={() => setLive(true)}
-              onError={() => setLive(false)}
-            >
-              <source src="/art/menu-loop.mp4" type="video/mp4" />
-            </video>
-          )}
-        </>
+        <LakeScene season={season} testId="lake-backdrop" />
       )}
       <div className="absolute inset-0 bg-gradient-to-t from-bg/80 via-bg/25 to-bg/30" />
     </div>

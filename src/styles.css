@@ -823,6 +823,12 @@
   background: #b85c4a;
   box-shadow: 16px 0 0 #c9a227, 32px 0 0 #6b8f71;
 }
+/* Plates and stills are pixel art. Never smooth them when they are scaled. */
+img[src*="/art/gen/stills/"],
+video[poster*="/art/gen/stills/"] {
+  image-rendering: pixelated;
+}
+
 /* Inside a desktop window the window is the frame. The cabinet and the bench drop their own. */
 .desk-sim-body .cab-shell {
   padding: 0;

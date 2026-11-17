@@ -38,7 +38,7 @@ import {
 } from "./deskWindows";
 import { particleCount, makePool, stepPool, type Particle } from "./particles";
 import { setKeyOwner } from "./keyGate";
-import { WALL_NATIVE_H, WALL_NATIVE_W, paintWallpaper } from "./wallpaper";
+import { LakeScene } from "./LakeScene";
 import { AppBody, type AppCtx } from "./ParlorApps";
 import { AppGlyph } from "./icons/glyphs";
 import type { DesktopSave, GameState, Mode, ResultsSave } from "./sim";
@@ -287,7 +287,7 @@ export function Desktop(props: DesktopProps) {
         } as CSSProperties
       }
     >
-      <WallPaper season={season} />
+      <LakeScene season={season} testId="wallpaper" />
       <ParticleLayer kind={info.particle} active={shown && !d.reducedMotion} />
 
       {phone ? (
@@ -389,37 +389,6 @@ export function Desktop(props: DesktopProps) {
 }
 
 /* ---------------------------------------------------------------- pieces */
-
-function WallPaper({ season }: { season: Season }) {
-  const ref = useRef<HTMLCanvasElement>(null);
-  useEffect(() => {
-    const c = ref.current;
-    const host = c?.parentElement;
-    if (!c || !host) return;
-    const paint = () => {
-      // Layout size, not the on-screen box: the desk can be mid-transition when this runs.
-      const w = Math.max(1, host.clientWidth);
-      const hgt = Math.max(1, host.clientHeight);
-      // Whole-number scale: every painted pixel covers the same number of screen pixels.
-      const scale = Math.max(1, Math.round(Math.min(hgt / WALL_NATIVE_H, w / WALL_NATIVE_W)));
-      const nw = Math.ceil(w / scale);
-      const nh = Math.ceil(hgt / scale);
-      c.width = nw;
-      c.height = nh;
-      c.style.width = `${nw * scale}px`;
-      c.style.height = `${nh * scale}px`;
-      const g = c.getContext("2d");
-      if (!g) return;
-      g.imageSmoothingEnabled = false;
-      paintWallpaper(g, nw, nh, season);
-    };
-    paint();
-    const ro = new ResizeObserver(paint);
-    ro.observe(host);
-    return () => ro.disconnect();
-  }, [season]);
-  return <canvas ref={ref} aria-hidden data-testid="wallpaper" className="pointer-events-none absolute left-0 top-0" style={{ imageRendering: "pixelated" }} />;
-}
 
 /** One canvas, one pool, pixel squares. Paused when not shown. Empty under reduced motion. */
 function ParticleLayer({ kind, active }: { kind: "rain" | "heat" | "leaves" | "snow"; active: boolean }) {
