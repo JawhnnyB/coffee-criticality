@@ -1,0 +1,49 @@
+DSN
+Reactor Design
+ACA
+Academy
+MUS
+Music
+SET
+Settings
+Reactor Control
+_
+×
+
+PWR — this site · teaching only
+
+HOLD THE BAND
+COMPARE
+LEAVE
+CORE
+SG
+HOT 312C
+COLD 292C
+15.5 MPA
+HEAT
+RODS
+350
+285
+SIMPLIFIED TEACHING DRAWING.
+NOT A LICENSE.
+
+This is the plant you designed. Match flow to power. Hold the ΔT band. Teaching only.
+
+Power
+62 %
+T-hot
+311.8 °C
+T-cold
+292.0 °C
+ΔT
+19.8 °C
+
+Q = ṁ × cp × ΔT · 28–36 °C · hold 0.0 / 8 s
+
+Rods withdrawn 62%
+Primary flow 100%
+Start
+Reactor Control
+Fall
+SOUND ON
+6:52 AM

@@ -1,0 +1,40 @@
+TAP version 13
+# Subtest: default PWR design matches the type constant at the 62% seed
+ok 1 - default PWR design matches the type constant at the 62% seed
+  ---
+  duration_ms: 13.157367
+  type: 'test'
+  ...
+# Subtest: a non-default design ΔT is the bench's unit, not the type constant
+ok 2 - a non-default design ΔT is the bench's unit, not the type constant
+  ---
+  duration_ms: 0.42359
+  type: 'test'
+  ...
+# Subtest: a seeded roll reports generation k from pins toppled per roll
+ok 3 - a seeded roll reports generation k from pins toppled per roll
+  ---
+  duration_ms: 12.541789
+  type: 'test'
+  ...
+# Subtest: day 1 includes a valve board, and a seed repeats the five boards
+ok 4 - day 1 includes a valve board, and a seed repeats the five boards
+  ---
+  duration_ms: 2.660745
+  type: 'test'
+  ...
+# Subtest: 200 seeds hit every orange slot, and one seed stays on one slot
+ok 5 - 200 seeds hit every orange slot, and one seed stays on one slot
+  ---
+  duration_ms: 1.11851
+  type: 'test'
+  ...
+1..5
+# tests 5
+# suites 0
+# pass 5
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 628.749822

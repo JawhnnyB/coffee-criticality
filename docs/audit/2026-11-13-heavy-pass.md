@@ -11,7 +11,7 @@ Work tree `/root/work/coffee`. Branch `g/heavy-pass-1113`. Base `origin/c/walk-u
 | Node | v22.23.3 |
 | npm | 10.9.9 |
 | Install | `npm ci` was already present; not re-run this session |
-| Test runner | `ESBUILD=/tmp/esb/node_modules/.bin/esbuild npm test` (`node --test scripts/**/*.test.mjs`) |
+| Test runner | `ESBUILD=<local esbuild> npm test` (`node --test scripts/**/*.test.mjs`) |
 
 Commits on the branch, oldest first:
 
@@ -33,11 +33,11 @@ Result is PASS only when a test failed before the behaviour, passed after, and f
 
 | Task | Result | Failing output before | Passing output after | Mutation output | Artifact |
 |---|---|---|---|---|---|
-| A1 BOWL k | PASS | New test, module absent: `Could not resolve ".../bowlModel.ts"`. `# tests 1 / # pass 0 / # fail 1` (`/tmp/evidence/a1-before.txt`). The canvas formula `prevFalls > 0 ? falls / prevFalls : null` was already in `MoreGames.tsx` at `0d8e735` (lines 892–894). | This session: `node --test scripts/bowl-k.test.mjs` with the other three: `# tests 5 / # pass 5 / # fail 0`. | This session, `generationK` returned `1` when `prevFalls > 0`: `actual 1`, `expected 0.16666666666666666`. `# pass 0 / # fail 1`. Restored: `# pass 1 / # fail 0`. | `/tmp/cc-scratch/bowl-physics.mjs`. Screenshot `docs/audit/2026-11-13-bowl-1100.png`. |
+| A1 BOWL k | PASS | New test, module absent: `Could not resolve ".../bowlModel.ts"`. `# tests 1 / # pass 0 / # fail 1` (`docs/audit/evidence/9a51081/logs/a1-before.txt`). The canvas formula `prevFalls > 0 ? falls / prevFalls : null` was already in `MoreGames.tsx` at `0d8e735` (lines 892–894). | This session: `node --test scripts/bowl-k.test.mjs` with the other three: `# tests 5 / # pass 5 / # fail 0`. | This session, `generationK` returned `1` when `prevFalls > 0`: `actual 1`, `expected 0.16666666666666666`. `# pass 0 / # fail 1`. Restored: `# pass 1 / # fail 0`. | `docs/audit/evidence/9a51081/scratch/bowl-physics.mjs`. Screenshot `docs/audit/2026-11-13-bowl-1100.png`. |
 | A2 LOTOTO slot | PASS | Base code was `Math.floor(Math.random() * 9)`, not `const lie = 8`. New test, module absent: `Could not resolve ".../lototoSlot.ts"`. `# pass 0 / # fail 1`. | Same 5-test run: pass. `lieSlot(42) === 5`. 200 seeds cover slots 0–8. | `return 8`: `1 !== 9` (`seen.size` 1, expected 9). `# pass 0 / # fail 1`. Restored: `# pass 1 / # fail 0`. | `docs/audit/2026-11-13-lototo-1100.png`. Clock constant in `MaintGame.tsx` is still `CLOCK = 32`. Miss −2 s, wrong tag −4 s. Not edited. |
-| A3 bench reads the design | PASS | No `bench-plant` test existed on `0d8e735`. The behavioural fail is the mutation. | `scripts/bench-plant.test.mjs`: `# tests 2 / # pass 2 / # fail 0`. Default PWR `dT === (62/100)*32`. | `benchThermal` forced `DT_AT_UNIT[type]`: non-default design `actual 19.84`, `expected 29.759999999999998`. `# pass 1 / # fail 1`. Restored: `# pass 2 / # fail 0`. | `/tmp/cc-scratch/bench-dt.mjs`. DOM diff below. |
+| A3 bench reads the design | PASS | No `bench-plant` test existed on `0d8e735`. The behavioural fail is the mutation. | `scripts/bench-plant.test.mjs`: `# tests 2 / # pass 2 / # fail 0`. Default PWR `dT === (62/100)*32`. | `benchThermal` forced `DT_AT_UNIT[type]`: non-default design `actual 19.84`, `expected 29.759999999999998`. `# pass 1 / # fail 1`. Restored: `# pass 2 / # fail 0`. | `docs/audit/evidence/9a51081/scratch/bench-dt.mjs`. DOM diff below. |
 | A4 CATCH seed | PASS | Before `deckSignature` existed: `M.deckSignature is not a function`. `# pass 0 / # fail 1`. | `scripts/catch-deck.test.mjs`: `# pass 1 / # fail 0`. Day 1 first kind `valve`, length 5, seed 7 repeats, seed 8 differs. | `const first = makeGauge`: `'gauge' !== 'valve'`. `# pass 0 / # fail 1`. Restored: `# pass 1 / # fail 0`. | `git diff 0d8e735 HEAD -- src/game/sim.ts` is empty, so `finishArcade` is unchanged. |
-| A5 shuffle check | UNVERIFIED | No code change, so there is no fail-before. | `node --test scripts/shuffle-model.test.mjs`: `# tests 5 / # pass 5 / # fail 0`. | Not run. Changing the rule would be a retune. | `/tmp/cc-scratch/shuffle-rate.mjs` and `/tmp/game-shuffle-rate.mjs`. |
+| A5 shuffle check | UNVERIFIED | No code change, so there is no fail-before. | `node --test scripts/shuffle-model.test.mjs`: `# tests 5 / # pass 5 / # fail 0`. | Not run. Changing the rule would be a retune. | `docs/audit/evidence/9a51081/scratch/shuffle-rate.mjs` and `docs/audit/evidence/9a51081/game-shuffle-rate.mjs`. |
 | B1 title clip | UNVERIFIED | Measured, did not fail. Reactor Control title delta 10 px. Academy title delta 10 px. Fail line is < 8 px. No code change. | n/a | n/a | Screenshot title text: `REACTOR CONTROL`, `ACADEMY`. |
 | B2 body flush | PASS | On the build before `0cab308`, and on `bce0f9b`'s padding (the child is `position:absolute; inset:0`, so padding does not move it): direct-child delta **2**. Fail line is within 16 px. | After `0cab308`, direct child `[data-testid=window-inset]` delta **18**. `bottom` 664. `titleDelta` 10. `padding` removed. | Live DOM `left: 0px` measured delta **2**. Restored `left: 16px` measured delta **18**. | `docs/audit/2026-11-13-control-1100.png`. |
 | B3 window bottom | UNVERIFIED | Reactor window bottom **664** at 1100×720. Fail line is > 720. No code change. | n/a | n/a | Same control screenshot. The window sits above the taskbar. |
@@ -49,18 +49,18 @@ Result is PASS only when a test failed before the behaviour, passed after, and f
 
 ## 3. Baseline vs after
 
-Walk14, both widths. Command: `node scripts/walk14.mjs /tmp/walk14-final`. Result rows compared to `/tmp/walk14-base/walk14-table.md`: all 14 result cells identical.
+Walk14, both widths. Command: `node scripts/walk14.mjs docs/audit/evidence/9a51081/walk14-final`. Result rows compared to `docs/audit/evidence/9a51081/walk14-base/walk14-table.md`: all 14 result cells identical.
 
 | | pass | pending-owner | fail | page errors per width |
 |---|---|---|---|---|
-| Baseline `/tmp/walk14-base` | 11 | 3 (steps 2, 6, 13) | 0 | 1 |
-| After inset `/tmp/walk14-final` | 11 | 3 (steps 2, 6, 13) | 0 | 1 |
+| Baseline `docs/audit/evidence/9a51081/walk14-base` | 11 | 3 (steps 2, 6, 13) | 0 | 1 |
+| After inset `docs/audit/evidence/9a51081/walk14-final` | 11 | 3 (steps 2, 6, 13) | 0 | 1 |
 
 Step 9 after the inset, both widths: `Power 62.0% → 60.5%`, `flow 100% → 100%`, `Rods 62% → 52%`, `ΔT 19.8 → 19.3 °C`. Hold bar present. That arrow is the walk driver moving the rods. The untouched 62% readout is the DOM diff below.
 
 A boot of the after build recorded one page error: `Minified React error #419`. The walk driver prints the count, not the message. Both walks print count 1 per width.
 
-npm test. Baseline file `/tmp/baseline-npm-test.txt`: `# tests 197 / # pass 188 / # fail 9`. This session `/tmp/npm-test-head.txt`: `# tests 202 / # pass 193 / # fail 9`. Exit code 1 both times. The five extra tests are the new A1–A4 files (5 subtests). Failing names, same set both times:
+npm test. Baseline file `docs/audit/evidence/9a51081/baseline-npm-test.txt`: `# tests 197 / # pass 188 / # fail 9`. This session `docs/audit/evidence/9a51081/npm-test-head.txt`: `# tests 202 / # pass 193 / # fail 9`. Exit code 1 both times. The five extra tests are the new A1–A4 files (5 subtests). Failing names, same set both times:
 
 1. `scripts/cabinet-rewards.test.mjs` (`Cannot find package 'esbuild'`)
 2. `scripts/desk-verdict.test.mjs` (`Cannot find package 'esbuild'`)
@@ -76,7 +76,7 @@ npm test. Baseline file `/tmp/baseline-npm-test.txt`: `# tests 197 / # pass 188 
 
 tsc. `npx tsc --noEmit --pretty false` before the inset and after `0cab308`: exit 0, stdout 0 bytes, zero `error TS` codes.
 
-62% bench DOM. `diff -q /tmp/bench-62-before.txt /tmp/bench-62-after2.txt` printed nothing and exited 0 (byte-identical `document.body.innerText`). Readout lines in both files:
+62% bench DOM. `diff -q docs/audit/evidence/9a51081/bench-62-before.txt docs/audit/evidence/9a51081/bench-62-after2.txt` printed nothing and exited 0 (byte-identical `document.body.innerText`). Readout lines in both files:
 
 ```
 HOT 312C
@@ -99,9 +99,9 @@ The same strings are visible on `docs/audit/2026-11-13-control-1100.png`: `POWER
 
 ## 4. Independent recomputations
 
-These scripts do not import the game. `node` was run on the files under `/tmp/cc-scratch` and `/tmp/game-shuffle-rate.mjs`.
+These scripts do not import the game. `node` was run on the files under `docs/audit/evidence/9a51081/scratch` and `docs/audit/evidence/9a51081/game-shuffle-rate.mjs`.
 
-Bowl. `/tmp/cc-scratch/bowl-physics.mjs`. Inputs: aim −0.24 rad, power 1, dt 1/60 s, two rolls. Damping `exp(-0.4*dt)`, pin contact `d2 < 80`, chain `d2 < 70`. Output:
+Bowl. `docs/audit/evidence/9a51081/scratch/bowl-physics.mjs`. Inputs: aim −0.24 rad, power 1, dt 1/60 s, two rolls. Damping `exp(-0.4*dt)`, pin contact `d2 < 80`, chain `d2 < 70`. Output:
 
 ```
 {"falls":[6,1],"kFromCounts":[null,0.16666666666666666],"kCheck":0.16666666666666666}
@@ -109,7 +109,7 @@ Bowl. `/tmp/cc-scratch/bowl-physics.mjs`. Inputs: aim −0.24 rad, power 1, dt 1
 
 `k = 1/6` from the raw counts. The game test asserts the same falls and the same `k`. This roll is not a 10-pin strike.
 
-Bench. `/tmp/cc-scratch/bench-dt.mjs`. `dT = (powerPct / max(40, flowPct)) * unit`. Seed power 62, flow 100, PWR unit 32, cold leg 292.
+Bench. `docs/audit/evidence/9a51081/scratch/bench-dt.mjs`. `dT = (powerPct / max(40, flowPct)) * unit`. Seed power 62, flow 100, PWR unit 32, cold leg 292.
 
 ```
 {"base_dT_C":19.84,"base_dT_1dp":"19.8","tCold_C":292,"tHot_C":311.84,"tHot_1dp":"311.8","custom_dT_C":29.759999999999998}
@@ -119,13 +119,13 @@ DOM shows `19.8` and `311.8`. A design unit of 48 gives 29.76, which is the numb
 
 Shuffle. Rule in `src/game/shuffleModel.ts`: `FQ_MAX = 1.5`, `RIM_MAX = 0.5`, `MIN_SWAPS = 3`. `GROK_PHASES_1-4.md` says Fq under 1.50, rim share at most 50%, at least 3 swaps, and "about 73%".
 
-Independent `/tmp/cc-scratch/shuffle-rate.mjs`, 1000 LCG scatters, enrichment 4.5:
+Independent `docs/audit/evidence/9a51081/scratch/shuffle-rate.mjs`, 1000 LCG scatters, enrichment 4.5:
 
 ```
 {"pass":754,"rate":0.754,"bestFq":1.3186581984347094}
 ```
 
-Game module `/tmp/game-shuffle-rate.mjs`, same starts:
+Game module `docs/audit/evidence/9a51081/game-shuffle-rate.mjs`, same starts:
 
 ```
 {"pass":754,"rate":0.754,"bestFq":1.3186581984347094,"startFq":1.4690307462479049,"startRim":0.4138582996034509,"startSwaps":7,"fqMax":1.5,"rimMax":0.5,"minSwaps":3}
@@ -180,3 +180,5 @@ Not a merge blocker: the shuffle pass rate is 754/1000 (0.754) in both the indep
 ## 10. Closing line
 
 No new teaching prose, no region number, no NRC title, no headline.
+
+Frozen values were not changed in this pass. `const LAMBDA = 0.005` and `const N_MAX = 40` match main. A list outside this repo that still expects 0.055 is not evidence in the branch. D1 stays open.
