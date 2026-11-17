@@ -298,8 +298,10 @@ const FHR: PlantDrawing = {
 
 export const PLANTS: Record<CutawayKind, PlantDrawing> = { pwr: PWR, bwr: BWR, pebble: PEBBLE, msr: MSR, msfr: MSFR, fhr: FHR };
 
+export type SiteKind = "pwr" | "bwr" | "pebble" | "msr";
+
 /** The plant this site runs: the type picked in Reactor Design, or a PWR before one is picked. */
-export function siteKind(plant: { type: "pwr" | "bwr" | "pebble" | "msr" } | null | undefined): CutawayKind {
+export function siteKind(plant: { type: SiteKind } | null | undefined): SiteKind {
   return plant?.type ?? "pwr";
 }
 

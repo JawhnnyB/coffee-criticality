@@ -1,0 +1,23 @@
+pwr type clicked
+pwr signed
+pwr intro 12: 
+pwr intro 18: 
+pwr intro 24: 
+pwr intro 30: 
+pwr intro 36: 
+pwr intro 42: 
+pwr walked in
+pwr-1280x720 cafe hud: 06:52 D1 MORNING LESS CRITICALITY CAFE HONEST Sit with Mabel. Don't rush the coffee. inPlay true
+pwr-1280x720 lot: true
+pwr-1280x720 looking for "Main corridor" hud: 07:05 D1 MORNING LESS LOT / CAMPUS HONEST Sit with Mabel. Don't rush the coffee.
+pwr-1280x720 corridor: false
+pwr-1280x720 looking for "Control room" hud: 07:07 D1 MORNING LESS LOT / CAMPUS HONEST Sit with Mabel. Don't rush the coffee.
+pwr-1280x720 control: false
+pwr-1280x720 looking for "Reactor hall" hud: 07:09 D1 MORNING LESS LOT / CAMPUS HONEST Sit with Mabel. Don't rush the coffee.
+pwr-1280x720 hall: false
+pwr-1280x720 reactor control ranges 2
+pwr-1280x720 scram text: true
+pwr-1280x720 clock before pace: 07:10 D1 MORNING LESS LOT / CAMPUS HONEST Sit with Mabel. Don't rush the coffee.
+pwr-1280x720 clock after 8s pace: 07:13 D1 MORNING LESS LOT / CAMPUS HONEST Sit with Mabel. Don't rush the coffee.
+pwr-1280x720 pageErrors 0
+pwr-1280x720 404 0
