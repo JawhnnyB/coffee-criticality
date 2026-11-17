@@ -1,0 +1,84 @@
+
+> build
+> vite build && npm run db:migrate
+
+[nitro:vercel] ℹ Using nodejs22.x runtime.
+[nitro:vercel] ℹ Using web entry format.
+vite v8.2.1 building client environment for production...
+[2Ktransforming...✓ 1987 modules transformed.
+rendering chunks...
+computing gzip size...
+.vercel/output/static/assets/styles-BKdWbGmJ.css   54.83 kB │ gzip:  11.26 kB
+.vercel/output/static/assets/login-DM44mIGz.js      1.33 kB │ gzip:   0.69 kB
+.vercel/output/static/assets/client-C14-KQ8E.js    31.66 kB │ gzip:  11.98 kB
+.vercel/output/static/assets/index-D9eG7E0c.js    402.72 kB │ gzip: 126.90 kB
+.vercel/output/static/assets/routes-CqLN1XlA.js   492.18 kB │ gzip: 152.06 kB
+
+✓ built in 1.46s
+vite v8.2.1 building ssr environment for production...
+[2Ktransforming...✓ 358 modules transformed.
+rendering chunks...
+computing gzip size...
+node_modules/.nitro/vite/services/ssr/assets/styles-BKdWbGmJ.css                      54.83 kB │ gzip:  11.26 kB
+node_modules/.nitro/vite/services/ssr/assets/kysely-adapter-Cj_QZw5p.js                0.05 kB │ gzip:   0.07 kB
+node_modules/.nitro/vite/services/ssr/assets/start-CthT1bk4.js                         0.17 kB │ gzip:   0.14 kB
+node_modules/.nitro/vite/services/ssr/assets/empty-plugin-adapters-Cr1JkUGc.js         0.24 kB │ gzip:   0.17 kB
+node_modules/.nitro/vite/services/ssr/assets/_tanstack-start-manifest_v-DSNb1SuI.js    0.72 kB │ gzip:   0.36 kB
+node_modules/.nitro/vite/services/ssr/assets/login-BjOvOKb8.js                         1.74 kB │ gzip:   0.81 kB
+node_modules/.nitro/vite/services/ssr/assets/client-CFWhP69o.js                       31.52 kB │ gzip:   9.47 kB
+node_modules/.nitro/vite/services/ssr/index.js                                        70.86 kB │ gzip:  18.06 kB
+node_modules/.nitro/vite/services/ssr/assets/router-B6wmphls.js                      369.72 kB │ gzip:  88.12 kB
+node_modules/.nitro/vite/services/ssr/assets/routes-CS_STsmU.js                      759.92 kB │ gzip: 195.76 kB
+
+✓ built in 629ms
+
+[nitro] ◐ Building [Nitro] (preset: vercel, compatibility: 2026-11-17)
+[nitro] ✔ Generated public .vercel/output/static
+vite v8.2.1 building nitro environment for production...
+[2Ktransforming...✓ 2409 modules transformed.
+rendering chunks...
+computing gzip size...
+.vercel/output/functions/__server.func/_ssr/kysely-adapter-Cj_QZw5p.mjs               0.15 kB │ gzip:   0.12 kB
+.vercel/output/functions/__server.func/_ssr/start-CthT1bk4.mjs                        0.16 kB │ gzip:   0.14 kB
+.vercel/output/functions/__server.func/_chunks/core.mjs                               0.25 kB │ gzip:   0.18 kB
+.vercel/output/functions/__server.func/_ssr/empty-plugin-adapters-Cr1JkUGc.mjs        0.25 kB │ gzip:   0.18 kB
+.vercel/output/functions/__server.func/_libs/zod.mjs                                  0.39 kB │ gzip:   0.24 kB
+.vercel/output/functions/__server.func/_tanstack-start-manifest_v-DSNb1SuI.mjs        0.80 kB │ gzip:   0.41 kB
+.vercel/output/functions/__server.func/_chunks/ssr-renderer.mjs                       1.01 kB │ gzip:   0.50 kB
+.vercel/output/functions/__server.func/_libs/defu.mjs                                 1.43 kB │ gzip:   0.60 kB
+.vercel/output/functions/__server.func/_runtime.mjs                                   1.92 kB │ gzip:   0.87 kB
+.vercel/output/functions/__server.func/_ssr/login-BjOvOKb8.mjs                        2.03 kB │ gzip:   0.89 kB
+.vercel/output/functions/__server.func/_libs/lucide-react.mjs                         3.66 kB │ gzip:   1.31 kB
+.vercel/output/functions/__server.func/_libs/better-auth__utils.mjs                   3.89 kB │ gzip:   1.33 kB
+.vercel/output/functions/__server.func/_libs/nanostores.mjs                           5.62 kB │ gzip:   1.82 kB
+.vercel/output/functions/__server.func/_libs/tanstack__history.mjs                   12.52 kB │ gzip:   3.72 kB
+.vercel/output/functions/__server.func/_libs/better-auth__memory-adapter.mjs         14.74 kB │ gzip:   4.14 kB
+.vercel/output/functions/__server.func/_libs/@better-auth/telemetry+[...].mjs        17.60 kB │ gzip:   4.92 kB
+.vercel/output/functions/__server.func/_libs/h3-v2+rou3.mjs                          17.63 kB │ gzip:   5.18 kB
+.vercel/output/functions/__server.func/_libs/h3+rou3+srvx.mjs                        22.66 kB │ gzip:   6.14 kB
+.vercel/output/functions/__server.func/_libs/noble__hashes.mjs                       23.75 kB │ gzip:   7.88 kB
+.vercel/output/functions/__server.func/_libs/@tanstack/router-core+[...].mjs         29.95 kB │ gzip:   8.00 kB
+.vercel/output/functions/__server.func/_ssr/client-CFWhP69o.mjs                      30.39 kB │ gzip:   9.43 kB
+.vercel/output/functions/__server.func/index.mjs                                     31.84 kB │ gzip:   9.94 kB
+.vercel/output/functions/__server.func/_libs/jose.mjs                                38.98 kB │ gzip:   8.63 kB
+.vercel/output/functions/__server.func/_libs/noble__ciphers.mjs                      46.67 kB │ gzip:  14.47 kB
+.vercel/output/functions/__server.func/_ssr/ssr.mjs                                  68.51 kB │ gzip:  17.93 kB
+.vercel/output/functions/__server.func/_libs/pg.mjs                                 149.56 kB │ gzip:  34.44 kB
+.vercel/output/functions/__server.func/_ssr/router-B6wmphls.mjs                     362.78 kB │ gzip:  87.56 kB
+.vercel/output/functions/__server.func/_libs/@better-auth/kysely-adapter+[...].mjs  478.23 kB │ gzip:  78.65 kB
+.vercel/output/functions/__server.func/_libs/electric-sql__pglite.mjs               750.67 kB │ gzip: 153.08 kB
+.vercel/output/functions/__server.func/_libs/@tanstack/react-router+[...].mjs       779.85 kB │ gzip: 164.51 kB
+.vercel/output/functions/__server.func/_ssr/routes-CS_STsmU.mjs                     788.76 kB │ gzip: 196.34 kB
+.vercel/output/functions/__server.func/_libs/@better-auth/core+[...].mjs            812.69 kB │ gzip: 160.02 kB
+
+✓ built in 981ms
+ℹ Generated .vercel/output/nitro.json
+
+[nitro] ✔ You can preview this build using npx vite preview
+[nitro] ✔ You can deploy this build using npx nitro deploy --prebuilt
+
+> db:migrate
+> node scripts/migrate.mjs
+
+[migrate] DATABASE_URL not set — skipping (the PGLite fallback migrates itself).
+BUILD_EXIT:0

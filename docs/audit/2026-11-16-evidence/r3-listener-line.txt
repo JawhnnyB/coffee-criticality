@@ -1,0 +1,9 @@
+250:    const keys = keysRef.current;
+251:    const edges = edgesRef.current;
+252:
+253:    const down = (e: KeyboardEvent) => {
+254:      applyWorldKey(e, modeRef.current, keys, edges, GAME_CODES);
+255:    };
+256:    const up = (e: KeyboardEvent) => keys.delete(e.code);
+257:    const clear = () => keys.clear();
+258:    window.addEventListener("keydown", down);
