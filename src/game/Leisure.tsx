@@ -2,6 +2,7 @@
 
 import { cabContext, cabFont } from "./cabCanvas";
 import { useEffect, useRef, useState } from "react";
+import { PAL } from "./palette";
 import { Bezel } from "./Arcade";
 
 const FISH = [
@@ -225,6 +226,88 @@ function neighbors(i: number) {
   return out;
 }
 
+const PLOT_TILE = 16;
+const PLOT_SCALE = 6;
+
+/**
+ * One bed of the plot, drawn on a 16 by 16 grid: soil, a seed, a sprout that droops when dry,
+ * a ripe plant, and the pest. The word for the state stays on the button for screen readers.
+ */
+function PlotTile({ cell }: { cell: Cell }) {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const state = cell.pest ? (cell.walk > 0.45 ? 5 : 4) : cell.stage === 2 ? (cell.wet > 0.2 ? 2 : 6) : cell.stage;
+  useEffect(() => {
+    const g = ref.current?.getContext("2d");
+    if (!g) return;
+    const px = (x: number, y: number, w: number, h: number, c: string) => {
+      g.fillStyle = c;
+      g.fillRect(x, y, w, h);
+    };
+    const wet = state === 2;
+    // Soil: furrows, darker when watered.
+    px(0, 0, 16, 16, wet ? PAL.woodDark : PAL.woodMid);
+    for (let y = 2; y < 16; y += 4) px(0, y, 16, 1, wet ? PAL.outline : PAL.woodDark);
+    for (let i = 0; i < 6; i++) px((i * 7 + 3) % 15, (i * 5 + 1) % 15, 1, 1, wet ? PAL.steelD : PAL.wood);
+    if (state === 1) {
+      px(7, 9, 2, 2, PAL.creamD);
+      px(7, 9, 1, 1, PAL.cream);
+      px(6, 11, 4, 1, PAL.woodDark);
+    }
+    if (state === 2) {
+      px(7, 6, 2, 7, PAL.leafD);
+      px(4, 6, 3, 2, PAL.leaf);
+      px(9, 4, 3, 2, PAL.leaf);
+      px(5, 5, 1, 1, PAL.leafL);
+      px(10, 3, 1, 1, PAL.leafL);
+      px(2, 13, 2, 1, PAL.sky);
+      px(12, 12, 2, 1, PAL.sky);
+    }
+    if (state === 6) {
+      px(7, 8, 2, 5, PAL.goldD);
+      px(4, 9, 3, 2, PAL.gold);
+      px(9, 8, 3, 2, PAL.gold);
+      px(3, 11, 1, 1, PAL.goldD);
+      px(12, 10, 1, 1, PAL.goldD);
+    }
+    if (state === 3) {
+      px(7, 5, 2, 9, PAL.leafD);
+      px(3, 8, 4, 2, PAL.leaf);
+      px(9, 7, 4, 2, PAL.leaf);
+      px(4, 11, 3, 2, PAL.leaf);
+      px(9, 11, 3, 2, PAL.leaf);
+      px(5, 2, 6, 5, PAL.bad);
+      px(6, 1, 4, 1, PAL.bad);
+      px(6, 3, 2, 2, PAL.copperL);
+      px(7, 0, 2, 2, PAL.leafD);
+      px(5, 6, 6, 1, PAL.badD);
+    }
+    if (state === 4 || state === 5) {
+      const dx = state === 5 ? 2 : 0;
+      px(4 + dx, 6, 8, 6, PAL.outline);
+      px(5 + dx, 5, 6, 1, PAL.outline);
+      px(5 + dx, 7, 6, 4, PAL.wine);
+      px(6 + dx, 7, 1, 4, PAL.bad);
+      px(9 + dx, 7, 1, 4, PAL.bad);
+      px(11 + dx, 7, 2, 2, PAL.outline);
+      px(12 + dx, 7, 1, 1, PAL.cream);
+      px(4 + dx, 12, 1, 2, PAL.outline);
+      px(7 + dx, 12, 1, 2, PAL.outline);
+      px(10 + dx, 12, 1, 2, PAL.outline);
+      px(12 + dx, 4, 1, 2, PAL.outline);
+      if (state === 5) px(1, 8, 2, 1, PAL.cream);
+    }
+  }, [state]);
+  return (
+    <canvas
+      ref={ref}
+      width={PLOT_TILE}
+      height={PLOT_TILE}
+      aria-hidden
+      style={{ width: PLOT_TILE * PLOT_SCALE, height: PLOT_TILE * PLOT_SCALE, imageRendering: "pixelated", display: "block", margin: 0, border: 0 }}
+    />
+  );
+}
+
 export function PlotGame({ onDone, onAbort }: { onDone: (score: number) => void; onAbort: () => void }) {
   const [grid, setGrid] = useState<Cell[]>(freshPlot);
   const [cut, setCut] = useState(0);
@@ -350,12 +433,12 @@ export function PlotGame({ onDone, onAbort }: { onDone: (score: number) => void;
             key={i}
             type="button"
             onClick={() => tap(i)}
-            className="flex h-16 items-center justify-center border border-[#3a2818] font-mono text-xs text-[#f3e6d0]"
-            style={{
-              background: c.pest ? "#5a2018" : c.stage === 0 ? "#4a3424" : c.stage === 1 ? "#3a2818" : c.stage === 2 ? (c.wet > 0.2 ? "#2a4a30" : "#3a3820") : "#6b8f71",
-            }}
+            aria-label={label(c)}
+            data-plot={label(c)}
+            className="block border-2 border-[#1a1410] p-0"
+            style={{ width: PLOT_TILE * PLOT_SCALE + 4, height: PLOT_TILE * PLOT_SCALE + 4, background: "#3a2818" }}
           >
-            {label(c)}
+            <PlotTile cell={c} />
           </button>
         ))}
       </div>
