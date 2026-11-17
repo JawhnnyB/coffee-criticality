@@ -1,0 +1,28 @@
+bwr type clicked
+bwr signed
+bwr stuck 12  buttons 
+bwr intro 12: 
+bwr intro 18: 
+bwr intro 24: 
+bwr stuck 30  buttons 
+bwr intro 30: 
+bwr intro 36: 
+bwr intro 42: 
+bwr walked in
+bwr-1280x720 cafe hud: 06:52 D1 MORNING LESS CRITICALITY CAFE HONEST Sit with Mabel. Don't rush the coffee. inPlay true
+bwr-1280x720 mabel talk open after KeyW
+bwr-1280x720 talk closed true
+bwr-1280x720 after mabel: 06:54 D1 MORNING LESS CRITICALITY CAFE HONEST East to the lot, then east onto the floor. met true
+bwr-1280x720 lot: true
+bwr-1280x720 corridor: true
+bwr-1280x720 control: true
+bwr-1280x720 hall: true
+bwr-1280x720 reactor control ranges 2
+bwr-1280x720 site panel: Recirc Recirc 100% Rods from below 62% out Power 75%
+bwr-1280x720 event: Recirc pump trip Recirc flow down. Power down with the voids. Recirc arrows stop. The core port dulls. Leave the rods. Let the lower flow set the lower power. Pull rods to get the 
+bwr-1280x720 event-right: Held. Leave the rods. Let the lower flow set the lower power.
+bwr-1280x720 scram text: false
+bwr-1280x720 clock before pace: 07:10 D1 MORNING LESS REACTOR HALL HONEST Control Room — Holt wants volume, not a speech.
+bwr-1280x720 clock after 8s pace: 07:16 D1 MORNING LESS REACTOR HALL HONEST Control Room — Holt wants volume, not a speech.
+bwr-1280x720 pageErrors 0
+bwr-1280x720 404 0

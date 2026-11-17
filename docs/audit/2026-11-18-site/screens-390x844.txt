@@ -1,0 +1,25 @@
+screens-390x844 title pixel-menu
+screens-390x844 title settings sheet
+screens-390x844 how to play
+screens-390x844 credits
+screens-390x844 setup region Pending verification
+screens-390x844 signed
+screens-390x844 walked in
+screens-390x844 pause map
+screens-390x844 pause academy: UNIT 1 · PRIYA · 1/22 · 0 read · teaching only Culture Heat Safety Physics Fuel Tier 1 Tier 2 Tier 3 JUST CULTURE Recommended for you Heat has to leave Not in t
+screens-390x844 desktop phone-home true
+screens-390x844 app settings opened marker settings-app 1
+screens-390x844 app music opened marker music-app 1
+screens-390x844 app news opened marker app-news 1
+screens-390x844 app radiation opened marker app-radiation 1
+screens-390x844 app nrc opened marker app-nrc 1
+screens-390x844 app results opened marker app-results 1
+screens-390x844 app coremap opened marker app-coremap 1
+screens-390x844 app cam opened marker app-cam 1
+screens-390x844 app academy opened marker academy-stage 1
+screens-390x844 app control opened marker site-panel 1
+screens-390x844 app design opened marker design-edit 1
+screens-390x844 type-locked count 1 text Unit 1 is built. The type stays.
+screens-390x844 BWR button disabled true after click lock Unit 1 is built. The type stays. site PWR — this site CRDMs on top. Liquid primary ~16 MPa. Steam generator. Pressurizer.
+screens-390x844 pageErrors 0
+screens-390x844 404 0

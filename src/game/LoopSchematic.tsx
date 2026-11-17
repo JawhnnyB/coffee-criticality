@@ -1,12 +1,27 @@
 "use client";
 
-/** Classroom PWR primary loop. Labels are the teaching. Not a license. */
-export function LoopSchematic({ hot = true }: { hot?: boolean }) {
+import { PlantCutaway } from "./PlantCutaway";
+import type { SiteKind } from "./plantLoops";
+import { siteLine } from "./siteText";
+
+/** The site's primary loop. PWR keeps the labeled teaching drawing. The other three show their own cutaway. */
+export function LoopSchematic({ hot = true, kind = "pwr" }: { hot?: boolean; kind?: SiteKind }) {
+  if (kind !== "pwr") {
+    return (
+      <div className="rounded-md border border-[#c4783a]/60 bg-[#2a2218] p-2" data-testid="loop-schematic">
+        <p className="font-mono text-[10px] tracking-widest text-good">{siteLine(kind, "loopHeader")}</p>
+        <PlantCutaway kind={kind} hot={hot} fit="contain" className="mt-1 h-[140px] w-full bg-[#16110d]" />
+        <p className="mt-2 text-sm leading-relaxed" style={{ color: "#f3e6d0" }}>
+          {siteLine(kind, "loopCaption")}
+        </p>
+      </div>
+    );
+  }
   const core = hot ? "#2a86a0" : "#8a9088";
   const glow = hot ? "#7ec8d8" : "#c8c4b8";
   return (
     <div className="rounded-md border border-[#c4783a]/60 bg-[#2a2218] p-2" data-testid="loop-schematic">
-      <p className="font-mono text-[10px] tracking-widest text-good">PRIMARY LOOP  ·  this site  ·  teaching only</p>
+      <p className="font-mono text-[10px] tracking-widest text-good">{siteLine("pwr", "loopHeader")}</p>
       <svg viewBox="0 0 320 100" className="mt-1 h-[100px] w-full" aria-hidden>
         <rect x="8" y="10" width="70" height="72" rx="6" fill="#3d5c66" stroke="#1a1410" strokeWidth="3" />
         <rect x="14" y="14" width="58" height="64" rx="4" fill="none" stroke="#1a2830" strokeWidth="2" />
@@ -38,7 +53,7 @@ export function LoopSchematic({ hot = true }: { hot?: boolean }) {
         <path d="M78 72 V34" stroke="#3d5c66" strokeWidth="3" fill="none" />
       </svg>
       <p className="mt-2 text-sm leading-relaxed" style={{ color: "#f3e6d0" }}>
-        Vessel. Core. Hot leg. SG. PZR. RCP. Cold leg · downcomer. Q = ṁ × cp × ΔT. ~16 MPa liquid. CRDM from above. Not a license.
+        {siteLine("pwr", "loopCaption")}
       </p>
     </div>
   );

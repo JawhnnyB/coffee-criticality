@@ -1,4 +1,6 @@
 /** Pillar F — the plant has a voice. Web Audio only. No sample library. */
+import { hallDistance, hallTone, type HallTone } from "./siteAudio";
+import type { SiteKind } from "./plantLoops";
 
 export type BedKind = "cafe" | "plant" | "menu" | "lot";
 export type FootKind = "wood" | "stone" | "grass" | "asphalt" | "metal" | "curb" | "stripe" | "water";
@@ -46,6 +48,12 @@ let steamGain: GainNode | null = null;
 let steamSrc: AudioBufferSourceNode | null = null;
 let coreOsc: OscillatorNode | null = null;
 let coreGain: GainNode | null = null;
+let hallHum: OscillatorNode | null = null;
+let hallHumGain: GainNode | null = null;
+let hallHiss: AudioBufferSourceNode | null = null;
+let hallHissFilter: BiquadFilterNode | null = null;
+let hallHissGain: GainNode | null = null;
+let hallTickAcc = 0;
 
 function ac() {
   if (ctx) return ctx;
@@ -424,6 +432,10 @@ export function syncWorld(w: {
   mode: string;
   valveSteam: boolean;
   dt: number;
+  site?: SiteKind;
+  power?: number;
+  scram?: boolean;
+  soundOn?: boolean;
 }) {
   if (!ctx && !gesturing) return;
   const c = ac();
@@ -452,6 +464,56 @@ export function syncWorld(w: {
     }
   } else {
     kettleAcc = 0;
+  }
+  const tone = hallTone(w.site ?? "pwr", w.power ?? 0, !!w.scram, hallDistance(w.room), w.soundOn !== false && !muted);
+  applyHall(tone, w.dt);
+}
+
+function applyHall(tone: HallTone, dt: number) {
+  const { c, music: dest } = bus();
+  if (!hallHum || !hallHumGain) {
+    const o = c.createOscillator();
+    const g = c.createGain();
+    o.type = "sine";
+    o.frequency.value = 55;
+    g.gain.value = 0.0001;
+    o.connect(g);
+    g.connect(dest);
+    o.start();
+    hallHum = o;
+    hallHumGain = g;
+  }
+  if (!hallHiss || !hallHissGain || !hallHissFilter) {
+    const src = c.createBufferSource();
+    src.buffer = noiseBuf();
+    src.loop = true;
+    const hp = c.createBiquadFilter();
+    hp.type = "bandpass";
+    hp.frequency.value = 1200;
+    hp.Q.value = 0.7;
+    const g = c.createGain();
+    g.gain.value = 0.0001;
+    src.connect(hp);
+    hp.connect(g);
+    g.connect(dest);
+    src.start();
+    hallHiss = src;
+    hallHissFilter = hp;
+    hallHissGain = g;
+  }
+  const gain = muted ? 0 : tone.gain;
+  hallHum.frequency.setTargetAtTime(Math.max(30, tone.humHz || 42), c.currentTime, 0.2);
+  hallHumGain.gain.setTargetAtTime(Math.max(0.0001, gain), c.currentTime, 0.15);
+  if (tone.hissHz > 0) hallHissFilter.frequency.setTargetAtTime(tone.hissHz, c.currentTime, 0.2);
+  hallHissGain.gain.setTargetAtTime(tone.hissHz > 0 ? Math.max(0.0001, gain * 0.45) : 0.0001, c.currentTime, 0.15);
+  if (tone.tickHz > 0 && gain > 0.001) {
+    hallTickAcc += dt;
+    if (hallTickAcc >= 1 / tone.tickHz) {
+      hallTickAcc = 0;
+      burst(880, 0.03, Math.min(0.02, gain), "square");
+    }
+  } else {
+    hallTickAcc = 0;
   }
 }
 

@@ -1,0 +1,29 @@
+bwr type clicked
+bwr signed
+bwr stuck 12  buttons 
+bwr intro 12: 
+bwr intro 18: 
+bwr intro 24: 
+bwr stuck 30  buttons 
+bwr intro 30: 
+bwr intro 36: 
+bwr intro 42: 
+bwr walked in
+bwr-390x844 cafe hud: 06:52 D1 MORNING MORE CRITICALITY CAFE inPlay true
+bwr-390x844 mabel talk open after KeyW
+bwr-390x844 talk closed true
+bwr-390x844 after mabel: 06:54 D1 MORNING MORE CRITICALITY CAFE met true
+bwr-390x844 looking for "Lot / Campus" room: CRITICALITY CAFE hud: 06:57 D1 MORNING MORE CRITICALITY CAFE
+bwr-390x844 lot: true
+bwr-390x844 corridor: true
+bwr-390x844 control: true
+bwr-390x844 hall: true
+bwr-390x844 reactor control ranges 2
+bwr-390x844 site panel: Recirc Recirc 100% Rods from below 62% out Power 75%
+bwr-390x844 event: Feedwater heater out Feedwater colder. Power wants to rise. Feedwater line still moves. No new leak mark. Drop recirc or insert rods until power is back in the band. Do nothing. Co
+bwr-390x844 event-wrong: Worse. Do nothing. Colder feed keeps adding reactivity.
+bwr-390x844 scram text: false
+bwr-390x844 clock before pace: 07:14 D1 MORNING MORE REACTOR HALL
+bwr-390x844 clock after 8s pace: 07:16 D1 MORNING MORE REACTOR HALL
+bwr-390x844 pageErrors 0
+bwr-390x844 404 0

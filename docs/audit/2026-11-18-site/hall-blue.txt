@@ -1,0 +1,38 @@
+Pixel counts on the real-input stills. Distance is the max channel difference from the palette hex.
+
+Cherenkov hexes in palette.ts: #1e4fa0, #2f86e0, #8cd2fa.
+"within24" counts pixels within 24 of one of those three.
+"strongblue" counts pixels with b>r+50, b>g+30, and b>140. That set includes scaled sight-glass pixels and the browser's range-input chrome. It is not a Cherenkov count.
+
+Hall stills, full image, within24 of the three hexes: 0 on pwr, bwr, pebble, and msr, at both 1280x720 and 390x844.
+
+PWR and BWR halls only: a sight-glass disc. On the 1280 stills it is 1616 pixels of exactly (47, 127, 193), box [712, 252, 763, 303]. That color is 31 away from #2f86e0, so it misses the within24 count. It is the water-plant port (hallPlant.ts port(), glow uses PAL.cherenkov) after the screenshot scales the canvas. Pebble and MSR halls have 0 strongblue pixels.
+
+Reactor Control stills, before the slider move: PWR and BWR cutaways have pixels within24 of the Cherenkov hexes (the water core). Pebble and MSR cutaways have 0 within24. The strongblue pixels on the pebble and salt panels are (58, 120, 192) and (74, 160, 200), in the slider band, not in the vessel. Those two colors are not in palette.ts.
+
+PWR reactor-after (scram text true in shift-pwr.txt): 0 pixels within24 of the Cherenkov hexes. The strongblue pixels left on that still sit in a header band, y 129–161, color (74, 160, 200).
+
+bwr-1280x720-hall.png 1280x720 cherenkovD/C/L within24 0/0/0 strongblue 1616
+bwr-1280x720-reactor-after.png 1280x720 cherenkovD/C/L within24 0/0/0 strongblue 2952
+bwr-1280x720-reactor-control.png 1280x720 cherenkovD/C/L within24 392/530/70 strongblue 3602
+bwr-390x844-hall.png 390x844 cherenkovD/C/L within24 0/0/0 strongblue 412
+bwr-390x844-reactor-after.png 390x844 cherenkovD/C/L within24 0/0/0 strongblue 0
+bwr-390x844-reactor-control.png 390x844 cherenkovD/C/L within24 395/532/67 strongblue 2154
+msr-1280x720-hall.png 1280x720 cherenkovD/C/L within24 0/0/0 strongblue 0
+msr-1280x720-reactor-after.png 1280x720 cherenkovD/C/L within24 0/0/0 strongblue 0
+msr-1280x720-reactor-control.png 1280x720 cherenkovD/C/L within24 0/0/0 strongblue 1215
+msr-390x844-hall.png 390x844 cherenkovD/C/L within24 0/0/0 strongblue 0
+msr-390x844-reactor-after.png 390x844 cherenkovD/C/L within24 0/0/0 strongblue 0
+msr-390x844-reactor-control.png 390x844 cherenkovD/C/L within24 0/0/0 strongblue 540
+pebble-1280x720-hall.png 1280x720 cherenkovD/C/L within24 0/0/0 strongblue 0
+pebble-1280x720-reactor-after.png 1280x720 cherenkovD/C/L within24 0/0/0 strongblue 0
+pebble-1280x720-reactor-control.png 1280x720 cherenkovD/C/L within24 0/0/0 strongblue 6840
+pebble-390x844-hall.png 390x844 cherenkovD/C/L within24 0/0/0 strongblue 0
+pebble-390x844-reactor-after.png 390x844 cherenkovD/C/L within24 0/0/0 strongblue 0
+pebble-390x844-reactor-control.png 390x844 cherenkovD/C/L within24 0/0/0 strongblue 3040
+pwr-1280x720-hall.png 1280x720 cherenkovD/C/L within24 0/0/0 strongblue 1616
+pwr-1280x720-reactor-after.png 1280x720 cherenkovD/C/L within24 0/0/0 strongblue 1251
+pwr-1280x720-reactor-control.png 1280x720 cherenkovD/C/L within24 343/458/50 strongblue 2102
+pwr-390x844-hall.png 390x844 cherenkovD/C/L within24 0/0/0 strongblue 408
+pwr-390x844-reactor-after.png 390x844 cherenkovD/C/L within24 0/0/0 strongblue 556
+pwr-390x844-reactor-control.png 390x844 cherenkovD/C/L within24 343/458/50 strongblue 1407

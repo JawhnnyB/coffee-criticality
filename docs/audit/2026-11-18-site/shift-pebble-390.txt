@@ -1,0 +1,28 @@
+pebble type clicked
+pebble signed
+pebble stuck 12  buttons 
+pebble intro 12: 
+pebble intro 18: 
+pebble intro 24: 
+pebble stuck 30  buttons 
+pebble intro 30: 
+pebble intro 36: 
+pebble intro 42: 
+pebble walked in
+pebble-390x844 cafe hud: 06:52 D1 MORNING MORE CRITICALITY CAFE inPlay true
+pebble-390x844 mabel talk open after KeyW
+pebble-390x844 talk closed true
+pebble-390x844 after mabel: 06:54 D1 MORNING MORE CRITICALITY CAFE met true
+pebble-390x844 lot: true
+pebble-390x844 corridor: true
+pebble-390x844 control: true
+pebble-390x844 hall: true
+pebble-390x844 reactor control ranges 2
+pebble-390x844 site panel: Helium Blower 100% Outlet 750 °C Passes 0 Burnup 0 MWd/kg
+pebble-390x844 event: Moisture in the helium Moisture alarm on the helium. A mark on the steam generator. Helium arrows still move. Scram, isolate the steam generator, dry the helium. Keep blowing wet h
+pebble-390x844 event-wrong: Worse. Keep blowing wet helium through graphite.
+pebble-390x844 scram text: false
+pebble-390x844 clock before pace: 07:10 D1 MORNING MORE REACTOR HALL
+pebble-390x844 clock after 8s pace: 07:11 D1 MORNING MORE REACTOR HALL
+pebble-390x844 pageErrors 0
+pebble-390x844 404 0

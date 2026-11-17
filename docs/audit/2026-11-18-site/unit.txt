@@ -17,371 +17,364 @@ TAP version 13
 # Subtest: at the reference flow, power comes to rest on the rod percent with zero reactivity
 ok 1 - at the reference flow, power comes to rest on the rod percent with zero reactivity
   ---
-  duration_ms: 244.603735
+  duration_ms: 231.120129
   type: 'test'
   ...
 # Subtest: a design flow other than 100 does not move the seeded power
 ok 2 - a design flow other than 100 does not move the seeded power
   ---
-  duration_ms: 17.016368
+  duration_ms: 16.637786
   type: 'test'
   ...
 # Subtest: power approaches the new rest point from below, without overshoot
 ok 3 - power approaches the new rest point from below, without overshoot
   ---
-  duration_ms: 133.506879
+  duration_ms: 129.497951
   type: 'test'
   ...
 # Subtest: the rods walk to the slider at the stated speed, and reactivity is positive on the way up
 ok 4 - the rods walk to the slider at the stated speed, and reactivity is positive on the way up
   ---
-  duration_ms: 0.654577
+  duration_ms: 0.604
   type: 'test'
   ...
 # Subtest: the first instant after a rod step is the prompt jump: n = beta * c / (beta - rho)
 ok 5 - the first instant after a rod step is the prompt jump: n = beta * c / (beta - rho)
   ---
-  duration_ms: 0.280695
+  duration_ms: 0.245068
   type: 'test'
   ...
 # Subtest: less flow at the same rods rests at lower power, more flow at higher power, on every type
 ok 6 - less flow at the same rods rests at lower power, more flow at higher power, on every type
   ---
-  duration_ms: 750.178434
+  duration_ms: 752.208145
   type: 'test'
   ...
 # Subtest: every coolant coefficient is negative and every power defect is positive
 ok 7 - every coolant coefficient is negative and every power defect is positive
   ---
-  duration_ms: 0.220037
+  duration_ms: 0.212949
   type: 'test'
   ...
 # Subtest: a frame that does not change the rounded power writes once, then not again
 ok 8 - a frame that does not change the rounded power writes once, then not again
   ---
-  duration_ms: 1.481762
+  duration_ms: 1.453699
   type: 'test'
   ...
 # Subtest: moving the rods writes once for the new percent, and the next tiny frame does not
 ok 9 - moving the rods writes once for the new percent, and the next tiny frame does not
   ---
-  duration_ms: 3.295168
+  duration_ms: 2.773843
   type: 'test'
   ...
 # Subtest: a scram is one write, and it carries the scram flag
 ok 10 - a scram is one write, and it carries the scram flag
   ---
-  duration_ms: 0.206817
+  duration_ms: 0.200273
   type: 'test'
   ...
 # Subtest: holding the band passes once, and the next frame does not write a second pass
 ok 11 - holding the band passes once, and the next frame does not write a second pass
   ---
-  duration_ms: 1.058333
+  duration_ms: 1.551448
   type: 'test'
   ...
 # Subtest: days 1 to 4 tell open, caught, and hid apart, and a hide is never a catch
 ok 12 - days 1 to 4 tell open, caught, and hid apart, and a hide is never a catch
   ---
-  duration_ms: 1.07191
+  duration_ms: 1.056615
   type: 'test'
   ...
 # Subtest: day 5 is the same picture for open, caught, and hid
 ok 13 - day 5 is the same picture for open, caught, and hid
   ---
-  duration_ms: 0.810632
+  duration_ms: 0.703434
   type: 'test'
   ...
 # Subtest: the four residue fields are the four days, and day 5 has none
 ok 14 - the four residue fields are the four days, and day 5 has none
   ---
-  duration_ms: 13.254539
+  duration_ms: 12.892189
   type: 'test'
   ...
 # Subtest: non-canvas app with placeholder gets a soft BRAND NOTE (utility exception)
 ok 15 - non-canvas app with placeholder gets a soft BRAND NOTE (utility exception)
   ---
-  duration_ms: 1.967321
+  duration_ms: 1.707996
   type: 'test'
   ...
 # Subtest: non-canvas app with a compliant card is silent
 ok 16 - non-canvas app with a compliant card is silent
   ---
-  duration_ms: 1.474398
+  duration_ms: 1.306591
   type: 'test'
   ...
 # Subtest: non-canvas app with no og:image at all is silent
 ok 17 - non-canvas app with no og:image at all is silent
   ---
-  duration_ms: 0.624022
+  duration_ms: 0.532822
   type: 'test'
   ...
 # Subtest: oversized card warns for non-canvas apps too
 ok 18 - oversized card warns for non-canvas apps too
   ---
-  duration_ms: 1.223895
+  duration_ms: 1.135442
   type: 'test'
   ...
 # Subtest: canvas app with no card warns 'missing' and missing og:type
 ok 19 - canvas app with no card warns 'missing' and missing og:type
   ---
-  duration_ms: 1.160113
+  duration_ms: 1.315284
   type: 'test'
   ...
 # Subtest: card present but placeholder still wired warns 'wire og:image' and missing og:type
 ok 20 - card present but placeholder still wired warns 'wire og:image' and missing og:type
   ---
-  duration_ms: 1.184363
+  duration_ms: 1.066559
   type: 'test'
   ...
 # Subtest: oversized card warns on the scraper budget (jpg and legacy png)
 ok 21 - oversized card warns on the scraper budget (jpg and legacy png)
   ---
-  duration_ms: 2.964836
+  duration_ms: 2.943589
   type: 'test'
   ...
 # Subtest: compliant jpg card under budget still warns without og:type for canvas apps
 ok 22 - compliant jpg card under budget still warns without og:type for canvas apps
   ---
-  duration_ms: 1.065851
+  duration_ms: 0.979714
   type: 'test'
   ...
 # Subtest: compliant game (custom card + og:type + x:game:image + narrow card) is silent
 ok 23 - compliant game (custom card + og:type + x:game:image + narrow card) is silent
   ---
-  duration_ms: 1.485758
+  duration_ms: 1.356843
   type: 'test'
   ...
 # Subtest: oversized x-banner warns on the same scraper budget as og.jpg
 ok 24 - oversized x-banner warns on the same scraper budget as og.jpg
   ---
-  duration_ms: 1.938365
+  duration_ms: 1.928775
   type: 'test'
   ...
 # Subtest: legacy png under budget with custom wiring still requires og:type for canvas
 ok 25 - legacy png under budget with custom wiring still requires og:type for canvas
   ---
-  duration_ms: 1.872234
+  duration_ms: 1.687491
   type: 'test'
   ...
 # Subtest: legacy png + og:type game still needs the X feed card
 ok 26 - legacy png + og:type game still needs the X feed card
   ---
-  duration_ms: 0.766724
+  duration_ms: 0.767955
   type: 'test'
   ...
 # Subtest: rootDeclaresOgTypeGame accepts property/content order variants
 ok 27 - rootDeclaresOgTypeGame accepts property/content order variants
   ---
-  duration_ms: 0.127131
+  duration_ms: 0.131468
   type: 'test'
   ...
 # Subtest: rootDeclaresOgTypeGame ignores comment-only scaffold examples
 ok 28 - rootDeclaresOgTypeGame ignores comment-only scaffold examples
   ---
-  duration_ms: 0.392802
+  duration_ms: 0.381672
   type: 'test'
   ...
 # Subtest: canvas app with comment-only og:type still warns
 ok 29 - canvas app with comment-only og:type still warns
   ---
-  duration_ms: 0.736772
+  duration_ms: 0.662213
   type: 'test'
   ...
 # Subtest: rootDeclaresGameImage requires a live x:game:image property
 ok 30 - rootDeclaresGameImage requires a live x:game:image property
   ---
-  duration_ms: 0.116252
+  duration_ms: 0.105805
   type: 'test'
   ...
-# Subtest: winning CATCH twice in one day pays culture once and adds no catch
-ok 31 - winning CATCH twice in one day pays culture once and adds no catch
+# node:internal/modules/package_json_reader:314
+#   throw new ERR_MODULE_NOT_FOUND(packageName, fileURLToPath(base), null);
+#         ^
+# Error [ERR_MODULE_NOT_FOUND]: Cannot find package 'esbuild' imported from /root/work/coffee/scripts/cabinet-rewards.test.mjs
+#     at Object.getPackageJSONURL (node:internal/modules/package_json_reader:314:9)
+#     at packageResolve (node:internal/modules/esm/resolve:772:81)
+#     at moduleResolve (node:internal/modules/esm/resolve:859:18)
+#     at defaultResolve (node:internal/modules/esm/resolve:989:11)
+#     at \#cachedDefaultResolve (node:internal/modules/esm/loader:747:20)
+#     at ModuleLoader.resolve (node:internal/modules/esm/loader:724:38)
+#     at ModuleLoader.getModuleJobForImport (node:internal/modules/esm/loader:320:38)
+#     at onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:680:36)
+#     at TracingChannel.tracePromise (node:diagnostics_channel:350:14)
+#     at ModuleLoader.import (node:internal/modules/esm/loader:679:21) {
+#   code: 'ERR_MODULE_NOT_FOUND'
+# }
+# Node.js v22.23.3
+# Subtest: scripts/cabinet-rewards.test.mjs
+not ok 5 - scripts/cabinet-rewards.test.mjs
   ---
-  duration_ms: 1.595914
+  duration_ms: 41.101017
   type: 'test'
-  ...
-# Subtest: CATCH culture pays again the next day
-ok 32 - CATCH culture pays again the next day
-  ---
-  duration_ms: 0.220841
-  type: 'test'
-  ...
-# Subtest: a losing CATCH run still reads as a lie, and its consolation pays once per day
-ok 33 - a losing CATCH run still reads as a lie, and its consolation pays once per day
-  ---
-  duration_ms: 0.232696
-  type: 'test'
-  ...
-# Subtest: a delay survival pays culture once per day, not per replay
-ok 34 - a delay survival pays culture once per day, not per replay
-  ---
-  duration_ms: 0.374649
-  type: 'test'
-  ...
-# Subtest: a good bowl round pays Jordan trust and culture once
-ok 35 - a good bowl round pays Jordan trust and culture once
-  ---
-  duration_ms: 0.267265
-  type: 'test'
-  ...
-# Subtest: a good golf round pays Mabel trust; a poor one pays nothing
-ok 36 - a good golf round pays Mabel trust; a poor one pays nothing
-  ---
-  duration_ms: 0.18977
-  type: 'test'
+  location: '/root/work/coffee/scripts/cabinet-rewards.test.mjs:1:1'
+  failureType: 'testCodeFailure'
+  exitCode: 1
+  signal: ~
+  error: 'test failed'
+  code: 'ERR_TEST_FAILURE'
   ...
 # {"check":"cabinet-keydown","mode":"delay","code":"KeyD","owner":"world","took":false,"keyCount":0,"prevented":false}
 # {"check":"cabinet-escape","mode":"delay","code":"Escape","took":true,"keyCount":1,"prevented":true}
 # {"check":"walk-keydown","mode":"play","code":"KeyD","owner":"world","took":true,"keyCount":1,"prevented":true}
 # {"check":"update-cabinet","mode":"delay","x":80,"y":90}
 # Subtest: a movement key is not stored while a cabinet is open and the desk is closed
-ok 37 - a movement key is not stored while a cabinet is open and the desk is closed
+ok 32 - a movement key is not stored while a cabinet is open and the desk is closed
   ---
-  duration_ms: 1.540417
+  duration_ms: 2.980965
   type: 'test'
   ...
 # Subtest: the same key is stored while walking
-ok 38 - the same key is stored while walking
+ok 33 - the same key is stored while walking
   ---
-  duration_ms: 0.230007
+  duration_ms: 0.217886
   type: 'test'
   ...
 # Subtest: update does not change x while the mode is a cabinet
-ok 39 - update does not change x while the mode is a cabinet
+ok 34 - update does not change x while the mode is a cabinet
   ---
-  duration_ms: 0.873698
+  duration_ms: 1.347261
   type: 'test'
   ...
 # Subtest: one snapshot per plant type, with fixed inputs
-ok 40 - one snapshot per plant type, with fixed inputs
+ok 35 - one snapshot per plant type, with fixed inputs
   ---
-  duration_ms: 7.723136
+  duration_ms: 7.714311
   type: 'test'
   ...
 # Subtest: every drawn colour is a listed token, or a step on the glow ramp
-ok 41 - every drawn colour is a listed token, or a step on the glow ramp
+ok 36 - every drawn colour is a listed token, or a step on the glow ramp
   ---
-  duration_ms: 4.678327
+  duration_ms: 4.440393
   type: 'test'
   ...
 # Subtest: hard pixel edges: every rectangle sits on whole pixels
-ok 42 - hard pixel edges: every rectangle sits on whole pixels
+ok 37 - hard pixel edges: every rectangle sits on whole pixels
   ---
-  duration_ms: 1.722656
+  duration_ms: 1.812085
   type: 'test'
   ...
 # Subtest: no text on the canvas: the pen has no text call and drawing never needs one
-ok 43 - no text on the canvas: the pen has no text call and drawing never needs one
+ok 38 - no text on the canvas: the pen has no text call and drawing never needs one
   ---
-  duration_ms: 1.851542
+  duration_ms: 1.736718
   type: 'test'
   ...
 # Subtest: fullCore draws more assemblies than the 3×3 window
-ok 44 - fullCore draws more assemblies than the 3×3 window
+ok 39 - fullCore draws more assemblies than the 3×3 window
   ---
-  duration_ms: 0.577439
+  duration_ms: 0.507163
   type: 'test'
   ...
 # Subtest: reduced motion draws zero particles and zero bubbles
-ok 45 - reduced motion draws zero particles and zero bubbles
+ok 40 - reduced motion draws zero particles and zero bubbles
   ---
-  duration_ms: 0.189627
+  duration_ms: 0.189402
   type: 'test'
   ...
 # Subtest: scram stops the particles and the bubbles
-ok 46 - scram stops the particles and the bubbles
+ok 41 - scram stops the particles and the bubbles
   ---
-  duration_ms: 0.108164
+  duration_ms: 0.109218
   type: 'test'
   ...
 # Subtest: the mapping is monotone: more power, more glow and particles; more flow, faster particles
-ok 47 - the mapping is monotone: more power, more glow and particles; more flow, faster particles
+ok 42 - the mapping is monotone: more power, more glow and particles; more flow, faster particles
   ---
-  duration_ms: 0.320986
+  duration_ms: 0.326832
   type: 'test'
   ...
 # Subtest: the boiling proxy is monotone: more void, more bubbles and faster rise
-ok 48 - the boiling proxy is monotone: more void, more bubbles and faster rise
+ok 43 - the boiling proxy is monotone: more void, more bubbles and faster rise
   ---
-  duration_ms: 0.354658
+  duration_ms: 0.443895
   type: 'test'
   ...
 # Subtest: the drawings carry their geometry: pebbles are circles with helium, BWR has bubbles, PWR and MSR have arrows
-ok 49 - the drawings carry their geometry: pebbles are circles with helium, BWR has bubbles, PWR and MSR have arrows
+ok 44 - the drawings carry their geometry: pebbles are circles with helium, BWR has bubbles, PWR and MSR have arrows
   ---
-  duration_ms: 1.164461
+  duration_ms: 1.182535
   type: 'test'
   ...
 # Subtest: camScale is an integer from 1 to 4, from the window width
-ok 50 - camScale is an integer from 1 to 4, from the window width
+ok 45 - camScale is an integer from 1 to 4, from the window width
   ---
-  duration_ms: 0.207257
+  duration_ms: 0.200632
   type: 'test'
   ...
 # Subtest: the glow moves only past a 5 percent change under reduced motion, and always under normal motion
-ok 51 - the glow moves only past a 5 percent change under reduced motion, and always under normal motion
+ok 46 - the glow moves only past a 5 percent change under reduced motion, and always under normal motion
   ---
-  duration_ms: 0.107699
+  duration_ms: 0.111295
   type: 'test'
   ...
 # Subtest: claims checker rejects a short number, a missing png, and an unexplained nonzero exit
-ok 52 - claims checker rejects a short number, a missing png, and an unexplained nonzero exit
+ok 47 - claims checker rejects a short number, a missing png, and an unexplained nonzero exit
   ---
-  duration_ms: 34.598146
+  duration_ms: 37.471266
   type: 'test'
   ...
 # Subtest: the control-room chair blocks the player, and a cafe chair does not
-ok 53 - the control-room chair blocks the player, and a cafe chair does not
+ok 48 - the control-room chair blocks the player, and a cafe chair does not
   ---
-  duration_ms: 1.627217
+  duration_ms: 1.634571
   type: 'test'
   ...
 # Subtest: parses frontmatter keys
-ok 54 - parses frontmatter keys
+ok 49 - parses frontmatter keys
   ---
-  duration_ms: 2.268064
+  duration_ms: 2.157726
   type: 'test'
   ...
 # Subtest: passes when the other AI approved and only the record changed since
-ok 55 - passes when the other AI approved and only the record changed since
+ok 50 - passes when the other AI approved and only the record changed since
   ---
-  duration_ms: 0.709569
+  duration_ms: 0.68392
   type: 'test'
   ...
 # Subtest: fails when one AI reviews its own work
-ok 56 - fails when one AI reviews its own work
+ok 51 - fails when one AI reviews its own work
   ---
-  duration_ms: 0.232576
+  duration_ms: 0.236149
   type: 'test'
   ...
 # Subtest: fails on an unknown code, not G or C
-ok 57 - fails on an unknown code, not G or C
+ok 52 - fails on an unknown code, not G or C
   ---
-  duration_ms: 0.160454
+  duration_ms: 0.198067
   type: 'test'
   ...
 # Subtest: fails without an approve verdict
-ok 58 - fails without an approve verdict
+ok 53 - fails without an approve verdict
   ---
-  duration_ms: 0.139151
+  duration_ms: 0.15738
   type: 'test'
   ...
 # Subtest: fails if code changed after the reviewed commit
-ok 59 - fails if code changed after the reviewed commit
+ok 54 - fails if code changed after the reviewed commit
   ---
-  duration_ms: 0.167511
+  duration_ms: 0.145056
   type: 'test'
   ...
 # Subtest: fails if the reviewed commit is not in the head's history
-ok 60 - fails if the reviewed commit is not in the head's history
+ok 55 - fails if the reviewed commit is not in the head's history
   ---
-  duration_ms: 0.195826
+  duration_ms: 0.191738
   type: 'test'
   ...
 # Subtest: fails when the record is for another PR
-ok 61 - fails when the record is for another PR
+ok 56 - fails when the record is for another PR
   ---
-  duration_ms: 0.119735
+  duration_ms: 0.116408
   type: 'test'
   ...
 # {"check":"glow-vs-power","kind":"pwr","levels":[0,18,1334,1380]}
@@ -392,111 +385,116 @@ ok 61 - fails when the record is for another PR
 # {"check":"legs","type":"pebble","tHot":735,"tCold":260,"hot":"\#e8a860","cold":"\#6a9aaa"}
 # {"check":"legs","type":"msr","tHot":678,"tCold":620,"hot":"\#e8a860","cold":"\#6a9aaa"}
 # Subtest: every colour painted is a palette colour
-ok 62 - every colour painted is a palette colour
+ok 57 - every colour painted is a palette colour
   ---
-  duration_ms: 13.027133
+  duration_ms: 14.050308
   type: 'test'
   ...
 # Subtest: Cherenkov light grows with power, and there is none at zero power
-ok 63 - Cherenkov light grows with power, and there is none at zero power
+ok 58 - Cherenkov light grows with power, and there is none at zero power
   ---
-  duration_ms: 5.24016
+  duration_ms: 7.715089
   type: 'test'
   ...
 # Subtest: after a scram the core keeps only the dim decay glow
-ok 64 - after a scram the core keeps only the dim decay glow
+ok 59 - after a scram the core keeps only the dim decay glow
   ---
-  duration_ms: 0.87678
+  duration_ms: 0.794697
   type: 'test'
   ...
 # Subtest: gas and fuel salt never glow blue, at any power
-ok 65 - gas and fuel salt never glow blue, at any power
+ok 60 - gas and fuel salt never glow blue, at any power
   ---
-  duration_ms: 2.006141
+  duration_ms: 1.868678
   type: 'test'
   ...
 # Subtest: the hot leg and cold leg differ in colour at full power, and match at zero power
-ok 66 - the hot leg and cold leg differ in colour at full power, and match at zero power
+ok 61 - the hot leg and cold leg differ in colour at full power, and match at zero power
   ---
-  duration_ms: 0.439864
+  duration_ms: 0.83868
   type: 'test'
   ...
 # Subtest: the colour ramp only gets warmer as the temperature rises
-ok 67 - the colour ramp only gets warmer as the temperature rises
+ok 62 - the colour ramp only gets warmer as the temperature rises
   ---
-  duration_ms: 0.403791
+  duration_ms: 0.430294
   type: 'test'
   ...
 # Subtest: a scram trips the turbine; at power the steam side runs
-ok 68 - a scram trips the turbine; at power the steam side runs
+ok 63 - a scram trips the turbine; at power the steam side runs
   ---
-  duration_ms: 0.214403
+  duration_ms: 0.218023
   type: 'test'
   ...
-# Subtest: a runaway core is never called holding
-ok 69 - a runaway core is never called holding
+# node:internal/modules/package_json_reader:314
+#   throw new ERR_MODULE_NOT_FOUND(packageName, fileURLToPath(base), null);
+#         ^
+# Error [ERR_MODULE_NOT_FOUND]: Cannot find package 'esbuild' imported from /root/work/coffee/scripts/desk-verdict.test.mjs
+#     at Object.getPackageJSONURL (node:internal/modules/package_json_reader:314:9)
+#     at packageResolve (node:internal/modules/esm/resolve:772:81)
+#     at moduleResolve (node:internal/modules/esm/resolve:859:18)
+#     at defaultResolve (node:internal/modules/esm/resolve:989:11)
+#     at \#cachedDefaultResolve (node:internal/modules/esm/loader:747:20)
+#     at ModuleLoader.resolve (node:internal/modules/esm/loader:724:38)
+#     at ModuleLoader.getModuleJobForImport (node:internal/modules/esm/loader:320:38)
+#     at onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:680:36)
+#     at TracingChannel.tracePromise (node:diagnostics_channel:350:14)
+#     at ModuleLoader.import (node:internal/modules/esm/loader:679:21) {
+#   code: 'ERR_MODULE_NOT_FOUND'
+# }
+# Node.js v22.23.3
+# Subtest: scripts/desk-verdict.test.mjs
+not ok 12 - scripts/desk-verdict.test.mjs
   ---
-  duration_ms: 0.798447
+  duration_ms: 36.259787
   type: 'test'
-  ...
-# Subtest: the holding band reads as holding, with the number
-ok 70 - the holding band reads as holding, with the number
-  ---
-  duration_ms: 0.149588
-  type: 'test'
-  ...
-# Subtest: below one the crowd shrinks, and far below it dies out
-ok 71 - below one the crowd shrinks, and far below it dies out
-  ---
-  duration_ms: 0.1881
-  type: 'test'
-  ...
-# Subtest: the leakage line says what the edge takes
-ok 72 - the leakage line says what the edge takes
-  ---
-  duration_ms: 0.102981
-  type: 'test'
+  location: '/root/work/coffee/scripts/desk-verdict.test.mjs:1:1'
+  failureType: 'testCodeFailure'
+  exitCode: 1
+  signal: ~
+  error: 'test failed'
+  code: 'ERR_TEST_FAILURE'
   ...
 # Subtest: every spoken line is quoted speech
-ok 73 - every spoken line is quoted speech
+ok 65 - every spoken line is quoted speech
   ---
-  duration_ms: 0.967655
+  duration_ms: 1.074445
   type: 'test'
   ...
 # Subtest: spoken lines fit the box and are whole sentences
-ok 74 - spoken lines fit the box and are whole sentences
+ok 66 - spoken lines fit the box and are whole sentences
   ---
-  duration_ms: 0.48889
+  duration_ms: 0.500588
   type: 'test'
   ...
 # Subtest: no stage directions inside spoken lines
-ok 75 - no stage directions inside spoken lines
+ok 67 - no stage directions inside spoken lines
   ---
-  duration_ms: 0.605181
+  duration_ms: 0.61293
   type: 'test'
   ...
 # Subtest: no line repeats another character's line word-for-word
-ok 76 - no line repeats another character's line word-for-word
+ok 68 - no line repeats another character's line word-for-word
   ---
-  duration_ms: 0.22888
+  duration_ms: 0.232043
   type: 'test'
   ...
 # Subtest: injects before </head>
-ok 77 - injects before </head>
+ok 69 - injects before </head>
   ---
-  duration_ms: 2.22248
+  duration_ms: 2.29174
   type: 'test'
   ...
 # Subtest: injects the extensions script without a project id
-ok 78 - injects the extensions script without a project id
+ok 70 - injects the extensions script without a project id
   ---
-  duration_ms: 0.526118
+  duration_ms: 0.454154
   type: 'test'
   ...
 # Subtest: injects project id on the script and meta when provided
-not ok 79 - injects project id on the script and meta when provided
+not ok 71 - injects project id on the script and meta when provided
   ---
-  duration_ms: 0.780524
+  duration_ms: 0.777954
   type: 'test'
   location: '/root/work/coffee/scripts/grok-pwa-plugin.test.mjs:36:1'
   failureType: 'testCodeFailure'
@@ -520,9 +518,9 @@ not ok 79 - injects project id on the script and meta when provided
     async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
   ...
 # Subtest: does not duplicate grok:app_id
-not ok 80 - does not duplicate grok:app_id
+not ok 72 - does not duplicate grok:app_id
   ---
-  duration_ms: 0.895303
+  duration_ms: 0.996777
   type: 'test'
   location: '/root/work/coffee/scripts/grok-pwa-plugin.test.mjs:43:1'
   failureType: 'testCodeFailure'
@@ -546,15 +544,15 @@ not ok 80 - does not duplicate grok:app_id
     async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
   ...
 # Subtest: omits x:creator tags without both creator values
-ok 81 - omits x:creator tags without both creator values
+ok 73 - omits x:creator tags without both creator values
   ---
-  duration_ms: 0.726935
+  duration_ms: 0.829631
   type: 'test'
   ...
 # Subtest: injects x:creator tags when both creator values are set
-not ok 82 - injects x:creator tags when both creator values are set
+not ok 74 - injects x:creator tags when both creator values are set
   ---
-  duration_ms: 1.340672
+  duration_ms: 1.244847
   type: 'test'
   location: '/root/work/coffee/scripts/grok-pwa-plugin.test.mjs:57:1'
   failureType: 'testCodeFailure'
@@ -578,15 +576,15 @@ not ok 82 - injects x:creator tags when both creator values are set
     async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
   ...
 # Subtest: escapes x:creator values
-ok 83 - escapes x:creator values
+ok 75 - escapes x:creator values
   ---
-  duration_ms: 0.167243
+  duration_ms: 0.218087
   type: 'test'
   ...
 # Subtest: does not duplicate x:creator tags
-not ok 84 - does not duplicate x:creator tags
+not ok 76 - does not duplicate x:creator tags
   ---
-  duration_ms: 0.603196
+  duration_ms: 0.632813
   type: 'test'
   location: '/root/work/coffee/scripts/grok-pwa-plugin.test.mjs:75:1'
   failureType: 'testCodeFailure'
@@ -610,9 +608,9 @@ not ok 84 - does not duplicate x:creator tags
     async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
   ...
 # Subtest: platform chrome injects twitter:card when the document has none
-not ok 85 - platform chrome injects twitter:card when the document has none
+not ok 77 - platform chrome injects twitter:card when the document has none
   ---
-  duration_ms: 0.535204
+  duration_ms: 0.572081
   type: 'test'
   location: '/root/work/coffee/scripts/grok-pwa-plugin.test.mjs:83:1'
   failureType: 'testCodeFailure'
@@ -636,15 +634,15 @@ not ok 85 - platform chrome injects twitter:card when the document has none
     async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
   ...
 # Subtest: does not duplicate twitter:card
-ok 86 - does not duplicate twitter:card
+ok 78 - does not duplicate twitter:card
   ---
-  duration_ms: 0.5938
+  duration_ms: 0.588601
   type: 'test'
   ...
 # Subtest: leaves an existing twitter:card alone
-not ok 87 - leaves an existing twitter:card alone
+not ok 79 - leaves an existing twitter:card alone
   ---
-  duration_ms: 0.357529
+  duration_ms: 0.352461
   type: 'test'
   location: '/root/work/coffee/scripts/grok-pwa-plugin.test.mjs:96:1'
   failureType: 'testCodeFailure'
@@ -668,21 +666,21 @@ not ok 87 - leaves an existing twitter:card alone
     async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
   ...
 # Subtest: does not duplicate the extensions script
-ok 88 - does not duplicate the extensions script
+ok 80 - does not duplicate the extensions script
   ---
-  duration_ms: 0.58206
+  duration_ms: 0.57955
   type: 'test'
   ...
 # Subtest: is idempotent
-ok 89 - is idempotent
+ok 81 - is idempotent
   ---
-  duration_ms: 0.346273
+  duration_ms: 0.354603
   type: 'test'
   ...
 # Subtest: uses the app name in the injected title tag
-not ok 90 - uses the app name in the injected title tag
+not ok 82 - uses the app name in the injected title tag
   ---
-  duration_ms: 0.348134
+  duration_ms: 0.302545
   type: 'test'
   location: '/root/work/coffee/scripts/grok-pwa-plugin.test.mjs:117:1'
   failureType: 'testCodeFailure'
@@ -706,81 +704,81 @@ not ok 90 - uses the app name in the injected title tag
     async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
   ...
 # Subtest: streaming injector handles </head> split across chunks
-ok 91 - streaming injector handles </head> split across chunks
+ok 83 - streaming injector handles </head> split across chunks
   ---
-  duration_ms: 0.505159
+  duration_ms: 0.462362
   type: 'test'
   ...
 # Subtest: streaming injector passes post-head chunks through untouched
-ok 92 - streaming injector passes post-head chunks through untouched
+ok 84 - streaming injector passes post-head chunks through untouched
   ---
-  duration_ms: 0.464823
+  duration_ms: 0.479959
   type: 'test'
   ...
 # Subtest: streaming injector falls back when no </head> is seen
-ok 93 - streaming injector falls back when no </head> is seen
+ok 85 - streaming injector falls back when no </head> is seen
   ---
-  duration_ms: 0.257366
+  duration_ms: 0.301616
   type: 'test'
   ...
 # Subtest: detects install query
-ok 94 - detects install query
+ok 86 - detects install query
   ---
-  duration_ms: 0.245497
+  duration_ms: 0.263
   type: 'test'
   ...
 # Subtest: filters non-document paths
-ok 95 - filters non-document paths
+ok 87 - filters non-document paths
   ---
-  duration_ms: 0.300096
+  duration_ms: 0.348358
   type: 'test'
   ...
 # Subtest: strips install params from the app link
-ok 96 - strips install params from the app link
+ok 88 - strips install params from the app link
   ---
-  duration_ms: 0.197772
+  duration_ms: 0.156833
   type: 'test'
   ...
 # Subtest: names the install page from host slug
-ok 97 - names the install page from host slug
+ok 89 - names the install page from host slug
   ---
-  duration_ms: 0.132796
+  duration_ms: 0.125001
   type: 'test'
   ...
 # Subtest: rejects hosts that are not plain slugs
-ok 98 - rejects hosts that are not plain slugs
+ok 90 - rejects hosts that are not plain slugs
   ---
-  duration_ms: 0.092384
+  duration_ms: 0.091052
   type: 'test'
   ...
 # Subtest: renders install page markup
-ok 99 - renders install page markup
+ok 91 - renders install page markup
   ---
-  duration_ms: 0.268138
+  duration_ms: 0.313552
   type: 'test'
   ...
 # Subtest: escapes host-derived values in the install page
-ok 100 - escapes host-derived values in the install page
+ok 92 - escapes host-derived values in the install page
   ---
-  duration_ms: 0.118361
+  duration_ms: 0.14293
   type: 'test'
   ...
 # Subtest: renders the manifest with the per-app name
-ok 101 - renders the manifest with the per-app name
+ok 93 - renders the manifest with the per-app name
   ---
-  duration_ms: 0.202634
+  duration_ms: 0.141716
   type: 'test'
   ...
 # Subtest: vite config keeps the nitro serverDir wiring
-ok 102 - vite config keeps the nitro serverDir wiring
+ok 94 - vite config keeps the nitro serverDir wiring
   ---
-  duration_ms: 0.162729
+  duration_ms: 0.148143
   type: 'test'
   ...
 # Subtest: nitro middleware and its bundled assets exist
-ok 103 - nitro middleware and its bundled assets exist
+ok 95 - nitro middleware and its bundled assets exist
   ---
-  duration_ms: 0.165061
+  duration_ms: 0.154367
   type: 'test'
   ...
 # {"check":"static-world","owner":"static","mode":"play","code":"KeyW","took":false,"keyCount":0}
@@ -799,882 +797,936 @@ ok 103 - nitro middleware and its bundled assets exist
 # {"check":"mini-focus","mini":true,"worldTook":false,"worldKeys":0}
 # {"check":"input","took":false,"keyCount":0}
 # Subtest: a desktop app focused does not store a world movement key
-ok 104 - a desktop app focused does not store a world movement key
+ok 96 - a desktop app focused does not store a world movement key
   ---
-  duration_ms: 2.013002
+  duration_ms: 2.009779
   type: 'test'
   ...
 # Subtest: a focused cabinet stores its own held key and the world listener does not
-ok 105 - a focused cabinet stores its own held key and the world listener does not
+ok 97 - a focused cabinet stores its own held key and the world listener does not
   ---
-  duration_ms: 0.231821
+  duration_ms: 0.200638
   type: 'test'
   ...
 # Subtest: an input inside a desktop app does not store the key
-ok 106 - an input inside a desktop app does not store the key
+ok 98 - an input inside a desktop app does not store the key
   ---
-  duration_ms: 0.199712
+  duration_ms: 0.198684
   type: 'test'
   ...
 # Subtest: day 1 steam stays until the valve is caught, and later days draw none
-ok 107 - day 1 steam stays until the valve is caught, and later days draw none
+ok 99 - day 1 steam stays until the valve is caught, and later days draw none
   ---
-  duration_ms: 0.68711
+  duration_ms: 0.725497
   type: 'test'
   ...
 # Subtest: the manifest lists one track per season, in calendar order
-ok 108 - the manifest lists one track per season, in calendar order
+ok 100 - the manifest lists one track per season, in calendar order
   ---
-  duration_ms: 1.306856
+  duration_ms: 1.281835
   type: 'test'
   ...
 # Subtest: each manifest track matches the generator's track definition
-ok 109 - each manifest track matches the generator's track definition
+ok 101 - each manifest track matches the generator's track definition
   ---
-  duration_ms: 0.358498
+  duration_ms: 0.372125
   type: 'test'
   ...
 # Subtest: the manifest says the music is original and generated, with no samples
-ok 110 - the manifest says the music is original and generated, with no samples
+ok 102 - the manifest says the music is original and generated, with no samples
   ---
-  duration_ms: 0.246051
+  duration_ms: 0.240708
   type: 'test'
   ...
 # Subtest: no audio file is shipped in public/music
-ok 111 - no audio file is shipped in public/music
+ok 103 - no audio file is shipped in public/music
   ---
-  duration_ms: 0.295562
+  duration_ms: 0.30803
   type: 'test'
   ...
 # Subtest: the same track and bar give the same notes
-ok 112 - the same track and bar give the same notes
+ok 104 - the same track and bar give the same notes
   ---
-  duration_ms: 1.263448
+  duration_ms: 1.223528
   type: 'test'
   ...
 # Subtest: every note is inside a playable range and inside its bar
-ok 113 - every note is inside a playable range and inside its bar
+ok 105 - every note is inside a playable range and inside its bar
   ---
-  duration_ms: 0.34067
+  duration_ms: 0.29514
   type: 'test'
   ...
 # Subtest: timing and pitch helpers are correct
-ok 114 - timing and pitch helpers are correct
+ok 106 - timing and pitch helpers are correct
   ---
-  duration_ms: 0.24277
+  duration_ms: 0.251784
   type: 'test'
   ...
 # Subtest: before the design, Reactor Control, Results, Core Map and CORE CAM are hidden; the design and academy show
-ok 115 - before the design, Reactor Control, Results, Core Map and CORE CAM are hidden; the design and academy show
+ok 107 - before the design, Reactor Control, Results, Core Map and CORE CAM are hidden; the design and academy show
   ---
-  duration_ms: 1.148169
+  duration_ms: 1.134818
   type: 'test'
   ...
 # Subtest: the mini games are hidden until a cabinet is found, then they show
-ok 116 - the mini games are hidden until a cabinet is found, then they show
+ok 108 - the mini games are hidden until a cabinet is found, then they show
   ---
-  duration_ms: 0.247653
+  duration_ms: 0.186576
   type: 'test'
   ...
 # Subtest: a design shows Reactor Control and the three design-gated apps
-ok 117 - a design shows Reactor Control and the three design-gated apps
+ok 109 - a design shows Reactor Control and the three design-gated apps
   ---
-  duration_ms: 0.14715
+  duration_ms: 0.145969
   type: 'test'
   ...
 # Subtest: Show all apps (dev only) shows everything
-ok 118 - Show all apps (dev only) shows everything
+ok 110 - Show all apps (dev only) shows everything
   ---
-  duration_ms: 0.187327
+  duration_ms: 0.125778
   type: 'test'
   ...
 # Subtest: pinned icons keep the player's order, skip unknown ids, and hide apps that are not visible
-ok 119 - pinned icons keep the player's order, skip unknown ids, and hide apps that are not visible
+ok 111 - pinned icons keep the player's order, skip unknown ids, and hide apps that are not visible
   ---
-  duration_ms: 0.766653
+  duration_ms: 0.788837
   type: 'test'
   ...
 # Subtest: every sim mode maps back to its registry app
-ok 120 - every sim mode maps back to its registry app
+ok 112 - every sim mode maps back to its registry app
   ---
-  duration_ms: 0.219586
+  duration_ms: 0.173324
   type: 'test'
   ...
 # Subtest: the clock shows 12 or 24 hours
-ok 121 - the clock shows 12 or 24 hours
+ok 113 - the clock shows 12 or 24 hours
   ---
-  duration_ms: 0.216882
+  duration_ms: 0.217296
   type: 'test'
   ...
 # Subtest: the theme follows the setup season unless a season is picked for it
-ok 122 - the theme follows the setup season unless a season is picked for it
+ok 114 - the theme follows the setup season unless a season is picked for it
   ---
-  duration_ms: 0.126848
+  duration_ms: 0.189438
   type: 'test'
   ...
 # Subtest: missing or unknown setup values fall back to the defaults, Fall and Steady
-ok 123 - missing or unknown setup values fall back to the defaults, Fall and Steady
+ok 115 - missing or unknown setup values fall back to the defaults, Fall and Steady
   ---
-  duration_ms: 0.345869
+  duration_ms: 0.317033
   type: 'test'
   ...
 # Subtest: the region is never a choice in this build, and says so
-ok 124 - the region is never a choice in this build, and says so
+ok 116 - the region is never a choice in this build, and says so
   ---
-  duration_ms: 0.343495
+  duration_ms: 0.362946
   type: 'test'
   ...
 # Subtest: the registry uses no real site name and no radiation number
-ok 125 - the registry uses no real site name and no radiation number
+ok 117 - the registry uses no real site name and no radiation number
   ---
-  duration_ms: 0.275456
+  duration_ms: 0.268491
   type: 'test'
   ...
 # Subtest: a window is clamped so it stays on the screen above the taskbar
-ok 126 - a window is clamped so it stays on the screen above the taskbar
+ok 118 - a window is clamped so it stays on the screen above the taskbar
   ---
-  duration_ms: 1.127321
+  duration_ms: 1.188305
   type: 'test'
   ...
 # Subtest: dragging cannot take a window off any edge
-ok 127 - dragging cannot take a window off any edge
+ok 119 - dragging cannot take a window off any edge
   ---
-  duration_ms: 0.272749
+  duration_ms: 0.261008
   type: 'test'
   ...
 # Subtest: a window never goes below the minimum size, and never wider than a small screen
-ok 128 - a window never goes below the minimum size, and never wider than a small screen
+ok 120 - a window never goes below the minimum size, and never wider than a small screen
   ---
-  duration_ms: 0.237188
+  duration_ms: 0.189593
   type: 'test'
   ...
 # Subtest: focus raises a window to the top and restores it from the taskbar
-ok 129 - focus raises a window to the top and restores it from the taskbar
+ok 121 - focus raises a window to the top and restores it from the taskbar
   ---
-  duration_ms: 0.282268
+  duration_ms: 0.27498
   type: 'test'
   ...
 # Subtest: opening a window that is already open focuses it instead of adding a second one
-ok 130 - opening a window that is already open focuses it instead of adding a second one
+ok 122 - opening a window that is already open focuses it instead of adding a second one
   ---
-  duration_ms: 0.234893
+  duration_ms: 0.228531
   type: 'test'
   ...
 # Subtest: close removes the window
-ok 131 - close removes the window
+ok 123 - close removes the window
   ---
-  duration_ms: 0.670105
+  duration_ms: 0.669577
   type: 'test'
   ...
 # Subtest: a focused mini game gets game keys, and Escape closes nothing (the game handles it)
-ok 132 - a focused mini game gets game keys, and Escape closes nothing (the game handles it)
+ok 124 - a focused mini game gets game keys, and Escape closes nothing (the game handles it)
   ---
-  duration_ms: 0.206183
+  duration_ms: 0.201354
   type: 'test'
   ...
 # Subtest: a focused sim app (Reactor Control, Academy) gets game keys, and Escape goes to the desktop
-ok 133 - a focused sim app (Reactor Control, Academy) gets game keys, and Escape goes to the desktop
+ok 125 - a focused sim app (Reactor Control, Academy) gets game keys, and Escape goes to the desktop
   ---
-  duration_ms: 0.116414
+  duration_ms: 0.097739
   type: 'test'
   ...
 # Subtest: with the desktop focused, game keys are blocked, and Escape belongs to the desktop
-ok 134 - with the desktop focused, game keys are blocked, and Escape belongs to the desktop
+ok 126 - with the desktop focused, game keys are blocked, and Escape belongs to the desktop
   ---
-  duration_ms: 0.284581
+  duration_ms: 0.286774
   type: 'test'
   ...
 # Subtest: keys that are not game keys always reach the desktop shell
-ok 135 - keys that are not game keys always reach the desktop shell
+ok 127 - keys that are not game keys always reach the desktop shell
   ---
-  duration_ms: 0.349212
+  duration_ms: 0.3825
   type: 'test'
   ...
 # Subtest: the focus kind follows the focused window
-ok 136 - the focus kind follows the focused window
+ok 128 - the focus kind follows the focused window
   ---
-  duration_ms: 0.180615
+  duration_ms: 0.251446
   type: 'test'
   ...
 # Subtest: a new window cascades and always opens on the screen
-ok 137 - a new window cascades and always opens on the screen
+ok 129 - a new window cascades and always opens on the screen
   ---
-  duration_ms: 0.208953
+  duration_ms: 0.219955
   type: 'test'
   ...
 # Subtest: reduced motion gets no particles at all
-ok 138 - reduced motion gets no particles at all
+ok 130 - reduced motion gets no particles at all
   ---
-  duration_ms: 0.883402
+  duration_ms: 0.875177
   type: 'test'
   ...
 # Subtest: the pool never holds more than 160 particles, however big the view
-ok 139 - the pool never holds more than 160 particles, however big the view
+ok 131 - the pool never holds more than 160 particles, however big the view
   ---
-  duration_ms: 0.511197
+  duration_ms: 0.461958
   type: 'test'
   ...
 # Subtest: an empty view has no particles
-ok 140 - an empty view has no particles
+ok 132 - an empty view has no particles
   ---
-  duration_ms: 0.111044
+  duration_ms: 0.151518
   type: 'test'
   ...
 # Subtest: the same seed makes the same pool, so the layer is testable
-ok 141 - the same seed makes the same pool, so the layer is testable
+ok 133 - the same seed makes the same pool, so the layer is testable
   ---
-  duration_ms: 0.838787
+  duration_ms: 0.831258
   type: 'test'
   ...
 # Subtest: stepping keeps the pool size and keeps particles near the view
-ok 142 - stepping keeps the pool size and keeps particles near the view
+ok 134 - stepping keeps the pool size and keeps particles near the view
   ---
-  duration_ms: 9.122692
+  duration_ms: 9.033214
   type: 'test'
   ...
 # Subtest: particles are palette colours and pixel squares
-ok 143 - particles are palette colours and pixel squares
+ok 135 - particles are palette colours and pixel squares
   ---
-  duration_ms: 0.386109
+  duration_ms: 0.346257
   type: 'test'
   ...
 # Subtest: pwr labels at 324/292 sit inside the drawing and clear of every object
-ok 144 - pwr labels at 324/292 sit inside the drawing and clear of every object
+ok 136 - pwr labels at 324/292 sit inside the drawing and clear of every object
   ---
-  duration_ms: 1.574956
+  duration_ms: 1.650043
   type: 'test'
   ...
 # Subtest: pwr labels at 350/285 sit inside the drawing and clear of every object
-ok 145 - pwr labels at 350/285 sit inside the drawing and clear of every object
+ok 137 - pwr labels at 350/285 sit inside the drawing and clear of every object
   ---
-  duration_ms: 0.283676
+  duration_ms: 0.25162
   type: 'test'
   ...
 # Subtest: pwr labels at 285/285 sit inside the drawing and clear of every object
-ok 146 - pwr labels at 285/285 sit inside the drawing and clear of every object
+ok 138 - pwr labels at 285/285 sit inside the drawing and clear of every object
   ---
-  duration_ms: 0.231381
+  duration_ms: 0.261215
   type: 'test'
   ...
 # Subtest: pwr labels do not overlap each other
-ok 147 - pwr labels do not overlap each other
+ok 139 - pwr labels do not overlap each other
   ---
-  duration_ms: 0.941975
+  duration_ms: 1.036484
   type: 'test'
   ...
 # Subtest: pwr drawn objects stay inside the native grid
-ok 148 - pwr drawn objects stay inside the native grid
+ok 140 - pwr drawn objects stay inside the native grid
   ---
-  duration_ms: 0.265978
+  duration_ms: 0.268812
   type: 'test'
   ...
 # Subtest: pwr carries the required facts: pressure, hot and cold, scale ends, and the footer
-ok 149 - pwr carries the required facts: pressure, hot and cold, scale ends, and the footer
+ok 141 - pwr carries the required facts: pressure, hot and cold, scale ends, and the footer
   ---
-  duration_ms: 0.188097
+  duration_ms: 0.185301
   type: 'test'
   ...
 # Subtest: pwr scale bar colours the operating points inside the seven bands
-ok 150 - pwr scale bar colours the operating points inside the seven bands
+ok 142 - pwr scale bar colours the operating points inside the seven bands
   ---
-  duration_ms: 0.283687
+  duration_ms: 0.303163
   type: 'test'
   ...
 # Subtest: bwr labels at 287/275 sit inside the drawing and clear of every object
-ok 151 - bwr labels at 287/275 sit inside the drawing and clear of every object
+ok 143 - bwr labels at 287/275 sit inside the drawing and clear of every object
   ---
-  duration_ms: 0.19345
+  duration_ms: 0.240694
   type: 'test'
   ...
 # Subtest: bwr labels at 330/275 sit inside the drawing and clear of every object
-ok 152 - bwr labels at 330/275 sit inside the drawing and clear of every object
+ok 144 - bwr labels at 330/275 sit inside the drawing and clear of every object
   ---
-  duration_ms: 0.322524
+  duration_ms: 0.330491
   type: 'test'
   ...
 # Subtest: bwr labels at 200/200 sit inside the drawing and clear of every object
-ok 153 - bwr labels at 200/200 sit inside the drawing and clear of every object
+ok 145 - bwr labels at 200/200 sit inside the drawing and clear of every object
   ---
-  duration_ms: 0.406508
+  duration_ms: 0.41921
   type: 'test'
   ...
 # Subtest: bwr labels do not overlap each other
-ok 154 - bwr labels do not overlap each other
+ok 146 - bwr labels do not overlap each other
   ---
-  duration_ms: 0.161609
+  duration_ms: 0.151831
   type: 'test'
   ...
 # Subtest: bwr drawn objects stay inside the native grid
-ok 155 - bwr drawn objects stay inside the native grid
+ok 147 - bwr drawn objects stay inside the native grid
   ---
-  duration_ms: 0.069387
+  duration_ms: 0.069217
   type: 'test'
   ...
 # Subtest: bwr carries the required facts: pressure, hot and cold, scale ends, and the footer
-ok 156 - bwr carries the required facts: pressure, hot and cold, scale ends, and the footer
+ok 148 - bwr carries the required facts: pressure, hot and cold, scale ends, and the footer
   ---
-  duration_ms: 0.071368
+  duration_ms: 0.072419
   type: 'test'
   ...
 # Subtest: bwr scale bar colours the operating points inside the seven bands
-ok 157 - bwr scale bar colours the operating points inside the seven bands
+ok 149 - bwr scale bar colours the operating points inside the seven bands
   ---
-  duration_ms: 0.132107
+  duration_ms: 0.1318
   type: 'test'
   ...
 # Subtest: pebble labels at 735/260 sit inside the drawing and clear of every object
-ok 158 - pebble labels at 735/260 sit inside the drawing and clear of every object
+ok 150 - pebble labels at 735/260 sit inside the drawing and clear of every object
   ---
-  duration_ms: 0.227939
+  duration_ms: 0.200931
   type: 'test'
   ...
 # Subtest: pebble labels at 750/250 sit inside the drawing and clear of every object
-ok 159 - pebble labels at 750/250 sit inside the drawing and clear of every object
+ok 151 - pebble labels at 750/250 sit inside the drawing and clear of every object
   ---
-  duration_ms: 0.131488
+  duration_ms: 0.112935
   type: 'test'
   ...
 # Subtest: pebble labels at 250/250 sit inside the drawing and clear of every object
-ok 160 - pebble labels at 250/250 sit inside the drawing and clear of every object
+ok 152 - pebble labels at 250/250 sit inside the drawing and clear of every object
   ---
-  duration_ms: 0.098789
+  duration_ms: 0.097546
   type: 'test'
   ...
 # Subtest: pebble labels do not overlap each other
-ok 161 - pebble labels do not overlap each other
+ok 153 - pebble labels do not overlap each other
   ---
-  duration_ms: 0.07719
+  duration_ms: 0.070694
   type: 'test'
   ...
 # Subtest: pebble drawn objects stay inside the native grid
-ok 162 - pebble drawn objects stay inside the native grid
+ok 154 - pebble drawn objects stay inside the native grid
   ---
-  duration_ms: 0.048497
+  duration_ms: 0.045701
   type: 'test'
   ...
 # Subtest: pebble carries the required facts: pressure, hot and cold, scale ends, and the footer
-ok 163 - pebble carries the required facts: pressure, hot and cold, scale ends, and the footer
+ok 155 - pebble carries the required facts: pressure, hot and cold, scale ends, and the footer
   ---
-  duration_ms: 0.061488
+  duration_ms: 0.06169
   type: 'test'
   ...
 # Subtest: pebble scale bar colours the operating points inside the seven bands
-ok 164 - pebble scale bar colours the operating points inside the seven bands
+ok 156 - pebble scale bar colours the operating points inside the seven bands
   ---
-  duration_ms: 0.064797
+  duration_ms: 0.062602
   type: 'test'
   ...
 # Subtest: msr labels at 678/620 sit inside the drawing and clear of every object
-ok 165 - msr labels at 678/620 sit inside the drawing and clear of every object
+ok 157 - msr labels at 678/620 sit inside the drawing and clear of every object
   ---
-  duration_ms: 0.765001
+  duration_ms: 0.877428
   type: 'test'
   ...
 # Subtest: msr labels at 680/620 sit inside the drawing and clear of every object
-ok 166 - msr labels at 680/620 sit inside the drawing and clear of every object
+ok 158 - msr labels at 680/620 sit inside the drawing and clear of every object
   ---
-  duration_ms: 0.149747
+  duration_ms: 0.159099
   type: 'test'
   ...
 # Subtest: msr labels at 620/620 sit inside the drawing and clear of every object
-ok 167 - msr labels at 620/620 sit inside the drawing and clear of every object
+ok 159 - msr labels at 620/620 sit inside the drawing and clear of every object
   ---
-  duration_ms: 0.130339
+  duration_ms: 0.132254
   type: 'test'
   ...
 # Subtest: msr labels do not overlap each other
-ok 168 - msr labels do not overlap each other
+ok 160 - msr labels do not overlap each other
   ---
-  duration_ms: 0.073076
+  duration_ms: 0.072788
   type: 'test'
   ...
 # Subtest: msr drawn objects stay inside the native grid
-ok 169 - msr drawn objects stay inside the native grid
+ok 161 - msr drawn objects stay inside the native grid
   ---
-  duration_ms: 0.052923
+  duration_ms: 0.089884
   type: 'test'
   ...
 # Subtest: msr carries the required facts: pressure, hot and cold, scale ends, and the footer
-ok 170 - msr carries the required facts: pressure, hot and cold, scale ends, and the footer
+ok 162 - msr carries the required facts: pressure, hot and cold, scale ends, and the footer
   ---
-  duration_ms: 0.068304
+  duration_ms: 0.08051
   type: 'test'
   ...
 # Subtest: msr scale bar colours the operating points inside the seven bands
-ok 171 - msr scale bar colours the operating points inside the seven bands
+ok 163 - msr scale bar colours the operating points inside the seven bands
   ---
-  duration_ms: 0.050954
+  duration_ms: 0.055957
   type: 'test'
   ...
 # Subtest: PWR: control rods enter the core from the top
-ok 172 - PWR: control rods enter the core from the top
+ok 164 - PWR: control rods enter the core from the top
   ---
-  duration_ms: 0.135335
+  duration_ms: 0.105175
   type: 'test'
   ...
 # Subtest: PWR: steam is drawn as dots on the secondary side, clear of the core and steam generator
-ok 173 - PWR: steam is drawn as dots on the secondary side, clear of the core and steam generator
+ok 165 - PWR: steam is drawn as dots on the secondary side, clear of the core and steam generator
   ---
-  duration_ms: 0.076359
+  duration_ms: 0.088084
   type: 'test'
   ...
 # Subtest: MSR scale covers the model's full-power hot leg (620 + 58 = 678 °C)
-ok 174 - MSR scale covers the model's full-power hot leg (620 + 58 = 678 °C)
+ok 166 - MSR scale covers the model's full-power hot leg (620 + 58 = 678 °C)
   ---
-  duration_ms: 0.07609
+  duration_ms: 0.059182
   type: 'test'
   ...
 # Subtest: seven bands, coldest first, hottest last
-ok 175 - seven bands, coldest first, hottest last
+ok 167 - seven bands, coldest first, hottest last
   ---
-  duration_ms: 0.856587
+  duration_ms: 0.869847
   type: 'test'
   ...
 # Subtest: values outside the scale are clamped to the end bands
-ok 176 - values outside the scale are clamped to the end bands
+ok 168 - values outside the scale are clamped to the end bands
   ---
-  duration_ms: 0.147334
+  duration_ms: 0.137848
   type: 'test'
   ...
 # Subtest: the designed plant's operating points land where the eye expects
-ok 177 - the designed plant's operating points land where the eye expects
+ok 169 - the designed plant's operating points land where the eye expects
   ---
-  duration_ms: 0.1217
+  duration_ms: 0.192092
   type: 'test'
   ...
 # Subtest: the drawing carries the required labels: pressure, hot and cold, scale, and the footer
-ok 178 - the drawing carries the required labels: pressure, hot and cold, scale, and the footer
+ok 170 - the drawing carries the required labels: pressure, hot and cold, scale, and the footer
   ---
-  duration_ms: 0.434335
+  duration_ms: 0.341528
   type: 'test'
   ...
 # Subtest: every label fits on the 160 × 80 native grid
-ok 179 - every label fits on the 160 × 80 native grid
+ok 171 - every label fits on the 160 × 80 native grid
   ---
-  duration_ms: 0.161328
+  duration_ms: 0.190913
   type: 'test'
   ...
 # Subtest: all six plants are drawn
-ok 180 - all six plants are drawn
+ok 172 - all six plants are drawn
   ---
-  duration_ms: 1.472493
+  duration_ms: 1.46151
   type: 'test'
   ...
 # Subtest: every loop closes, and every step of every loop is one drawn pipe in the flow direction
-ok 181 - every loop closes, and every step of every loop is one drawn pipe in the flow direction
+ok 173 - every loop closes, and every step of every loop is one drawn pipe in the flow direction
   ---
-  duration_ms: 0.690301
+  duration_ms: 0.642022
   type: 'test'
   ...
 # Subtest: pipes run only across and down, and start and end on the parts they join
-ok 182 - pipes run only across and down, and start and end on the parts they join
+ok 174 - pipes run only across and down, and start and end on the parts they join
   ---
-  duration_ms: 0.613934
+  duration_ms: 0.627364
   type: 'test'
   ...
 # Subtest: every part and every pipe fits inside the picture
-ok 183 - every part and every pipe fits inside the picture
+ok 175 - every part and every pipe fits inside the picture
   ---
-  duration_ms: 1.114305
+  duration_ms: 0.366213
   type: 'test'
   ...
 # Subtest: every plant makes steam for one turbine, and only steam pipes feed the turbine
-ok 184 - every plant makes steam for one turbine, and only steam pipes feed the turbine
+ok 176 - every plant makes steam for one turbine, and only steam pipes feed the turbine
   ---
-  duration_ms: 0.274469
+  duration_ms: 0.27541
   type: 'test'
   ...
 # Subtest: PWR: closed primary loop. Core, steam generator, pump and pressurizer. The turbine is on the secondary side.
-ok 185 - PWR: closed primary loop. Core, steam generator, pump and pressurizer. The turbine is on the secondary side.
+ok 177 - PWR: closed primary loop. Core, steam generator, pump and pressurizer. The turbine is on the secondary side.
   ---
-  duration_ms: 0.179822
+  duration_ms: 0.195509
   type: 'test'
   ...
 # Subtest: BWR: one open loop from the vessel to the turbine, no steam generator, recirculation through the vessel
-ok 186 - BWR: one open loop from the vessel to the turbine, no steam generator, recirculation through the vessel
+ok 178 - BWR: one open loop from the vessel to the turbine, no steam generator, recirculation through the vessel
   ---
-  duration_ms: 0.213435
+  duration_ms: 0.209934
   type: 'test'
   ...
 # Subtest: only the BWR sends core coolant to the turbine
-ok 187 - only the BWR sends core coolant to the turbine
+ok 179 - only the BWR sends core coolant to the turbine
   ---
-  duration_ms: 0.120966
+  duration_ms: 0.121761
   type: 'test'
   ...
 # Subtest: radioactive salt never reaches the steam generator: salt plants have an intermediate loop
-ok 188 - radioactive salt never reaches the steam generator: salt plants have an intermediate loop
+ok 180 - radioactive salt never reaches the steam generator: salt plants have an intermediate loop
   ---
-  duration_ms: 0.406398
+  duration_ms: 0.376089
   type: 'test'
   ...
 # Subtest: pebble bed: helium goes down through the bed, through a separate steam generator, back by the blower
-ok 189 - pebble bed: helium goes down through the bed, through a separate steam generator, back by the blower
+ok 181 - pebble bed: helium goes down through the bed, through a separate steam generator, back by the blower
   ---
-  duration_ms: 0.349436
+  duration_ms: 0.425097
   type: 'test'
   ...
 # Subtest: MSR and MSFR carry fuel in the salt and can drain it: the MSR through a freeze valve
-ok 190 - MSR and MSFR carry fuel in the salt and can drain it: the MSR through a freeze valve
+ok 182 - MSR and MSFR carry fuel in the salt and can drain it: the MSR through a freeze valve
   ---
-  duration_ms: 0.324619
+  duration_ms: 0.206206
   type: 'test'
   ...
 # Subtest: Cherenkov blue only in a hot core cooled by a clear liquid
-ok 191 - Cherenkov blue only in a hot core cooled by a clear liquid
+ok 183 - Cherenkov blue only in a hot core cooled by a clear liquid
   ---
-  duration_ms: 0.149293
+  duration_ms: 0.130544
   type: 'test'
   ...
 # Subtest: the containment holds the PWR primary, and the turbine is outside it
-ok 192 - the containment holds the PWR primary, and the turbine is outside it
+ok 184 - the containment holds the PWR primary, and the turbine is outside it
   ---
-  duration_ms: 0.1408
+  duration_ms: 0.14602
   type: 'test'
   ...
 # Subtest: core health is 100 when every part is full, and drops by the weight when one part is zero
-ok 193 - core health is 100 when every part is full, and drops by the weight when one part is zero
+ok 185 - core health is 100 when every part is full, and drops by the weight when one part is zero
   ---
-  duration_ms: 1.131393
+  duration_ms: 1.149471
   type: 'test'
   ...
 # Subtest: a part just under full prints 99.7, not 100, and the walk inputs still score 60
-ok 194 - a part just under full prints 99.7, not 100, and the walk inputs still score 60
+ok 186 - a part just under full prints 99.7, not 100, and the walk inputs still score 60
   ---
-  duration_ms: 0.310977
+  duration_ms: 0.218109
   type: 'test'
   ...
 # Subtest: a hide lowers the residue part, and a catch does not
-ok 195 - a hide lowers the residue part, and a catch does not
+ok 187 - a hide lowers the residue part, and a catch does not
   ---
-  duration_ms: 0.203319
+  duration_ms: 0.220209
   type: 'test'
   ...
 # Subtest: more power means more glow and more particles, and more flow means faster particles
-ok 196 - more power means more glow and more particles, and more flow means faster particles
+ok 188 - more power means more glow and more particles, and more flow means faster particles
   ---
-  duration_ms: 0.319527
+  duration_ms: 0.315464
   type: 'test'
   ...
 # Subtest: reduced motion asks for zero particles, and a full core draws more cells than the window
-ok 197 - reduced motion asks for zero particles, and a full core draws more cells than the window
+ok 189 - reduced motion asks for zero particles, and a full core draws more cells than the window
   ---
-  duration_ms: 0.14394
+  duration_ms: 0.144505
   type: 'test'
   ...
 # Subtest: burnup stays pending, and the daily row does not invent a mass
-ok 198 - burnup stays pending, and the daily row does not invent a mass
+ok 190 - burnup stays pending, and the daily row does not invent a mass
   ---
-  duration_ms: 0.258889
+  duration_ms: 0.20431
   type: 'test'
   ...
 # Subtest: colour-safe marks use the listed palette, one per band, and no grey ramp
-ok 199 - colour-safe marks use the listed palette, one per band, and no grey ramp
+ok 191 - colour-safe marks use the listed palette, one per band, and no grey ramp
   ---
-  duration_ms: 0.265276
+  duration_ms: 0.319266
   type: 'test'
   ...
 # Subtest: band time is the last day, after the clock resets
-ok 200 - band time is the last day, after the clock resets
+ok 192 - band time is the last day, after the clock resets
   ---
-  duration_ms: 0.175345
+  duration_ms: 0.207011
   type: 'test'
   ...
 # Subtest: higher burnup dims the glow, and scram eases to 0.15 over three seconds
-ok 201 - higher burnup dims the glow, and scram eases to 0.15 over three seconds
+ok 193 - higher burnup dims the glow, and scram eases to 0.15 over three seconds
   ---
-  duration_ms: 0.418885
+  duration_ms: 0.398813
   type: 'test'
   ...
 # Subtest: scram clears the flow, vapor rises, and the downcomer falls
-ok 202 - scram clears the flow, vapor rises, and the downcomer falls
+ok 194 - scram clears the flow, vapor rises, and the downcomer falls
   ---
-  duration_ms: 0.446428
+  duration_ms: 0.443731
   type: 'test'
   ...
 # Subtest: core map uses passes and does not set shuffleDone
-ok 203 - core map uses passes and does not set shuffleDone
+ok 195 - core map uses passes and does not set shuffleDone
   ---
-  duration_ms: 0.316499
+  duration_ms: 0.271073
   type: 'test'
   ...
 # Subtest: server render has no window, so reduced motion is false and does not throw
-ok 204 - server render has no window, so reduced motion is false and does not throw
+ok 196 - server render has no window, so reduced motion is false and does not throw
   ---
-  duration_ms: 0.681281
+  duration_ms: 0.717002
   type: 'test'
   ...
 # Subtest: a new state starts outside the desktop, and the desktop has its defaults
-ok 205 - a new state starts outside the desktop, and the desktop has its defaults
+ok 197 - a new state starts outside the desktop, and the desktop has its defaults
   ---
-  duration_ms: 1.779206
+  duration_ms: 1.748532
   type: 'test'
   ...
 # Subtest: opening the desktop freezes the clock, and leaving it returns to the world
-ok 206 - opening the desktop freezes the clock, and leaving it returns to the world
+ok 198 - opening the desktop freezes the clock, and leaving it returns to the world
   ---
-  duration_ms: 1.012745
+  duration_ms: 1.042868
   type: 'test'
   ...
 # Subtest: an overlay launched from the desktop returns to the desktop when it is closed
-ok 207 - an overlay launched from the desktop returns to the desktop when it is closed
+ok 199 - an overlay launched from the desktop returns to the desktop when it is closed
   ---
-  duration_ms: 0.349086
+  duration_ms: 0.347359
   type: 'test'
   ...
 # Subtest: Academy launched from the desktop sets its flag and goal, and returns to the desktop
-ok 208 - Academy launched from the desktop sets its flag and goal, and returns to the desktop
+ok 200 - Academy launched from the desktop sets its flag and goal, and returns to the desktop
   ---
-  duration_ms: 0.230789
+  duration_ms: 0.246617
   type: 'test'
   ...
 # Subtest: the setup is saved as the season and stance, with the region left unset
-ok 209 - the setup is saved as the season and stance, with the region left unset
+ok 201 - the setup is saved as the season and stance, with the region left unset
   ---
-  duration_ms: 0.159804
+  duration_ms: 0.989113
   type: 'test'
   ...
 # Subtest: a new shift keeps the setup and the desktop settings, and starts everything else over
-ok 210 - a new shift keeps the setup and the desktop settings, and starts everything else over
+ok 202 - a new shift keeps the setup and the desktop settings, and starts everything else over
   ---
-  duration_ms: 0.348906
+  duration_ms: 0.299477
   type: 'test'
   ...
 # Subtest: settings made in a shift survive a reload, with the setup and the desktop
-ok 211 - settings made in a shift survive a reload, with the setup and the desktop
+ok 203 - settings made in a shift survive a reload, with the setup and the desktop
   ---
-  duration_ms: 1.031138
+  duration_ms: 1.039584
   type: 'test'
   ...
 # Subtest: with no shift started, settings are not written, so no save appears before a shift
-ok 212 - with no shift started, settings are not written, so no save appears before a shift
+ok 204 - with no shift started, settings are not written, so no save appears before a shift
   ---
-  duration_ms: 0.196367
+  duration_ms: 0.164928
   type: 'test'
   ...
 # Subtest: the version 2 save carries the fields the spec names
-ok 213 - the version 2 save carries the fields the spec names
+ok 205 - the version 2 save carries the fields the spec names
   ---
-  duration_ms: 0.468043
+  duration_ms: 0.620762
   type: 'test'
   ...
 # Subtest: a real version 1 fixture migrates without changing residue, flags, plant, academy, trust, or culture
-ok 214 - a real version 1 fixture migrates without changing residue, flags, plant, academy, trust, or culture
+ok 206 - a real version 1 fixture migrates without changing residue, flags, plant, academy, trust, or culture
   ---
-  duration_ms: 1.508563
+  duration_ms: 1.637674
   type: 'test'
   ...
 # Subtest: a version 2 save round-trips, and writing it does not change the version 1 key
-ok 215 - a version 2 save round-trips, and writing it does not change the version 1 key
+ok 207 - a version 2 save round-trips, and writing it does not change the version 1 key
   ---
-  duration_ms: 1.298722
+  duration_ms: 1.314204
   type: 'test'
   ...
 # Subtest: a corrupt version 2 save is kept, and the version 1 save is not loaded
-ok 216 - a corrupt version 2 save is kept, and the version 1 save is not loaded
+ok 208 - a corrupt version 2 save is kept, and the version 1 save is not loaded
   ---
-  duration_ms: 0.343113
+  duration_ms: 0.192501
   type: 'test'
   ...
 # Subtest: start map is not a plateau: a single swap can lower Fq
-ok 217 - start map is not a plateau: a single swap can lower Fq
+ok 209 - start map is not a plateau: a single swap can lower Fq
   ---
-  duration_ms: 11.73245
+  duration_ms: 10.767557
   type: 'test'
   ...
 # Subtest: start map does not already pass
-ok 218 - start map does not already pass
+ok 210 - start map does not already pass
   ---
-  duration_ms: 0.201121
+  duration_ms: 0.264086
   type: 'test'
   ...
 # Subtest: greedy play from the start map reaches the pass band at every enrichment
-ok 219 - greedy play from the start map reaches the pass band at every enrichment
+ok 211 - greedy play from the start map reaches the pass band at every enrichment
   ---
-  duration_ms: 43.69455
+  duration_ms: 42.860251
   type: 'test'
   ...
 # Subtest: pass band has real margin: guided play lands well under the limit
-ok 220 - pass band has real margin: guided play lands well under the limit
+ok 212 - pass band has real margin: guided play lands well under the limit
   ---
-  duration_ms: 436.543376
+  duration_ms: 434.164719
   type: 'test'
   ...
 # Subtest: the trade-off is real: out-in is flat but leaks, in-out is quiet on the rim but peaks
-ok 221 - the trade-off is real: out-in is flat but leaks, in-out is quiet on the rim but peaks
+ok 213 - the trade-off is real: out-in is flat but leaks, in-out is quiet on the rim but peaks
   ---
-  duration_ms: 0.575836
+  duration_ms: 0.474878
+  type: 'test'
+  ...
+# Subtest: hall tone follows power, goes quiet on a scram, and dies when sound is off
+ok 214 - hall tone follows power, goes quiet on a scram, and dies when sound is off
+  ---
+  duration_ms: 0.912399
+  type: 'test'
+  ...
+# Subtest: BWR power rises when recirc flow rises at the same rods
+ok 215 - BWR power rises when recirc flow rises at the same rods
+  ---
+  duration_ms: 1.042384
+  type: 'test'
+  ...
+# Subtest: draining a salt core ends fission heat
+ok 216 - draining a salt core ends fission heat
+  ---
+  duration_ms: 0.29549
+  type: 'test'
+  ...
+# Subtest: pebble burnup rises on each pass and the outlet stays near 750
+ok 217 - pebble burnup rises on each pass and the outlet stays near 750
+  ---
+  duration_ms: 0.188883
+  type: 'test'
+  ...
+# Subtest: salt panel shows βeff smaller than β and helium does not glow
+ok 218 - salt panel shows βeff smaller than β and helium does not glow
+  ---
+  duration_ms: 0.43754
+  type: 'test'
+  ...
+# Subtest: each type has at least three events and a wrong response is worse
+ok 219 - each type has at least three events and a wrong response is worse
+  ---
+  duration_ms: 0.999119
+  type: 'test'
+  ...
+# Subtest: a tripped recirc pump stops the hall arrows
+ok 220 - a tripped recirc pump stops the hall arrows
+  ---
+  duration_ms: 0.415072
+  type: 'test'
+  ...
+# Subtest: a steam-generator tube leak leaves a mark
+ok 221 - a steam-generator tube leak leaves a mark
+  ---
+  duration_ms: 0.178504
+  type: 'test'
+  ...
+# Subtest: PWR lines stay the original sentences
+ok 222 - PWR lines stay the original sentences
+  ---
+  duration_ms: 1.124334
   type: 'test'
   ...
 # Subtest: full-core and depletion change k and the OpenMC letter
-ok 222 - full-core and depletion change k and the OpenMC letter
+ok 223 - full-core and depletion change k and the OpenMC letter
   ---
-  duration_ms: 46.32807
+  duration_ms: 43.409809
   type: 'test'
   ...
 # Subtest: PWR bench values match the trainer's own readout
-ok 223 - PWR bench values match the trainer's own readout
+ok 224 - PWR bench values match the trainer's own readout
   ---
-  duration_ms: 1.098759
+  duration_ms: 1.093181
   type: 'test'
   ...
 # Subtest: ΔT is in band at 100% power and 100% flow for PWR
-ok 224 - ΔT is in band at 100% power and 100% flow for PWR
+ok 225 - ΔT is in band at 100% power and 100% flow for PWR
   ---
-  duration_ms: 0.137279
+  duration_ms: 0.182964
   type: 'test'
   ...
 # Subtest: ΔT rises with power and falls with flow, for every plant type
-ok 225 - ΔT rises with power and falls with flow, for every plant type
+ok 226 - ΔT rises with power and falls with flow, for every plant type
   ---
-  duration_ms: 0.190305
+  duration_ms: 0.186232
   type: 'test'
   ...
 # Subtest: fuel is hotter than the hot leg, which is hotter than the cold leg, whenever power is above zero
-ok 226 - fuel is hotter than the hot leg, which is hotter than the cold leg, whenever power is above zero
+ok 227 - fuel is hotter than the hot leg, which is hotter than the cold leg, whenever power is above zero
   ---
-  duration_ms: 0.412543
+  duration_ms: 0.342176
   type: 'test'
   ...
 # Subtest: zero power gives no ΔT and no fuel rise
-ok 227 - zero power gives no ΔT and no fuel rise
+ok 228 - zero power gives no ΔT and no fuel rise
   ---
-  duration_ms: 0.124057
+  duration_ms: 0.122477
   type: 'test'
   ...
 # Subtest: a PlantDesign and its type give the same answer
-ok 228 - a PlantDesign and its type give the same answer
+ok 229 - a PlantDesign and its type give the same answer
   ---
-  duration_ms: 0.680223
+  duration_ms: 0.674257
   type: 'test'
   ...
 # Subtest: the flow floor keeps ΔT finite at very low flow
-ok 229 - the flow floor keeps ΔT finite at very low flow
+ok 230 - the flow floor keeps ΔT finite at very low flow
   ---
-  duration_ms: 0.19153
+  duration_ms: 0.193541
   type: 'test'
   ...
 # Subtest: the shared run seeds at the 62% drill, and flow still comes from the design
-ok 230 - the shared run seeds at the 62% drill, and flow still comes from the design
+ok 231 - the shared run seeds at the 62% drill, and flow still comes from the design
   ---
-  duration_ms: 0.154484
+  duration_ms: 0.194008
   type: 'test'
   ...
 # Subtest: history is per minute while open and per hour while closed, and it caps
-ok 231 - history is per minute while open and per hour while closed, and it caps
+ok 232 - history is per minute while open and per hour while closed, and it caps
   ---
-  duration_ms: 0.585098
+  duration_ms: 0.551097
   type: 'test'
   ...
 # Subtest: fuel mass stays pending until someone cites an inventory
-ok 232 - fuel mass stays pending until someone cites an inventory
+ok 233 - fuel mass stays pending until someone cites an inventory
   ---
-  duration_ms: 0.347516
+  duration_ms: 0.39101
   type: 'test'
   ...
 # Subtest: the Core Map keeps its grid and swap count, and never sets shuffleDone
-ok 233 - the Core Map keeps its grid and swap count, and never sets shuffleDone
+ok 234 - the Core Map keeps its grid and swap count, and never sets shuffleDone
   ---
-  duration_ms: 1.97328
+  duration_ms: 2.139909
   type: 'test'
   ...
 # Subtest: a corrupt saved Core Map is ignored, not loaded
-ok 234 - a corrupt saved Core Map is ignored, not loaded
+ok 235 - a corrupt saved Core Map is ignored, not loaded
   ---
-  duration_ms: 0.251184
+  duration_ms: 0.294721
   type: 'test'
   ...
 # Subtest: the shipped pool is empty, so the Local tab has nothing to show
-ok 235 - the shipped pool is empty, so the Local tab has nothing to show
+ok 236 - the shipped pool is empty, so the Local tab has nothing to show
   ---
-  duration_ms: 0.233494
+  duration_ms: 0.1888
   type: 'test'
   ...
 # Subtest: same seed, same items; a different seed can change the order
-ok 236 - same seed, same items; a different seed can change the order
+ok 237 - same seed, same items; a different seed can change the order
   ---
-  duration_ms: 0.258139
+  duration_ms: 0.267334
   type: 'test'
   ...
 # Subtest: a pick is 3 to 5 items when the pool has enough eligible items
-ok 237 - a pick is 3 to 5 items when the pool has enough eligible items
+ok 238 - a pick is 3 to 5 items when the pool has enough eligible items
   ---
-  duration_ms: 1.164236
+  duration_ms: 1.307291
   type: 'test'
   ...
 # Subtest: conditions on season, stance, day and residue are respected
-ok 238 - conditions on season, stance, day and residue are respected
+ok 239 - conditions on season, stance, day and residue are respected
   ---
-  duration_ms: 0.598349
+  duration_ms: 0.574835
   type: 'test'
   ...
 # Subtest: a residue hide is never labelled as a catch
-ok 239 - a residue hide is never labelled as a catch
+ok 240 - a residue hide is never labelled as a catch
   ---
-  duration_ms: 0.382675
+  duration_ms: 0.420699
   type: 'test'
   ...
 # Subtest: the NRC search finds only what is on screen
-ok 240 - the NRC search finds only what is on screen
+ok 241 - the NRC search finds only what is on screen
   ---
-  duration_ms: 0.344655
+  duration_ms: 0.193595
   type: 'test'
   ...
 # Subtest: the background data has nine pending slots and no value or number
-ok 241 - the background data has nine pending slots and no value or number
+ok 242 - the background data has nine pending slots and no value or number
   ---
-  duration_ms: 0.568479
+  duration_ms: 0.614738
   type: 'test'
   ...
 # Subtest: the committed news list is empty
-ok 242 - the committed news list is empty
+ok 243 - the committed news list is empty
   ---
-  duration_ms: 0.486124
+  duration_ms: 0.44268
   type: 'test'
   ...
 # Subtest: a wide cafe uses the smallest whole zoom that covers the view
-ok 243 - a wide cafe uses the smallest whole zoom that covers the view
+ok 244 - a wide cafe uses the smallest whole zoom that covers the view
   ---
-  duration_ms: 0.877866
+  duration_ms: 0.967617
   type: 'test'
   ...
 # Subtest: rooms of different widths get the same zoom at one view size, so people do not change size between rooms
-ok 244 - rooms of different widths get the same zoom at one view size, so people do not change size between rooms
+ok 245 - rooms of different widths get the same zoom at one view size, so people do not change size between rooms
   ---
-  duration_ms: 0.143231
+  duration_ms: 0.155626
   type: 'test'
   ...
 # Subtest: the cover zoom stops at 5
-ok 245 - the cover zoom stops at 5
+ok 246 - the cover zoom stops at 5
   ---
-  duration_ms: 0.098125
+  duration_ms: 0.097272
   type: 'test'
   ...
 # Subtest: a phone-width view is zoom 2, and the camera pans because the room is bigger than the view
-ok 246 - a phone-width view is zoom 2, and the camera pans because the room is bigger than the view
+ok 247 - a phone-width view is zoom 2, and the camera pans because the room is bigger than the view
   ---
-  duration_ms: 0.21802
+  duration_ms: 0.10112
   type: 'test'
   ...
 # Subtest: a phone at the PHONE_VIEW_W threshold is still zoom 2
-ok 247 - a phone at the PHONE_VIEW_W threshold is still zoom 2
+ok 248 - a phone at the PHONE_VIEW_W threshold is still zoom 2
   ---
-  duration_ms: 0.134956
+  duration_ms: 0.116624
   type: 'test'
   ...
 # Subtest: the lot is walked at a zoom from the view height, not shown whole at zoom 1
-ok 248 - the lot is walked at a zoom from the view height, not shown whole at zoom 1
+ok 249 - the lot is walked at a zoom from the view height, not shown whole at zoom 1
   ---
-  duration_ms: 0.160542
+  duration_ms: 0.151903
   type: 'test'
   ...
-1..248
-# tests 248
+1..249
+# tests 249
 # suites 0
-# pass 241
-# fail 7
+# pass 240
+# fail 9
 # cancelled 0
 # skipped 0
 # todo 0
-# duration_ms 4115.35301
-UNIT_EXIT:1
+# duration_ms 4420.413764
+UNIT:1

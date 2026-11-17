@@ -56,7 +56,9 @@ import { systemReducedMotion } from "./reducedMotion";
 import { hasSave, hydrateSave, peekSave, wipeSave, writeSave } from "./save";
 import { computeKeff } from "./nuclearLab";
 import { NuclearDesk } from "./NuclearDesk";
+import { anatomyLines, hallBlurb, siteLine } from "./siteText";
 import { LoopSchematic } from "./LoopSchematic";
+import { readFace } from "./siteFace";
 import { DEPARTMENTS, dayDef, eodNpcLine, incidentOwner, shoreLine, yesterdayLine } from "./week";
 import { DEFAULT_PLAYER_LOOK, type PlayerLook } from "./artSpec";
 import { MAP_HUD, ROOM_BLURB, roomLinks } from "./site";
@@ -598,6 +600,10 @@ export function GameApp() {
         mode: s.mode,
         valveSteam: s.room === "maintenance" && maintenanceSteamOn(s.day, s.residue.valve),
         dt,
+        site: siteKind(s.plant),
+        power: sitePower(s.run),
+        scram: s.run.scram,
+        soundOn: !isMuted(),
       });
       if (s.mode === "play") {
         saveAcc += dt;
@@ -1939,8 +1945,18 @@ function siteLive(s: GameState): LiveRun | undefined {
   const ran = s.run.history.length > 0 || s.run.powerPct > 0;
   const powerPct = ran ? s.run.powerPct : 100;
   const flowPct = ran ? s.run.flowPct : 100;
+  const face = readFace();
   const ts = thermalState(s.plant, { powerPct, flowPct });
-  return { power: s.run.scram ? 0 : powerPct / 100, flow: flowPct / 100, rods: ran ? s.run.rodsWithdrawnPct / 100 : 0.85, scram: s.run.scram, tHot: ts.tHot, tCold: ts.tCold };
+  return {
+    power: s.run.scram ? 0 : powerPct / 100,
+    flow: face.flowMul <= 0 ? 0 : flowPct / 100,
+    rods: ran ? s.run.rodsWithdrawnPct / 100 : 0.85,
+    scram: s.run.scram,
+    tHot: ts.tHot,
+    tCold: ts.tCold,
+    arrows: face.flowMul > 0,
+    tubeMark: face.tubeMark,
+  };
 }
 
 function StillStage({
@@ -1961,11 +1977,20 @@ function StillStage({
   const site = siteKind(sitePlant);
   const ofSite = stillId === "pwr" || stillId === "mural_criticality" || stillId === "window_reactor";
   const kind = ofSite ? site : stillId ? STILL_CUTAWAY[stillId] : undefined;
+  if (stillId === "reactor") {
+    still = { ...still, body: siteLine(site, "hallFloor") };
+  }
+  if (stillId === "msr_fast") {
+    still = { ...still, title: "Fast fluoride (MSFR) — no graphite", body: siteLine("msr", "fastSalt") };
+  }
   if (ofSite && site !== "pwr") {
     const own = STILLS[site];
     still = { ...own, title: `${SITE_NAME[site]} loop (this site)` };
   }
-  const showLoop = kind === "pwr" && (stillId === "pwr" || stillId === "mural_criticality");
+  if (stillId === "window_reactor") {
+    still = { ...still, body: siteLine(site, "windowReactor") };
+  }
+  const showLoop = stillId === "pwr" || stillId === "mural_criticality";
   return (
     <div className="absolute inset-0 z-50 flex flex-col bg-[#16110d]" data-testid="still-stage">
       <div className="relative min-h-0 flex-1">
@@ -2005,7 +2030,7 @@ function StillStage({
           </div>
           {showLoop ? (
             <div className="mt-3">
-              <LoopSchematic />
+              <LoopSchematic kind={site} />
             </div>
           ) : null}
         </div>
@@ -2086,6 +2111,13 @@ function AcademyStage({
 }) {
   const page = ACADEMY[index];
   const still = STILLS[page.still];
+  const kind = siteKind(plant);
+  const body =
+    page.title === "Heat has to leave"
+      ? siteLine(kind, "heatLeaves")
+      : page.title === "The vessel has names"
+        ? siteLine(kind, "vesselNames")
+        : page.body;
   const [tierOnly, setTierOnly] = useState<AcademyTier | null>(null);
   const shown = ACADEMY.map((_, i) => i).filter((i) => tierOnly === null || ACADEMY[i].tier === tierOnly);
   const pos = shown.indexOf(index);
@@ -2167,7 +2199,7 @@ function AcademyStage({
             Not in this build.
           </div>
           <p className="text-[12px]" data-testid="academy-tier">{`Tier ${page.tier}`}</p>
-          <TeachPriya line={page.body} size={96} />
+          <TeachPriya line={body} size={96} />
           <p className="mt-2 text-[11px] text-subtle">Teaching model only — not a license. k-numbers stay classroom proxies.</p>
         {page.extra === "trainer" && (
           <button type="button" className="btn-primary mt-4" onClick={onTrainer}>
@@ -2185,19 +2217,12 @@ function AcademyStage({
         )}
         {page.extra === "fluids" && (
           <p className="mt-3 font-mono text-xs text-good">
-            IN cold leg → downcomer → lower plenum → core up → OUT hot leg → steam generator. PWR classroom ~16 MPa, liquid. BWR boils in-vessel instead. Teaching only.
+            {siteLine(kind, "fluids")}
           </p>
         )}
         {page.extra === "anatomy" && (
           <ul className="mt-4 space-y-1 text-left text-sm text-muted">
-            {[
-              "Reactor pressure vessel — thick steel, ~16 MPa classroom",
-              "CRDMs on the head — rods from above",
-              "Downcomer annulus · core barrel · fuel assemblies",
-              "Hot leg · steam generator U-tubes (heat leaves here)",
-              "Cold leg · reactor coolant pump",
-              "Pressurizer — keeps the primary from boiling",
-            ].map((line) => (
+            {anatomyLines(kind).map((line) => (
               <li key={line}>{line}</li>
             ))}
           </ul>
@@ -2497,7 +2522,7 @@ function PauseStage({
             <span>Control · Core</span>
             <span>Eng · Maint · Break · Arcade</span>
           </p>
-          <p className="mt-2 text-sm text-fg">{ROOM_BLURB[focus]}</p>
+          <p className="mt-2 text-sm text-fg">{hallBlurb(siteKind(s.plant), focus, ROOM_BLURB[focus])}</p>
           <p className="font-mono text-[11px] text-subtle">{roomLinks(focus)} · teaching layout — not a license</p>
           {focus !== s.room && visited ? (
             <button type="button" className="btn-primary mt-2" onClick={() => onTravel(focus)}>

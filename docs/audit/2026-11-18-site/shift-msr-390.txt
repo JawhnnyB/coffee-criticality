@@ -1,0 +1,28 @@
+msr type clicked
+msr signed
+msr stuck 12  buttons 
+msr intro 12: 
+msr intro 18: 
+msr intro 24: 
+msr stuck 30  buttons 
+msr intro 30: 
+msr intro 36: 
+msr intro 42: 
+msr walked in
+msr-390x844 cafe hud: 06:52 D1 MORNING MORE CRITICALITY CAFE inPlay true
+msr-390x844 mabel talk open after KeyD
+msr-390x844 talk closed true
+msr-390x844 after mabel: 06:54 D1 MORNING MORE CRITICALITY CAFE met true
+msr-390x844 lot: true
+msr-390x844 corridor: true
+msr-390x844 control: true
+msr-390x844 hall: true
+msr-390x844 reactor control ranges 2
+msr-390x844 site panel: Salt Pump 100% Plug frozen Salt level 100% β 0.0065 βeff 0.0036 Fission heat 100%
+msr-390x844 event: Freeze-valve heater fault Heater current low. Plug temperature falling. Heater tape on the valve is dark. Restore the heater before the plug thaws on its own. Ignore it. The plug o
+msr-390x844 event-wrong: Worse. Ignore it. The plug opens and the salt starts to leave.
+msr-390x844 scram text: false
+msr-390x844 clock before pace: 07:10 D1 MORNING MORE REACTOR HALL
+msr-390x844 clock after 8s pace: 07:16 D1 MORNING MORE REACTOR HALL
+msr-390x844 pageErrors 0
+msr-390x844 404 0

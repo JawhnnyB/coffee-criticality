@@ -1,0 +1,28 @@
+pwr type clicked
+pwr signed
+pwr stuck 12  buttons 
+pwr intro 12: 
+pwr intro 18: 
+pwr intro 24: 
+pwr stuck 30  buttons 
+pwr intro 30: 
+pwr intro 36: 
+pwr intro 42: 
+pwr walked in
+pwr-390x844 cafe hud: 06:52 D1 MORNING MORE CRITICALITY CAFE inPlay true
+pwr-390x844 mabel talk open after KeyW
+pwr-390x844 talk closed true
+pwr-390x844 after mabel: 06:54 D1 MORNING MORE CRITICALITY CAFE met true
+pwr-390x844 lot: true
+pwr-390x844 corridor: true
+pwr-390x844 control: true
+pwr-390x844 hall: true
+pwr-390x844 reactor control ranges 2
+pwr-390x844 site panel: PWR Rods 62% out Flow 100% Power 62%
+pwr-390x844 event: Steam generator tube leak Steam-line radiation alarm. A mark on the steam-generator tubes. Arrows still move. Cut power, isolate the steam generator, hold the primary. Leave it onl
+pwr-390x844 event-wrong: Worse. Leave it online. The alarm stays and the secondary carries activity.
+pwr-390x844 scram text: true
+pwr-390x844 clock before pace: 07:10 D1 MORNING MORE REACTOR HALL
+pwr-390x844 clock after 8s pace: 07:16 D1 MORNING MORE REACTOR HALL
+pwr-390x844 pageErrors 0
+pwr-390x844 404 0

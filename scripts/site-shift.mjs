@@ -31,14 +31,21 @@ async function hud(page) {
   return "";
 }
 
+async function roomName(page) {
+  const text = await page.getByTestId("instrument").innerText().catch(() => "");
+  const lines = text.split("\n").map((s) => s.trim()).filter(Boolean);
+  const i = lines.findIndex((l) => l === "LESS" || l === "MORE");
+  return i >= 0 ? lines[i + 1] || "" : "";
+}
+
 async function holdUntil(page, code, ms, needle) {
   await page.keyboard.down(code);
   const steps = Math.ceil(ms / 400);
   let hit = false;
   for (let i = 0; i < steps; i++) {
     await page.waitForTimeout(400);
-    const now = (await hud(page)).toLowerCase();
-    if (needle && now.includes(needle.toLowerCase())) {
+    const now = (await roomName(page)).toLowerCase();
+    if (needle && now === needle.toLowerCase()) {
       hit = true;
       break;
     }
@@ -52,25 +59,38 @@ async function hold(page, code, ms) {
 }
 
 async function dismissTalk(page) {
-  for (let i = 0; i < 10; i++) {
-    if (!(await page.getByTestId("paper-talk").count())) return;
-    await page.keyboard.press("Enter");
-    await page.waitForTimeout(280);
+  await finishTalk(page);
+}
+
+async function finishTalk(page) {
+  for (let i = 0; i < 24; i++) {
+    if (await page.getByTestId("instrument").count()) return true;
+    const choice = page.locator("[data-testid=paper-talk] button");
+    if (await choice.count()) {
+      await choice.first().click({ force: true }).catch(() => {});
+      await page.waitForTimeout(400);
+      continue;
+    }
+    const paper = page.getByTestId("paper-talk");
+    if (await paper.count()) await paper.click({ force: true, position: { x: 40, y: 30 } }).catch(() => {});
+    else await page.keyboard.press("Enter");
+    await page.waitForTimeout(450);
   }
+  return (await page.getByTestId("instrument").count()) > 0;
 }
 
 async function reach(page, needle, moves, lines, tag) {
   const want = needle.toLowerCase();
   for (const [code, ms] of moves) {
     await dismissTalk(page);
-    const now = (await hud(page)).toLowerCase();
-    if (now.includes(want)) return true;
+    const now = (await roomName(page)).toLowerCase();
+    if (now === want) return true;
     if (await holdUntil(page, code, ms, needle)) return true;
   }
   await dismissTalk(page);
-  const now = await hud(page);
-  log(lines, `${tag} looking for ${JSON.stringify(needle)} hud: ${now || "(no instrument)"}`);
-  return now.toLowerCase().includes(want);
+  const now = await roomName(page);
+  log(lines, `${tag} looking for ${JSON.stringify(needle)} room: ${now || "(none)"} hud: ${await hud(page) || "(no instrument)"}`);
+  return now.toLowerCase() === want;
 }
 
 async function throughMenus(page, type, lines) {
@@ -97,12 +117,17 @@ async function throughMenus(page, type, lines) {
       log(lines, `${type.id} walked in`);
       return true;
     }
-    const sign = page.getByRole("button", { name: "Sign the unit" });
-    if ((await sign.count()) && (await sign.first().isVisible().catch(() => false))) {
-      await sign.first().click();
+    const sign = page.locator("button").filter({ hasText: "Sign the unit" });
+    if (await sign.count()) {
+      await sign.first().click({ force: true, timeout: 8000 });
       log(lines, `${type.id} signed`);
       await page.waitForTimeout(400);
       continue;
+    }
+    if (i === 12 || i === 30) {
+      const title = await page.locator("h2").first().innerText().catch(() => "");
+      const buttons = await page.locator("button").allInnerTexts().catch(() => []);
+      log(lines, `${type.id} stuck ${i} ${title.replace(/\s+/g, " ").slice(0, 60)} buttons ${buttons.slice(0, 6).join(" | ").replace(/\s+/g, " ").slice(0, 180)}`);
     }
     const walk = page.getByTestId("brief-walk");
     if (await walk.count()) {
@@ -135,8 +160,8 @@ async function throughMenus(page, type, lines) {
     }
     const cont = page.getByTestId("builder-continue");
     if (await cont.count()) {
-      await cont.first().click();
-      await page.waitForTimeout(180);
+      await cont.first().click({ force: true, timeout: 8000 });
+      await page.waitForTimeout(220);
       continue;
     }
     await page.keyboard.press("Enter");
@@ -174,33 +199,67 @@ async function reactorControl(page, lines, tag) {
   const ranges = page.locator("input[type=range]");
   const n = await ranges.count();
   log(lines, `${tag} reactor control ranges ${n}`);
+  const panel0 = await page.getByTestId("site-panel").innerText().catch(() => "");
+  log(lines, `${tag} site panel: ${panel0.replace(/\s+/g, " ").slice(0, 180)}`);
   await page.screenshot({ path: `${out}/${tag}-reactor-control.png` });
   if (n >= 2) {
-    await ranges.nth(1).fill("50");
-    await ranges.nth(0).fill("100");
-    await page.waitForTimeout(2800);
+    await ranges.nth(0).scrollIntoViewIfNeeded().catch(() => {});
+    await ranges.nth(1).fill("50", { timeout: 8000 }).catch((e) => log(lines, `${tag} flow fill failed ${e.message.split("\n")[0]}`));
+    await ranges.nth(0).fill("100", { timeout: 8000 }).catch((e) => log(lines, `${tag} rod fill failed ${e.message.split("\n")[0]}`));
+    await page.waitForTimeout(1200);
+  }
+  await page.screenshot({ path: `${out}/${tag}-reactor-mid.png` });
+  const call = page.getByTestId("plant-call");
+  if (await call.count()) {
+    await call.scrollIntoViewIfNeeded().catch(() => {});
+    await call.click();
+    await page.waitForTimeout(300);
+    const ev = await page.getByTestId("plant-event").innerText().catch(() => "");
+    log(lines, `${tag} event: ${ev.replace(/\s+/g, " ").slice(0, 180)}`);
+    await page.screenshot({ path: `${out}/${tag}-event.png` });
+    const which = tag.includes("390x844") ? "event-wrong" : "event-right";
+    const choice = page.getByTestId(which);
+    if (await choice.count()) {
+      await choice.click({ force: true, timeout: 4000 });
+      await page.waitForTimeout(400);
+      const result = await page.getByTestId("event-result").innerText().catch(() => "");
+      log(lines, `${tag} ${which}: ${result.replace(/\s+/g, " ").slice(0, 180)}`);
+      await page.screenshot({ path: `${out}/${tag}-${which}.png` });
+    }
+  } else log(lines, `${tag} plant call missing`);
+  const scram = page.getByRole("button", { name: "Scram" });
+  if (await scram.count()) {
+    await scram.first().scrollIntoViewIfNeeded().catch(() => {});
+    await scram.first().click({ force: true, timeout: 4000 });
+    await page.waitForTimeout(600);
   }
   await page.screenshot({ path: `${out}/${tag}-reactor-after.png` });
   const panel = await bodyText(page);
   log(lines, `${tag} scram text: ${/Scram/i.test(panel)}`);
   const close = page.getByTestId("close-control");
-  if (await close.count()) await close.click().catch(() => {});
-  await page.keyboard.press("Escape");
+  if (await close.count()) await close.click({ force: true, timeout: 4000 }).catch((e) => log(lines, `${tag} close-control ${e.message.split("\n")[0]}`));
+  await page.keyboard.press("Escape").catch(() => {});
   await page.waitForTimeout(200);
-  if (await page.getByTestId("pause-stage").count()) await page.keyboard.press("Escape");
+  if (await page.getByTestId("pause-stage").count()) await page.keyboard.press("Escape").catch(() => {});
   const back = page.getByRole("button", { name: "Back to shift" });
-  if (await back.count()) await back.click().catch(() => {});
+  if (await back.count()) await back.click({ force: true, timeout: 4000 }).catch(() => {});
+  const phoneBack = page.getByTestId("phone-back");
+  if (await phoneBack.count()) await phoneBack.click({ force: true, timeout: 4000 }).catch(() => {});
   await page.waitForTimeout(250);
-  if ((await hud(page)) === "") await page.keyboard.press("Escape");
+  if ((await hud(page)) === "") await page.keyboard.press("Escape").catch(() => {});
 }
 
-async function oneShift(browser, type, width, height) {
+async function oneShift(context, type, width, height) {
   const lines = [];
   const pageErrors = [];
   const missing = [];
   const tag = `${type.id}-${width}x${height}`;
-  const page = await browser.newPage({ viewport: { width, height } });
+  const page = await context.newPage();
+  page.setDefaultTimeout(8000);
   page.on("pageerror", (e) => pageErrors.push(String(e)));
+  page.on("console", (msg) => {
+    if (msg.type() === "error") pageErrors.push(msg.text().slice(0, 300));
+  });
   page.on("response", (r) => {
     if (r.status() === 404) missing.push(r.url());
   });
@@ -213,40 +272,100 @@ async function oneShift(browser, type, width, height) {
 
   if (inPlay) {
     await dismissTalk(page);
-    const toLot = [
-      ["KeyW", 1000],
-      ["KeyD", 5000],
+    const approach = [
+      ["KeyD", 800],
+      ["KeyW", 800],
+      ["KeyW", 400],
+      ["KeyA", 400],
+      ["KeyD", 800],
+      ["KeyS", 400],
+      ["KeyW", 400],
     ];
-    const lot = await reach(page, "Lot / Campus", toLot, lines, tag);
+    let met = false;
+    for (const [code, ms] of approach) {
+      await hold(page, code, ms);
+      await page.keyboard.press("KeyE");
+      await page.waitForTimeout(300);
+      if (await page.getByTestId("paper-talk").count()) {
+        met = true;
+        log(lines, `${tag} mabel talk open after ${code}`);
+        const back = await finishTalk(page);
+        log(lines, `${tag} talk closed ${back}`);
+        break;
+      }
+    }
+    if (!met) {
+      const again = [
+        ["KeyA", 1200],
+        ["KeyS", 800],
+        ["KeyW", 400],
+        ["KeyD", 400],
+        ["KeyW", 400],
+        ["KeyD", 400],
+        ["KeyW", 400],
+        ["KeyE", 0],
+      ];
+      for (const [code, ms] of again) {
+        if (ms > 0) await hold(page, code, ms);
+        await page.keyboard.press("KeyE");
+        await page.waitForTimeout(250);
+        if (await page.getByTestId("paper-talk").count()) {
+          met = true;
+          log(lines, `${tag} mabel talk open on second sweep after ${code}`);
+          log(lines, `${tag} talk closed ${await finishTalk(page)}`);
+          break;
+        }
+      }
+    }
+    log(lines, `${tag} after mabel: ${await hud(page)} met ${met}`);
+
+    if (!met) {
+      await page.screenshot({ path: `${out}/${tag}-mabel-miss.png` });
+      log(lines, `${tag} lot: false`);
+      log(lines, `${tag} corridor: false`);
+      log(lines, `${tag} control: false`);
+      log(lines, `${tag} hall: false`);
+    } else {
+    let lot = await reach(page, "Lot / Campus", [["KeyD", 8000]], lines, tag);
+    if (!lot && /cafe/i.test(await roomName(page))) {
+      lot = await reach(
+        page,
+        "Lot / Campus",
+        [
+          ["KeyS", 800],
+          ["KeyD", 6000],
+          ["KeyW", 1600],
+          ["KeyD", 8000],
+        ],
+        lines,
+        tag,
+      );
+    }
     await page.screenshot({ path: `${out}/${tag}-lot.png` });
     log(lines, `${tag} lot: ${lot}`);
 
-    const toHall = [
-      ["KeyD", 8000],
-      ["KeyW", 4500],
-      ["KeyS", 8000],
-      ["KeyD", 2000],
-      ["KeyW", 4500],
-    ];
+    const toHall = [["KeyD", 16000]];
     const corridor = await reach(page, "Main corridor", toHall, lines, tag);
     await page.screenshot({ path: `${out}/${tag}-corridor.png` });
     log(lines, `${tag} corridor: ${corridor}`);
 
     const toControl = [
-      ["KeyD", 2500],
-      ["KeyW", 2500],
+      ["KeyS", 800],
+      ["KeyD", 2400],
+      ["KeyW", 4000],
     ];
     const control = await reach(page, "Control room", toControl, lines, tag);
     await page.screenshot({ path: `${out}/${tag}-control.png` });
     log(lines, `${tag} control: ${control}`);
 
     const toCore = [
-      ["KeyW", 1400],
-      ["KeyD", 3000],
+      ["KeyW", 1200],
+      ["KeyD", 6000],
     ];
     const core = await reach(page, "Reactor hall", toCore, lines, tag);
     await page.screenshot({ path: `${out}/${tag}-hall.png` });
     log(lines, `${tag} hall: ${core}`);
+    }
 
     await reactorControl(page, lines, tag);
 
@@ -269,17 +388,26 @@ async function oneShift(browser, type, width, height) {
 const browser = await chromium.launch({ headless: true });
 const chunks = [];
 const only = process.env.SHIFT_ONLY;
-const jobs = [
-  ...(only ? TYPES.filter((t) => t.id === only) : TYPES).map((type) => [type, 1280, 720]),
-  ...(only ? [] : [[TYPES[0], 390, 844]]),
-];
+const phone = process.env.SHIFT_PHONE !== "0";
+const width = Number(process.env.SHIFT_W || 0);
+const height = Number(process.env.SHIFT_H || 0);
+const chosen = only ? TYPES.filter((t) => t.id === only) : TYPES;
+const jobs = width
+  ? chosen.map((type) => [type, width, height])
+  : [
+      ...chosen.map((type) => [type, 1280, 720]),
+      ...(only || !phone ? [] : chosen.map((type) => [type, 390, 844])),
+    ];
 for (const [type, w, h] of jobs) {
+  const context = await browser.newContext({ viewport: { width: w, height: h } });
   try {
-    chunks.push(await oneShift(browser, type, w, h));
+    chunks.push(await oneShift(context, type, w, h));
   } catch (err) {
     const line = `${type.id}-${w}x${h} THREW ${err instanceof Error ? err.message.split("\n")[0] : err}`;
     chunks.push(line);
     console.log(line);
+  } finally {
+    await context.close();
   }
 }
 await browser.close();

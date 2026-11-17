@@ -1,0 +1,28 @@
+pebble type clicked
+pebble signed
+pebble stuck 12  buttons 
+pebble intro 12: 
+pebble intro 18: 
+pebble intro 24: 
+pebble stuck 30  buttons 
+pebble intro 30: 
+pebble intro 36: 
+pebble intro 42: 
+pebble walked in
+pebble-1280x720 cafe hud: 06:52 D1 MORNING LESS CRITICALITY CAFE HONEST Sit with Mabel. Don't rush the coffee. inPlay true
+pebble-1280x720 mabel talk open after KeyW
+pebble-1280x720 talk closed true
+pebble-1280x720 after mabel: 06:54 D1 MORNING LESS CRITICALITY CAFE HONEST East to the lot, then east onto the floor. met true
+pebble-1280x720 lot: true
+pebble-1280x720 corridor: true
+pebble-1280x720 control: true
+pebble-1280x720 hall: true
+pebble-1280x720 reactor control ranges 2
+pebble-1280x720 site panel: Helium Blower 100% Outlet 750 °C Passes 0 Burnup 0 MWd/kg
+pebble-1280x720 event: Pebble jam in the discharge Discharge counter stuck. Burnup on that pebble stops moving. The loading tube is dark. Core arrows still move if the blower is up. Stop fuelling. Leave 
+pebble-1280x720 event-right: Held. Stop fuelling. Leave the blower on. Clear the line before the next pass.
+pebble-1280x720 scram text: false
+pebble-1280x720 clock before pace: 07:10 D1 MORNING LESS REACTOR HALL HONEST Control Room — Holt wants volume, not a speech.
+pebble-1280x720 clock after 8s pace: 07:16 D1 MORNING LESS REACTOR HALL HONEST Control Room — Holt wants volume, not a speech.
+pebble-1280x720 pageErrors 0
+pebble-1280x720 404 0
