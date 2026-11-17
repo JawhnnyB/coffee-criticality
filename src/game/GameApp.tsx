@@ -38,6 +38,7 @@ import { FuelShuffle } from "./FuelShuffle";
 import { MaintGame } from "./MaintGame";
 import { Desktop } from "./Desktop";
 import { LakeScene } from "./LakeScene";
+import { PlantCutaway, STILL_CUTAWAY } from "./PlantCutaway";
 import { seasonOrDefault, type Season } from "./parlorOS";
 import { maintenanceSteamOn } from "./steamRule";
 import { applyWorldKey, CABINET_MODES, getKeyOwner, setKeyOwner } from "./keyGate";
@@ -1931,7 +1932,9 @@ function StillStage({
   return (
     <div className="absolute inset-0 z-50 flex flex-col bg-[#16110d]" data-testid="still-stage">
       <div className="relative min-h-0 flex-1">
-        {still.video ? (
+        {stillId && STILL_CUTAWAY[stillId] ? (
+          <PlantCutaway kind={STILL_CUTAWAY[stillId]} fit="contain" className="absolute inset-0 bg-[#16110d]" />
+        ) : still.video ? (
           <video
             key={still.video}
             src={still.video}
@@ -2326,7 +2329,9 @@ function AcademyStage({
           <div className="mt-4 grid gap-3">
             {(["msr", "msr_fhr", "msr_fast"] as const).map((id) => (
               <div key={id} className="overflow-hidden rounded-md border border-border bg-surface">
-                {STILLS[id].video ? (
+                {STILL_CUTAWAY[id] ? (
+                  <PlantCutaway kind={STILL_CUTAWAY[id]} className="w-full bg-[#f3e6d0]" />
+                ) : STILLS[id].video ? (
                   <video
                     src={STILLS[id].video}
                     poster={STILLS[id].src}

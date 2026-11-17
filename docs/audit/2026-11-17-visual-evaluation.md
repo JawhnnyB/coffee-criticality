@@ -26,11 +26,22 @@ The screens were reached with `window.__controlsTest`. This was not a playthroug
 
 Also done, on the owner's instruction: the 29 painted JPEGs that no source file loads moved from `public/art/gen/stills/` to `reference/painted/stills/` (12 MB). They no longer ship. `cutaway_pwr_loop.jpg` is still loaded and stays. The owner approved the redrawn plates.
 
+## Plant cutaways (owner request, 17 November)
+
+The four plant plates and two salt stills were redrawn from the seven painted cutaways in `reference/painted/stills/`, as code.
+
+- `src/game/plantLoops.ts` holds each plant's parts, loops, flow direction and media, with the sources for each flow path. `src/game/cutawayPaint.ts` paints from it. `scripts/plant-loops.test.mjs` checks the physics: every loop closes, every pipe runs with its loop, the PWR primary is closed and holds a pressurizer on a hot leg, only the BWR sends core water to the turbine, salt plants keep radioactive salt away from the steam generator, the pebble bed's helium goes down, and Cherenkov blue appears only in a hot core cooled by a clear liquid. Four mutations of the data each fail the tests.
+- The cutaways animate in Reactor Design, the still viewer and the Academy salt page. With reduced motion they paint one frame. Every pipe carries an arrow, so a still frame shows the flow.
+- Palette exception: `cherenkovD`, `cherenkov` and `cherenkovL` are added to `palette.ts`, for Cherenkov light only. No tint of the base colours is this blue. The owner asked for it. `pixelize.py` never maps to these three.
+- The old plates and thumbnails are in `reference/old-plates/`.
+- Shown blue: PWR and BWR (water) and FHR (FLiBe is clear; Cherenkov light has been proposed for FHR monitoring). Not blue: the pebble bed (helium's refractive index is too close to 1) and the two fuel-salt reactors, drawn hot instead. A cool PWR is drawn without the glow, as the game's copy says. Strictly, a core just shut down still glows faintly from decay betas.
+- The fast-salt card says chloride. The drawing follows the CNRS MSFR, which is fluoride with a thorium blanket.
+
 ## Still wrong, and what each needs
 
 | Problem | Needs |
 |---|---|
-| Reactor Control schematic is boxes labelled CORE and SG. | A new drawing under `STYLE-STANDARD.md` section 4. `schematicMath.ts` is on the frozen-file check, so the owner decides. |
+| Reactor Control's live schematic is still boxes labelled CORE and SG. | It reads `schematicMath.ts`, a frozen file. The new cutaways are a separate drawing; moving Reactor Control onto them is the owner's call. |
 | Rooms are sparse. Corridor, break room and parlor have large bare floors. | More props in the room atlases, and collision for them in `content.ts`. That file is checked in review, so it is a separate change. |
 | Radiation shows "Pending verification" fifteen times. NRC shows "verify before publish" eleven times. News is empty. | Cited values and text. Owner decisions D2 and D15. No layout can fix an empty page. |
 | Cabinet start screens are a paragraph of small text in a large dark field. | A title card for each cabinet. That is new art for twelve cabinets. |

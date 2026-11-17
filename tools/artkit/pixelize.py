@@ -41,7 +41,9 @@ PLATES = [
 def palette():
     text = (ROOT / "src/game/palette.ts").read_text()
     block = text[text.index("export const PAL") : text.index("} as const")]
-    return sorted(set(re.findall(r'"#([0-9a-fA-F]{6})"', block)))
+    # The Cherenkov shades are for drawn Cherenkov light only. The plate redraw never maps to them.
+    pairs = re.findall(r'(\w+):\s*"#([0-9a-fA-F]{6})"', block)
+    return sorted({hexc for key, hexc in pairs if not key.startswith("cherenkov")})
 
 
 def palette_image(cols):

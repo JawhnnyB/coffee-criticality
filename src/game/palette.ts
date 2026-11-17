@@ -36,6 +36,13 @@ export const PAL = {
   skinTan: "#c49468",
   skinBrown: "#a86c44",
   skinBlush: "#b46058",
+  /**
+   * Cherenkov light, and nothing else. An owner exception to the palette rule in spec 2.2
+   * (17 November): no tint of the base colours is this blue, and the blue is the physics.
+   */
+  cherenkovD: "#1e4fa0",
+  cherenkov: "#2f86e0",
+  cherenkovL: "#8cd2fa",
 } as const;
 
 export type PalKey = keyof typeof PAL;

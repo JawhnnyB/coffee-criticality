@@ -55,8 +55,8 @@ export function TeachReadout({ k, v }: { k: string; v: string }) {
 }
 
 export const TYPE_THUMB: Record<string, string> = {
-  pwr: "/art/gen/stills/thumb_pwr.png?v=gauge",
-  bwr: "/art/gen/stills/thumb_bwr.png?v=gauge",
-  pebble: "/art/gen/stills/thumb_pebble.png",
-  msr: "/art/gen/stills/thumb_msr.png",
+  pwr: "/art/gen/stills/thumb_pwr.png?v=loops",
+  bwr: "/art/gen/stills/thumb_bwr.png?v=loops",
+  pebble: "/art/gen/stills/thumb_pebble.png?v=loops",
+  msr: "/art/gen/stills/thumb_msr.png?v=loops",
 };

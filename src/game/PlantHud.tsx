@@ -1,6 +1,7 @@
 "use client";
 
 import { linearHeat, pressureMPa, type PlantDesign, type PlantType } from "./plant";
+import { PlantCutaway } from "./PlantCutaway";
 import { TeachReadout } from "./TeachFrame";
 
 const COPY: Record<PlantType, string> = {
@@ -33,10 +34,10 @@ export function coreIsHot(plant: PlantDesign) {
 }
 
 export function cutawayStill(type: PlantType, hot = true) {
-  if (type === "pwr") return "/art/gen/stills/plate_pwr.png?v=gauge";
-  if (type === "bwr") return "/art/gen/stills/plate_bwr.png?v=gauge";
-  if (type === "pebble") return "/art/gen/stills/plate_pebble.png?v=metal";
-  return "/art/gen/stills/plate_msr.png?v=metal";
+  if (type === "pwr") return "/art/gen/stills/plate_pwr.png?v=loops";
+  if (type === "bwr") return "/art/gen/stills/plate_bwr.png?v=loops";
+  if (type === "pebble") return "/art/gen/stills/plate_pebble.png?v=loops";
+  return "/art/gen/stills/plate_msr.png?v=loops";
 }
 
 export function cutawayVideo(type: PlantType, hot = true) {
@@ -47,20 +48,14 @@ export function cutawayVideo(type: PlantType, hot = true) {
 export function CutawayLoop({
   type,
   hot = true,
-  className = "aspect-video w-full object-contain teach-pixel",
+  className = "w-full",
 }: {
   type: PlantType;
   hot?: boolean;
   className?: string;
 }) {
-  return (
-    <img
-      src={cutawayStill(type, hot)}
-      alt=""
-      className={className}
-      style={{ imageRendering: "pixelated" }}
-    />
-  );
+  // Painted live from plantLoops.ts: the loops, the flow, and Cherenkov blue where it is real.
+  return <PlantCutaway kind={type} hot={hot} className={className} />;
 }
 
 export function PlantHud({ plant }: { plant: PlantDesign }) {
@@ -70,7 +65,7 @@ export function PlantHud({ plant }: { plant: PlantDesign }) {
   return (
     <div className="teach-ink" data-testid="plant-hud">
       <p className="teach-kicker">This site · {SITE[plant.type]} · teaching only</p>
-      <CutawayLoop type={plant.type} hot={hot} className="mt-2 max-h-32 w-full object-contain teach-pixel" />
+      <CutawayLoop type={plant.type} hot={hot} className="mt-2 w-full" />
       <div className="mt-3 grid grid-cols-2 gap-2">
         <TeachReadout k="ΔT" v={`${plant.dT} °C`} />
         <TeachReadout k="Flow" v={`${plant.flow} %`} />
