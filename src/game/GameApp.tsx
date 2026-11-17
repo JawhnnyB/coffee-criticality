@@ -38,7 +38,10 @@ import { FuelShuffle } from "./FuelShuffle";
 import { MaintGame } from "./MaintGame";
 import { Desktop } from "./Desktop";
 import { LakeScene } from "./LakeScene";
-import { PlantCutaway, STILL_CUTAWAY } from "./PlantCutaway";
+import { PlantCutaway, STILL_CUTAWAY, sitePower } from "./PlantCutaway";
+import type { LiveRun } from "./cutawayPaint";
+import { HALL_PIPES } from "./hallPlant";
+import { siteKind, type CutawayKind } from "./plantLoops";
 import { seasonOrDefault, type Season } from "./parlorOS";
 import { maintenanceSteamOn } from "./steamRule";
 import { applyWorldKey, CABINET_MODES, getKeyOwner, setKeyOwner } from "./keyGate";
@@ -48,7 +51,7 @@ import { isRevealing, requestSkip } from "./chatter";
 import { Chatter } from "./ChatterLine";
 import { heartCount } from "./pixel";
 import { drawWorld, glyphWidth, paintGlyphs, preloadRoomArt } from "./render";
-import { DEFAULT_PLANT, plantTitle, type PlantDesign } from "./plant";
+import { DEFAULT_PLANT, plantTitle, thermalState, type PlantDesign } from "./plant";
 import { systemReducedMotion } from "./reducedMotion";
 import { hasSave, hydrateSave, peekSave, wipeSave, writeSave } from "./save";
 import { computeKeff } from "./nuclearLab";
@@ -1113,7 +1116,7 @@ export function GameApp() {
 
       <div ref={wrapRef} className="relative min-h-0 flex-1">
         {!playing && !deskShown && !(ART.menu && (mode === "role" || mode === "intro" || mode === "brief")) && (
-          <MenuBackdrop season={seasonOrDefault(s.setup.season)} />
+          <MenuBackdrop season={seasonOrDefault(s.setup.season)} site={siteKind(s.plant)} power={sitePower(s.run)} />
         )}
 
         <canvas
@@ -1138,7 +1141,7 @@ export function GameApp() {
             toast={s.toastT > 0 ? s.toast : ""}
             objective={s.objective}
             day={s.day}
-            nearLabel={s.nearLabel}
+            nearLabel={hallLabel(s.nearLabel, siteKind(s.plant), s.room)}
           />
         )}
 
@@ -1431,6 +1434,8 @@ export function GameApp() {
           <StillStage
             still={STILLS[s.stillId]}
             stillId={s.stillId}
+            sitePlant={s.plant}
+            live={siteLive(s)}
             onClose={() => {
               closeStill(s);
               applyMode("play");
@@ -1491,12 +1496,9 @@ export function GameApp() {
         {mode === "eod" && (
           <div className="absolute inset-0 z-30 flex items-end justify-center overflow-y-auto bg-bg/70 p-3 pb-28 sm:items-center sm:p-6">
             <div className="paper mx-auto w-full max-w-xl p-4 sm:p-5" data-testid="paper-eod">
-              <img
-                src="/art/gen/stills/plate_lake.png?v=key"
-                alt=""
-                className="mb-3 h-[120px] w-[214px] max-w-full object-contain sm:h-[180px] sm:w-[320px]"
-                style={{ imageRendering: "pixelated" }}
-              />
+              <div className="relative mb-3 h-[120px] w-[214px] max-w-full overflow-hidden border border-[#3a2818] sm:h-[180px] sm:w-[320px]" data-testid="eod-site">
+                <LakeScene season={seasonOrDefault(s.setup.season)} site={siteKind(s.plant)} power={sitePower(s.run)} testId="eod-lake" />
+              </div>
               <div className="mb-3 flex gap-2">
                 {(["mabel", "elena", "holt", "priya"] as const).map((id) => (
                   <CastFace key={id} id={id} zoom={1} />
@@ -1919,21 +1921,56 @@ function ScoresBoard({ scores, onClose }: { scores: ParlorScores; onClose: () =>
   );
 }
 
+/** Plant names for captions. Short labels, not new lesson text. */
+const SITE_NAME: Record<"pwr" | "bwr" | "pebble" | "msr", string> = { pwr: "PWR", bwr: "BWR", pebble: "Pebble bed", msr: "MSR" };
+
+/** The hall pipes keep their places; their names follow what the site's pipes carry. */
+function hallLabel(label: string, site: CutawayKind, room: string): string {
+  if (room !== "reactor" || site === "fhr" || site === "msfr") return label;
+  const p = HALL_PIPES[site];
+  if (label === "Hot leg") return p.outName;
+  if (label === "Cold leg") return p.backName;
+  return label;
+}
+
+/** The site's run as the cutaway reads it. Before the player has run the plant, the crew holds it at power. */
+function siteLive(s: GameState): LiveRun | undefined {
+  if (!s.plant) return undefined;
+  const ran = s.run.history.length > 0 || s.run.powerPct > 0;
+  const powerPct = ran ? s.run.powerPct : 100;
+  const flowPct = ran ? s.run.flowPct : 100;
+  const ts = thermalState(s.plant, { powerPct, flowPct });
+  return { power: s.run.scram ? 0 : powerPct / 100, flow: flowPct / 100, rods: ran ? s.run.rodsWithdrawnPct / 100 : 0.85, scram: s.run.scram, tHot: ts.tHot, tCold: ts.tCold };
+}
+
 function StillStage({
-  still,
+  still: given,
   stillId,
+  sitePlant,
+  live,
   onClose,
 }: {
   still: { src: string; title: string; body: string; teaching?: boolean; video?: string; photo?: boolean };
   stillId?: string;
+  sitePlant: PlantDesign | null;
+  live?: LiveRun;
   onClose: () => void;
 }) {
-  const showLoop = stillId === "pwr" || stillId === "mural_criticality" || (still.src.includes("cutaway_pwr_loop") && stillId !== "bwr");
+  let still = given;
+  // Stills of the plant itself show the site's reactor, with that reactor's caption.
+  const site = siteKind(sitePlant);
+  const ofSite = stillId === "pwr" || stillId === "mural_criticality" || stillId === "window_reactor";
+  const kind = ofSite ? site : stillId ? STILL_CUTAWAY[stillId] : undefined;
+  if (ofSite && site !== "pwr") {
+    const own = STILLS[site];
+    still = { ...own, title: `${SITE_NAME[site]} loop (this site)` };
+  }
+  const showLoop = kind === "pwr" && (stillId === "pwr" || stillId === "mural_criticality");
   return (
     <div className="absolute inset-0 z-50 flex flex-col bg-[#16110d]" data-testid="still-stage">
       <div className="relative min-h-0 flex-1">
-        {stillId && STILL_CUTAWAY[stillId] ? (
-          <PlantCutaway kind={STILL_CUTAWAY[stillId]} fit="contain" className="absolute inset-0 bg-[#16110d]" />
+        {kind ? (
+          <PlantCutaway kind={kind} fit="contain" className="absolute inset-0 bg-[#16110d]" live={live} />
         ) : still.video ? (
           <video
             key={still.video}
@@ -2641,7 +2678,21 @@ function MiniMap({
   );
 }
 
-function MenuBackdrop({ scene, focus = "50% 50%", zoom = 1, season = "fall" }: { scene?: string; focus?: string; zoom?: number; season?: Season }) {
+function MenuBackdrop({
+  scene,
+  focus = "50% 50%",
+  zoom = 1,
+  season = "fall",
+  site = "pwr",
+  power = 1,
+}: {
+  scene?: string;
+  focus?: string;
+  zoom?: number;
+  season?: Season;
+  site?: CutawayKind;
+  power?: number;
+}) {
   return (
     <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden bg-bg">
       {scene ? (
@@ -2653,7 +2704,7 @@ function MenuBackdrop({ scene, focus = "50% 50%", zoom = 1, season = "fall" }: {
           style={{ objectPosition: focus, transform: `scale(${zoom})`, transformOrigin: focus }}
         />
       ) : (
-        <LakeScene season={season} testId="lake-backdrop" />
+        <LakeScene season={season} testId="lake-backdrop" site={site} power={power} />
       )}
       <div className="absolute inset-0 bg-gradient-to-t from-bg/80 via-bg/25 to-bg/30" />
     </div>

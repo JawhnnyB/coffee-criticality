@@ -303,5 +303,16 @@ export function siteKind(plant: { type: "pwr" | "bwr" | "pebble" | "msr" } | nul
   return plant?.type ?? "pwr";
 }
 
+/**
+ * How hard the site is running, 0 to 1, for the skyline and the world. Before the player has run
+ * Reactor Control the plant is at full power under the crew on shift. A scrammed plant is near zero.
+ */
+export function sitePower(run: { powerPct: number; scram: boolean; history: unknown[] } | null | undefined): number {
+  if (!run) return 1;
+  if (run.scram) return 0.05;
+  if (run.history.length === 0 && run.powerPct <= 0) return 1;
+  return Math.max(0, Math.min(1, run.powerPct / 100));
+}
+
 export const CUTAWAY_W = 320;
 export const CUTAWAY_H = 180;

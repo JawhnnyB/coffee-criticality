@@ -1,5 +1,6 @@
 import { PAL } from "./palette";
 import type { Season } from "./parlorOS";
+import type { CutawayKind } from "./plantLoops";
 
 /**
  * The desktop wallpaper: the lake at Lake Master, with the plant on the far shore.
@@ -119,7 +120,105 @@ function towerHalf(row: number, rows: number, base: number): number {
   return Math.max(2, Math.round(base * Math.sqrt(0.25 + grow * u * u)));
 }
 
-export function paintWallpaper(g: CanvasRenderingContext2D, w: number, h: number, season: Season): void {
+type Px = (x: number, y: number, ww: number, hh: number, color: string) => void;
+
+/** A box building with a lit sun side and a row of lit windows. */
+function building(px: Px, L: Look, x: number, base: number, bw: number, bh: number, windows = true) {
+  px(x, base - bh, bw, bh, L.plant);
+  px(x, base - bh, Math.max(1, Math.round(bw * 0.3)), bh, L.plantHi);
+  px(x, base - bh, bw, 1, L.plantHi);
+  if (!windows) return;
+  for (let i = 0; i < Math.floor((bw - 2) / 4); i++) if (hash(i + x, 31) > 0.35) px(x + 2 + i * 4, base - Math.round(bh * 0.55), 2, 1, L.plantLit);
+}
+
+/** A thin stack with a red aircraft light on top. */
+function stack(px: Px, L: Look, x: number, base: number, sh: number) {
+  px(x, base - sh, 2, sh, L.plant);
+  px(x, base - sh, 1, sh, L.plantHi);
+  px(x, base - sh - 1, 2, 1, PAL.bad);
+}
+
+/**
+ * The site skyline by reactor type. What you see from across the lake:
+ * PWR: domed containment, a cooling tower, the turbine hall.
+ * BWR: a tall box reactor building, a slender off-gas stack, a cooling tower, the turbine hall.
+ * Pebble bed: two small module buildings and a stack. Sea- or lake-water cooled, so no tower.
+ * Salt (MSR, and the FHR and MSFR comparisons): a low building, a stack, and a bank of air coolers.
+ * power: 0 to 1. The cooling tower plume grows with it.
+ */
+function drawSite(px: Px, L: Look, site: CutawayKind, base: number, tx: number, rows: number, halfBase: number, power: number) {
+  const hallW = Math.round(rows * 0.9);
+  const hallH = Math.round(rows * 0.22);
+  if (site === "pwr" || site === "bwr") {
+    for (let r = 0; r < rows; r++) {
+      const half = towerHalf(r, rows, halfBase);
+      px(tx - half, base - rows + r, half * 2, 1, L.plant);
+      px(tx - half, base - rows + r, Math.max(2, Math.round(half * 0.45)), 1, L.plantHi);
+    }
+    px(tx - towerHalf(0, rows, halfBase), base - rows, towerHalf(0, rows, halfBase) * 2, 1, L.plantHi);
+    // Plume: soft blocks that lean right as they climb. More power, a taller plume.
+    const puffs = Math.round(9 * Math.max(0, Math.min(1, power)));
+    for (let i = 0; i < puffs; i++) {
+      const pw = 5 + Math.round(hash(i, 21) * 5) + i;
+      const ph = 3 + Math.round(hash(i, 22) * 2);
+      const x = tx - Math.round(pw / 2) + i * 3 + Math.round(hash(i, 23) * 3);
+      const y = base - rows - 3 - i * 4;
+      if (y < 2) break;
+      px(x, y, pw, ph, L.plume);
+      px(x + 1, y - 1, Math.max(2, pw - 3), 1, L.plume);
+    }
+    px(tx, base - rows - 1, 1, 1, PAL.bad);
+    building(px, L, tx + halfBase + 3, base, hallW, hallH);
+    stack(px, L, tx + halfBase + 3 + hallW - 4, base - hallH, Math.round(rows * 0.35));
+    if (site === "pwr") {
+      // Containment: a cylinder with a hemispherical dome.
+      const dx = tx - halfBase - Math.round(rows * 0.55);
+      const dr = Math.round(rows * 0.2);
+      for (let dy = 0; dy <= dr; dy++) {
+        const half = Math.round(Math.sqrt(dr * dr - (dr - dy) * (dr - dy)));
+        px(dx - half, base - dr * 2 + dy, half * 2 + 1, 1, L.plant);
+        px(dx - half, base - dr * 2 + dy, Math.max(1, Math.round(half * 0.6)), 1, L.plantHi);
+      }
+      px(dx - dr, base - dr, dr * 2 + 1, dr, L.plant);
+      px(dx - dr, base - dr, Math.round(dr * 0.6), dr, L.plantHi);
+      px(dx - 1, base - dr + 2, 1, 1, L.plantLit);
+    } else {
+      // BWR: a tall square reactor building with the refuelling floor at the top, and the off-gas stack.
+      const bw = Math.round(rows * 0.5);
+      const bh = Math.round(rows * 0.7);
+      const bx = tx - halfBase - bw - 4;
+      building(px, L, bx, base, bw, bh);
+      // Lights along the refuelling floor near the roof.
+      for (let i = 1; i < bw - 1; i += 3) px(bx + i, base - bh + 2, 1, 1, L.plantLit);
+      stack(px, L, bx - 5, base, Math.round(rows * 1.25));
+    }
+    return;
+  }
+  if (site === "pebble") {
+    // Two reactor modules side by side, each with its steam generator, feeding one turbine.
+    const mw = Math.round(rows * 0.34);
+    const mh = Math.round(rows * 0.5);
+    building(px, L, tx - mw - 2, base, mw, mh);
+    building(px, L, tx + 2, base, mw, mh);
+    building(px, L, tx + mw + 6, base, hallW, hallH);
+    stack(px, L, tx - mw - 8, base, Math.round(rows * 0.85));
+    return;
+  }
+  // Salt: a low reactor building, the stack, and air coolers with fans on top.
+  const lw = Math.round(rows * 1.1);
+  const lh = Math.round(rows * 0.3);
+  building(px, L, tx - Math.round(lw / 2), base, lw, lh);
+  stack(px, L, tx - Math.round(lw / 2) - 5, base, Math.round(rows * 0.9));
+  const cx0 = tx + Math.round(lw / 2) + 4;
+  for (let i = 0; i < 4; i++) {
+    const cx = cx0 + i * 7;
+    px(cx, base - 6, 6, 6, L.plant);
+    px(cx, base - 6, 6, 1, L.plantHi);
+    px(cx + 1, base - 8, 4, 2, L.plantHi);
+  }
+}
+
+export function paintWallpaper(g: CanvasRenderingContext2D, w: number, h: number, season: Season, site: CutawayKind = "pwr", power = 1): void {
   const L = LOOKS[season];
   // A tall phone canvas keeps the plant low, under the icon grid.
   const horizon = Math.round(h * (h > w ? 0.74 : 0.56));
@@ -173,51 +272,13 @@ export function paintWallpaper(g: CanvasRenderingContext2D, w: number, h: number
     px(x, horizon - top, 1, top, L.shore);
   }
 
-  // The plant, right of centre on the far shore.
+  // The plant on the far shore, drawn as the site the player built.
   const base = horizon - 1;
   const tx = Math.round(w * 0.68);
   const rows = Math.round(u * 0.23);
   const halfBase = Math.round(rows * 0.46);
-  for (let r = 0; r < rows; r++) {
-    const half = towerHalf(r, rows, halfBase);
-    px(tx - half, base - rows + r, half * 2, 1, L.plant);
-  }
-  // The sun side of the tower: a lit strip that follows the curve.
-  for (let r = 0; r < rows; r++) {
-    const half = towerHalf(r, rows, halfBase);
-    px(tx - half, base - rows + r, Math.max(2, Math.round(half * 0.45)), 1, L.plantHi);
-  }
-  px(tx - towerHalf(0, rows, halfBase), base - rows, towerHalf(0, rows, halfBase) * 2, 1, L.plantHi);
-  // Plume: a column of soft blocks that leans right as it climbs.
-  for (let i = 0; i < 9; i++) {
-    const pw = 5 + Math.round(hash(i, 21) * 5) + i;
-    const ph = 3 + Math.round(hash(i, 22) * 2);
-    const x = tx - Math.round(pw / 2) + i * 3 + Math.round(hash(i, 23) * 3);
-    const y = base - rows - 3 - i * 4;
-    if (y < 2) break;
-    px(x, y, pw, ph, L.plume);
-    px(x + 1, y - 1, Math.max(2, pw - 3), 1, L.plume);
-  }
-  // Containment dome and the turbine hall beside the tower.
-  const dx = tx - halfBase - Math.round(rows * 0.55);
-  const dr = Math.round(rows * 0.2);
-  for (let dy = 0; dy <= dr; dy++) {
-    const half = Math.round(Math.sqrt(dr * dr - (dr - dy) * (dr - dy)));
-    px(dx - half, base - dr * 2 + dy, half * 2 + 1, 1, L.plant);
-    px(dx - half, base - dr * 2 + dy, Math.max(1, Math.round(half * 0.6)), 1, L.plantHi);
-  }
-  px(dx - dr, base - dr, dr * 2 + 1, dr, L.plant);
-  px(dx - dr, base - dr, Math.round(dr * 0.6), dr, L.plantHi);
-  const hallW = Math.round(rows * 0.9);
-  const hallH = Math.round(rows * 0.22);
-  const hx = tx + halfBase + 3;
-  px(hx, base - hallH, hallW, hallH, L.plant);
-  px(hx + hallW - 4, base - hallH - Math.round(rows * 0.35), 2, Math.round(rows * 0.35), L.plant);
-  for (let i = 0; i < Math.floor(hallW / 4); i++) {
-    if (hash(i, 31) > 0.35) px(hx + 2 + i * 4, base - hallH + 2, 2, 1, L.plantLit);
-  }
-  px(dx - 1, base - dr + 2, 1, 1, L.plantLit);
-  px(tx, base - rows - 1, 1, 1, PAL.bad);
+  const tower = site === "pwr" || site === "bwr";
+  drawSite(px, L, site, base, tx, rows, halfBase, power);
 
   // The lake: three bands, then broken glints that thin out toward the viewer.
   const lakeH = h - horizon;
@@ -230,7 +291,7 @@ export function paintWallpaper(g: CanvasRenderingContext2D, w: number, h: number
   }
   // Reflections: the shore line, then the tower as broken rows under it.
   px(0, horizon, w, 1, L.shore);
-  for (let r = 0; r < rows; r++) {
+  for (let r = 0; tower && r < rows; r++) {
     if (r % 2 === 1) continue;
     const half = towerHalf(rows - 1 - r, rows, halfBase);
     const wob = Math.round(Math.sin(r * 1.3) * 1.5);

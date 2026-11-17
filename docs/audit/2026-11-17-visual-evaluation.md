@@ -37,6 +37,23 @@ The four plant plates and two salt stills were redrawn from the seven painted cu
 - Shown blue: PWR and BWR (water) and FHR (FLiBe is clear; Cherenkov light has been proposed for FHR monitoring). Not blue: the pebble bed (helium's refractive index is too close to 1) and the two fuel-salt reactors, drawn hot instead. A cool PWR is drawn without the glow, as the game's copy says. Strictly, a core just shut down still glows faintly from decay betas.
 - The fast-salt card says chloride. The drawing follows the CNRS MSFR, which is fluoride with a thorium blanket.
 
+## The chosen reactor is the site (owner request, 17 November)
+
+The type picked in Reactor Design is now the plant. It is locked after the first clock-in ("Unit 1 is built. The type stays.").
+
+- **Reactor Control** draws the site's cutaway above the schematic, driven by the run. Pipe colour follows temperature, so the hot leg and the cold leg separate as power rises and match at zero. Dash and pump speed follow flow. The glow follows power. The rods follow the rod setting. BWR voids follow power over flow. Pressurizer level follows average temperature. A scram drives the rods in, trips the turbine and leaves only a dim decay-heat glow. Helium and fuel salt never glow.
+- **Reactor hall** centrepiece by type. PWR: dome head with closure studs and a CRDM grid. BWR: head with lifting lugs, no drives on top, because its rods come from below. Pebble bed: a small head, a ring of rod drives and a pebble loading tube. Salt: concrete roof plugs, one off over the pump bowl, and a freeze-valve hatch. Each has a viewing port: blue water, salt or pebbles. Lagged pipes carry the type's names (hot leg and cold leg, main steam and feedwater, hot gas duct and cold helium, fuel salt out and return). Each has a temperature band and flow arrows. Salt lines have heater tape.
+- **Control room** wall mimic: the site's loops, scaled.
+- **Lot**: the reactor building roof. PWR keeps its dome. BWR gets a flat refuelling-floor roof with crane rails and a roof hatch. Pebble bed gets two module roofs. Salt gets air coolers whose fans turn while the plant makes heat.
+- **Skyline** (desktop wallpaper, menu, end of day): PWR has a dome, a cooling tower and a plume that scales with power. BWR has a tall box reactor building and an off-gas stack. Pebble bed has two module buildings and no tower. Salt has a low building and air coolers.
+- **Stills**: the vessel window, the criticality mural and the Full core card show the site's plate.
+
+Text: only short labels changed ("— this site"). Lesson text still describes a PWR. The lines that no longer fit a non-PWR site are listed for the owner in the report, not rewritten here.
+
+Stills: `site-w-halls.png`, `site-w-halls-close.png`, `site-ctl-sheet.png`, `site-lot-sheet.png`, `site-eod-sheet.png`, `site-still-sheet.png`, `site-wall-seasons.png`, `site-lock-control.png`.
+
+Not verified: Reactor Control in the 390×844 run. The harness does not open it there on this branch or on `c0b12df`.
+
 ## Still wrong, and what each needs
 
 | Problem | Needs |
@@ -59,9 +76,9 @@ The four plant plates and two salt stills were redrawn from the seven painted cu
 
 ## Checks
 
-- Unit suite: 220 tests, 211 pass, 9 fail. The nine names match `docs/audit/2026-11-14-evidence/fail-baseline.txt`.
+- Unit suite: 240 tests, 231 pass, 9 fail (after the site-reactor work). Earlier: 220 tests, 211 pass, 9 fail. The nine names match `docs/audit/2026-11-14-evidence/fail-baseline.txt`.
 - `python3 tools/artkit/pixelize.py --check`: zero off-palette pixels in all eleven plates.
-- Frozen files `sim.ts`, `shuffleModel.ts`, `schematicMath.ts`, `save.ts`, `content.ts`: unchanged against `c0b12df`. `DelayGame.tsx` changed only in its canvas context line and its font strings.
+- Frozen files `sim.ts`, `shuffleModel.ts`, `schematicMath.ts`, `save.ts`: unchanged against `c0b12df`. `content.ts` changed only in plate paths and cache keys (`?v=loops`, and the FHR and fast-salt cards now point at their own plates). No text in it changed. `DelayGame.tsx` changed only in its canvas context line and its font strings.
 - No sentence of game text was added.
 
 ## Stills

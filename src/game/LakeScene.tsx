@@ -2,13 +2,15 @@
 
 import { useEffect, useRef } from "react";
 import type { Season } from "./parlorOS";
+import type { CutawayKind } from "./plantLoops";
 import { WALL_NATIVE_H, WALL_NATIVE_W, paintWallpaper } from "./wallpaper";
 
 /**
  * The lake and the plant, painted by code at a whole-number scale. It fills its parent.
  * The desktop uses it as the wallpaper. The screens outside a room use it as the backdrop.
  */
-export function LakeScene({ season, testId }: { season: Season; testId?: string }) {
+/** site: the reactor this plant runs. power: 0 to 1, for the cooling tower plume. */
+export function LakeScene({ season, testId, site = "pwr", power = 1 }: { season: Season; testId?: string; site?: CutawayKind; power?: number }) {
   const ref = useRef<HTMLCanvasElement>(null);
   useEffect(() => {
     const c = ref.current;
@@ -29,12 +31,12 @@ export function LakeScene({ season, testId }: { season: Season; testId?: string 
       const g = c.getContext("2d");
       if (!g) return;
       g.imageSmoothingEnabled = false;
-      paintWallpaper(g, nw, nh, season);
+      paintWallpaper(g, nw, nh, season, site, power);
     };
     paint();
     const ro = new ResizeObserver(paint);
     ro.observe(host);
     return () => ro.disconnect();
-  }, [season]);
-  return <canvas ref={ref} aria-hidden data-testid={testId} className="pointer-events-none absolute left-0 top-0 max-w-none" style={{ imageRendering: "pixelated" }} />;
+  }, [season, site, Math.round(power * 10)]);
+  return <canvas ref={ref} aria-hidden data-testid={testId} data-site={site} className="pointer-events-none absolute left-0 top-0 max-w-none" style={{ imageRendering: "pixelated" }} />;
 }

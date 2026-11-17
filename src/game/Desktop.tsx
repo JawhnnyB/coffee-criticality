@@ -39,6 +39,8 @@ import {
 import { particleCount, makePool, stepPool, type Particle } from "./particles";
 import { setKeyOwner } from "./keyGate";
 import { LakeScene } from "./LakeScene";
+import { sitePower } from "./PlantCutaway";
+import { siteKind } from "./plantLoops";
 import { AppBody, type AppCtx } from "./ParlorApps";
 import { AppGlyph } from "./icons/glyphs";
 import type { DesktopSave, GameState, Mode, ResultsSave } from "./sim";
@@ -287,7 +289,7 @@ export function Desktop(props: DesktopProps) {
         } as CSSProperties
       }
     >
-      <LakeScene season={season} testId="wallpaper" />
+      <LakeScene season={season} testId="wallpaper" site={siteKind(props.s.plant)} power={sitePower(props.s.run)} />
       <ParticleLayer kind={info.particle} active={shown && !d.reducedMotion} />
 
       {phone ? (

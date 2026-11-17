@@ -2,7 +2,9 @@
 
 import { useEffect, useRef } from "react";
 import { CUTAWAY_H, CUTAWAY_W, paintCutaway, type LiveRun } from "./cutawayPaint";
-import type { CutawayKind } from "./plantLoops";
+import { sitePower, type CutawayKind } from "./plantLoops";
+
+export { sitePower };
 
 /** The still ids that show a plant cutaway, and which plant each one shows. */
 export const STILL_CUTAWAY: Record<string, CutawayKind> = {

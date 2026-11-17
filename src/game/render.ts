@@ -5,6 +5,8 @@ import { LOOKS, PAL, drawChibi, drawEmote, pix, steam } from "./pixel";
 import { maintenanceSteamOn } from "./steamRule";
 import { A6_ROOMS } from "./roomArt";
 import { ROOM_ATLAS, type AtlasStamp } from "./roomAtlas";
+import { HALL_PIPES, drawHallReactor, drawLaggedPipe, drawLotRoof, drawMimic, type HallState } from "./hallPlant";
+import { PLANTS, cherenkov, siteKind, sitePower } from "./plantLoops";
 import { worldZoom } from "./artScale";
 import { SEASON_INFO, seasonOrDefault } from "./parlorOS";
 import { npcsHere, type GameState } from "./sim";
@@ -132,12 +134,54 @@ export function drawWorld(
   const drawables: { y: number; draw: () => void }[] = [];
 
   if (usingA6 && atlas && spec) {
+    // The reactor hall draws its vessel and its two main pipes for the site's reactor type.
+    const hall = s.room === "reactor";
+    const HALL_REDRAWN = new Set(["core", "pipe_run", "pipe_corner", "pipe_v"]);
     for (const st of spec.stamps) {
       if (st.kind === "rug") continue;
+      if (hall && HALL_REDRAWN.has(st.kind)) continue;
       drawables.push({
         y: st.foot,
         draw: () => blitStamp(g, atlas, st),
       });
+    }
+    if (hall) {
+      const kind = siteKind(s.plant);
+      const power = sitePower(s.run);
+      const ran = s.run.history.length > 0 || s.run.powerPct > 0;
+      const level = s.run.scram ? 0.08 : power;
+      const st: HallState = {
+        kind,
+        glow: cherenkov(PLANTS[kind], level > 0.02) ? level : 0,
+        flow: ran ? Math.max(0, s.run.flowPct / 100) : 1,
+        hot: level > 0.02,
+      };
+      const t = now;
+      const pipes = HALL_PIPES[kind];
+      // Out of the vessel to the right and down the wall; back in from the left, past valve 14.
+      drawables.push({ y: 112, draw: () => drawLaggedPipe(g, 224, 99, 62, 10, pipes.out, 1, st.flow, t) });
+      drawables.push({ y: 176, draw: () => drawLaggedPipe(g, 275, 104, 10, 72, pipes.out, 1, st.flow, t) });
+      drawables.push({ y: 128, draw: () => drawLaggedPipe(g, 96, 115, 50, 10, pipes.back, 1, st.flow, t) });
+      drawables.push({ y: 144, draw: () => drawHallReactor(g, { x: 144, y: 64, w: 81, h: 83 }, st, t) });
+    }
+    if (s.room === "gate") {
+      const kind = siteKind(s.plant);
+      const running = !s.run.scram && sitePower(s.run) > 0.02;
+      // Over the roof of the reactor building stamp, above its facade.
+      drawables.push({ y: 192.5, draw: () => drawLotRoof(g, { x: 1249, y: 97, w: 190, h: 64 }, kind, running, now) });
+    }
+    if (s.room === "control") {
+      const kind = siteKind(s.plant);
+      const level = s.run.scram ? 0.08 : sitePower(s.run);
+      const ran = s.run.history.length > 0 || s.run.powerPct > 0;
+      const st: HallState = {
+        kind,
+        glow: cherenkov(PLANTS[kind], level > 0.02) ? level : 0,
+        flow: ran ? Math.max(0, s.run.flowPct / 100) : 1,
+        hot: level > 0.02,
+      };
+      // The wall panel beside the window becomes the plant mimic.
+      drawables.push({ y: 30, draw: () => drawMimic(g, { x: 190, y: 6, w: 44, h: 22 }, PLANTS[kind], st, now) });
     }
     if (s.room === "control") {
       const board = room.props.find((p) => p.kind === "board");
