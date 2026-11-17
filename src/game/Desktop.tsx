@@ -38,6 +38,7 @@ import {
 } from "./deskWindows";
 import { particleCount, makePool, stepPool, type Particle } from "./particles";
 import { setKeyOwner } from "./keyGate";
+import { WALL_NATIVE_H, paintWallpaper } from "./wallpaper";
 import { AppBody, type AppCtx } from "./ParlorApps";
 import { AppGlyph } from "./icons/glyphs";
 import type { DesktopSave, GameState, Mode, ResultsSave } from "./sim";
@@ -393,36 +394,31 @@ function WallPaper({ season }: { season: Season }) {
   const ref = useRef<HTMLCanvasElement>(null);
   useEffect(() => {
     const c = ref.current;
-    if (!c) return;
+    const host = c?.parentElement;
+    if (!c || !host) return;
     const paint = () => {
-      const r = c.getBoundingClientRect();
+      const r = host.getBoundingClientRect();
       const w = Math.max(1, Math.floor(r.width));
       const hgt = Math.max(1, Math.floor(r.height));
-      c.width = w;
-      c.height = hgt;
+      // Whole-number scale: every painted pixel covers the same number of screen pixels.
+      const scale = Math.max(1, Math.round(hgt / WALL_NATIVE_H));
+      const nw = Math.ceil(w / scale);
+      const nh = Math.ceil(hgt / scale);
+      c.width = nw;
+      c.height = nh;
+      c.style.width = `${nw * scale}px`;
+      c.style.height = `${nh * scale}px`;
       const g = c.getContext("2d");
       if (!g) return;
       g.imageSmoothingEnabled = false;
-      const sky = season === "winter" ? "#3d5c66" : season === "summer" ? "#c4783a" : season === "fall" ? "#6a4a32" : "#6b8f71";
-      const hill = season === "winter" ? "#2a3a44" : season === "fall" ? "#4a3020" : "#3d5c66";
-      g.globalAlpha = 0.22;
-      g.fillStyle = sky;
-      g.fillRect(0, 0, w, Math.floor(hgt * 0.42));
-      g.globalAlpha = 0.28;
-      g.fillStyle = hill;
-      const base = Math.floor(hgt * 0.38);
-      for (let x = 0; x < w; x += 8) {
-        const n = ((x * 17 + (season === "summer" ? 3 : 1)) % 5) * 6;
-        g.fillRect(x, base - n, 8, hgt);
-      }
-      g.globalAlpha = 1;
+      paintWallpaper(g, nw, nh, season);
     };
     paint();
     const ro = new ResizeObserver(paint);
-    ro.observe(c);
+    ro.observe(host);
     return () => ro.disconnect();
   }, [season]);
-  return <canvas ref={ref} aria-hidden className="pointer-events-none absolute inset-0 h-full w-full" style={{ imageRendering: "pixelated" }} />;
+  return <canvas ref={ref} aria-hidden data-testid="wallpaper" className="pointer-events-none absolute left-0 top-0" style={{ imageRendering: "pixelated" }} />;
 }
 
 /** One canvas, one pool, pixel squares. Paused when not shown. Empty under reduced motion. */
