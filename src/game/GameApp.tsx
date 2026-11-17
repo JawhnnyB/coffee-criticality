@@ -1093,7 +1093,7 @@ export function GameApp() {
   return (
     <div className={"relative flex h-svh min-h-[100dvh] flex-col overflow-hidden bg-bg text-fg" + (ART.hud || ART.menu ? " art-on" : "")}>
       <header className="pointer-events-none absolute inset-x-0 top-0 z-40 flex items-start justify-between gap-3 p-3 sm:p-4">
-        {!playing && mode !== "splash" && mode !== "brief" && mode !== "intro" && mode !== "role" && mode !== "build" && !(ART.menu && mode === "menu") ? (
+        {!playing && mode !== "splash" && mode !== "brief" && mode !== "intro" && mode !== "role" && mode !== "build" && mode !== "eod" && !(ART.menu && mode === "menu") ? (
           <div className="pointer-events-auto max-w-[58%] border border-border bg-bg-elevated px-3 py-2">
             <p className="font-display text-[11px] uppercase tracking-[0.16em] text-muted">{SITE}</p>
             <p className="font-display text-lg leading-none text-fg">{TITLE}</p>

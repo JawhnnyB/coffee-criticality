@@ -121,7 +121,8 @@ function towerHalf(row: number, rows: number, base: number): number {
 
 export function paintWallpaper(g: CanvasRenderingContext2D, w: number, h: number, season: Season): void {
   const L = LOOKS[season];
-  const horizon = Math.round(h * 0.56);
+  // A tall phone canvas keeps the plant low, under the icon grid.
+  const horizon = Math.round(h * (h > w ? 0.74 : 0.56));
   // Feature size follows the shorter side, so a tall phone canvas keeps the plant small and clear of the icons.
   const u = Math.min(h, Math.round(w * 0.5625));
   const px = (x: number, y: number, ww: number, hh: number, color: string) => {

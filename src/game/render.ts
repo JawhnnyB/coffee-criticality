@@ -120,6 +120,7 @@ export function drawWorld(
       if (st.kind !== "rug") continue;
       blitStamp(g, atlas, st);
     }
+    if (s.room === "corridor") drawHallRunner(g, room.w, room.h);
     for (const p of room.props) {
       if (p.kind !== "lamp") continue;
       lampPool(g, p.rect.x + p.rect.w / 2, p.rect.y + p.rect.h);
@@ -309,6 +310,42 @@ const GLYPH: Record<string, string[]> = {
   "·": ["000", "000", "010", "000", "000"],
   " ": ["000", "000", "000", "000", "000"],
 };
+
+/** One strip of carpet: ink edge, cream border, body, and a lighter line inside each long edge. */
+function runnerStrip(g: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, along: "x" | "y") {
+  g.fillStyle = PAL.outline;
+  g.fillRect(x, y, w, h);
+  g.fillStyle = PAL.cream;
+  g.fillRect(x + 1, y + 1, w - 2, h - 2);
+  g.fillStyle = PAL.badD;
+  g.fillRect(x + 3, y + 3, w - 6, h - 6);
+  g.fillStyle = PAL.bad;
+  if (along === "x") {
+    g.fillRect(x + 3, y + 5, w - 6, 1);
+    g.fillRect(x + 3, y + h - 6, w - 6, 1);
+  } else {
+    g.fillRect(x + 5, y + 3, 1, h - 6);
+    g.fillRect(x + w - 6, y + 3, 1, h - 6);
+  }
+}
+
+/**
+ * The corridor is the hub of Unit 1 and its floor was bare. A carpet runner joins the four doors.
+ * It is floor decoration only: nothing blocks, and nothing in content.ts changes.
+ */
+function drawHallRunner(g: CanvasRenderingContext2D, roomW: number, roomH: number) {
+  const band = 28;
+  const midY = Math.round(roomH / 2);
+  const midX = Math.round(roomW / 2);
+  runnerStrip(g, midX - band / 2, 50, band, roomH - 50 - 26, "y");
+  runnerStrip(g, 8, midY - band / 2, roomW - 16, band, "x");
+  // Where the two strips cross: one body, and a cream diamond.
+  g.fillStyle = PAL.badD;
+  g.fillRect(midX - band / 2 + 3, midY - band / 2 + 3, band - 6, band - 6);
+  g.fillStyle = PAL.cream;
+  for (let i = 0; i < 4; i++) g.fillRect(midX - i, midY - 3 + i, i * 2 + 1, 1);
+  for (let i = 0; i < 3; i++) g.fillRect(midX - 2 + i, midY + 1 + i, 5 - i * 2, 1);
+}
 
 export function glyphWidth(text: string, scale = 2) {
   const n = text.length;
