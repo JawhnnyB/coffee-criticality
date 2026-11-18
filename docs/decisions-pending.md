@@ -95,3 +95,25 @@ Still open: the intro scenes (`public/art/intro/scene-*.png`) and the badge have
 
 
 
+
+## Crew scenes, cabinet levels and the Refuelling Outage (18 November, Claude)
+
+The owner asked for a progressing social environment, progressing mini games, and fuel shuffling, and chose: a new outage mode beside the 6×6 puzzle; preset published data plus the player's own OpenMC results; progress saved as flags; Claude drafts the text and the owner approves it.
+
+### Text for owner review
+
+- `src/game/socialScenes.ts`: 21 scenes (three per person), every line and choice. Marked DRAFT in the file.
+- `src/game/OutageApp.tsx`: the outage's explanatory lines, including the result verdicts ("Yours is as long or longer, and no more peaked." and the two others).
+- `src/game/GameApp.tsx` `noteCab`: "CATCH.CAB level 2: 40 s clock." style unlock lines, and "level 3 is cleared. Mabel sets it up once they trust you."
+- `src/game/cabLevels.ts` `LADDERS[*].what`: the few words for each level ("quicker fish", "the lane drifts").
+- Tier names in `src/game/social.ts`: New, Colleague, Trusted, Close.
+
+### Choices made without the owner (most conservative option)
+
+- **Tiers** come from trust gained since the first morning (6, 14 and 24 points), with day gates: Trusted from day 2, Close from day 4. Nobody is close by Tuesday. The first conversation with each person never carries a scene, because it belongs to the introduction.
+- **Scenes** are added after what the person would have said anyway, never in place of it, so incident and goal lines are untouched. sim.ts's own pickChoice applies their trust, culture and flags.
+- **Cabinet levels:** seven cabinets have three levels each; DELAY (frozen file), LOAD and PHYS (tested teaching models) stay at one. Level 3 at GOLF (Mabel) and BOWL (Jordan) also needs the host at Trusted. The clear scores are a first guess and need a playtest: catch 4/5 boards, rods a full hold, pebble 5 then 6, fish 4 then 5 of 6, golf 8 of 10, bowl 5 then 6, horde 20 then 30 kills, plot 6 then 8 harvests.
+- **The outage opens** when Priya's Trusted scene hands it over (flag `outageOpen`), or from day 4 if that never happens.
+- **The outage saves** in its own browser key (`cc.outage.v1`), not in the game save. Flags record what matters to the story: `outage:c2:done`, `outage:c2:beat`.
+- **The pass line** compares your loading with the plant's own pattern in the same simulator, not with the 1.435 FΔH limit, because the simulator does not model pins. Both numbers are shown.
+- **OpenMC:** `tools/openmc/beavrs_lattice.py` was written and syntax-checked here, but not run. This environment has no OpenMC and no nuclear data. Someone with OpenMC should run one type and paste it in before this is called done.

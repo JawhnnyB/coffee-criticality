@@ -1,5 +1,6 @@
 "use client";
 
+import { TUNE, type CabLevel } from "./cabLevels";
 import { cabContext, cabFont } from "./cabCanvas";
 import { type ReactNode, useEffect, useRef, useState } from "react";
 import { playHuntHit, playHuntMiss } from "./audio";
@@ -575,11 +576,13 @@ export function Arcade({
   onAbort,
   fromEod = false,
   day = 1,
+  level = 1,
 }: {
   onDone: (score: number, leftover?: number) => void;
   onAbort: () => void;
   fromEod?: boolean;
   day?: number;
+  level?: CabLevel;
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [phase, setPhase] = useState<"brief" | "play" | "end">("brief");
@@ -596,7 +599,7 @@ export function Arcade({
     const deck = deckFor(day);
     let round = 0;
     let board = deck[0];
-    let clock = CLOCK;
+    let clock = level === 1 ? CLOCK : TUNE.catchClock[level - 1];
     let caught = 0;
     let miss = 0;
     let flash = 0;

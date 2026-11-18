@@ -97,6 +97,7 @@ import {
   openCab,
   openShufflePractice,
   pickChoice,
+  pushMsg,
   resolveIncident,
   startShift,
   travelTo,
@@ -112,6 +113,8 @@ import {
   type ParlorScores,
 } from "./sim";
 import type { AcademyTier, Choice, Line, NpcId, RoleId } from "./content";
+import { addScene, knownAbout, nextHint, tierOf, TIER_NAME, type Tier } from "./social";
+import { cabLevel, LADDERS, recordCab } from "./cabLevels";
 
 const GAME_CODES = new Set([
   "KeyW",
@@ -232,6 +235,7 @@ export function GameApp() {
   const stickRef = useRef({ x: 0, y: 0, active: false });
   const modeRef = useRef<Mode>("splash");
   const sigRef = useRef("");
+  const talkRef = useRef<{ dialogue: Line[] | null; acc: number }>({ dialogue: null, acc: 0 });
   const [mode, setMode] = useState<Mode>("splash");
   const [ready, setReady] = useState(false);
   const [touch, setTouch] = useState(false);
@@ -594,6 +598,29 @@ export function GameApp() {
       const a = collectActions(keys, edges, stickRef.current);
       if (edges.has("KeyK")) tryCloseShift(s);
       update(s, a, dt);
+      // A conversation just opened: add the person's due scene after what they would have said anyway.
+      if (s.mode === "dialogue" && s.dialogue !== talkRef.current.dialogue) {
+        talkRef.current.dialogue = s.dialogue;
+        const npc = s.talkNpc;
+        if (npc) {
+          const first = !s.flags[`social:met:${npc}`];
+          s.flags[`social:met:${npc}`] = true;
+          addScene(s, first);
+        }
+      }
+      // Someone moved up a tier: say so once.
+      talkRef.current.acc += dt;
+      if (talkRef.current.acc > 0.5 && s.mode === "play") {
+        talkRef.current.acc = 0;
+        for (const id of Object.keys(NPCS) as NpcId[]) {
+          const t = tierOf(s, id);
+          const key = `social:tier:${id}:${t}`;
+          if (t > 0 && s.flags[`${id}Talked`] && !s.flags[key]) {
+            s.flags[key] = true;
+            pushMsg(s, `${shortName(id)} · ${TIER_NAME[t as Tier]}.`);
+          }
+        }
+      }
       syncWorld({
         room: s.room,
         period: s.period,
@@ -765,7 +792,9 @@ export function GameApp() {
 
         {mode === "fish" && (
           <FishGame
+            level={cabLevel(s.flags, "fish")}
             onDone={(score) => {
+              noteCab(s, "fish", score);
               finishLeisure(s, score);
               applyMode(s.mode);
               playBlip("ok");
@@ -780,7 +809,9 @@ export function GameApp() {
         )}
         {mode === "plot" && (
           <PlotGame
+            level={cabLevel(s.flags, "plot")}
             onDone={(score) => {
+              noteCab(s, "plot", score);
               finishLeisure(s, score);
               applyMode(s.mode);
               playBlip("ok");
@@ -796,7 +827,9 @@ export function GameApp() {
 
         {mode === "horde" && (
           <HordeGame
+            level={cabLevel(s.flags, "horde")}
             onDone={(score) => {
+              noteCab(s, "horde", score);
               finishLeisure(s, score);
               applyMode(s.mode);
               playBlip("ok");
@@ -826,7 +859,9 @@ export function GameApp() {
         )}
         {mode === "golf" && (
           <GolfGame
+            level={cabLevel(s.flags, "golf")}
             onDone={(score) => {
+              noteCab(s, "golf", score);
               finishLeisure(s, score);
               applyMode(s.mode);
               playBlip("ok");
@@ -841,7 +876,9 @@ export function GameApp() {
         )}
         {mode === "rods" && (
           <RodsGame
+            level={cabLevel(s.flags, "rods")}
             onDone={(score) => {
+              noteCab(s, "rods", score);
               finishLeisure(s, score);
               applyMode(s.mode);
               playBlip("ok");
@@ -856,7 +893,9 @@ export function GameApp() {
         )}
         {mode === "pebble" && (
           <PebbleGame
+            level={cabLevel(s.flags, "pebble")}
             onDone={(score) => {
+              noteCab(s, "pebble", score);
               finishLeisure(s, score);
               applyMode(s.mode);
               playBlip("ok");
@@ -871,7 +910,9 @@ export function GameApp() {
         )}
         {mode === "bowl" && (
           <BowlGame
+            level={cabLevel(s.flags, "bowl")}
             onDone={(score) => {
+              noteCab(s, "bowl", score);
               finishLeisure(s, score);
               applyMode(s.mode);
               playBlip("ok");
@@ -923,7 +964,9 @@ export function GameApp() {
           <Arcade
             day={s.day}
             fromEod={s.returnMode === "eod"}
+            level={cabLevel(s.flags, "catch")}
             onDone={(score, leftover = 0) => {
+              noteCab(s, "catch", score);
               finishArcade(s, score, leftover);
               applyMode(s.mode);
               playBlip("ok");
@@ -1931,6 +1974,24 @@ function ScoresBoard({ scores, onClose }: { scores: ParlorScores; onClose: () =>
 const SITE_NAME: Record<"pwr" | "bwr" | "pebble" | "msr", string> = { pwr: "PWR", bwr: "BWR", pebble: "Pebble bed", msr: "MSR" };
 
 /** The hall pipes keep their places; their names follow what the site's pipes carry. */
+/** "Dr. Mabel Quinn" → "Mabel", "Mr. Reginald Holt" → "Holt": how the floor says their names. */
+function shortName(id: NpcId): string {
+  const parts = NPCS[id].name.split(" ");
+  if (parts[0] === "Mr.") return parts[parts.length - 1];
+  return parts[0] === "Dr." ? parts[1] : parts[0];
+}
+
+/** Record a levelled cabinet run and say what it unlocked. */
+function noteCab(s: GameState, id: string, score: number) {
+  const ladder = LADDERS[id];
+  if (!ladder) return;
+  const host = ladder.host;
+  const out = recordCab(s.flags, id, cabLevel(s.flags, id), score, host ? { trust: s.trust[host], start: NPCS[host].startTrust } : undefined);
+  const name = id === "catch" ? "CATCH.CAB" : `${id.toUpperCase()}.CAB`;
+  if (out.unlocked) pushMsg(s, `${name} level ${out.unlocked}: ${ladder.what[out.unlocked - 1]}.`);
+  else if (out.waitsOn) pushMsg(s, `${name} level 3 is cleared. ${shortName(out.waitsOn)} sets it up once they trust you.`);
+}
+
 function hallLabel(label: string, site: CutawayKind, room: string): string {
   if (room !== "reactor" || site === "fhr" || site === "msfr") return label;
   const p = HALL_PIPES[site];
@@ -2575,6 +2636,17 @@ function PauseStage({
                       {NPCS[id].role} · {met ? trustState(s.trust[id]) : "Not introduced"}
                     </div>
                     {met ? <div className="text-[11px] text-muted">{relationLine(id, s.flags, s.trust[id])}</div> : null}
+                    {met ? (
+                      <div className="mt-0.5 text-[11px]" data-testid={`crew-${id}`}>
+                        <span className="font-mono tracking-wide text-fg">{TIER_NAME[tierOf(s, id)]}</span>
+                        <span className="text-subtle"> · {nextHint(s, id)}</span>
+                        <ul className="mt-0.5 space-y-0.5 text-muted">
+                          {knownAbout(s, id).slice(1).map((k) => (
+                            <li key={k}>· {k}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    ) : null}
                     <div className="text-[11px] text-[#b5a48c]">{met ? NPC_INTRO[id].who : NPC_INTRO[id].beat}</div>
                     </div>
                   </div>

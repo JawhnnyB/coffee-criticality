@@ -1,5 +1,6 @@
 "use client";
 
+import { TUNE, type CabLevel } from "./cabLevels";
 import { cabContext, cabFont } from "./cabCanvas";
 import { useEffect, useRef, useState } from "react";
 import { PAL } from "./palette";
@@ -21,7 +22,7 @@ const FISH = [
 type Kind = (typeof FISH)[number];
 
 /** Follow the fish with the mouse. Harder fish run faster and juke. */
-export function FishGame({ onDone, onAbort }: { onDone: (score: number) => void; onAbort: () => void }) {
+export function FishGame({ onDone, onAbort, level = 1 }: { onDone: (score: number) => void; onAbort: () => void; level?: CabLevel }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [done, setDone] = useState<string[] | null>(null);
   const [hud, setHud] = useState({ name: "Cast", lock: 0, n: 0, got: 0, line: "Put the cursor on the fish. Hold it." });
@@ -112,8 +113,8 @@ export function FishGame({ onDone, onAbort }: { onDone: (score: number) => void;
           ang += (Math.random() - 0.5) * (0.6 + kind.twitch * 0.7);
         }
         ang += Math.sin(now / (180 / (1 + kind.twitch))) * kind.twitch * 0.012;
-        fx += Math.cos(ang) * kind.spd * dt;
-        fy += Math.sin(ang) * kind.spd * 0.55 * dt;
+        fx += Math.cos(ang) * kind.spd * TUNE.fishSpeed[level - 1] * dt;
+        fy += Math.sin(ang) * kind.spd * TUNE.fishSpeed[level - 1] * 0.55 * dt;
         if (fy < 18 || fy > H - 16) {
           ang = -ang;
           fy = Math.max(18, Math.min(H - 16, fy));
@@ -308,10 +309,10 @@ function PlotTile({ cell }: { cell: Cell }) {
   );
 }
 
-export function PlotGame({ onDone, onAbort }: { onDone: (score: number) => void; onAbort: () => void }) {
+export function PlotGame({ onDone, onAbort, level = 1 }: { onDone: (score: number) => void; onAbort: () => void; level?: CabLevel }) {
   const [grid, setGrid] = useState<Cell[]>(freshPlot);
   const [cut, setCut] = useState(0);
-  const [clock, setClock] = useState(45);
+  const [clock, setClock] = useState<number>(TUNE.plotClock[level - 1]);
   const [done, setDone] = useState(false);
   const [canCd, setCanCd] = useState(0);
   const cutRef = useRef(0);
@@ -321,7 +322,7 @@ export function PlotGame({ onDone, onAbort }: { onDone: (score: number) => void;
   useEffect(() => {
     if (done) return;
     let last = performance.now();
-    let t = 45;
+    let t: number = TUNE.plotClock[level - 1];
     let raf = 0;
     const loop = (now: number) => {
       if (doneRef.current) return;
@@ -343,7 +344,7 @@ export function PlotGame({ onDone, onAbort }: { onDone: (score: number) => void;
               c.grow = 0;
             }
           }
-          if ((c.stage === 2 || c.stage === 3) && !c.pest && Math.random() < dt * 0.05) {
+          if ((c.stage === 2 || c.stage === 3) && !c.pest && Math.random() < dt * 0.05 * TUNE.plotPest[level - 1]) {
             c.pest = true;
             c.walk = 0;
             const opts = neighbors(i);

@@ -1,5 +1,6 @@
 "use client";
 
+import { TUNE, type CabLevel } from "./cabLevels";
 import { cabContext, cabFont } from "./cabCanvas";
 import { useEffect, useRef, useState } from "react";
 import { Bezel } from "./Arcade";
@@ -111,7 +112,7 @@ function inRect(x: number, y: number, r: Wall) {
   return x >= r.x && x <= r.x + r.w && y >= r.y && y <= r.y + r.h;
 }
 
-export function GolfGame({ onDone, onAbort }: { onDone: (score: number) => void; onAbort: () => void }) {
+export function GolfGame({ onDone, onAbort, level = 1 }: { onDone: (score: number) => void; onAbort: () => void; level?: CabLevel }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [card, setCard] = useState<number[] | null>(null);
   const doneRef = useRef(false);
@@ -194,7 +195,7 @@ export function GolfGame({ onDone, onAbort }: { onDone: (score: number) => void;
       if (speed > 0.8) {
         x += vx * dt;
         y += vy * dt;
-        const damp = Math.exp(-2.4 * dt);
+        const damp = Math.exp(-TUNE.golfDamp[level - 1] * dt);
         vx *= damp;
         vy *= damp;
         for (const w of hole.walls) {
@@ -339,7 +340,7 @@ export function GolfGame({ onDone, onAbort }: { onDone: (score: number) => void;
 }
 
 /** Magnetic jack: one step per cycle. Overlap the banks or worth spikes. */
-export function RodsGame({ onDone, onAbort }: { onDone: (score: number) => void; onAbort: () => void }) {
+export function RodsGame({ onDone, onAbort, level = 1 }: { onDone: (score: number) => void; onAbort: () => void; level?: CabLevel }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [end, setEnd] = useState<{ ok: boolean; line: string; hold: number } | null>(null);
   const endRef = useRef(false);
@@ -419,7 +420,7 @@ export function RodsGame({ onDone, onAbort }: { onDone: (score: number) => void;
       const dWorth = worth.reduce((a, b) => a + b, 0);
       const spike = worth.some((w, i) => i > 0 && banks[i] > 40 && banks[i - 1] < 70 && w > 0.35);
       const overlapOk = banks[0] < 40 || banks[1] > Math.max(0, banks[0] - 110);
-      const inBand = Math.abs(dWorth - demand) < 0.28 && !spike && overlapOk && banks[0] > 24;
+      const inBand = Math.abs(dWorth - demand) < TUNE.rodsBand[level - 1] && !spike && overlapOk && banks[0] > 24;
       if (inBand) {
         hold += dt;
         inBandT += dt;
@@ -516,7 +517,7 @@ export function RodsGame({ onDone, onAbort }: { onDone: (score: number) => void;
 /** Pebble stats for the compare card: how many passes a pebble made, and how many reached the core. */
 type PebbleStats = { score: number; finished: number; passes: number; core: number };
 
-export function PebbleGame({ onDone, onAbort }: { onDone: (score: number) => void; onAbort: () => void }) {
+export function PebbleGame({ onDone, onAbort, level = 1 }: { onDone: (score: number) => void; onAbort: () => void; level?: CabLevel }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [end, setEnd] = useState<PebbleStats | null>(null);
   const endRef = useRef(false);
@@ -552,8 +553,8 @@ export function PebbleGame({ onDone, onAbort }: { onDone: (score: number) => voi
     let raf = 0;
     let dropX = W / 2;
     let gateX = 90;
-    let gateV = 56;
-    const GATE_W = 54;
+    let gateV = 56 * TUNE.pebbleGateSpeed[level - 1];
+    const GATE_W = TUNE.pebbleGate[level - 1];
 
     const down = (e: KeyboardEvent) => {
       if (!hostOwnsKey("mini", e.code)) return;
@@ -727,7 +728,7 @@ export function PebbleGame({ onDone, onAbort }: { onDone: (score: number) => voi
   );
 }
 
-export function BowlGame({ onDone, onAbort }: { onDone: (score: number) => void; onAbort: () => void }) {
+export function BowlGame({ onDone, onAbort, level = 1 }: { onDone: (score: number) => void; onAbort: () => void; level?: CabLevel }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [end, setEnd] = useState<number | null>(null);
   const endRef = useRef(false);
@@ -834,6 +835,8 @@ export function BowlGame({ onDone, onAbort }: { onDone: (score: number) => void;
         by += bvy * dt;
         bvy += 8 * dt;
         bvx *= Math.exp(-0.4 * dt);
+        // An oiled lane drifts the ball right; the player aims against it.
+        bvx += TUNE.bowlDrift[level - 1] * dt;
         if (bx < 70 || bx > 250) bvx *= -0.7;
         for (const p of pins) {
           if (!p.up) {

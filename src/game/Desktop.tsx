@@ -106,7 +106,12 @@ export function Desktop(props: DesktopProps) {
   const season: Season = themeSeason(d.followSeason, d.wallpaper, s.setup.season);
   const info = SEASON_INFO[season];
   const hasShift = s.role !== null;
-  const input = { hasPlant: !!s.plant, foundCabinets: !!s.flags[CABINET_FOUND_FLAG], showAll: d.showAllApps && import.meta.env.DEV };
+  const input = {
+    hasPlant: !!s.plant,
+    foundCabinets: !!s.flags[CABINET_FOUND_FLAG],
+    showAll: d.showAllApps && import.meta.env.DEV,
+    outageOpen: !!s.flags.outageOpen || s.day >= 4,
+  };
   const apps = visibleApps(input);
   const pinned = pinnedVisible(d.pinned, input);
   const screen = { w: size.w, h: size.h };

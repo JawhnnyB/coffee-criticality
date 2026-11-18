@@ -124,6 +124,8 @@ export interface AppDef {
   needsDesign?: boolean;
   /** Mini games appear only after their cabinet is found. */
   needsFound?: boolean;
+  /** Shown once Priya hands over the reload (or from day 4). */
+  needsOutage?: boolean;
   /** The line a placeholder shows. */
   note?: string;
 }
@@ -133,6 +135,7 @@ export const APP_IDS = [
   "music",
   "design",
   "control",
+  "outage",
   "academy",
   "news",
   "radiation",
@@ -162,6 +165,7 @@ export const APPS: Record<AppId, AppDef> = {
   music: { id: "music", title: "Music", short: "MUS", kind: "static" },
   design: { id: "design", title: "Reactor Design", short: "DSN", kind: "static" },
   control: { id: "control", title: "Reactor Control", short: "CTL", kind: "sim", mode: "reactor", needsDesign: true },
+  outage: { id: "outage", title: "Refuelling Outage", short: "OUT", kind: "static", needsOutage: true },
   academy: { id: "academy", title: "Academy", short: "ACA", kind: "sim", mode: "academy" },
   news: { id: "news", title: "News", short: "NEW", kind: "static" },
   radiation: { id: "radiation", title: "Radiation", short: "RAD", kind: "static" },
@@ -198,6 +202,8 @@ export interface VisibilityInput {
   foundCabinets: boolean;
   /** Settings "Show all apps". Honoured only in a dev build. */
   showAll: boolean;
+  /** The outage has been handed over. */
+  outageOpen?: boolean;
 }
 
 /** Which apps the start menu and the home grid show. Rules are in the spec, section 4.4 and phase 1 item 15. */
@@ -206,6 +212,7 @@ export function visibleApps(input: VisibilityInput): AppDef[] {
     if (input.showAll) return true;
     if (app.needsDesign && !input.hasPlant) return false;
     if (app.needsFound && !input.foundCabinets) return false;
+    if (app.needsOutage && !input.outageOpen) return false;
     return true;
   });
 }

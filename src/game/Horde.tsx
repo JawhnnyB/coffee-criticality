@@ -1,5 +1,6 @@
 "use client";
 
+import { TUNE, type CabLevel } from "./cabLevels";
 import { cabContext, cabFont } from "./cabCanvas";
 import { useEffect, useRef, useState } from "react";
 import { Bezel } from "./Arcade";
@@ -188,7 +189,7 @@ function spawnZed(round: number, r: () => number, map: (typeof HORDE_MAPS)[numbe
   };
 }
 
-export function HordeGame({ onDone, onAbort }: { onDone: (score: number) => void; onAbort: () => void }) {
+export function HordeGame({ onDone, onAbort, level = 1 }: { onDone: (score: number) => void; onAbort: () => void; level?: CabLevel }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [end, setEnd] = useState<{ round: number; kills: number; map: string } | null>(null);
   const endRef = useRef(false);
@@ -256,7 +257,7 @@ export function HordeGame({ onDone, onAbort }: { onDone: (score: number) => void
     let reloadT = 0;
     let cool = 0;
     let kills = 0;
-    let round = 1;
+    let round: number = TUNE.hordeStartRound[level - 1];
     let toSpawn = 6;
     let waveWait = 1.4;
     let zeds: Zed[] = [];
