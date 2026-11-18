@@ -24,6 +24,10 @@ Keys in `src/game/siteText.ts` (each key exists for pwr, bwr, pebble, and msr):
 | fastSalt | Still `msr_fast` (`GameApp.tsx`) |
 | hallFloor | Still `reactor` and the pause-map hall line is `hallBlurb()` |
 | vesselNames | Academy page "The vessel has names" (`GameApp.tsx`) |
+| whyThermal | Nuclear desk, Σ_s1→2 lesson, "why": the PWR sentence says "this site is a PWR". Added 18 Nov by Claude. |
+| voidStep | Nuclear desk, MTC lesson step: the PWR sentence says "This site is a PWR. Void is not a knob here", which is wrong on a BWR. Added 18 Nov by Claude. |
+
+`scripts/site-text.test.mjs` now checks every lesson field on every non-PWR site and fails if any still says the site is a PWR.
 
 `hallBlurb()` in the same file replaces only the reactor-hall pause line. Other rooms keep `ROOM_BLURB`.
 
@@ -48,11 +52,11 @@ Other options: leave the card saying chloride and change the drawing, or show bo
 Chosen: `siteControls.ts` maps operator input onto the power, flow, and rods the bench already writes. The sim files were not edited.
 
 - PWR: the bench numbers pass through.
-- BWR: displayed power is `bwrPower(flow, rods)`, written onto the run after the bench step so the bench cannot overwrite it. Rods are labeled "from below". The drawing of rods from below was already in the hall and the cutaway.
-- Pebble: a "Pass a pebble" button raises burnup by 8 MWd/kg and discharges at 90. The panel outlet is 750 °C (Zhang et al., HTR-PM, Engineering 2016). The bench ΔT is still the sim's own number.
-- Salt: "Open the freeze valve" melts the plug, then the level falls, then fission heat is 0 and the run is scrammed. βeff is shown as 0.55 × β. Display only.
+- BWR (changed 18 Nov by Claude): power is the bench's own power. `benchStep.ts` already gives the BWR the largest coolant coefficient, standing in for voids, so more recirc flow cools the core, adds reactivity, and power climbs to a new rest point with the delayed-neutron lag. The earlier `bwrPower(flow, rods)` formula replaced that power after each frame, so the panel, the run and the band hold disagreed. It was removed. Checked on screen: rods 80, recirc 70% gave 60% power, recirc 120% gave 84%.
+- Pebble: a "Pass a pebble" button raises burnup by 8 MWd/kg and discharges at 90. The panel outlet (changed 18 Nov by Claude) is the thermal model's hot temperature, inlet plus Q / (ṁ cp): 735 °C at full power and full blower, hotter at lower blower, cooler at lower power. HTR-PM is about 250 °C in and 750 °C out (Zhang et al., Engineering 2016).
+- Salt (fixed 18 Nov by Claude): "Open the freeze valve" is a shutdown. From the moment it is ordered the band hold stops counting and the run cannot pass. Fission heat falls with the salt level, and when the salt is gone the run ends as a scram with the line "Fuel salt drained. Fission stopped. Decay heat goes to the drain tank. Teaching only." That line is new text for owner review. Before the fix, the hold kept counting and the run ended "BAND.HELD" at 93% power. βeff is shown as 0.55 × β. Display only.
 
-Other option: teach BWR flow only as a caption and leave power on the bench kinetics. Not chosen, because the brief asked for power to rise with recirc flow.
+The per-frame decision is `siteStep()` in `siteControls.ts`, a pure function with tests that run the real bench.
 
 The day-incident machine in `sim.ts` was not used for these controls. It is part of the frozen shift story.
 
@@ -60,7 +64,13 @@ The day-incident machine in `sim.ts` was not used for these controls. It is part
 
 Chosen: the twelve events live on Reactor Control as "A call from the plant". They do not join the week incident list in `sim.ts`. That list has its own rates, and those files are frozen.
 
-A right response ends the call. A wrong response sets `ended`, which the panel prints as "Worse." A tripped pump writes flow to 0. A scram writes scram. The tube mark stays on the hall face after you leave the bench.
+A right response ends the call. A wrong response sets `ended`, which the panel prints as "Worse." A scram writes scram. The tube mark stays on the hall face after you leave the bench.
+
+Changed 18 Nov by Claude, with an explicit outcome row per event (`OUTCOMES` in `siteEvents.ts`):
+
+- One pump tripping halves the flow (bench flow 50%, the slider floor). It used to write flow 0, which overheated the core and scrammed it even after the right answer. A PWR has other loops still pumping. A BWR keeps one recirc pump and natural circulation.
+- Wrong answers that a real plant trips on now scram: holding full power after an RCP trip, a stuck-open spray valve, a frozen salt line, and thawing the freeze valve with the rods pulled.
+- "Freeze-valve heater fault" was backwards. The MSRE freeze valve is held frozen by cooling air, and heat opens it. The event is now "Freeze-valve cooling air lost": the plug warms, and if it opens, the drain is the designed shutdown. Its title, panel, hall, right and wrong lines are new text for owner review.
 
 Other option: roll the events on the game clock inside `sim.ts`. Not chosen.
 
@@ -77,6 +87,10 @@ Chosen: redraw the eight walk sheets by hand in `scripts/draw-cast.mjs`. Same fr
 The player sheet keeps the tintA6 key colours (`#5a9438`, `#98c860`, `#3a6824`, `#7a4028`, `#c47840`, `#f5c9a0`, `#2a1810`, `#3b2318`) so the hoodie picker still recolours the shirt and the hair. Those keys are not all in `palette.ts`. NPC sheets use palette colours only. Cherenkov blue is not on any person.
 
 Other options: leave the old sheets, or paint the player in palette colours and lose the hoodie picker. Not chosen. The old walk sheets are in `reference/old-sprites/`. The other sprite files (idle, loco) were not the sheets the walker draws, so they were left where they were.
+
+Changed 18 Nov by Claude: every front and back head had a light pixel at each top corner. On Mabel's grey hair the cream highlight read as two horns. The corners are now plain hair with one shine across the crown, buns are rounded, and Mabel's highlight is `muted` grey. Run `node scripts/draw-cast.mjs` to rebuild the sheets.
+
+Still open: the intro scenes (`public/art/intro/scene-*.png`) and the badge have the old chibi cast painted in. In-game walkers and intro art no longer match.
 
 
 
