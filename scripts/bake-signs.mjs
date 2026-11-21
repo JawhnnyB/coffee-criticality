@@ -90,7 +90,7 @@ def trefoil(canvas, cx, cy, r):
 
 jobs = [
     ("containment.webp", dict(x=32,y=70,w=54,h=30,bg=(232,194,26),fg=(107,31,107),lines=["CAUTION","HIGH RAD","AREA"],trefoil=(59,112,8))),
-    ("pressurizer.webp", dict(x=40,y=90,w=58,h=26,bg=(255,255,255),fg=(192,57,43),lines=["DANGER","HOT SURFACES"],shear=0.18)),
+    ("pressurizer.webp", dict(x=22,y=70,w=124,h=64,bg=(255,255,255),fg=(192,57,43),lines=["DANGER","HOT SURFACES"],shear=0.08)),
     ("msiv.webp", dict(x=360,y=54,w=70,h=46,bg=(236,236,236),fg=(17,17,17),lines=["MAIN STEAM","LINE RAD","MONITOR"],trefoil=(395,40,7))),
     ("tunnel.webp", dict(trefoil=(240,86,6))),
     ("freeze.webp", dict(x=60,y=80,w=80,h=34,bg=(255,255,255),fg=(17,17,17),lines=["FREEZE VALVE","FV-103"],shear=0.16)),
