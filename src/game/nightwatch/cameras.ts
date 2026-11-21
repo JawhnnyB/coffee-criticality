@@ -431,21 +431,7 @@ function oddities(g: G, t: number, v: Vis, r: Room, scene: string) {
     g.fillRect(x - 14 * s, y - 32 * s, 28 * s, 7 * s);
     g.fillRect(x - 12 * s, y - 62 * s, 24 * s, 30 * s);
   }
-  if (v.has("hardhat") && !stateReady(scene, "hardhat")) {
-    const [x, y] = r.floor(-0.2, 0.25);
-    const s = r.scale(0.25) * 2.4;
-    g.fillStyle = "rgba(0,0,0,0.45)";
-    g.beginPath();
-    g.ellipse(x, y + 2 * s, 18 * s, 5 * s, 0, 0, Math.PI * 2);
-    g.fill();
-    g.fillStyle = "#e8c21a";
-    g.beginPath();
-    g.ellipse(x, y - 8 * s, 16 * s, 12 * s, 0, Math.PI, 0);
-    g.fill();
-    g.fillRect(x - 20 * s, y - 8 * s, 40 * s, 5 * s);
-    g.fillStyle = "#f6e27a";
-    g.fillRect(x - 4 * s, y - 16 * s, 6 * s, 4 * s);
-  }
+  // The hard hat is the corridor state plate (aux camera). No code hat on the turbine.
   if (v.has("flicker")) {
     const off = hash(Math.floor(t * 9), 11) > 0.62 || Math.sin(t * 31) > 0.85;
     if (off) {

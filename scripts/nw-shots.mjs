@@ -53,7 +53,6 @@ const states = [
   ["corridor", "doorAjar"],
   ["corridor", "chair"],
   ["corridor", "hardhat"],
-  ["turbine", "hardhat"],
   ["pool", "poolLow"],
   ["pool", "toolBag"],
   ["freeze", "frostGone"],

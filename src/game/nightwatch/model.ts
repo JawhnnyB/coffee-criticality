@@ -180,7 +180,7 @@ const SHARED_EVENTS: EventDef[] = [
 const SHARED_ODDITIES: Oddity[] = [
   { id: "flicker", camera: "aux", visual: "flicker" },
   { id: "chair", camera: "aux", visual: "chair" },
-  { id: "hardhat-corridor", camera: "turbine", visual: "hardhat" },
+  { id: "hardhat-corridor", camera: "aux", visual: "hardhat" },
   { id: "fog", camera: "yard", visual: "fog" },
   { id: "gull", camera: "intake", visual: "gull" },
   { id: "pool-ripple", camera: "pool", visual: "ripple" },

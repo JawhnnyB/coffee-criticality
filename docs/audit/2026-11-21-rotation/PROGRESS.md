@@ -13,7 +13,7 @@ Branch made by Claude: `g/nw-plates` + `c/crew-outage-1118` merged. Full suite a
 - A4 done · Puddles are a multiply wet sheen (about 0.7), a soft light reflection, and one drip. Radius follows the event's development. Containment 1.00%, drywell 0.76%, corridor 2.34%, all events.
 - A5 done · Pool ripples are three expanding annuli that shift a copy of the pool plate, not white rings. Plate change 0.36% (oddity band). The tool bag stays an event at 1.87%.
 - A6 done · Discharge status bar moved from (100, 150, 50, 8) onto the dark screen at (89, 128, 15, 6). MSIV bar moved from under the board onto its lower margin (364, 96, 64, 4). Freeze sign already sits on its wall board. Crops and the list are in visual/.
-- A7 todo · Hard hat on the wrong camera
+- A7 done · hardhat-corridor is on camera aux. The corridor state plate is what shows. The yellow code hat on the turbine is deleted. Oddities do not flash.
 - A8 todo · Pressurizer sign
 - A9 todo · The Cherenkov glow
 - A10 todo · Intake screens
