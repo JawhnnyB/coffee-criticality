@@ -1064,7 +1064,7 @@ export function paintCamera(g: G, scene: string, visuals: string[], t: number, o
   g.globalCompositeOperation = "source-over";
   if (grade.mono && typeof g.filter === "string" && g.canvas) {
     g.filter = "grayscale(1) contrast(1.15) brightness(1.05)";
-    g.drawImage(g.canvas as CanvasImageSource, 0, 0);
+    g.drawImage(g.canvas as CanvasImageSource, 0, 0, W, H);
     g.filter = "none";
   }
   // Exposure breathing, the auto-gain hunting in the dark.
