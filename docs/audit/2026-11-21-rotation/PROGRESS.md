@@ -60,8 +60,10 @@ Branch made by Claude: `g/nw-plates` + `c/crew-outage-1118` merged. Full suite a
 
 ## Part F
 
-- F1 done · Full suite: 294 tests, 285 pass, 9 fail. The 9 are the known baseline (cabinet-rewards, desk-verdict, and the seven grok-pwa meta inject tests). No new failures.
-- F2 done · npm run typecheck passes. npm run build passes and writes the Nitro output. vite preview cannot serve it: TanStack Start looks for dist/server/server.js, and the Vercel preset does not emit that file. The built game is served with scripts/preview-built.mjs (srvx).
-- F3 blocked: a full sweeper rotation is four nights at 7.5 real minutes each, plus the story week. Not run.
+- F1 done · Full suite, re-run after the pool glow cache: 294 tests, 285 pass, 9 fail. The 9 are the known baseline (cabinet-rewards, desk-verdict, and the seven grok-pwa meta inject tests). Night Watch unit tests 17/17. No new failures.
+- F2 done · npm run typecheck passes. npm run build passes and writes the Nitro output. dist/server/server.js is absent, so vite preview cannot: TanStack Start looks for that file and the Vercel preset does not emit it. scripts/preview-built.mjs (srvx) served the build at 127.0.0.1:8091 and the homepage returned 200.
+- F3 blocked: a full sweeper rotation is four nights at 7.5 real minutes each, plus the story week. Not run. No grades.
+- F4 blocked: the same playthrough at 390×844 was not run. Same reason.
 - F5 blocked: no bot table. See B6.
-- F7 todo · Frame time
+- F6 done · visible.md. Events clear 0.4%. Oddities sit inside 0.12–2.0%. The script exits 0.
+- F7 done · paintCamera, 40 frames, plates loaded. At 4×: turbine 6.5 ms, corridor 6.6 ms, tunnel 6.7 ms, pool 6.9 ms. Under 8 ms. The first timing this pass had the pool at 8.4 ms; the Cherenkov glow is now one baked blit, and the remeasure is the number above. The last plates pass worst case was 6.7 ms. This is 0.2 ms over that and under the 8 ms line. Tablet up on the built game, 5.00 s at 4×: busy 1.35 s (27%). The last pass was 28%. Page errors 0. The tablet was a replay opened with flags, not a graded night.
