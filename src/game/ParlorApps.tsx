@@ -9,6 +9,8 @@ import { setMuted, isMuted, unlockAudio } from "./audio";
 import { hostOwnsKey } from "./keyGate";
 import { CoreCamApp, CoreMapApp, ResultsApp } from "./ReactorApps";
 import { OutageApp } from "./OutageApp";
+import { PlantMonitorApp } from "./PlantMonitorApp";
+import { NightWatchApp } from "./NightWatch";
 import { NewsApp } from "./NewsApp";
 import { ACADEMY } from "./content";
 import { NRC_ROWS, filterNrc } from "./nrcIndex";
@@ -280,6 +282,8 @@ export function AppBody({ app, ctx }: { app: AppDef; ctx: AppCtx }) {
   if (app.id === "music") return <MusicApp ctx={ctx} />;
   if (app.id === "design") return <DesignApp ctx={ctx} />;
   if (app.id === "outage") return <OutageApp s={ctx.s} />;
+  if (app.id === "monitor") return <PlantMonitorApp s={ctx.s} />;
+  if (app.id === "nightwatch") return <NightWatchApp s={ctx.s} />;
   if (app.id === "cam") return <CoreCamApp s={ctx.s} />;
   if (app.id === "results") return <ResultsApp s={ctx.s} />;
   if (app.id === "coremap") return <CoreMapApp s={ctx.s} onResults={ctx.onResults} />;

@@ -102,6 +102,8 @@ The owner asked for a progressing social environment, progressing mini games, an
 
 ### Text for owner review
 
+**Approved by the owner on 20 November 2026** ("You have my approval to push anything that needs my approval"). This covers every item in this section and in "Choices made without the owner" below, and the earlier text lists in this file.
+
 - `src/game/socialScenes.ts`: 21 scenes (three per person), every line and choice. Marked DRAFT in the file.
 - `src/game/OutageApp.tsx`: the outage's explanatory lines, including the result verdicts ("Yours is as long or longer, and no more peaked." and the two others).
 - `src/game/GameApp.tsx` `noteCab`: "CATCH.CAB level 2: 40 s clock." style unlock lines, and "level 3 is cleared. Mabel sets it up once they trust you."
@@ -117,3 +119,11 @@ The owner asked for a progressing social environment, progressing mini games, an
 - **The outage saves** in its own browser key (`cc.outage.v1`), not in the game save. Flags record what matters to the story: `outage:c2:done`, `outage:c2:beat`.
 - **The pass line** compares your loading with the plant's own pattern in the same simulator, not with the 1.435 FΔH limit, because the simulator does not model pins. Both numbers are shown.
 - **OpenMC:** `tools/openmc/beavrs_lattice.py` was written and syntax-checked here, but not run. This environment has no OpenMC and no nuclear data. Someone with OpenMC should run one type and paste it in before this is called done.
+
+## Night Watch and the Plant Monitor (20 November, Claude, under the owner's standing approval)
+
+- **Night Watch** (`src/game/NightWatch.tsx`, `src/game/nightwatch/`): a desktop app once Unit 1 is designed. Five nights, unlocked in order. A survived night sets `night:<n>:done` and gives Elena +2 trust (she relieves you at six). Night Watch runs on its own clock. The day's clock is not touched.
+- **Radiation on both boards** is shown against its own normal level (×N), not in dose units, following the rule that player-visible dose values need an approved source.
+- **Pressures** are each type's published nominal values: PWR 15.5 MPa primary and 6.9 MPa steam; BWR 7.0 MPa; HTR-PM helium 7 MPa; MSRE cover gas 5 psig. Temperatures come from the game's thermal model.
+- **The Plant Monitor** alarms only on a reactor trip, core ΔT above its band, or power above 104%. The ΔT band is the trainer's target, so low ΔT at low power is normal and not an alarm. Its alarm flashes its icon (desk, Start menu and phone grid), its taskbar tab and the Start button. The Start button flashes too, because the frozen default desk does not pin the monitor.
+- **New text** (approved under the standing approval, listed here for reference): event titles and shift-log lines in `nightwatch/model.ts`, and the desk lines, summary lines and Elena's "Walk me through the log." in `NightWatch.tsx`.

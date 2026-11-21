@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState, type CSSProperties, type ReactNode, type RefObject } from "react";
+import { createContext, useContext, useEffect, useRef, useState, type CSSProperties, type ReactNode, type RefObject } from "react";
+import { monitorAlarm } from "./nightwatch/monitor";
 import { PAL } from "./palette";
 import { isMuted, setMuted } from "./audio";
 import {
@@ -113,6 +114,9 @@ export function Desktop(props: DesktopProps) {
     outageOpen: !!s.flags.outageOpen || s.day >= 4,
   };
   const apps = visibleApps(input);
+  // The Plant Monitor's alarm: its icon, its taskbar tab and the Start button flash red.
+  const plantAlarm = !!s.plant && monitorAlarm(siteKind(s.plant), s.run, s.minutes);
+  const alarmApps = new Set<string>(plantAlarm ? ["monitor"] : []);
   const pinned = pinnedVisible(d.pinned, input);
   const screen = { w: size.w, h: size.h };
   // A game or bench needs room: sim windows open near full size, and clamp to the screen when it is smaller.
@@ -277,6 +281,7 @@ export function Desktop(props: DesktopProps) {
   const simOpenOnPhone = phone && !!simMode;
 
   return (
+    <AlarmApps.Provider value={alarmApps}>
     <div
       ref={rootRef}
       data-testid="desktop"
@@ -294,6 +299,7 @@ export function Desktop(props: DesktopProps) {
         } as CSSProperties
       }
     >
+      <style>{`@keyframes deskalarm { 0%,49% { background: ${PAL.bad}; } 50%,100% { background: ${PAL.ink}; } }`}</style>
       <LakeScene season={season} testId="wallpaper" site={siteKind(props.s.plant)} power={sitePower(props.s.run)} />
       <ParticleLayer kind={info.particle} active={shown && !d.reducedMotion} />
 
@@ -389,9 +395,11 @@ export function Desktop(props: DesktopProps) {
             setMuteTick((n) => n + 1);
           }}
           muteTick={muteTick}
+          alarmApps={alarmApps}
         />
       ) : null}
     </div>
+    </AlarmApps.Provider>
   );
 }
 
@@ -448,16 +456,22 @@ function ParticleLayer({ kind, active }: { kind: "rain" | "heat" | "leaves" | "s
   );
 }
 
+/** Apps with a live alarm. Their icon flashes red wherever it is drawn (desk, Start menu, phone grid). */
+const AlarmApps = createContext<Set<string>>(new Set());
+
 function AppIcon({ app }: { app: AppDef }) {
+  const alarm = useContext(AlarmApps).has(app.id);
   return (
     <span
       className="flex items-center justify-center"
+      data-alarm={alarm ? "1" : "0"}
       style={{
         width: 32,
         height: 32,
         background: PAL.ink,
-        border: `2px solid ${PAL.outline}`,
+        border: `2px solid ${alarm ? PAL.bad : PAL.outline}`,
         color: PAL.cream,
+        animation: alarm ? "deskalarm 0.8s infinite" : undefined,
       }}
     >
       <AppGlyph id={app.id} />
@@ -602,6 +616,7 @@ function Taskbar({
   muted,
   onSound,
   muteTick,
+  alarmApps,
 }: {
   season: string;
   taskbar: string;
@@ -614,6 +629,8 @@ function Taskbar({
   muted: boolean;
   onSound: () => void;
   muteTick: number;
+  /** Apps whose tab flashes red (an alarm on the Plant Monitor). */
+  alarmApps?: Set<string>;
 }) {
   void muteTick;
   return (
@@ -627,7 +644,8 @@ function Taskbar({
         onClick={onStart}
         aria-expanded={startOpen}
         data-testid="start-button"
-        style={{ height: 26, padding: "0 10px", background: PAL.copper, color: PAL.ink, border: `2px solid ${PAL.outline}`, fontFamily: "var(--font-body)", fontSize: "var(--text-small)", lineHeight: "1.2", cursor: "pointer" }}
+        data-alarm={alarmApps?.size ? "1" : "0"}
+        style={{ animation: alarmApps?.size ? "deskalarm 0.8s infinite" : undefined, height: 26, padding: "0 10px", background: PAL.copper, color: PAL.ink, border: `2px solid ${PAL.outline}`, fontFamily: "var(--font-body)", fontSize: "var(--text-small)", lineHeight: "1.2", cursor: "pointer" }}
       >
         Start
       </button>
@@ -639,7 +657,10 @@ function Taskbar({
             aria-pressed={focusedId === w.id && !w.minimized}
             onClick={() => onWin(w)}
             className="truncate"
+            data-testid={`task-${w.appId}`}
+            data-alarm={alarmApps?.has(w.appId) ? "1" : "0"}
             style={{
+              animation: alarmApps?.has(w.appId) ? "deskalarm 0.8s infinite" : undefined,
               maxWidth: 140,
               height: 26,
               padding: "0 8px",

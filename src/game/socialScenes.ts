@@ -1,5 +1,5 @@
 /**
- * DRAFT TEXT, written by Claude for owner review (docs/decisions-pending.md, "Crew scenes"). Not approved.
+ * Written by Claude, approved by the owner on 20 November 2026 (docs/decisions-pending.md, "Crew scenes").
  * One scene per person per tier. Each ends with a choice; sim's pickChoice applies its trust, culture and flag.
  * Voice: the existing cast's, short and concrete. No real names, places or dose numbers.
  */
