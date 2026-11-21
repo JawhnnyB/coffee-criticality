@@ -17,6 +17,7 @@ Branch made by Claude: `g/nw-plates` + `c/crew-outage-1118` merged. Full suite a
 - A8 done · Pressurizer words were a small board on a larger white sign. They are rebaked to fill it (about 124×64). Before and after crops are in visual/.
 - A9 done · Cherenkov is a vertical strip rising out of the cells, brighter at the bottom. Every fifth cell stays dark. The round lamp dots are gone.
 - A10 done · Intake screens are flat framed mesh in the same three slots, not round columns. Debris is the same camera with kelp on the mesh. Screen edges stay within 8 px of 80, 144, 210, 274, 340 and 404. The beacon spot stays dark. New plates kept.
+- A-band done · Flicker is one fixture (0.42%). Fog is two low wisps (0.48%). Cavity glow is a small warm patch (0.62%). The corridor hard hat is smaller so the plate change is 1.14%. `visible.md` exits clean: every event clears 0.4%, every oddity is inside 0.12–2.0%.
 - A11 todo · Shoot the before-and-after sheet
 
 ## Part B

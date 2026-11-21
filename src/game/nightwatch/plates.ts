@@ -52,7 +52,7 @@ export const PLATES: Record<string, PlateSpec> = {
     states: {
       doorAjar: { file: "/nightwatch/plates/corridor-doorAjar.webp", measured: [313, 55, 142, 215], box: [305, 47, 158, 223] },
       chair: { file: "/nightwatch/plates/corridor-chair.webp", measured: [191, 169, 48, 63], box: [183, 161, 64, 79] },
-      hardhat: { file: "/nightwatch/plates/corridor-hardhat.webp", measured: [192, 162, 97, 83], box: [184, 154, 113, 99] },
+      hardhat: { file: "/nightwatch/plates/corridor-hardhat.webp", measured: [236, 166, 149, 52], box: [228, 158, 165, 68] },
     },
   },
   pool: {

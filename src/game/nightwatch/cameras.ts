@@ -433,10 +433,16 @@ function oddities(g: G, t: number, v: Vis, r: Room, scene: string) {
   }
   // The hard hat is the corridor state plate (aux camera). No code hat on the turbine.
   if (v.has("flicker")) {
+    // One fixture, not the whole frame. Quiet enough to stay an oddity.
     const off = hash(Math.floor(t * 9), 11) > 0.62 || Math.sin(t * 31) > 0.85;
     if (off) {
-      g.fillStyle = "rgba(0,0,0,0.38)";
-      g.fillRect(0, 0, W, H);
+      g.save();
+      g.globalCompositeOperation = "multiply";
+      g.fillStyle = "rgb(70,70,70)";
+      g.beginPath();
+      g.ellipse(W * 0.32, 28, 22, 8, 0, 0, Math.PI * 2);
+      g.fill();
+      g.restore();
     }
   }
 }
@@ -641,8 +647,10 @@ const S: Record<string, Scene> = {
     live(g, t, v) {
       if (v.has("warmGlow")) {
         g.globalCompositeOperation = "lighter";
-        g.fillStyle = rad(g, W / 2, 180, 160, [[0, `rgba(255,200,150,${0.4 + 0.08 * Math.sin(t)})`], [1, "rgba(0,0,0,0)"]]);
-        g.fillRect(0, 0, W, H);
+        g.fillStyle = rad(g, W / 2, 168, 42, [[0, `rgba(255,190,140,${0.28 + 0.06 * Math.sin(t)})`], [1, "rgba(0,0,0,0)"]]);
+        g.beginPath();
+        g.ellipse(W / 2, 168, 36, 14, 0, 0, Math.PI * 2);
+        g.fill();
         g.globalCompositeOperation = "source-over";
       }
     },
@@ -988,10 +996,14 @@ const S: Record<string, Scene> = {
         g.globalCompositeOperation = "source-over";
       }
       if (v.has("fog") || v.has("arc")) {
-        for (let k = 0; k < 8; k++) {
-          const x = ((t * 6 + k * 90) % (W + 200)) - 100;
-          g.fillStyle = rad(g, x, 150 + k * 6, 120, [[0, "rgba(190,180,160,0.55)"], [1, "rgba(0,0,0,0)"]]);
-          g.fillRect(x - 120, 30, 240, 240);
+        const n = v.has("arc") ? 3 : 2;
+        for (let k = 0; k < n; k++) {
+          const x = 140 + k * 160 + Math.sin(t * 0.4 + k) * 8;
+          const a = v.has("arc") ? 0.4 : 0.34;
+          g.fillStyle = rad(g, x, 158, 40, [[0, `rgba(200,190,170,${a})`], [1, "rgba(0,0,0,0)"]]);
+          g.beginPath();
+          g.ellipse(x, 158, 34, 12, 0, 0, Math.PI * 2);
+          g.fill();
         }
       }
       const van = v.at("van");

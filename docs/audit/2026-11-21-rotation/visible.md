@@ -10,82 +10,82 @@ The same scene and visual draws the same frame on every site, so those rows shar
 | Site | Camera | Scene | Visual | Kind | Plate px | Code px | Plate % | Event rule | Oddity rule |
 | --- | --- | --- | --- | --- | ---: | ---: | ---: | --- | --- |
 | pwr | core | containment | puddle | event | 5204 | 5672 | 1.00 | pass | n/a |
-| pwr | pzr | pressurizer | steamWisp | event | 4799 | 3786 | 0.93 | pass | n/a |
-| pwr | pzr | pressurizer | flicker | oddity | 204606 | 137185 | 39.47 | n/a | FAIL >2.0% |
-| pwr | steamline | msiv | beacon | event | 15328 | 14835 | 2.96 | pass | n/a |
+| pwr | pzr | pressurizer | steamWisp | event | 4796 | 3786 | 0.93 | pass | n/a |
+| pwr | pzr | pressurizer | flicker | oddity | 2156 | 2129 | 0.42 | n/a | pass |
+| pwr | steamline | msiv | beacon | event | 14880 | 14387 | 2.87 | pass | n/a |
 | pwr | turbine | turbine | pumpStopped | event | 19612 | 18543 | 3.78 | pass | n/a |
-| pwr | turbine | turbine | hardhat | oddity | 12273 | 12289 | 2.37 | n/a | FAIL >2.0% |
 | pwr | aux | corridor | puddle | event | 12142 | 10938 | 2.34 | pass | n/a |
 | pwr | aux | corridor | doorAjar | event | 41602 | 13228 | 8.03 | pass | n/a |
-| pwr | aux | corridor | flicker | oddity | 429689 | 429005 | 82.89 | n/a | FAIL >2.0% |
+| pwr | aux | corridor | flicker | oddity | 2222 | 2224 | 0.43 | n/a | pass |
 | pwr | aux | corridor | chair | oddity | 8580 | 2858 | 1.66 | n/a | pass |
-| pwr | pool | pool | toolBag | event | 9696 | 3776 | 1.87 | pass | n/a |
-| pwr | pool | pool | poolLow | event | 38361 | 28928 | 7.40 | pass | n/a |
-| pwr | pool | pool | ripple | oddity | 1861 | 55 | 0.36 | n/a | pass |
-| pwr | yard | yard | arc | event | 160231 | 173035 | 30.91 | pass | n/a |
-| pwr | yard | yard | fog | oddity | 129917 | 142108 | 25.06 | n/a | FAIL >2.0% |
+| pwr | aux | corridor | hardhat | oddity | 5893 | 0 | 1.14 | n/a | pass |
+| pwr | pool | pool | toolBag | event | 9203 | 3776 | 1.78 | pass | n/a |
+| pwr | pool | pool | poolLow | event | 38292 | 28928 | 7.39 | pass | n/a |
+| pwr | pool | pool | ripple | oddity | 1368 | 55 | 0.26 | n/a | pass |
+| pwr | yard | yard | arc | event | 36312 | 36188 | 7.00 | pass | n/a |
+| pwr | yard | yard | fog | oddity | 2485 | 2321 | 0.48 | n/a | pass |
 | pwr | yard | yard | rover:0.5 | other | 3447 | 3857 | 0.66 | pass | n/a |
 | pwr | yard | yard | van:0.5 | other | 20115 | 20102 | 3.88 | pass | n/a |
-| pwr | intake | intake | debris | event | 64294 | 11653 | 12.40 | pass | n/a |
-| pwr | intake | intake | gull | oddity | 3169 | 3168 | 0.61 | n/a | pass |
+| pwr | intake | intake | debris | event | 27399 | 11653 | 5.29 | pass | n/a |
+| pwr | intake | intake | gull | oddity | 3167 | 3168 | 0.61 | n/a | pass |
 | bwr | core | drywell | puddle | event | 3957 | 4679 | 0.76 | pass | n/a |
 | bwr | pzr | torus | steamWisp | event | 10373 | 10893 | 2.00 | pass | n/a |
 | bwr | steamline | tunnel | beacon | event | 20728 | 20512 | 4.00 | pass | n/a |
 | bwr | steamline | tunnel | condensate | oddity | 5438 | 6774 | 1.05 | n/a | pass |
 | bwr | turbine | turbine | pumpStopped | event | 19612 | 18543 | 3.78 | pass | n/a |
-| bwr | turbine | turbine | hardhat | oddity | 12273 | 12289 | 2.37 | n/a | FAIL >2.0% |
 | bwr | aux | corridor | puddle | event | 12142 | 10938 | 2.34 | pass | n/a |
 | bwr | aux | corridor | doorAjar | event | 41602 | 13228 | 8.03 | pass | n/a |
-| bwr | aux | corridor | flicker | oddity | 429689 | 429005 | 82.89 | n/a | FAIL >2.0% |
+| bwr | aux | corridor | flicker | oddity | 2222 | 2224 | 0.43 | n/a | pass |
 | bwr | aux | corridor | chair | oddity | 8580 | 2858 | 1.66 | n/a | pass |
-| bwr | pool | pool | toolBag | event | 9696 | 3776 | 1.87 | pass | n/a |
-| bwr | pool | pool | poolLow | event | 38361 | 28928 | 7.40 | pass | n/a |
-| bwr | pool | pool | ripple | oddity | 1861 | 55 | 0.36 | n/a | pass |
-| bwr | yard | yard | arc | event | 160231 | 173035 | 30.91 | pass | n/a |
-| bwr | yard | yard | fog | oddity | 129917 | 142108 | 25.06 | n/a | FAIL >2.0% |
+| bwr | aux | corridor | hardhat | oddity | 5893 | 0 | 1.14 | n/a | pass |
+| bwr | pool | pool | toolBag | event | 9203 | 3776 | 1.78 | pass | n/a |
+| bwr | pool | pool | poolLow | event | 38292 | 28928 | 7.39 | pass | n/a |
+| bwr | pool | pool | ripple | oddity | 1368 | 55 | 0.26 | n/a | pass |
+| bwr | yard | yard | arc | event | 36312 | 36188 | 7.00 | pass | n/a |
+| bwr | yard | yard | fog | oddity | 2485 | 2321 | 0.48 | n/a | pass |
 | bwr | yard | yard | rover:0.5 | other | 3447 | 3857 | 0.66 | pass | n/a |
 | bwr | yard | yard | van:0.5 | other | 20115 | 20102 | 3.88 | pass | n/a |
-| bwr | intake | intake | debris | event | 64294 | 11653 | 12.40 | pass | n/a |
-| bwr | intake | intake | gull | oddity | 3169 | 3168 | 0.61 | n/a | pass |
-| pebble | core | cavity | warmGlow | oddity | 79541 | 80104 | 15.34 | n/a | FAIL >2.0% |
+| bwr | intake | intake | debris | event | 27399 | 11653 | 5.29 | pass | n/a |
+| bwr | intake | intake | gull | oddity | 3167 | 3168 | 0.61 | n/a | pass |
+| pebble | core | cavity | warmGlow | oddity | 3204 | 3201 | 0.62 | n/a | pass |
 | pebble | pzr | blower | shake | event | 28725 | 22866 | 5.54 | pass | n/a |
 | pebble | pzr | blower | steamWisp | event | 4507 | 4082 | 0.87 | pass | n/a |
-| pebble | steamline | discharge | jam | event | 22651 | 23856 | 4.37 | pass | n/a |
+| pebble | steamline | discharge | jam | event | 19851 | 20848 | 3.83 | pass | n/a |
 | pebble | turbine | turbine | pumpStopped | event | 19612 | 18543 | 3.78 | pass | n/a |
-| pebble | turbine | turbine | hardhat | oddity | 12273 | 12289 | 2.37 | n/a | FAIL >2.0% |
 | pebble | aux | corridor | puddle | event | 12142 | 10938 | 2.34 | pass | n/a |
 | pebble | aux | corridor | doorAjar | event | 41602 | 13228 | 8.03 | pass | n/a |
-| pebble | aux | corridor | flicker | oddity | 429689 | 429005 | 82.89 | n/a | FAIL >2.0% |
+| pebble | aux | corridor | flicker | oddity | 2222 | 2224 | 0.43 | n/a | pass |
 | pebble | aux | corridor | chair | oddity | 8580 | 2858 | 1.66 | n/a | pass |
-| pebble | pool | pool | toolBag | event | 9696 | 3776 | 1.87 | pass | n/a |
-| pebble | pool | pool | poolLow | event | 38361 | 28928 | 7.40 | pass | n/a |
-| pebble | pool | pool | ripple | oddity | 1861 | 55 | 0.36 | n/a | pass |
-| pebble | yard | yard | arc | event | 160231 | 173035 | 30.91 | pass | n/a |
-| pebble | yard | yard | fog | oddity | 129917 | 142108 | 25.06 | n/a | FAIL >2.0% |
+| pebble | aux | corridor | hardhat | oddity | 5893 | 0 | 1.14 | n/a | pass |
+| pebble | pool | pool | toolBag | event | 9203 | 3776 | 1.78 | pass | n/a |
+| pebble | pool | pool | poolLow | event | 38292 | 28928 | 7.39 | pass | n/a |
+| pebble | pool | pool | ripple | oddity | 1368 | 55 | 0.26 | n/a | pass |
+| pebble | yard | yard | arc | event | 36312 | 36188 | 7.00 | pass | n/a |
+| pebble | yard | yard | fog | oddity | 2485 | 2321 | 0.48 | n/a | pass |
 | pebble | yard | yard | rover:0.5 | other | 3447 | 3857 | 0.66 | pass | n/a |
 | pebble | yard | yard | van:0.5 | other | 20115 | 20102 | 3.88 | pass | n/a |
-| pebble | intake | intake | debris | event | 64294 | 11653 | 12.40 | pass | n/a |
-| pebble | intake | intake | gull | oddity | 3169 | 3168 | 0.61 | n/a | pass |
+| pebble | intake | intake | debris | event | 27399 | 11653 | 5.29 | pass | n/a |
+| pebble | intake | intake | gull | oddity | 3167 | 3168 | 0.61 | n/a | pass |
 | msr | core | cell | heaterDark | event | 46887 | 312 | 9.04 | pass | n/a |
 | msr | core | cell | shadow | oddity | 839 | 4233 | 0.16 | n/a | pass; plate < half of code |
 | msr | pzr | freeze | frostGone | event | 46037 | 27320 | 8.88 | pass | n/a |
 | msr | steamline | offgas | beacon | event | 16445 | 15486 | 3.17 | pass | n/a |
 | msr | turbine | turbine | pumpStopped | event | 19612 | 18543 | 3.78 | pass | n/a |
-| msr | turbine | turbine | hardhat | oddity | 12273 | 12289 | 2.37 | n/a | FAIL >2.0% |
 | msr | aux | corridor | puddle | event | 12142 | 10938 | 2.34 | pass | n/a |
 | msr | aux | corridor | doorAjar | event | 41602 | 13228 | 8.03 | pass | n/a |
-| msr | aux | corridor | flicker | oddity | 429689 | 429005 | 82.89 | n/a | FAIL >2.0% |
+| msr | aux | corridor | flicker | oddity | 2222 | 2224 | 0.43 | n/a | pass |
 | msr | aux | corridor | chair | oddity | 8580 | 2858 | 1.66 | n/a | pass |
-| msr | pool | pool | toolBag | event | 9696 | 3776 | 1.87 | pass | n/a |
-| msr | pool | pool | poolLow | event | 38361 | 28928 | 7.40 | pass | n/a |
-| msr | pool | pool | ripple | oddity | 1861 | 55 | 0.36 | n/a | pass |
-| msr | yard | yard | arc | event | 160231 | 173035 | 30.91 | pass | n/a |
-| msr | yard | yard | fog | oddity | 129917 | 142108 | 25.06 | n/a | FAIL >2.0% |
+| msr | aux | corridor | hardhat | oddity | 5893 | 0 | 1.14 | n/a | pass |
+| msr | pool | pool | toolBag | event | 9203 | 3776 | 1.78 | pass | n/a |
+| msr | pool | pool | poolLow | event | 38292 | 28928 | 7.39 | pass | n/a |
+| msr | pool | pool | ripple | oddity | 1368 | 55 | 0.26 | n/a | pass |
+| msr | yard | yard | arc | event | 36312 | 36188 | 7.00 | pass | n/a |
+| msr | yard | yard | fog | oddity | 2485 | 2321 | 0.48 | n/a | pass |
 | msr | yard | yard | rover:0.5 | other | 3447 | 3857 | 0.66 | pass | n/a |
 | msr | yard | yard | van:0.5 | other | 20115 | 20102 | 3.88 | pass | n/a |
-| msr | intake | intake | debris | event | 64294 | 11653 | 12.40 | pass | n/a |
-| msr | intake | intake | gull | oddity | 3169 | 3168 | 0.61 | n/a | pass |
+| msr | intake | intake | debris | event | 27399 | 11653 | 5.29 | pass | n/a |
+| msr | intake | intake | gull | oddity | 3167 | 3168 | 0.61 | n/a | pass |
 
 Page errors: 0.
 Every event clears 0.4%.
-14 oddities outside 0.12%–2.0%.
+Every oddity is inside 0.12%–2.0%.
