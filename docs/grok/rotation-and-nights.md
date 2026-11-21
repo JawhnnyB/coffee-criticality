@@ -1,5 +1,49 @@
 # Grok Build: the night rotation, and Night Watch at full quality
 
+## START HERE: this is a build task, start executing now
+
+**This is a build request to carry out, not a document to summarise.** Do not reply with a plan, a summary or questions. Run step 0 immediately, then work through the parts in order. The owner is not watching and will not answer questions.
+
+### Step 0 (run now)
+
+```sh
+git fetch origin
+# If g/rotation-nights already exists, you are resuming: check it out and go to "Resuming" below.
+git checkout -b g/rotation-nights origin/g/nw-plates
+git merge --no-edit origin/c/crew-outage-1118   # clean merge, checked 21 November
+ESBUILD=$(command -v esbuild || echo node_modules/.bin/esbuild) node --test 'scripts/**/*.test.mjs' 2>&1 | tail -5   # expect the 9 baseline failures only
+```
+
+Then create `docs/audit/2026-11-21-rotation/PROGRESS.md` with one line per part (A, B, C, D, E, F), each marked `todo`. Commit and push it straight away.
+
+### Checkpoints: commit and push after every part
+
+The work is long, and your turn may end or time out at any point. Protect it:
+
+1. Do the parts **in order: A → B → C → D → E → F.** Each part is one checkpoint.
+2. At the end of each part:
+   - run the unit tests;
+   - mark the part `done` in `PROGRESS.md`, with one line on what changed and anything skipped;
+   - commit as `Part X: <what>`;
+   - `git push origin g/rotation-nights`.
+3. **Inside a big part** (A, B, C), also commit and push after each checkbox item, so at most one item can be lost.
+4. Never leave work only in the sandbox. Pushed means safe.
+
+### Resuming
+
+If the owner sends "continue", or you find `g/rotation-nights` already exists:
+1. Check it out.
+2. Read `PROGRESS.md`.
+3. Start at the first part not marked `done`, at the first unchecked item.
+
+Do not redo finished parts.
+
+### If something blocks you
+
+- Write it in `PROGRESS.md` as `blocked: <reason>`.
+- Skip to the next item, and keep going.
+- Only stop when every part is `done` or `blocked`.
+
 - **Owner:** JawhnnyB.
 - **Brief by:** Claude, 21 November 2026.
 - **Owner's go-ahead:** "give Grok a big to do list to properly execute this."
@@ -67,7 +111,7 @@ The visibility check (≥ 0.4% of the frame changes) was written for **events**.
 - [ ] **A10. Intake screens** are round columns; real travelling screens are flat framed mesh panels in guide slots.
   - Regenerate the intake plate and the debris state together: same camera, same water.
   - Keep the old plate if the new one fails the anchor check. Say which.
-- [ ] **A11. Shoot the before-and-after sheet** for every changed scene (`docs/audit/<date>-rotation/visual/`).
+- [ ] **A11. Shoot the before-and-after sheet** for every changed scene (`docs/audit/2026-11-21-rotation/visual/`).
 
 ---
 
@@ -220,7 +264,7 @@ Add `carryover(s): NightSeed` in `nightwatch/carryover.ts`. It feeds `newNight` 
 - [ ] **F6.** `visible.md` from A1.
 - [ ] **F7. Frame time:** `paintCamera` at 4× slower CPU, and main-thread busy % with the tablet up, before and after. Stay at or under the last pass's numbers (about 8 ms per feed frame).
 
-**Evidence** goes in `docs/audit/<date>-rotation/`, with a README that says what was checked, what was not, and the list of new lines for approval.
+**Evidence** goes in `docs/audit/2026-11-21-rotation/`, with a README that says what was checked, what was not, and the list of new lines for approval.
 
 ---
 
