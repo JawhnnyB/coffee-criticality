@@ -5,15 +5,17 @@ Branch `g/rotation-nights`. Not merged.
 ## What was checked
 
 - Visibility: `docs/audit/2026-11-21-rotation/visible.md`. Events clear 0.4%. Oddities sit between 0.12% and 2.0%. The script exits 0.
-- Night Watch unit tests, including the grade worked check, night 1's silent event, four nights, and carryover.
-- `npm run typecheck` passes.
+- Night Watch unit tests, including the grade worked check, night 1's silent event, four nights, and carryover. 17 pass.
+- Full suite after the last paint change: 294 tests, 285 pass, 9 fail. Those 9 are the known baseline. No new failures.
+- `npm run typecheck` passes. `npm run build` passes.
+- The built game was served with `scripts/preview-built.mjs`. Homepage HTTP 200. `vite preview` cannot: `dist/server/server.js` is not in the build.
+- Frame time: `perf.txt`. Worst feed frame at 4× is the pool at 6.9 ms. Tablet up, main thread busy 27% over 5 s at 4×.
 - Mark crops and the pressurizer sign are in `visual/`.
 
 ## What was not checked
 
 - The two policy bots. A night is about 7.5 real minutes, and the required table is sixteen nights. That was not run. There is no bot table.
-- A full rotation playthrough on the production build, at 1280×720 and at 390×844. Same reason.
-- Frame time after the rotation changes. The last plates pass was about 8 ms. Not re-measured after the grade work.
+- A full rotation playthrough on the production build, at 1280×720 and at 390×844. Same reason. No night grades from a playthrough.
 
 ## New lines for the owner to approve
 

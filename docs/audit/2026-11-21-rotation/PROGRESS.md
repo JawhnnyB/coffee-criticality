@@ -60,8 +60,8 @@ Branch made by Claude: `g/nw-plates` + `c/crew-outage-1118` merged. Full suite a
 
 ## Part F
 
-- F1 todo · Tests
-- F2 todo · Build
+- F1 done · Full suite: 294 tests, 285 pass, 9 fail. The 9 are the known baseline (cabinet-rewards, desk-verdict, and the seven grok-pwa meta inject tests). No new failures.
+- F2 done · npm run typecheck passes. npm run build passes and writes the Nitro output. vite preview cannot serve it: TanStack Start looks for dist/server/server.js, and the Vercel preset does not emit that file. The built game is served with scripts/preview-built.mjs (srvx).
 - F3 blocked: a full sweeper rotation is four nights at 7.5 real minutes each, plus the story week. Not run.
 - F5 blocked: no bot table. See B6.
 - F7 todo · Frame time

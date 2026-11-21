@@ -906,15 +906,10 @@ const S: Record<string, Scene> = {
           col++;
         }
       } else {
-        const strip = cherenkovStrip();
-        const cells = PLATES.pool.glow ?? [];
-        if (strip) {
+        const frame = poolGlowFrame(t);
+        if (frame) {
           g.globalCompositeOperation = "lighter";
-          cells.forEach(([x, y], i) => {
-            if (i % 5 === 2) return;
-            g.globalAlpha = 0.35 + 0.2 * Math.sin(t * 1.1 + i);
-            g.drawImage(strip as CanvasImageSource, x - 6, y - 36, 12, 48);
-          });
+          g.drawImage(frame as CanvasImageSource, GLOW_X, GLOW_Y, GLOW_W, GLOW_H);
           g.globalAlpha = 1;
           g.globalCompositeOperation = "source-over";
         }
@@ -1193,6 +1188,54 @@ function cherenkovStrip(): Surface | null {
     cherenkov = null;
     return null;
   }
+}
+
+/** Glow cells sit in this box. One baked frame is blitted instead of a strip per cell. */
+const GLOW_X = 60;
+const GLOW_Y = 128;
+const GLOW_W = 344;
+const GLOW_H = 140;
+const GLOW_N = 16;
+let poolGlow: Surface[] | null | undefined;
+
+function poolGlowFrame(t: number): Surface | null {
+  if (poolGlow === undefined) {
+    const strip = cherenkovStrip();
+    const cells = PLATES.pool.glow ?? [];
+    if (!strip || cells.length === 0 || typeof OffscreenCanvas === "undefined") poolGlow = null;
+    else {
+      const frames: Surface[] = [];
+      const period = (Math.PI * 2) / 1.1;
+      try {
+        for (let f = 0; f < GLOW_N; f++) {
+          const c = new OffscreenCanvas(GLOW_W * CAM_PX, GLOW_H * CAM_PX);
+          const cg = c.getContext("2d") as G | null;
+          if (!cg) {
+            poolGlow = null;
+            break;
+          }
+          cg.setTransform(CAM_PX, 0, 0, CAM_PX, 0, 0);
+          cg.globalCompositeOperation = "lighter";
+          const tt = (f / GLOW_N) * period;
+          for (let i = 0; i < cells.length; i++) {
+            if (i % 5 === 2) continue;
+            const [x, y] = cells[i];
+            cg.globalAlpha = 0.35 + 0.2 * Math.sin(tt * 1.1 + i);
+            cg.drawImage(strip as CanvasImageSource, x - 6 - GLOW_X, y - 36 - GLOW_Y, 12, 48);
+          }
+          frames.push(c);
+        }
+        if (poolGlow !== null) poolGlow = frames.length === GLOW_N ? frames : null;
+      } catch {
+        poolGlow = null;
+      }
+    }
+  }
+  const frames = poolGlow;
+  if (!frames || frames.length === 0) return null;
+  const period = (Math.PI * 2) / 1.1;
+  const u = ((t % period) + period) % period;
+  return frames[Math.floor((u / period) * frames.length) % frames.length];
 }
 
 /** Where people walk on each scene: the floor line and how big they are (0: nobody can be seen). */
