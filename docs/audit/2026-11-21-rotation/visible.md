@@ -9,13 +9,13 @@ The same scene and visual draws the same frame on every site, so those rows shar
 
 | Site | Camera | Scene | Visual | Kind | Plate px | Code px | Plate % | Event rule | Oddity rule |
 | --- | --- | --- | --- | --- | ---: | ---: | ---: | --- | --- |
-| pwr | core | containment | puddle | event | 16236 | 8995 | 3.13 | pass | n/a |
+| pwr | core | containment | puddle | event | 5204 | 5672 | 1.00 | pass | n/a |
 | pwr | pzr | pressurizer | steamWisp | event | 4799 | 3786 | 0.93 | pass | n/a |
 | pwr | pzr | pressurizer | flicker | oddity | 204606 | 137185 | 39.47 | n/a | FAIL >2.0% |
 | pwr | steamline | msiv | beacon | event | 15328 | 14835 | 2.96 | pass | n/a |
 | pwr | turbine | turbine | pumpStopped | event | 19612 | 18543 | 3.78 | pass | n/a |
 | pwr | turbine | turbine | hardhat | oddity | 12273 | 12289 | 2.37 | n/a | FAIL >2.0% |
-| pwr | aux | corridor | puddle | event | 15715 | 15467 | 3.03 | pass | n/a |
+| pwr | aux | corridor | puddle | event | 12142 | 10938 | 2.34 | pass | n/a |
 | pwr | aux | corridor | doorAjar | event | 41602 | 13228 | 8.03 | pass | n/a |
 | pwr | aux | corridor | flicker | oddity | 429689 | 429005 | 82.89 | n/a | FAIL >2.0% |
 | pwr | aux | corridor | chair | oddity | 8580 | 2858 | 1.66 | n/a | pass |
@@ -28,13 +28,13 @@ The same scene and visual draws the same frame on every site, so those rows shar
 | pwr | yard | yard | van:0.5 | other | 20115 | 20102 | 3.88 | pass | n/a |
 | pwr | intake | intake | debris | event | 64294 | 11653 | 12.40 | pass | n/a |
 | pwr | intake | intake | gull | oddity | 3169 | 3168 | 0.61 | n/a | pass |
-| bwr | core | drywell | puddle | event | 19155 | 8575 | 3.70 | pass | n/a |
+| bwr | core | drywell | puddle | event | 3957 | 4679 | 0.76 | pass | n/a |
 | bwr | pzr | torus | steamWisp | event | 10373 | 10893 | 2.00 | pass | n/a |
 | bwr | steamline | tunnel | beacon | event | 20728 | 20512 | 4.00 | pass | n/a |
 | bwr | steamline | tunnel | condensate | oddity | 5438 | 6774 | 1.05 | n/a | pass |
 | bwr | turbine | turbine | pumpStopped | event | 19612 | 18543 | 3.78 | pass | n/a |
 | bwr | turbine | turbine | hardhat | oddity | 12273 | 12289 | 2.37 | n/a | FAIL >2.0% |
-| bwr | aux | corridor | puddle | event | 15715 | 15467 | 3.03 | pass | n/a |
+| bwr | aux | corridor | puddle | event | 12142 | 10938 | 2.34 | pass | n/a |
 | bwr | aux | corridor | doorAjar | event | 41602 | 13228 | 8.03 | pass | n/a |
 | bwr | aux | corridor | flicker | oddity | 429689 | 429005 | 82.89 | n/a | FAIL >2.0% |
 | bwr | aux | corridor | chair | oddity | 8580 | 2858 | 1.66 | n/a | pass |
@@ -53,7 +53,7 @@ The same scene and visual draws the same frame on every site, so those rows shar
 | pebble | steamline | discharge | jam | event | 22651 | 23856 | 4.37 | pass | n/a |
 | pebble | turbine | turbine | pumpStopped | event | 19612 | 18543 | 3.78 | pass | n/a |
 | pebble | turbine | turbine | hardhat | oddity | 12273 | 12289 | 2.37 | n/a | FAIL >2.0% |
-| pebble | aux | corridor | puddle | event | 15715 | 15467 | 3.03 | pass | n/a |
+| pebble | aux | corridor | puddle | event | 12142 | 10938 | 2.34 | pass | n/a |
 | pebble | aux | corridor | doorAjar | event | 41602 | 13228 | 8.03 | pass | n/a |
 | pebble | aux | corridor | flicker | oddity | 429689 | 429005 | 82.89 | n/a | FAIL >2.0% |
 | pebble | aux | corridor | chair | oddity | 8580 | 2858 | 1.66 | n/a | pass |
@@ -72,7 +72,7 @@ The same scene and visual draws the same frame on every site, so those rows shar
 | msr | steamline | offgas | beacon | event | 16445 | 15486 | 3.17 | pass | n/a |
 | msr | turbine | turbine | pumpStopped | event | 19612 | 18543 | 3.78 | pass | n/a |
 | msr | turbine | turbine | hardhat | oddity | 12273 | 12289 | 2.37 | n/a | FAIL >2.0% |
-| msr | aux | corridor | puddle | event | 15715 | 15467 | 3.03 | pass | n/a |
+| msr | aux | corridor | puddle | event | 12142 | 10938 | 2.34 | pass | n/a |
 | msr | aux | corridor | doorAjar | event | 41602 | 13228 | 8.03 | pass | n/a |
 | msr | aux | corridor | flicker | oddity | 429689 | 429005 | 82.89 | n/a | FAIL >2.0% |
 | msr | aux | corridor | chair | oddity | 8580 | 2858 | 1.66 | n/a | pass |

@@ -493,7 +493,10 @@ export function visualsOn(n: Night, camera: string): string[] {
   for (const e of n.events) {
     if (e.def.camera !== camera || n.minute < e.start) continue;
     const d = development(e, n.minute);
-    if (d > 0.05 || (e.doneAt !== null && e.def.consequence === "finding")) v.push(e.def.visual);
+    if (d > 0.05 || (e.doneAt !== null && e.def.consequence === "finding")) {
+      v.push(e.def.visual);
+      v.push(`${e.def.visual}:${Math.min(1, d).toFixed(3)}`);
+    }
   }
   const o = oddityOn(n, camera);
   if (o) v.push(o.def.visual);

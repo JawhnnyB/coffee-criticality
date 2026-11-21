@@ -307,30 +307,25 @@ function room(g: G, o: RoomSpec): Room {
 
 /* ---------------------------------------------------------------- shared live layers */
 
-function puddle(g: G, cx: number, cy: number, r: number, t: number) {
+function puddle(g: G, cx: number, cy: number, rFull: number, t: number, grow = 1) {
+  const r = Math.max(22, rFull * (0.35 + 0.65 * grow));
   g.save();
   g.translate(cx, cy);
-  g.scale(1, 0.22);
-  // Wet floor: darker than dry concrete, with a bright rim and the ceiling lights caught in it.
-  g.fillStyle = rad(g, 0, 0, r, [[0, "rgba(8,10,12,0.75)"], [0.8, "rgba(14,16,18,0.6)"], [1, "rgba(0,0,0,0)"]]);
+  g.scale(1, 0.28);
+  g.globalCompositeOperation = "multiply";
+  g.fillStyle = rad(g, 0, 0, r, [[0, "rgb(165,165,165)"], [0.72, "rgb(200,200,200)"], [1, "rgb(255,255,255)"]]);
   g.beginPath();
   g.arc(0, 0, r, 0, Math.PI * 2);
   g.fill();
-  g.strokeStyle = "rgba(220,230,235,0.35)";
-  g.lineWidth = 3;
-  g.beginPath();
-  g.arc(0, 0, r * 0.82, Math.PI * 1.05, Math.PI * 1.95);
-  g.stroke();
-  g.globalCompositeOperation = "lighter";
-  g.fillStyle = `rgba(255,250,230,${0.45 + 0.15 * Math.sin(t * 1.7)})`;
-  g.fillRect(-r * 0.35, -r * 0.2, r * 0.7, r * 0.08);
-  g.fillRect(-r * 0.2, r * 0.2, r * 0.4, r * 0.06);
-  g.globalCompositeOperation = "source-over";
   g.restore();
-  // A drip from above, landing.
+  g.save();
+  g.globalCompositeOperation = "lighter";
+  g.fillStyle = rad(g, cx - r * 0.12, cy, r * 0.4, [[0, `rgba(255,248,220,${0.28 + 0.06 * Math.sin(t * 1.7)})`], [1, "rgba(255,248,220,0)"]]);
+  g.fillRect(cx - r * 0.45, cy - 8, r * 0.9, 16);
+  g.restore();
   const ph = (t * 0.9) % 1;
-  g.fillStyle = "rgba(220,230,240,0.8)";
-  g.fillRect(cx + r * 0.1, cy - 160 + ph * 160, 1.5, 4);
+  g.fillStyle = "rgba(200,214,222,0.7)";
+  g.fillRect(cx + r * 0.08, cy - 110 + ph * 110, 1, 2);
 }
 
 /** Steam or vapour rising from (x, y), spreading and thinning. */
@@ -530,7 +525,7 @@ const S: Record<string, Scene> = {
       if (usingPlate) shaftGlint(g, W / 2, H - 28, 0.95, true, t);
       else pumpSet(g, W / 2, H - 28, 0.95, true, t);
       if (v.has("puddle")) {
-        puddle(g, W / 2, H - 16, 90, t);
+        puddle(g, W / 2, H - 16, 90, t, v.at("puddle") ?? 1);
         plume(g, W / 2 + 10, H - 70, t, 0.8);
       }
     },
@@ -581,7 +576,7 @@ const S: Record<string, Scene> = {
       if (usingPlate) shaftGlint(g, W / 2, H - 24, 0.9, true, t);
       else pumpSet(g, W / 2, H - 24, 0.9, true, t);
       if (v.has("puddle")) {
-        puddle(g, W / 2, H - 12, 100, t);
+        puddle(g, W / 2, H - 12, 100, t, v.at("puddle") ?? 1);
         plume(g, W / 2 - 20, H - 60, t, 0.7);
       }
     },
@@ -849,7 +844,7 @@ const S: Record<string, Scene> = {
         g.lineTo(290, H);
         g.fill();
       }
-      if (v.has("puddle")) puddle(g, 200, H - 26, 80, t);
+      if (v.has("puddle")) puddle(g, 200, H - 26, 80, t, v.at("puddle") ?? 1);
     },
   },
   pool: {
