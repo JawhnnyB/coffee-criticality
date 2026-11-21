@@ -154,6 +154,7 @@ function NightShift({ s, nightNo, onLeave }: { s: GameState; nightNo: number; on
   useEffect(() => {
     let last = performance.now();
     let acc = 0;
+    let nextFeed = 0;
     let raf = 0;
     const loop = (now: number) => {
       const dt = Math.min(0.25, (now - last) / 1000);
@@ -161,7 +162,9 @@ function NightShift({ s, nightNo, onLeave }: { s: GameState; nightNo: number; on
       if (!n.over) tick(n, dt / SECONDS_PER_MINUTE);
       setSwitching((v) => (v > 0 ? Math.max(0, v - dt * 3.5) : 0));
       const c = canvas.current?.getContext("2d");
-      if (c && n.tablet) {
+      // Real CCTV is about 15 frames a second. The clock above this still moves every quarter second.
+      if (c && n.tablet && now >= nextFeed) {
+        nextFeed = now + 1000 / 15;
         const cam = n.watch.cameras.find((x) => x.id === n.camera)!;
         c.setTransform(CAM_PX, 0, 0, CAM_PX, 0, 0);
         paintCamera(c, cam.scene, visualsOn(n, cam.id), now / 1000, { switching: 0, tripped: n.over?.why === "trip" });

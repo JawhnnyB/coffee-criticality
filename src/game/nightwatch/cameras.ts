@@ -11,7 +11,7 @@
  * A photoreal plate, when it has loaded, replaces the base. The live layer and the camera pass stay in code.
  */
 
-import { PLATES, plateFor, roverSheet, stateFor } from "./plates";
+import { PLATES, SIGNS_BAKED, plateFor, roverSheet, stateFor } from "./plates";
 
 export const CAM_W = 480;
 export const CAM_H = 270;
@@ -39,6 +39,8 @@ interface Vis {
 let usingPlate = false;
 /** True while words are being painted onto a photo's blank sign boards. */
 let wordsOnly = false;
+/** The look of the frame currently being painted. Infrared beacons stay white without a full-frame filter. */
+let frameLook = "fluor";
 
 function stateReady(scene: string, visual: string) {
   return stateFor(scene, visual) !== null;
@@ -346,7 +348,7 @@ function plume(g: G, x: number, y: number, t: number, scale = 1) {
 function beacon(g: G, x: number, y: number, t: number, color: [number, number, number] = [230, 40, 30]) {
   // A rotating beacon: never fully dark, and bright enough to bloom the sensor when it faces the lens.
   const lit = 0.35 + 0.65 * Math.max(0, Math.sin(t * 7));
-  const [r, gr, b] = color;
+  const [r, gr, b] = frameLook === "ir" ? [236, 236, 236] : color;
   g.fillStyle = "#1a1a1a";
   g.fillRect(x - 6, y + 6, 12, 5);
   g.fillStyle = `rgba(${r},${gr},${b},${0.6 + 0.4 * lit})`;
@@ -365,8 +367,7 @@ function beacon(g: G, x: number, y: number, t: number, color: [number, number, n
 function rover(g: G, p: number, t: number, floorY: number, s = 1) {
   const x = -30 + p * (W + 60);
   const h = 78 * s;
-  const step = Math.sin(t * 6) * 3 * s;
-  // Torch beam on the floor ahead.
+  // Torch beam on the floor ahead. The sprite does not include a beam.
   g.globalCompositeOperation = "lighter";
   g.save();
   g.translate(x + 18 * s, floorY);
@@ -379,6 +380,16 @@ function rover(g: G, p: number, t: number, floorY: number, s = 1) {
   g.beginPath();
   g.ellipse(x, floorY, 14 * s, 3 * s, 0, 0, Math.PI * 2);
   g.fill();
+  const sheet = roverSheet();
+  if (sheet) {
+    const frame = Math.floor(t * 8) % 8;
+    const fh = h;
+    const fw = fh * (96 / 192);
+    const cellW = sheet.width / 8;
+    g.drawImage(sheet, frame * cellW, 0, cellW, sheet.height, x - fw / 2, floorY - fh, fw, fh);
+    return;
+  }
+  const step = Math.sin(t * 6) * 3 * s;
   // Legs.
   g.fillStyle = "#1e2c3a";
   g.fillRect(x - 6 * s + step, floorY - h * 0.45, 5 * s, h * 0.45);
@@ -395,15 +406,6 @@ function rover(g: G, p: number, t: number, floorY: number, s = 1) {
   g.fillStyle = "#fff6d0";
   g.fillRect(x + 15 * s, floorY - h * 0.76, 3 * s, 3 * s);
   // Head and hard hat.
-  const sheet = roverSheet();
-  if (sheet) {
-    const frame = Math.floor(t * 8) % 8;
-    const fh = h;
-    const fw = fh * (96 / 192);
-    const cellW = sheet.width / 8;
-    g.drawImage(sheet, frame * cellW, 0, cellW, sheet.height, x - fw / 2, floorY - fh, fw, fh);
-    return;
-  }
   g.fillStyle = "#c9a58a";
   g.fillRect(x - 4 * s, floorY - h * 0.94, 8 * s, 9 * s);
   g.fillStyle = "#e6e6e0";
@@ -436,12 +438,18 @@ function oddities(g: G, t: number, v: Vis, r: Room, scene: string) {
   }
   if (v.has("hardhat") && !stateReady(scene, "hardhat")) {
     const [x, y] = r.floor(-0.2, 0.25);
-    const s = r.scale(0.25);
+    const s = r.scale(0.25) * 2.4;
+    g.fillStyle = "rgba(0,0,0,0.45)";
+    g.beginPath();
+    g.ellipse(x, y + 2 * s, 18 * s, 5 * s, 0, 0, Math.PI * 2);
+    g.fill();
     g.fillStyle = "#e8c21a";
     g.beginPath();
-    g.ellipse(x, y - 4 * s, 12 * s, 9 * s, 0, Math.PI, 0);
+    g.ellipse(x, y - 8 * s, 16 * s, 12 * s, 0, Math.PI, 0);
     g.fill();
-    g.fillRect(x - 15 * s, y - 4 * s, 30 * s, 3 * s);
+    g.fillRect(x - 20 * s, y - 8 * s, 40 * s, 5 * s);
+    g.fillStyle = "#f6e27a";
+    g.fillRect(x - 4 * s, y - 16 * s, 6 * s, 4 * s);
   }
   if (v.has("flicker")) {
     const off = hash(Math.floor(t * 9), 11) > 0.62 || Math.sin(t * 31) > 0.85;
@@ -616,11 +624,17 @@ const S: Record<string, Scene> = {
     },
     live(g, t, v) {
       if (v.has("beacon")) beacon(g, W / 2, 70, t);
-      if (v.has("condensate"))
+      if (v.has("condensate")) {
         for (let k = 0; k < 4; k++) {
-          g.fillStyle = "rgba(200,220,230,0.7)";
-          g.fillRect(120 + k * 70, 120 + ((t * 60 + k * 37) % 120), 1, 3);
+          const x = 140 + k * 60;
+          const drop = 118 + ((t * 36 + k * 22) % 80);
+          g.fillStyle = "rgba(220,232,240,0.9)";
+          g.fillRect(x, 108, 4, drop - 108);
+          g.beginPath();
+          g.arc(x + 2, drop, 5, 0, Math.PI * 2);
+          g.fill();
         }
+      }
     },
   },
   cavity: {
@@ -704,16 +718,25 @@ const S: Record<string, Scene> = {
       g.fillRect(74, 50, 332, 30);
     },
     live(g, t, v) {
-      // Trace heaters glow along the salt line; one zone out.
-      for (let x = 92; x < 388; x += 6) {
-        const dead = v.has("heaterDark") && x > 220 && x < 300;
-        g.fillStyle = dead ? "rgba(40,30,20,0.9)" : `rgba(255,${Math.round(110 + 30 * Math.sin(t + x))},40,0.8)`;
-        g.fillRect(x, 160, 3, 2);
+      // The photo already has the glowing trace. Dots are the code fallback, including a dark zone
+      // when the dark-heater plate has not loaded.
+      const plateShowsHeaters = usingPlate && (!v.has("heaterDark") || stateReady("cell", "heaterDark"));
+      if (!plateShowsHeaters) {
+        for (let x = 92; x < 388; x += 6) {
+          const dead = v.has("heaterDark") && x > 220 && x < 300;
+          g.fillStyle = dead ? "rgba(40,30,20,0.9)" : `rgba(255,${Math.round(110 + 30 * Math.sin(t + x))},40,0.8)`;
+          g.fillRect(x, 160, 3, 2);
+        }
       }
       if (v.has("shadow")) {
-        g.fillStyle = "rgba(0,0,0,0.35)";
-        g.fillRect(300, 50, 4, 60);
-        g.fillRect(288, 106, 28, 10);
+        // A figure in the shield window. A pale rim, because darkening the photo's glass alone stays under the sensor noise.
+        g.fillStyle = "rgba(8,5,2,0.9)";
+        g.fillRect(214, 108, 28, 84);
+        g.fillRect(200, 92, 56, 30);
+        g.strokeStyle = "rgba(255,214,140,0.95)";
+        g.lineWidth = 3;
+        g.strokeRect(214, 108, 28, 84);
+        g.strokeRect(200, 92, 56, 30);
       }
     },
   },
@@ -728,7 +751,7 @@ const S: Record<string, Scene> = {
       marks(g, "freeze");
     },
     live(g, t, v) {
-      if (!v.has("frostGone"))
+      if (!v.has("frostGone") && !usingPlate)
         for (let k = 0; k < 420; k++) {
           g.fillStyle = "rgba(240,245,250,0.85)";
           g.fillRect(203 + hash(k, 1) * 64, 116 + hash(k, 2) * 52, 2, 2);
@@ -837,13 +860,27 @@ const S: Record<string, Scene> = {
         g.fillStyle = lin(g, 0, top, 0, H, [[0, "#1d4f6b"], [0.5, "#0f3048"], [1, "#081b2a"]]);
         g.fillRect(14, top, W - 28, H - top);
       }
-      // Racks on the bottom, glowing Cherenkov blue.
-      for (let x = 40; x < W - 40; x += 22) {
-        g.fillStyle = "#0b1822";
-        g.fillRect(x, 196, 18, 60);
+      // Racks on the bottom, glowing Cherenkov blue. A photo already has its own cells:
+      // the code glow is placed on those cells, and the flat rectangles stay off.
+      if (!usingPlate) {
+        for (let x = 40; x < W - 40; x += 22) {
+          g.fillStyle = "#0b1822";
+          g.fillRect(x, 196, 18, 60);
+          g.globalCompositeOperation = "lighter";
+          g.fillStyle = rad(g, x + 9, 226, 26, [[0, `rgba(80,160,255,${0.55 + 0.1 * Math.sin(t * 1.1 + x)})`], [1, "rgba(0,0,0,0)"]]);
+          g.fillRect(x - 20, 190, 58, 70);
+          g.globalCompositeOperation = "source-over";
+        }
+      } else {
+        const dot = cherenkovDot();
         g.globalCompositeOperation = "lighter";
-        g.fillStyle = rad(g, x + 9, 226, 26, [[0, `rgba(80,160,255,${0.55 + 0.1 * Math.sin(t * 1.1 + x)})`], [1, "rgba(0,0,0,0)"]]);
-        g.fillRect(x - 20, 190, 58, 70);
+        if (dot) {
+          for (const [x, y] of PLATES.pool.glow ?? []) {
+            g.globalAlpha = 0.5 + 0.12 * Math.sin(t * 1.1 + x);
+            g.drawImage(dot as CanvasImageSource, x - 16, y - 16, 32, 32);
+          }
+          g.globalAlpha = 1;
+        }
         g.globalCompositeOperation = "source-over";
       }
       // Caustics on the surface.
@@ -855,11 +892,11 @@ const S: Record<string, Scene> = {
       }
       if (v.has("ripple") || v.has("toolBag")) {
         const rx = 200 + Math.sin(t * 0.4) * 40;
-        g.strokeStyle = "rgba(220,240,255,0.35)";
-        g.lineWidth = 1;
-        for (let k = 1; k < 4; k++) {
+        g.strokeStyle = "rgba(230,246,255,0.9)";
+        g.lineWidth = 2;
+        for (let k = 1; k < 6; k++) {
           g.beginPath();
-          g.ellipse(rx, top + 8, ((t * 10 + k * 12) % 40) + 4, 3, 0, 0, Math.PI * 2);
+          g.ellipse(rx, top + 10, ((t * 12 + k * 16) % 48) + 8, 5, 0, 0, Math.PI * 2);
           g.stroke();
         }
       }
@@ -920,7 +957,8 @@ const S: Record<string, Scene> = {
       g.globalCompositeOperation = "source-over";
     },
     live(g, t, v) {
-      if (v.has("arc") && hash(Math.floor(t * 14), 7) > 0.6) {
+      if (v.has("arc") && Math.abs(hash(Math.floor(t * 14), 7)) > 0.3) {
+        // hash() is signed, so a raw "> 0.6" never fired and the flashover never showed.
         g.globalCompositeOperation = "lighter";
         g.fillStyle = rad(g, 278, 62, 90, [[0, "rgba(200,220,255,0.9)"], [0.2, "rgba(160,190,255,0.4)"], [1, "rgba(0,0,0,0)"]]);
         g.fillRect(180, 0, 200, 160);
@@ -929,8 +967,8 @@ const S: Record<string, Scene> = {
       if (v.has("fog") || v.has("arc")) {
         for (let k = 0; k < 8; k++) {
           const x = ((t * 6 + k * 90) % (W + 200)) - 100;
-          g.fillStyle = rad(g, x, 150 + k * 6, 110, [[0, "rgba(160,150,130,0.16)"], [1, "rgba(0,0,0,0)"]]);
-          g.fillRect(x - 110, 40, 220, 220);
+          g.fillStyle = rad(g, x, 150 + k * 6, 120, [[0, "rgba(190,180,160,0.55)"], [1, "rgba(0,0,0,0)"]]);
+          g.fillRect(x - 120, 30, 240, 240);
         }
       }
       const van = v.at("van");
@@ -976,14 +1014,18 @@ const S: Record<string, Scene> = {
         beacon(g, 450, 30, t, [240, 190, 40]);
       }
       if (v.has("gull")) {
-        const gx = ((t * 30) % (W + 60)) - 30;
-        g.fillStyle = "#d8d8d0";
+        const gx = ((t * 36) % (W + 80)) - 40;
+        const gy = 46 + Math.sin(t * 3) * 8;
+        g.fillStyle = "#f2f2ea";
         g.beginPath();
-        g.moveTo(gx - 10, 50 + Math.sin(t * 8) * 3);
-        g.lineTo(gx, 54);
-        g.lineTo(gx + 10, 50 + Math.sin(t * 8) * 3);
-        g.lineTo(gx, 56);
+        g.moveTo(gx - 36, gy + 2);
+        g.quadraticCurveTo(gx - 12, gy - 18, gx, gy);
+        g.quadraticCurveTo(gx + 12, gy - 18, gx + 36, gy + 2);
+        g.quadraticCurveTo(gx + 10, gy + 10, gx, gy + 6);
+        g.quadraticCurveTo(gx - 10, gy + 10, gx - 36, gy + 2);
         g.fill();
+        g.fillStyle = "#1a1a18";
+        g.fillRect(gx + 16, gy - 1, 6, 2);
       }
     },
   },
@@ -1042,10 +1084,10 @@ function noiseFrames(): Surface[] | null {
   noiseTried = true;
   const frames: Surface[] = [];
   for (let f = 0; f < 4; f++) {
-    const c = makeCanvas();
+    const c = makeBacking();
     const g = c?.getContext("2d") as G | null | undefined;
     if (!c || !g) return null;
-    const img = g.createImageData(W, H);
+    const img = g.createImageData(W * CAM_PX, H * CAM_PX);
     for (let i = 0; i < img.data.length; i += 4) {
       const v = Math.floor(hash(i, f + 1) * 255);
       img.data[i] = img.data[i + 1] = img.data[i + 2] = v;
@@ -1069,6 +1111,31 @@ function parseVis(visuals: string[]): Vis {
   };
 }
 
+/** One Cherenkov blob, reused. Building a radial gradient per cell per frame was the pool's frame cost. */
+let cherenkov: Surface | null | undefined;
+function cherenkovDot(): Surface | null {
+  if (cherenkov !== undefined) return cherenkov;
+  const s = 64;
+  try {
+    const c: Surface | null = typeof OffscreenCanvas !== "undefined" ? new OffscreenCanvas(s, s) : null;
+    const g = c?.getContext("2d") as G | null | undefined;
+    if (!c || !g) {
+      cherenkov = null;
+      return null;
+    }
+    const gr = g.createRadialGradient(s / 2, s / 2, 0, s / 2, s / 2, s / 2);
+    gr.addColorStop(0, "rgba(80,160,255,1)");
+    gr.addColorStop(1, "rgba(80,160,255,0)");
+    g.fillStyle = gr;
+    g.fillRect(0, 0, s, s);
+    cherenkov = c;
+    return c;
+  } catch {
+    cherenkov = null;
+    return null;
+  }
+}
+
 /** Where people walk on each scene: the floor line and how big they are (0: nobody can be seen). */
 const WALK: Record<string, { y: number; s: number }> = {
   containment: { y: 250, s: 0.9 },
@@ -1085,7 +1152,7 @@ const WALK: Record<string, { y: number; s: number }> = {
   turbine: { y: 200, s: 0.55 },
   corridor: { y: 200, s: 0.5 },
   pool: { y: 100, s: 0.5 },
-  yard: { y: 200, s: 0.45 },
+  yard: { y: 214, s: 0.9 },
   intake: { y: 112, s: 0.45 },
   cell: { y: 236, s: 0 },
 };
@@ -1148,9 +1215,11 @@ function layBase(g: G, scene: string, sc: Scene, v: Vis, cached: boolean) {
     if (drawn) g.drawImage(drawn as CanvasImageSource, 0, 0, W, H);
     else g.drawImage(plate, 0, 0, W, H);
     blitStates(g, scene, v);
-    wordsOnly = true;
-    marks(g, scene);
-    wordsOnly = false;
+    if (!SIGNS_BAKED) {
+      wordsOnly = true;
+      marks(g, scene);
+      wordsOnly = false;
+    }
     return;
   }
   usingPlate = false;
@@ -1175,14 +1244,38 @@ function blitStates(g: G, scene: string, v: Vis) {
   }
 }
 
-let stamp: Surface | null | undefined;
+let stampB: Surface | null | undefined;
+let maskB: Surface | null | undefined;
 
+/** A canvas at the tablet's backing size (960×540), not the logical 480×270. */
+function makeBacking(): Surface | null {
+  try {
+    if (typeof OffscreenCanvas !== "undefined") return new OffscreenCanvas(W * CAM_PX, H * CAM_PX);
+    if (typeof document !== "undefined") {
+      const el = document.createElement("canvas");
+      el.width = W * CAM_PX;
+      el.height = H * CAM_PX;
+      return el;
+    }
+  } catch {
+    // No canvas here.
+  }
+  return null;
+}
+
+/**
+ * Paste a state plate into its box. The mask is built with source-over, then applied once:
+ * destination-in on each edge strip would erase the strip drawn before it.
+ */
 function blitFeather(g: G, img: CanvasImageSource, box: [number, number, number, number]) {
   const [x, y, w, h] = box;
-  if (stamp === undefined) stamp = makeCanvas();
-  const c = stamp;
-  const sg = c?.getContext("2d") as G | null | undefined;
-  if (!c || !sg) {
+  if (stampB === undefined) stampB = makeBacking();
+  if (maskB === undefined) maskB = makeBacking();
+  const stamp = stampB;
+  const mask = maskB;
+  const sg = stamp?.getContext("2d") as G | null | undefined;
+  const mg = mask?.getContext("2d") as G | null | undefined;
+  if (!stamp || !mask || !sg || !mg) {
     g.save();
     g.beginPath();
     g.rect(x, y, w, h);
@@ -1191,50 +1284,46 @@ function blitFeather(g: G, img: CanvasImageSource, box: [number, number, number,
     g.restore();
     return;
   }
+  const px = CAM_PX;
+  const BW = W * px;
+  const BH = H * px;
   sg.setTransform(1, 0, 0, 1, 0, 0);
   sg.globalCompositeOperation = "source-over";
-  sg.clearRect(0, 0, W, H);
-  sg.drawImage(img, 0, 0, W, H);
-  sg.globalCompositeOperation = "destination-in";
-  const f = 6;
+  sg.clearRect(0, 0, BW, BH);
+  sg.drawImage(img, 0, 0, BW, BH);
+
+  mg.setTransform(1, 0, 0, 1, 0, 0);
+  mg.globalCompositeOperation = "source-over";
+  mg.clearRect(0, 0, BW, BH);
+  const X = x * px;
+  const Y = y * px;
+  const Ww = w * px;
+  const Hh = h * px;
+  const f = 6 * px;
   const soft = "rgba(255,255,255,0)";
-  if (w > f * 2 && h > f * 2) {
-    sg.fillStyle = "#fff";
-    sg.fillRect(x + f, y + f, w - f * 2, h - f * 2);
+  if (Ww > f * 2 && Hh > f * 2) {
+    mg.fillStyle = "#fff";
+    mg.fillRect(X + f, Y + f, Ww - f * 2, Hh - f * 2);
   }
-  sg.fillStyle = lin(sg, x, 0, x + f, 0, [[0, soft], [1, "#fff"]]);
-  sg.fillRect(x, y, Math.min(f, w), h);
-  sg.fillStyle = lin(sg, x + w - f, 0, x + w, 0, [[0, "#fff"], [1, soft]]);
-  sg.fillRect(x + Math.max(0, w - f), y, Math.min(f, w), h);
-  sg.fillStyle = lin(sg, 0, y, 0, y + f, [[0, soft], [1, "#fff"]]);
-  sg.fillRect(x, y, w, Math.min(f, h));
-  sg.fillStyle = lin(sg, 0, y + h - f, 0, y + h, [[0, "#fff"], [1, soft]]);
-  sg.fillRect(x, y + Math.max(0, h - f), w, Math.min(f, h));
+  mg.fillStyle = lin(mg, X, 0, X + f, 0, [[0, soft], [1, "#fff"]]);
+  mg.fillRect(X, Y, Math.min(f, Ww), Hh);
+  mg.fillStyle = lin(mg, X + Ww - f, 0, X + Ww, 0, [[0, "#fff"], [1, soft]]);
+  mg.fillRect(X + Math.max(0, Ww - f), Y, Math.min(f, Ww), Hh);
+  mg.fillStyle = lin(mg, 0, Y, 0, Y + f, [[0, soft], [1, "#fff"]]);
+  mg.fillRect(X, Y, Ww, Math.min(f, Hh));
+  mg.fillStyle = lin(mg, 0, Y + Hh - f, 0, Y + Hh, [[0, "#fff"], [1, soft]]);
+  mg.fillRect(X, Y + Math.max(0, Hh - f), Ww, Math.min(f, Hh));
+
+  sg.globalCompositeOperation = "destination-in";
+  sg.drawImage(mask, 0, 0);
   sg.globalCompositeOperation = "source-over";
-  g.drawImage(c as CanvasImageSource, 0, 0);
+  g.drawImage(stamp, 0, 0, W, H);
 }
 
-/**
- * Draw one camera frame. visuals: the model's layers for this camera. switching: 0..1 static while changing
- * feed. After a reactor trip the plant goes to emergency lighting: darker, with a slow red cast.
- */
-export function paintCamera(g: G, scene: string, visuals: string[], t: number, opts: { switching?: number; tripped?: boolean } = {}) {
-  const sc = S[scene] ?? S.corridor;
-  const v = parseVis(visuals);
-  g.save();
-  g.globalAlpha = 1;
-  g.globalCompositeOperation = "source-over";
-  layBase(g, S[scene] ? scene : "corridor", sc, v, true);
-  layers(g, S[scene] ? scene : "corridor", sc, v, t);
-  usingPlate = false;
-  if (opts.tripped) {
-    g.fillStyle = "rgba(0,0,0,0.5)";
-    g.fillRect(0, 0, W, H);
-    g.fillStyle = `rgba(200,20,10,${0.14 + 0.06 * Math.sin(t * 2)})`;
-    g.fillRect(0, 0, W, H);
-  }
-  // Camera pass: grade, infrared black and white, lens, grain, scan.
-  const grade = GRADE[sc.look];
+const gradedCache = new Map<string, Surface>();
+
+function applyGrade(g: G, look: Look) {
+  const grade = GRADE[look];
   g.globalCompositeOperation = "multiply";
   g.fillStyle = grade.tint;
   g.fillRect(0, 0, W, H);
@@ -1242,10 +1331,108 @@ export function paintCamera(g: G, scene: string, visuals: string[], t: number, o
   g.fillStyle = grade.lift;
   g.fillRect(0, 0, W, H);
   g.globalCompositeOperation = "source-over";
-  if (grade.mono && typeof g.filter === "string" && g.canvas) {
-    g.filter = "grayscale(1) contrast(1.15) brightness(1.05)";
-    g.drawImage(g.canvas as CanvasImageSource, 0, 0, W, H);
-    g.filter = "none";
+}
+
+/** State visuals this scene can show as a plate crop, in a stable order. */
+function activeStates(scene: string, visuals: string[]): string[] {
+  const states = PLATES[scene]?.states;
+  if (!states) return [];
+  const set = new Set(visuals.map((x) => x.split(":")[0]));
+  return Object.keys(states).filter((k) => set.has(k)).sort();
+}
+
+/** Photo or code base, state crops, then the colour grade. Cached per scene and which states are on. */
+function gradedStill(scene: string, sc: Scene, visuals: string[]): Surface | null {
+  const plate = plateFor(scene);
+  const names = plate ? activeStates(scene, visuals) : [];
+  const key = plate ? `${scene}:photo:${names.join(",")}` : `${scene}:code`;
+  const hit = gradedCache.get(key);
+  if (hit) return hit;
+  const c = makeBacking();
+  const cg = c?.getContext("2d") as G | null | undefined;
+  if (!c || !cg) return null;
+  cg.setTransform(CAM_PX, 0, 0, CAM_PX, 0, 0);
+  cg.globalAlpha = 1;
+  cg.globalCompositeOperation = "source-over";
+  if (plate) {
+    cg.drawImage(plate, 0, 0, W, H);
+    if (!SIGNS_BAKED) {
+      wordsOnly = true;
+      marks(cg, scene);
+      wordsOnly = false;
+    }
+    // Crop before the grade, so the state takes the same tint as the rest of the photo.
+    blitStates(cg, scene, parseVis(visuals));
+  } else sc.base(cg);
+  applyGrade(cg, sc.look);
+  if (sc.look === "ir") {
+    cg.globalCompositeOperation = "saturation";
+    cg.fillStyle = "#808080";
+    cg.fillRect(0, 0, W, H);
+    cg.globalCompositeOperation = "overlay";
+    cg.fillStyle = "rgba(170,170,170,0.22)";
+    cg.fillRect(0, 0, W, H);
+    cg.globalCompositeOperation = "source-over";
+  }
+  gradedCache.set(key, c);
+  return c;
+}
+
+let lens: Surface | null | undefined;
+
+/** Scanlines and vignette, one image for every feed. */
+function lensOverlay(): Surface | null {
+  if (lens !== undefined) return lens;
+  const c = makeBacking();
+  const og = c?.getContext("2d") as G | null | undefined;
+  if (!c || !og) {
+    lens = null;
+    return null;
+  }
+  og.setTransform(CAM_PX, 0, 0, CAM_PX, 0, 0);
+  og.clearRect(0, 0, W, H);
+  og.fillStyle = "rgba(0,0,0,0.07)";
+  for (let y = 0; y < H; y += 2) og.fillRect(0, y, W, 1);
+  og.fillStyle = rad(og, W / 2, H / 2, W * 0.62, [[0.55, "rgba(0,0,0,0)"], [1, "rgba(0,0,0,0.75)"]]);
+  og.fillRect(0, 0, W, H);
+  lens = c;
+  return c;
+}
+
+/** Drop cached frames. The audit page uses this when it turns plates on and off. */
+export function resetFrameCaches() {
+  gradedCache.clear();
+  plateCache.clear();
+  lens = undefined;
+}
+
+/**
+ * Draw one camera frame. visuals: the model's layers for this camera. switching: 0..1 static while changing
+ * feed. After a reactor trip the plant goes to emergency lighting: darker, with a slow red cast.
+ *
+ * The static picture (photo or code base, state crops, plus the colour grade) is cached. A frame draws
+ * that, then the live layer, then grain, the rolling bar and one cached scanline-and-vignette overlay.
+ */
+export function paintCamera(g: G, scene: string, visuals: string[], t: number, opts: { switching?: number; tripped?: boolean } = {}) {
+  const sc = S[scene] ?? S.corridor;
+  const name = S[scene] ? scene : "corridor";
+  const v = parseVis(visuals);
+  g.save();
+  g.globalAlpha = 1;
+  g.globalCompositeOperation = "source-over";
+  frameLook = sc.look;
+  const still = gradedStill(name, sc, visuals);
+  usingPlate = plateFor(name) !== null;
+  if (still) g.drawImage(still as CanvasImageSource, 0, 0, W, H);
+  else layBase(g, name, sc, v, true);
+  layers(g, name, sc, v, t);
+  usingPlate = false;
+  if (!still) applyGrade(g, sc.look);
+  if (opts.tripped) {
+    g.fillStyle = "rgba(0,0,0,0.5)";
+    g.fillRect(0, 0, W, H);
+    g.fillStyle = `rgba(200,20,10,${0.14 + 0.06 * Math.sin(t * 2)})`;
+    g.fillRect(0, 0, W, H);
   }
   // Exposure breathing, the auto-gain hunting in the dark.
   g.fillStyle = `rgba(0,0,0,${0.06 + 0.05 * Math.sin(t * 0.7)})`;
@@ -1267,13 +1454,17 @@ export function paintCamera(g: G, scene: string, visuals: string[], t: number, o
       g.fillRect(hash(k, tick + 1) * W, hash(tick + 2, k) * H, 1, 1);
     }
   }
-  g.fillStyle = "rgba(0,0,0,0.07)";
-  for (let y = 0; y < H; y += 2) g.fillRect(0, y, W, 1);
   const bar = ((t * 22) % (H + 60)) - 30;
   g.fillStyle = lin(g, 0, bar - 20, 0, bar + 20, [[0, "rgba(255,255,255,0)"], [0.5, "rgba(255,255,255,0.035)"], [1, "rgba(255,255,255,0)"]]);
   g.fillRect(0, bar - 20, W, 40);
-  g.fillStyle = rad(g, W / 2, H / 2, W * 0.62, [[0.55, "rgba(0,0,0,0)"], [1, "rgba(0,0,0,0.75)"]]);
-  g.fillRect(0, 0, W, H);
+  const shade = lensOverlay();
+  if (shade) g.drawImage(shade as CanvasImageSource, 0, 0, W, H);
+  else {
+    g.fillStyle = "rgba(0,0,0,0.07)";
+    for (let y = 0; y < H; y += 2) g.fillRect(0, y, W, 1);
+    g.fillStyle = rad(g, W / 2, H / 2, W * 0.62, [[0.55, "rgba(0,0,0,0)"], [1, "rgba(0,0,0,0.75)"]]);
+    g.fillRect(0, 0, W, H);
+  }
   if (opts.switching && opts.switching > 0) {
     // Feed change: torn bands and snow.
     const s = opts.switching;

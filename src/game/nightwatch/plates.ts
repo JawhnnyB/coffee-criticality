@@ -7,14 +7,21 @@
 
 export interface PlateState {
   file: string;
-  /** Logical 480×270 box the variant replaces, feathered at the edge. */
+  /** Logical 480×270 box the variant replaces, feathered at the edge. Measured change plus 8 px, clipped to the frame. */
   box: [number, number, number, number];
+  /** Tight rectangle where this file actually differs from the base plate, logical pixels. */
+  measured: [number, number, number, number];
 }
 
 export interface PlateSpec {
   file: string;
   states?: Record<string, PlateState>;
+  /** Cherenkov glow centres in the pool photo, logical pixels. */
+  glow?: [number, number][];
 }
+
+/** Words are painted into the plate files by scripts/bake-signs.mjs. Photo frames do not draw marks() on top. */
+export const SIGNS_BAKED = true;
 
 export const PLATES: Record<string, PlateSpec> = {
   containment: { file: "/nightwatch/plates/containment.webp" },
@@ -29,13 +36,13 @@ export const PLATES: Record<string, PlateSpec> = {
   cell: {
     file: "/nightwatch/plates/cell.webp",
     states: {
-      heaterDark: { file: "/nightwatch/plates/cell-heaterDark.webp", box: [214, 150, 92, 20] },
+      heaterDark: { file: "/nightwatch/plates/cell-heaterDark.webp", measured: [89, 79, 305, 89], box: [81, 71, 321, 105] },
     },
   },
   freeze: {
     file: "/nightwatch/plates/freeze.webp",
     states: {
-      frostGone: { file: "/nightwatch/plates/freeze-frostGone.webp", box: [196, 110, 80, 64] },
+      frostGone: { file: "/nightwatch/plates/freeze-frostGone.webp", measured: [209, 1, 149, 179], box: [201, 0, 165, 188] },
     },
   },
   offgas: { file: "/nightwatch/plates/offgas.webp" },
@@ -43,23 +50,28 @@ export const PLATES: Record<string, PlateSpec> = {
   corridor: {
     file: "/nightwatch/plates/corridor.webp",
     states: {
-      doorAjar: { file: "/nightwatch/plates/corridor-doorAjar.webp", box: [340, 66, 120, 204] },
-      chair: { file: "/nightwatch/plates/corridor-chair.webp", box: [226, 170, 80, 64] },
-      hardhat: { file: "/nightwatch/plates/corridor-hardhat.webp", box: [190, 222, 50, 26] },
+      doorAjar: { file: "/nightwatch/plates/corridor-doorAjar.webp", measured: [313, 55, 142, 215], box: [305, 47, 158, 223] },
+      chair: { file: "/nightwatch/plates/corridor-chair.webp", measured: [191, 169, 48, 63], box: [183, 161, 64, 79] },
+      hardhat: { file: "/nightwatch/plates/corridor-hardhat.webp", measured: [192, 162, 97, 83], box: [184, 154, 113, 99] },
     },
   },
   pool: {
     file: "/nightwatch/plates/pool.webp",
+    glow: [
+      [70, 170], [150, 170], [230, 170], [310, 170], [390, 170],
+      [70, 210], [150, 210], [230, 210], [310, 210], [390, 210],
+      [70, 250], [150, 250], [230, 250], [310, 250], [390, 250],
+    ],
     states: {
-      poolLow: { file: "/nightwatch/plates/pool-poolLow.webp", box: [10, 96, 460, 40] },
-      toolBag: { file: "/nightwatch/plates/pool-toolBag.webp", box: [372, 66, 60, 36] },
+      poolLow: { file: "/nightwatch/plates/pool-poolLow.webp", measured: [28, 131, 444, 139], box: [20, 123, 460, 147] },
+      toolBag: { file: "/nightwatch/plates/pool-toolBag.webp", measured: [401, 87, 70, 65], box: [393, 79, 86, 81] },
     },
   },
   yard: { file: "/nightwatch/plates/yard.webp" },
   intake: {
     file: "/nightwatch/plates/intake.webp",
     states: {
-      debris: { file: "/nightwatch/plates/intake-debris.webp", box: [70, 110, 340, 115] },
+      debris: { file: "/nightwatch/plates/intake-debris.webp", measured: [76, 42, 323, 213], box: [68, 34, 339, 229] },
     },
   },
 };
@@ -68,6 +80,12 @@ export const PLATES: Record<string, PlateSpec> = {
 export const ROVER_SHEET = "/nightwatch/rover.webp";
 
 const loaded = new Map<string, HTMLImageElement>();
+let platesOn = true;
+
+/** The visibility audit turns this off to measure the code drawing. The game leaves it on. */
+export function setPlatesEnabled(on: boolean) {
+  platesOn = on;
+}
 
 function ready(img: HTMLImageElement | undefined): HTMLImageElement | null {
   return img && img.complete && img.naturalWidth > 0 ? img : null;
@@ -99,15 +117,18 @@ export function loadPlates(): Promise<void> {
 }
 
 export function plateFor(scene: string): HTMLImageElement | null {
+  if (!platesOn) return null;
   const spec = PLATES[scene];
   return spec ? ready(loaded.get(spec.file)) : null;
 }
 
 export function stateFor(scene: string, visual: string): HTMLImageElement | null {
+  if (!platesOn) return null;
   const st = PLATES[scene]?.states?.[visual];
   return st ? ready(loaded.get(st.file)) : null;
 }
 
 export function roverSheet(): HTMLImageElement | null {
+  if (!platesOn) return null;
   return ready(loaded.get(ROVER_SHEET));
 }

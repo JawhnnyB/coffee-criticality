@@ -1,0 +1,23 @@
+night 1 seed events:
+  event radwaste-leak visual puddle camera aux at 31 min
+  event porv visual steamWisp camera pzr at 137 min
+  event pool-fme visual toolBag camera pool at 208 min
+  oddity hardhat-corridor visual hardhat camera turbine 94-123
+  oddity flicker visual flicker camera aux 204-259
+shift open: 1
+main thread at 4×, tablet up, 5.00s window: busy 1.38s (28%)
+camera 1 core
+camera 2 pzr
+camera 3 steamline
+camera 4 turbine
+camera 5 aux
+camera 6 pool
+camera 7 yard
+camera 8 intake
+00:41 CAM aux red gAux -> radiation: Logged. The crew is on it.
+02:38 CAM pzr red press -> leak: Logged. The crew is on it.
+summary: 06:00. The van pulls into the lot. | Night 1: caught 2 (0 before the alarm) · ran their course 1 · false reports 0 | Elena: "Walk me through the log." | 00:42 Radwaste line flange weeping under the pipe chase. Area roped off, flange retorqued. | 02:38 A pressurizer relief valve weeping by its seat. Block valve shut; pressure recovered. | 04:46 Found by the day shift instead: tool bag at the pool edge. | Back to the desk
+reports 2
+
+page errors: 0
+failed requests: 0

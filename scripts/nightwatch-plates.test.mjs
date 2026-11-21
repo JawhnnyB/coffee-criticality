@@ -48,6 +48,34 @@ for (const site of ["pwr", "bwr", "pebble", "msr"]) {
   for (const o of w.oddities) visuals.add(o.visual);
 }
 
+function grown(m) {
+  let [x, y, w, h] = m;
+  x -= 8;
+  y -= 8;
+  w += 16;
+  h += 16;
+  if (x < 0) {
+    w += x;
+    x = 0;
+  }
+  if (y < 0) {
+    h += y;
+    y = 0;
+  }
+  if (x + w > 480) w = 480 - x;
+  if (y + h > 270) h = 270 - y;
+  return [x, y, w, h];
+}
+
+test("every state box is the measured change plus 8 px, clipped to the frame", () => {
+  for (const [name, spec] of Object.entries(W.PLATES)) {
+    for (const [visual, st] of Object.entries(spec.states ?? {})) {
+      assert.ok(st.measured, `${name} ${visual} stores a measured rect`);
+      assert.deepEqual(st.box, grown(st.measured), `${name} ${visual}`);
+    }
+  }
+});
+
 test("every scene has a plate file, 960×540 and at most 180 KB, and so does every state", () => {
   for (const name of W.SCENE_NAMES) {
     const spec = W.PLATES[name];
