@@ -31,7 +31,7 @@ The same scene and visual draws the same frame on every site, so those rows shar
 | bwr | core | drywell | puddle | event | 19155 | 8575 | 3.70 | pass | n/a |
 | bwr | pzr | torus | steamWisp | event | 10373 | 10893 | 2.00 | pass | n/a |
 | bwr | steamline | tunnel | beacon | event | 20728 | 20512 | 4.00 | pass | n/a |
-| bwr | steamline | tunnel | condensate | oddity | 4361 | 4360 | 0.84 | n/a | pass |
+| bwr | steamline | tunnel | condensate | oddity | 5438 | 6774 | 1.05 | n/a | pass |
 | bwr | turbine | turbine | pumpStopped | event | 19612 | 18543 | 3.78 | pass | n/a |
 | bwr | turbine | turbine | hardhat | oddity | 12273 | 12289 | 2.37 | n/a | FAIL >2.0% |
 | bwr | aux | corridor | puddle | event | 15715 | 15467 | 3.03 | pass | n/a |

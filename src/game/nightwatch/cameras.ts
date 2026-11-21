@@ -625,14 +625,23 @@ const S: Record<string, Scene> = {
     live(g, t, v) {
       if (v.has("beacon")) beacon(g, W / 2, 70, t);
       if (v.has("condensate")) {
+        const grow = v.at("condensate") ?? 0.7;
         for (let k = 0; k < 4; k++) {
-          const x = 140 + k * 60;
-          const drop = 118 + ((t * 36 + k * 22) % 80);
-          g.fillStyle = "rgba(220,232,240,0.9)";
-          g.fillRect(x, 108, 4, drop - 108);
+          const x = 148 + k * 52;
+          const fall = (t * 22 + k * 19) % 70;
+          const streak = 5;
+          for (let s = 0; s < streak; s++) {
+            g.fillStyle = `rgba(186,198,206,${0.28 * (1 - s / streak)})`;
+            g.fillRect(x, 116 + fall + s, 1, 2);
+          }
+          const pr = 16 + grow * 8;
+          g.save();
+          g.globalCompositeOperation = "multiply";
+          g.fillStyle = rad(g, x, H - 18, pr, [[0, "rgb(50,50,50)"], [0.7, "rgb(110,110,110)"], [1, "rgb(255,255,255)"]]);
           g.beginPath();
-          g.arc(x + 2, drop, 5, 0, Math.PI * 2);
+          g.ellipse(x, H - 18, pr, pr * 0.34, 0, 0, Math.PI * 2);
           g.fill();
+          g.restore();
         }
       }
     },
