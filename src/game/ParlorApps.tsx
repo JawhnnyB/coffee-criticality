@@ -685,6 +685,9 @@ export const APP_ICON_TONE: Record<AppId, string> = {
   phys: PAL.leafD,
   load: PAL.leafD,
   lototo: PAL.leafD,
+  outage: PAL.steelD,
+  monitor: PAL.steel,
+  nightwatch: PAL.steelD,
 };
 
 export { APPS };

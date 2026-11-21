@@ -9,7 +9,8 @@ import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 
 import { PAL } from "./palette";
 import { bumpTrust, pushMsg, type GameState } from "./sim";
 import { siteKind } from "./plantLoops";
-import { CAM_H, CAM_W, lookOf, paintCamera } from "./nightwatch/cameras";
+import { CAM_H, CAM_PX, CAM_W, lookOf, paintCamera } from "./nightwatch/cameras";
+import { loadPlates } from "./nightwatch/plates";
 import { startAmbience, stopAmbience } from "./nightwatch/ambience";
 import {
   CATEGORY_LABEL,
@@ -73,6 +74,9 @@ export function NightWatchApp({ s }: { s: GameState }) {
   const [running, setRunning] = useState<number | null>(null);
   const done = nightsDone(s.flags);
   const site = siteKind(s.plant);
+  useEffect(() => {
+    void loadPlates();
+  }, []);
   if (running !== null) return <NightShift s={s} nightNo={running} onLeave={() => setRunning(null)} />;
   return (
     <div className="app-pad" data-testid="app-nightwatch" style={{ fontFamily: "var(--font-body)", color: PAL.ink, lineHeight: 1.5 }}>
@@ -106,6 +110,7 @@ function NightShift({ s, nightNo, onLeave }: { s: GameState; nightNo: number; on
   const [toast, setToast] = useState<string>("");
   const [switching, setSwitching] = useState(0);
   useEffect(() => {
+    void loadPlates();
     startAmbience();
     return () => stopAmbience();
   }, []);
@@ -158,6 +163,7 @@ function NightShift({ s, nightNo, onLeave }: { s: GameState; nightNo: number; on
       const c = canvas.current?.getContext("2d");
       if (c && n.tablet) {
         const cam = n.watch.cameras.find((x) => x.id === n.camera)!;
+        c.setTransform(CAM_PX, 0, 0, CAM_PX, 0, 0);
         paintCamera(c, cam.scene, visualsOn(n, cam.id), now / 1000, { switching: 0, tripped: n.over?.why === "trip" });
       }
       acc += dt;
@@ -178,6 +184,7 @@ function NightShift({ s, nightNo, onLeave }: { s: GameState; nightNo: number; on
     const c = canvas.current?.getContext("2d");
     if (!c || !n.tablet || switching <= 0) return;
     const cam = n.watch.cameras.find((x) => x.id === n.camera)!;
+    c.setTransform(CAM_PX, 0, 0, CAM_PX, 0, 0);
     paintCamera(c, cam.scene, visualsOn(n, cam.id), performance.now() / 1000, { switching, tripped: n.over?.why === "trip" });
   });
 
@@ -294,8 +301,8 @@ function NightShift({ s, nightNo, onLeave }: { s: GameState; nightNo: number; on
           <div style={{ position: "relative", width: "100%", aspectRatio: `${CAM_W} / ${CAM_H}`, background: PAL.ink, border: `2px solid ${PAL.copperD}` }}>
             <canvas
               ref={canvas}
-              width={CAM_W}
-              height={CAM_H}
+              width={CAM_W * CAM_PX}
+              height={CAM_H * CAM_PX}
               data-testid="nw-canvas"
               style={{ width: "100%", height: "100%", imageRendering: "auto", display: n.tablet ? "block" : "none" }}
             />

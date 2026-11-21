@@ -8,10 +8,15 @@
  *
  * Each scene has a static base (cached once per scene where the browser allows) and a live layer: the model's
  * visuals for that camera (an event, an oddity, the rover on his rounds, the day supervisor's headlights).
+ * A photoreal plate, when it has loaded, replaces the base. The live layer and the camera pass stay in code.
  */
+
+import { PLATES, plateFor, roverSheet, stateFor } from "./plates";
 
 export const CAM_W = 480;
 export const CAM_H = 270;
+/** Backing-store scale. Logical coordinates stay 480×270; the tablet canvas is twice that. */
+export const CAM_PX = 2;
 const W = CAM_W;
 const H = CAM_H;
 
@@ -28,6 +33,15 @@ interface Vis {
   has: (k: string) => boolean;
   /** 0..1 progress of a "name:0.42" visual, or null. */
   at: (k: string) => number | null;
+}
+
+/** True while a photo plate is the base, so static equipment already in the photo is not drawn again. */
+let usingPlate = false;
+/** True while words are being painted onto a photo's blank sign boards. */
+let wordsOnly = false;
+
+function stateReady(scene: string, visual: string) {
+  return stateFor(scene, visual) !== null;
 }
 
 function hash(a: number, b: number) {
@@ -112,11 +126,13 @@ function handwheel(g: G, cx: number, cy: number, r: number) {
 }
 
 function sign(g: G, x: number, y: number, w: number, h: number, bg: string, fg: string, lines: string[]) {
-  g.fillStyle = bg;
-  g.fillRect(x, y, w, h);
-  g.strokeStyle = "rgba(0,0,0,0.5)";
-  g.lineWidth = 1;
-  g.strokeRect(x + 0.5, y + 0.5, w - 1, h - 1);
+  if (!wordsOnly) {
+    g.fillStyle = bg;
+    g.fillRect(x, y, w, h);
+    g.strokeStyle = "rgba(0,0,0,0.5)";
+    g.lineWidth = 1;
+    g.strokeRect(x + 0.5, y + 0.5, w - 1, h - 1);
+  }
   g.fillStyle = fg;
   let size = Math.max(5, Math.round(h / (lines.length + 1)));
   g.font = `bold ${size}px Arial, sans-serif`;
@@ -379,6 +395,15 @@ function rover(g: G, p: number, t: number, floorY: number, s = 1) {
   g.fillStyle = "#fff6d0";
   g.fillRect(x + 15 * s, floorY - h * 0.76, 3 * s, 3 * s);
   // Head and hard hat.
+  const sheet = roverSheet();
+  if (sheet) {
+    const frame = Math.floor(t * 8) % 8;
+    const fh = h;
+    const fw = fh * (96 / 192);
+    const cellW = sheet.width / 8;
+    g.drawImage(sheet, frame * cellW, 0, cellW, sheet.height, x - fw / 2, floorY - fh, fw, fh);
+    return;
+  }
   g.fillStyle = "#c9a58a";
   g.fillRect(x - 4 * s, floorY - h * 0.94, 8 * s, 9 * s);
   g.fillStyle = "#e6e6e0";
@@ -394,8 +419,8 @@ const GENERIC: Room = {
   scale: (f) => 1 - f * 0.7,
 };
 
-function oddities(g: G, t: number, v: Vis, r: Room) {
-  if (v.has("chair")) {
+function oddities(g: G, t: number, v: Vis, r: Room, scene: string) {
+  if (v.has("chair") && !stateReady(scene, "chair")) {
     const [x, y] = r.floor(0.15, 0.35);
     const s = r.scale(0.35);
     g.fillStyle = "rgba(0,0,0,0.4)";
@@ -409,7 +434,7 @@ function oddities(g: G, t: number, v: Vis, r: Room) {
     g.fillRect(x - 14 * s, y - 32 * s, 28 * s, 7 * s);
     g.fillRect(x - 12 * s, y - 62 * s, 24 * s, 30 * s);
   }
-  if (v.has("hardhat")) {
+  if (v.has("hardhat") && !stateReady(scene, "hardhat")) {
     const [x, y] = r.floor(-0.2, 0.25);
     const s = r.scale(0.25);
     g.fillStyle = "#e8c21a";
@@ -429,6 +454,16 @@ function oddities(g: G, t: number, v: Vis, r: Room) {
 
 /* ---------------------------------------------------------------- equipment */
 
+/** The spinning highlight on a pump coupling. Kept in code even when the pump body is in the plate. */
+function shaftGlint(g: G, cx: number, floorY: number, s: number, running: boolean, t: number) {
+  if (!running) return;
+  const mh = 90 * s;
+  const top = floorY - 170 * s;
+  const ph = (t * 25) % 1;
+  g.fillStyle = "rgba(255,255,255,0.18)";
+  g.fillRect(cx - 12 * s + ph * 24 * s, top + mh + 2 * s, 3 * s, 18 * s);
+}
+
 /** A vertical pump and motor: motor with cooling fins, coupling, casing, nozzles. */
 function pumpSet(g: G, cx: number, floorY: number, s: number, running: boolean, t: number) {
   const mw = 70 * s;
@@ -440,11 +475,7 @@ function pumpSet(g: G, cx: number, floorY: number, s: number, running: boolean, 
   vCyl(g, cx - mw * 0.55, top - 8 * s, mw * 1.1, 10 * s, "#22252a", "#55606a", "#9aa4ab");
   // Coupling: a spinning shaft behind a guard.
   vCyl(g, cx - 12 * s, top + mh, 24 * s, 22 * s, "#1b1c1d", "#4a4d50", "#8d9296");
-  if (running) {
-    const ph = (t * 25) % 1;
-    g.fillStyle = "rgba(255,255,255,0.18)";
-    g.fillRect(cx - 12 * s + ph * 24 * s, top + mh + 2 * s, 3 * s, 18 * s);
-  }
+  shaftGlint(g, cx, floorY, s, running, t);
   vCyl(g, cx - mw * 0.6, top + mh + 22 * s, mw * 1.2, 58 * s, "#25282b", "#5b6266", "#a3aaae");
   hPipe(g, cx - 160 * s, floorY - 50 * s, 120 * s, 30 * s);
   hPipe(g, cx + 40 * s, floorY - 50 * s, 120 * s, 30 * s);
@@ -454,6 +485,30 @@ function pumpSet(g: G, cx: number, floorY: number, s: number, running: boolean, 
 
 /* ---------------------------------------------------------------- scenes */
 
+/** Words and radiation symbols. On a photo these land on the blank boards the plate already has. */
+function marks(g: G, scene: string) {
+  if (scene === "containment") {
+    sign(g, 32, 70, 54, 30, "#e8c21a", "#6b1f6b", ["CAUTION", "HIGH RAD", "AREA"]);
+    trefoil(g, 59, 112, 8);
+  } else if (scene === "pressurizer") {
+    sign(g, 40, 90, 58, 26, "#ffffff", "#c0392b", ["DANGER", "HOT SURFACES"]);
+  } else if (scene === "msiv") {
+    sign(g, 360, 54, 70, 46, "#ececec", "#111", ["MAIN STEAM", "LINE RAD", "MONITOR"]);
+    trefoil(g, 395, 40, 7);
+  } else if (scene === "tunnel") {
+    trefoil(g, W / 2, 86, 6);
+  } else if (scene === "freeze") {
+    sign(g, 60, 80, 80, 34, "#ffffff", "#111", ["FREEZE VALVE", "FV-103"]);
+  } else if (scene === "offgas") {
+    trefoil(g, 440, 90, 8);
+  } else if (scene === "turbine") {
+    sign(g, 20, 40, 40, 18, "#0f6b2f", "#fff", ["EXIT"]);
+  } else if (scene === "corridor") {
+    sign(g, 386, 94, 58, 46, "#e8c21a", "#6b1f6b", ["LOCKED HIGH", "RADIATION", "AREA"]);
+    trefoil(g, 415, 158, 9);
+  }
+}
+
 const S: Record<string, Scene> = {
   containment: {
     look: "fluor",
@@ -461,11 +516,11 @@ const S: Record<string, Scene> = {
       room(g, { backW: 0.5, backH: 0.5, vy: 0.45, wallLow: "#4d5357", wallHigh: "#5e6569", ceiling: "#3c4144", floor: "#3a3d3f", floorLine: "rgba(0,0,0,0.3)", floorKind: "grating", lights: [0.2, 0.6] });
       // Polar crane girder.
       hPipe(g, 0, 14, W, 10, "#3b2a10", "#a7781c", "#e2b63a");
-      sign(g, 32, 70, 54, 30, "#e8c21a", "#6b1f6b", ["CAUTION", "HIGH RAD", "AREA"]);
-      trefoil(g, 59, 112, 8);
+      marks(g, "containment");
     },
     live(g, t, v) {
-      pumpSet(g, W / 2, H - 28, 0.95, true, t);
+      if (usingPlate) shaftGlint(g, W / 2, H - 28, 0.95, true, t);
+      else pumpSet(g, W / 2, H - 28, 0.95, true, t);
       if (v.has("puddle")) {
         puddle(g, W / 2, H - 16, 90, t);
         plume(g, W / 2 + 10, H - 70, t, 0.8);
@@ -485,7 +540,7 @@ const S: Record<string, Scene> = {
       lagged(g, 392, 0, 14, 60, true);
       vCyl(g, 380, 56, 38, 30, "#3a1f14", "#7d4a2c", "#b98058");
       handwheel(g, 399, 52, 16);
-      sign(g, 40, 90, 58, 26, "#ffffff", "#c0392b", ["DANGER", "HOT SURFACES"]);
+      marks(g, "pressurizer");
     },
     live(g, t, v) {
       if (v.has("steamWisp")) plume(g, 400, 62, t, 1.1);
@@ -498,8 +553,7 @@ const S: Record<string, Scene> = {
       lagged(g, 0, 128, W, 46);
       vCyl(g, 200, 96, 80, 110, "#26292c", "#5a6064", "#a7aeb2");
       vCyl(g, 214, 54, 52, 44, "#1d3a28", "#3f7353", "#82b896");
-      sign(g, 360, 54, 70, 46, "#ececec", "#111", ["MAIN STEAM", "LINE RAD", "MONITOR"]);
-      trefoil(g, 395, 40, 7);
+      marks(g, "msiv");
     },
     live(g, t, v) {
       // The monitor's display: green normal, red with the reading high.
@@ -516,7 +570,8 @@ const S: Record<string, Scene> = {
       lagged(g, 0, 40, 160, 20);
     },
     live(g, t, v) {
-      pumpSet(g, W / 2, H - 24, 0.9, true, t);
+      if (usingPlate) shaftGlint(g, W / 2, H - 24, 0.9, true, t);
+      else pumpSet(g, W / 2, H - 24, 0.9, true, t);
       if (v.has("puddle")) {
         puddle(g, W / 2, H - 12, 100, t);
         plume(g, W / 2 - 20, H - 60, t, 0.7);
@@ -557,7 +612,7 @@ const S: Record<string, Scene> = {
       for (const [x0, x1] of [[0, 196], [W, 284]] as const) {
         poly(g, [[x0, 70], [x1, 104], [x1, 114], [x0, 116]], lin(g, 0, 70, 0, 116, [[0, "#c8cdd0"], [1, "#4b5054"]]));
       }
-      trefoil(g, W / 2, 86, 6);
+      marks(g, "tunnel");
     },
     live(g, t, v) {
       if (v.has("beacon")) beacon(g, W / 2, 70, t);
@@ -594,10 +649,23 @@ const S: Record<string, Scene> = {
       vCyl(g, 290, 0, 110, H - 30, "#2a2e31", "#6b7276", "#c2c8cb");
     },
     live(g, t, v) {
-      const dx = v.has("shake") ? Math.sin(t * 80) * 2 : 0;
-      vCyl(g, 70 + dx, 110, 130, 120, "#1f3327", "#3d6a4d", "#7fae8d");
-      vCyl(g, 120 + dx, 150, 30, 30, "#141618", "#3c4043", "#7b8186");
-      hPipe(g, 200, 150, 90, 24);
+      if (!usingPlate) {
+        const dx = v.has("shake") ? Math.sin(t * 80) * 2 : 0;
+        vCyl(g, 70 + dx, 110, 130, 120, "#1f3327", "#3d6a4d", "#7fae8d");
+        vCyl(g, 120 + dx, 150, 30, 30, "#141618", "#3c4043", "#7b8186");
+        hPipe(g, 200, 150, 90, 24);
+      } else if (v.has("shake")) {
+        // Redraw the casing from the plate itself, a couple of pixels off, so the machine vibrates.
+        const img = plateFor("blower");
+        if (img) {
+          const dx = Math.sin(t * 80) * 2;
+          const sx = (66 * img.width) / W;
+          const sy = (106 * img.height) / H;
+          const sw = (138 * img.width) / W;
+          const sh = (128 * img.height) / H;
+          g.drawImage(img, sx, sy, sw, sh, 66 + dx, 106, 138, 128);
+        }
+      }
       if (v.has("steamWisp")) plume(g, 340, 150, t, 1);
       if (v.has("shake")) beacon(g, 135, 96, t, [240, 190, 40]);
     },
@@ -657,7 +725,7 @@ const S: Record<string, Scene> = {
       vCyl(g, 205, 120, 60, 44, "#26292c", "#5a6064", "#a7aeb2");
       hPipe(g, 265, 136, 90, 12);
       vCyl(g, 350, 112, 70, 70, "#30353a", "#62696f", "#a9b0b5");
-      sign(g, 60, 80, 80, 34, "#ffffff", "#111", ["FREEZE VALVE", "FV-103"]);
+      marks(g, "freeze");
     },
     live(g, t, v) {
       if (!v.has("frostGone"))
@@ -684,7 +752,7 @@ const S: Record<string, Scene> = {
       room(g, { backW: 0.5, backH: 0.45, vy: 0.45, wallLow: "#4c5155", wallHigh: "#5b6165", ceiling: "#3a3e41", floor: "#393c3e", floorLine: "rgba(0,0,0,0.3)", floorKind: "concrete", lights: [0.3, 0.7] });
       for (const x of [80, 200, 320]) vCyl(g, x, 70, 80, 150, "#2a2d30", "#62686c", "#b0b6b9");
       lagged(g, 60, 56, 360, 12);
-      trefoil(g, 440, 90, 8);
+      marks(g, "offgas");
     },
     live(g, t, v) {
       if (v.has("beacon")) beacon(g, 440, 110, t);
@@ -698,12 +766,17 @@ const S: Record<string, Scene> = {
       poly(g, [[110, 120], [370, 120], [310, 96], [170, 96]], lin(g, 0, 96, 0, 120, [[0, "#9fb8a2"], [1, "#3e5a45"]]));
       g.fillStyle = "#2c3f31";
       g.fillRect(110, 120, 260, 18);
-      sign(g, 20, 40, 40, 18, "#0f6b2f", "#fff", ["EXIT"]);
+      marks(g, "turbine");
     },
     live(g, t, v) {
-      // Feed pumps A (left) and B (right) in the foreground.
-      pumpSet(g, 70, H - 6, 0.55, true, t);
-      pumpSet(g, 410, H - 6, 0.55, !v.has("pumpStopped"), t);
+      // Feed pumps A (left) and B (right) in the foreground. The bodies live in the plate; the glint stays.
+      if (usingPlate) {
+        shaftGlint(g, 70, H - 6, 0.55, true, t);
+        shaftGlint(g, 410, H - 6, 0.55, !v.has("pumpStopped"), t);
+      } else {
+        pumpSet(g, 70, H - 6, 0.55, true, t);
+        pumpSet(g, 410, H - 6, 0.55, !v.has("pumpStopped"), t);
+      }
       if (v.has("pumpStopped")) beacon(g, 410, 120, t);
     },
   },
@@ -724,11 +797,10 @@ const S: Record<string, Scene> = {
       g.fillRect(372, 70, 86, 176);
       g.fillStyle = lin(g, 376, 0, 454, 0, [[0, "#8f2b20"], [0.4, "#b8392a"], [1, "#6a1f17"]]);
       g.fillRect(376, 74, 78, 172);
-      sign(g, 386, 94, 58, 46, "#e8c21a", "#6b1f6b", ["LOCKED HIGH", "RADIATION", "AREA"]);
-      trefoil(g, 415, 158, 9);
+      marks(g, "corridor");
     },
     live(g, t, v) {
-      if (v.has("doorAjar")) {
+      if (v.has("doorAjar") && !stateReady("corridor", "doorAjar")) {
         g.fillStyle = "#050505";
         g.fillRect(360, 74, 16, 172);
         g.fillStyle = "rgba(0,0,0,0.45)";
@@ -754,13 +826,17 @@ const S: Record<string, Scene> = {
     live(g, t, v) {
       const low = v.has("poolLow");
       const top = low ? 122 : 106;
-      // Exposed liner where the level dropped.
-      if (low) {
-        g.fillStyle = lin(g, 0, 100, 0, 122, [[0, "#8a9196"], [1, "#4b5155"]]);
-        g.fillRect(14, 106, W - 28, 16);
+      // A loaded plate already has the water. The flat fill comes back if the low-level variant is missing.
+      const photo = usingPlate && !(low && !stateReady("pool", "poolLow"));
+      if (!photo) {
+        // Exposed liner where the level dropped.
+        if (low) {
+          g.fillStyle = lin(g, 0, 100, 0, 122, [[0, "#8a9196"], [1, "#4b5155"]]);
+          g.fillRect(14, 106, W - 28, 16);
+        }
+        g.fillStyle = lin(g, 0, top, 0, H, [[0, "#1d4f6b"], [0.5, "#0f3048"], [1, "#081b2a"]]);
+        g.fillRect(14, top, W - 28, H - top);
       }
-      g.fillStyle = lin(g, 0, top, 0, H, [[0, "#1d4f6b"], [0.5, "#0f3048"], [1, "#081b2a"]]);
-      g.fillRect(14, top, W - 28, H - top);
       // Racks on the bottom, glowing Cherenkov blue.
       for (let x = 40; x < W - 40; x += 22) {
         g.fillStyle = "#0b1822";
@@ -787,7 +863,7 @@ const S: Record<string, Scene> = {
           g.stroke();
         }
       }
-      if (v.has("toolBag")) {
+      if (v.has("toolBag") && !stateReady("pool", "toolBag")) {
         g.fillStyle = lin(g, 0, 70, 0, 96, [[0, "#7a2e1c"], [1, "#3e170e"]]);
         g.fillRect(380, 76, 44, 22);
         g.fillStyle = "#151515";
@@ -890,11 +966,13 @@ const S: Record<string, Scene> = {
         g.fillRect(Math.sin(t * 0.8 + k) * 20, y, W, 2);
       }
       if (v.has("debris")) {
-        for (const x of [80, 210, 340])
-          for (let k = 0; k < 14; k++) {
-            g.fillStyle = "rgba(40,32,20,0.9)";
-            g.fillRect(x + 6 + hash(k, x) * 52, 120 + hash(x, k) * 90, 5, 3);
-          }
+        if (!stateReady("intake", "debris")) {
+          for (const x of [80, 210, 340])
+            for (let k = 0; k < 14; k++) {
+              g.fillStyle = "rgba(40,32,20,0.9)";
+              g.fillRect(x + 6 + hash(k, x) * 52, 120 + hash(x, k) * 90, 5, 3);
+            }
+        }
         beacon(g, 450, 30, t, [240, 190, 40]);
       }
       if (v.has("gull")) {
@@ -1018,7 +1096,7 @@ function layers(g: G, scene: string, sc: Scene, v: Vis, t: number) {
   const rv = v.at("rover");
   const walk = WALK[scene];
   if (rv !== null && walk && walk.s > 0) rover(g, rv, t, walk.y, walk.s);
-  oddities(g, t, v, GENERIC);
+  oddities(g, t, v, GENERIC, scene);
 }
 
 /**
@@ -1027,10 +1105,113 @@ function layers(g: G, scene: string, sc: Scene, v: Vis, t: number) {
  */
 export function paintReference(g: G, scene: string, visuals: string[], t: number, withLayers = true) {
   const sc = S[scene] ?? S.corridor;
+  const name = S[scene] ? scene : "corridor";
+  const v = parseVis(visuals);
   g.save();
-  sc.base(g);
-  if (withLayers) layers(g, scene, sc, parseVis(visuals), t);
+  layBase(g, name, sc, v, false);
+  if (withLayers) layers(g, name, sc, v, t);
+  usingPlate = false;
   g.restore();
+}
+
+const plateCache = new Map<string, Surface>();
+
+/** The photo, drawn once at the backing-store size, so a frame does not rescale the file. */
+function cachedPlate(scene: string, img: CanvasImageSource): Surface | null {
+  const hit = plateCache.get(scene);
+  if (hit) return hit;
+  let c: Surface | null = null;
+  try {
+    if (typeof OffscreenCanvas !== "undefined") c = new OffscreenCanvas(W * CAM_PX, H * CAM_PX);
+    else if (typeof document !== "undefined") {
+      const el = document.createElement("canvas");
+      el.width = W * CAM_PX;
+      el.height = H * CAM_PX;
+      c = el;
+    }
+  } catch {
+    c = null;
+  }
+  const cg = c?.getContext("2d") as G | null | undefined;
+  if (!c || !cg) return null;
+  cg.drawImage(img, 0, 0, W * CAM_PX, H * CAM_PX);
+  plateCache.set(scene, c);
+  return c;
+}
+
+/** Photo plate, or the code base. `cached` is the game path; the reference export redraws. */
+function layBase(g: G, scene: string, sc: Scene, v: Vis, cached: boolean) {
+  const plate = plateFor(scene);
+  usingPlate = plate !== null;
+  if (plate) {
+    const drawn = cachedPlate(scene, plate);
+    if (drawn) g.drawImage(drawn as CanvasImageSource, 0, 0, W, H);
+    else g.drawImage(plate, 0, 0, W, H);
+    blitStates(g, scene, v);
+    wordsOnly = true;
+    marks(g, scene);
+    wordsOnly = false;
+    return;
+  }
+  usingPlate = false;
+  if (cached) {
+    const base = baseFor(scene, sc);
+    if (base) {
+      g.drawImage(base as CanvasImageSource, 0, 0);
+      return;
+    }
+  }
+  sc.base(g);
+}
+
+/** Paste a state plate into its box with a 6px soft edge, so the seam does not show. */
+function blitStates(g: G, scene: string, v: Vis) {
+  const states = PLATES[scene]?.states;
+  if (!states) return;
+  for (const [visual, st] of Object.entries(states)) {
+    if (!v.has(visual)) continue;
+    const img = stateFor(scene, visual);
+    if (img) blitFeather(g, img, st.box);
+  }
+}
+
+let stamp: Surface | null | undefined;
+
+function blitFeather(g: G, img: CanvasImageSource, box: [number, number, number, number]) {
+  const [x, y, w, h] = box;
+  if (stamp === undefined) stamp = makeCanvas();
+  const c = stamp;
+  const sg = c?.getContext("2d") as G | null | undefined;
+  if (!c || !sg) {
+    g.save();
+    g.beginPath();
+    g.rect(x, y, w, h);
+    g.clip();
+    g.drawImage(img, 0, 0, W, H);
+    g.restore();
+    return;
+  }
+  sg.setTransform(1, 0, 0, 1, 0, 0);
+  sg.globalCompositeOperation = "source-over";
+  sg.clearRect(0, 0, W, H);
+  sg.drawImage(img, 0, 0, W, H);
+  sg.globalCompositeOperation = "destination-in";
+  const f = 6;
+  const soft = "rgba(255,255,255,0)";
+  if (w > f * 2 && h > f * 2) {
+    sg.fillStyle = "#fff";
+    sg.fillRect(x + f, y + f, w - f * 2, h - f * 2);
+  }
+  sg.fillStyle = lin(sg, x, 0, x + f, 0, [[0, soft], [1, "#fff"]]);
+  sg.fillRect(x, y, Math.min(f, w), h);
+  sg.fillStyle = lin(sg, x + w - f, 0, x + w, 0, [[0, "#fff"], [1, soft]]);
+  sg.fillRect(x + Math.max(0, w - f), y, Math.min(f, w), h);
+  sg.fillStyle = lin(sg, 0, y, 0, y + f, [[0, soft], [1, "#fff"]]);
+  sg.fillRect(x, y, w, Math.min(f, h));
+  sg.fillStyle = lin(sg, 0, y + h - f, 0, y + h, [[0, "#fff"], [1, soft]]);
+  sg.fillRect(x, y + Math.max(0, h - f), w, Math.min(f, h));
+  sg.globalCompositeOperation = "source-over";
+  g.drawImage(c as CanvasImageSource, 0, 0);
 }
 
 /**
@@ -1043,10 +1224,9 @@ export function paintCamera(g: G, scene: string, visuals: string[], t: number, o
   g.save();
   g.globalAlpha = 1;
   g.globalCompositeOperation = "source-over";
-  const base = baseFor(scene, sc);
-  if (base) g.drawImage(base as CanvasImageSource, 0, 0);
-  else sc.base(g);
-  layers(g, scene, sc, v, t);
+  layBase(g, S[scene] ? scene : "corridor", sc, v, true);
+  layers(g, S[scene] ? scene : "corridor", sc, v, t);
+  usingPlate = false;
   if (opts.tripped) {
     g.fillStyle = "rgba(0,0,0,0.5)";
     g.fillRect(0, 0, W, H);
@@ -1075,7 +1255,10 @@ export function paintCamera(g: G, scene: string, visuals: string[], t: number, o
   if (frames) {
     g.globalAlpha = sc.look === "ir" ? 0.16 : 0.11;
     g.globalCompositeOperation = "overlay";
-    g.drawImage(frames[tick % frames.length] as CanvasImageSource, (tick * 37) % 7, 0);
+    g.save();
+    g.translate((tick * 37) % 7, 0);
+    g.drawImage(frames[tick % frames.length] as CanvasImageSource, 0, 0, W, H);
+    g.restore();
     g.globalCompositeOperation = "source-over";
     g.globalAlpha = 1;
   } else {
@@ -1102,7 +1285,7 @@ export function paintCamera(g: G, scene: string, visuals: string[], t: number, o
     }
     if (frames) {
       g.globalAlpha = 0.85 * s;
-      g.drawImage(frames[Math.floor(t * 60) % frames.length] as CanvasImageSource, 0, 0);
+      g.drawImage(frames[Math.floor(t * 60) % frames.length] as CanvasImageSource, 0, 0, W, H);
       g.globalAlpha = 1;
     } else {
       g.fillStyle = `rgba(128,128,128,${0.8 * s})`;
