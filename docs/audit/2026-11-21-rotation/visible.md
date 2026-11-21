@@ -19,9 +19,9 @@ The same scene and visual draws the same frame on every site, so those rows shar
 | pwr | aux | corridor | doorAjar | event | 41602 | 13228 | 8.03 | pass | n/a |
 | pwr | aux | corridor | flicker | oddity | 429689 | 429005 | 82.89 | n/a | FAIL >2.0% |
 | pwr | aux | corridor | chair | oddity | 8580 | 2858 | 1.66 | n/a | pass |
-| pwr | pool | pool | toolBag | event | 10361 | 6533 | 2.00 | pass | n/a |
+| pwr | pool | pool | toolBag | event | 9696 | 3776 | 1.87 | pass | n/a |
 | pwr | pool | pool | poolLow | event | 38361 | 28928 | 7.40 | pass | n/a |
-| pwr | pool | pool | ripple | oddity | 2810 | 2814 | 0.54 | n/a | pass |
+| pwr | pool | pool | ripple | oddity | 1861 | 55 | 0.36 | n/a | pass |
 | pwr | yard | yard | arc | event | 160231 | 173035 | 30.91 | pass | n/a |
 | pwr | yard | yard | fog | oddity | 129917 | 142108 | 25.06 | n/a | FAIL >2.0% |
 | pwr | yard | yard | rover:0.5 | other | 3447 | 3857 | 0.66 | pass | n/a |
@@ -38,9 +38,9 @@ The same scene and visual draws the same frame on every site, so those rows shar
 | bwr | aux | corridor | doorAjar | event | 41602 | 13228 | 8.03 | pass | n/a |
 | bwr | aux | corridor | flicker | oddity | 429689 | 429005 | 82.89 | n/a | FAIL >2.0% |
 | bwr | aux | corridor | chair | oddity | 8580 | 2858 | 1.66 | n/a | pass |
-| bwr | pool | pool | toolBag | event | 10361 | 6533 | 2.00 | pass | n/a |
+| bwr | pool | pool | toolBag | event | 9696 | 3776 | 1.87 | pass | n/a |
 | bwr | pool | pool | poolLow | event | 38361 | 28928 | 7.40 | pass | n/a |
-| bwr | pool | pool | ripple | oddity | 2810 | 2814 | 0.54 | n/a | pass |
+| bwr | pool | pool | ripple | oddity | 1861 | 55 | 0.36 | n/a | pass |
 | bwr | yard | yard | arc | event | 160231 | 173035 | 30.91 | pass | n/a |
 | bwr | yard | yard | fog | oddity | 129917 | 142108 | 25.06 | n/a | FAIL >2.0% |
 | bwr | yard | yard | rover:0.5 | other | 3447 | 3857 | 0.66 | pass | n/a |
@@ -57,9 +57,9 @@ The same scene and visual draws the same frame on every site, so those rows shar
 | pebble | aux | corridor | doorAjar | event | 41602 | 13228 | 8.03 | pass | n/a |
 | pebble | aux | corridor | flicker | oddity | 429689 | 429005 | 82.89 | n/a | FAIL >2.0% |
 | pebble | aux | corridor | chair | oddity | 8580 | 2858 | 1.66 | n/a | pass |
-| pebble | pool | pool | toolBag | event | 10361 | 6533 | 2.00 | pass | n/a |
+| pebble | pool | pool | toolBag | event | 9696 | 3776 | 1.87 | pass | n/a |
 | pebble | pool | pool | poolLow | event | 38361 | 28928 | 7.40 | pass | n/a |
-| pebble | pool | pool | ripple | oddity | 2810 | 2814 | 0.54 | n/a | pass |
+| pebble | pool | pool | ripple | oddity | 1861 | 55 | 0.36 | n/a | pass |
 | pebble | yard | yard | arc | event | 160231 | 173035 | 30.91 | pass | n/a |
 | pebble | yard | yard | fog | oddity | 129917 | 142108 | 25.06 | n/a | FAIL >2.0% |
 | pebble | yard | yard | rover:0.5 | other | 3447 | 3857 | 0.66 | pass | n/a |
@@ -76,9 +76,9 @@ The same scene and visual draws the same frame on every site, so those rows shar
 | msr | aux | corridor | doorAjar | event | 41602 | 13228 | 8.03 | pass | n/a |
 | msr | aux | corridor | flicker | oddity | 429689 | 429005 | 82.89 | n/a | FAIL >2.0% |
 | msr | aux | corridor | chair | oddity | 8580 | 2858 | 1.66 | n/a | pass |
-| msr | pool | pool | toolBag | event | 10361 | 6533 | 2.00 | pass | n/a |
+| msr | pool | pool | toolBag | event | 9696 | 3776 | 1.87 | pass | n/a |
 | msr | pool | pool | poolLow | event | 38361 | 28928 | 7.40 | pass | n/a |
-| msr | pool | pool | ripple | oddity | 2810 | 2814 | 0.54 | n/a | pass |
+| msr | pool | pool | ripple | oddity | 1861 | 55 | 0.36 | n/a | pass |
 | msr | yard | yard | arc | event | 160231 | 173035 | 30.91 | pass | n/a |
 | msr | yard | yard | fog | oddity | 129917 | 142108 | 25.06 | n/a | FAIL >2.0% |
 | msr | yard | yard | rover:0.5 | other | 3447 | 3857 | 0.66 | pass | n/a |

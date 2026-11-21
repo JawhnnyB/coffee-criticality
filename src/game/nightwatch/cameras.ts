@@ -902,12 +902,29 @@ const S: Record<string, Scene> = {
       }
       if (v.has("ripple") || v.has("toolBag")) {
         const rx = 200 + Math.sin(t * 0.4) * 40;
-        g.strokeStyle = "rgba(230,246,255,0.9)";
-        g.lineWidth = 2;
-        for (let k = 1; k < 6; k++) {
+        const img = plateFor("pool");
+        for (let k = 0; k < 3; k++) {
+          const age = (t * 0.3 + k / 3) % 1;
+          const rxr = 16 + age * 34;
+          const ryr = 5 + age * 7;
+          const y = 188 + k * 8;
+          g.save();
           g.beginPath();
-          g.ellipse(rx, top + 10, ((t * 12 + k * 16) % 48) + 8, 5, 0, 0, Math.PI * 2);
-          g.stroke();
+          g.ellipse(rx, y, rxr, ryr, 0, 0, Math.PI * 2);
+          g.ellipse(rx, y, rxr * 0.72, ryr * 0.72, 0, 0, Math.PI * 2, true);
+          g.clip();
+          if (img) {
+            const shift = 6 * Math.sin(t * 1.4 + k);
+            g.drawImage(img, 0, 0, img.width, img.height, shift, 0.6, W, H);
+          } else {
+            g.globalAlpha = 0.12;
+            g.strokeStyle = "rgba(220,240,255,0.9)";
+            g.lineWidth = 1;
+            g.beginPath();
+            g.ellipse(rx, y, rxr * 0.86, ryr * 0.86, 0, 0, Math.PI * 2);
+            g.stroke();
+          }
+          g.restore();
         }
       }
       if (v.has("toolBag") && !stateReady("pool", "toolBag")) {

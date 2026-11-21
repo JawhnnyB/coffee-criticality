@@ -11,7 +11,7 @@ Branch made by Claude: `g/nw-plates` + `c/crew-outage-1118` merged. Full suite a
 - A2 done · Salt-cell shadow is a soft multiply silhouette, about 70px, sway ±1px over 4s, no outline. Plate change 0.16% (inside the oddity band). The code glass changes more, so the row notes plate < half of code.
 - A3 done · Tunnel condensate is four 1×2 drips with a short fading streak, and a dark wet patch under each. The model lists it as an oddity, so the patches sit at 1.05% (inside 0.12–2.0), not at event volume.
 - A4 done · Puddles are a multiply wet sheen (about 0.7), a soft light reflection, and one drip. Radius follows the event's development. Containment 1.00%, drywell 0.76%, corridor 2.34%, all events.
-- A5 todo · Pool ripples and the tool-bag splash
+- A5 done · Pool ripples are three expanding annuli that shift a copy of the pool plate, not white rings. Plate change 0.36% (oddity band). The tool bag stays an event at 1.87%.
 - A6 todo · Discharge panel
 - A7 todo · Hard hat on the wrong camera
 - A8 todo · Pressurizer sign
