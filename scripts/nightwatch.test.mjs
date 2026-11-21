@@ -133,6 +133,46 @@ test("coffee: the tablet drains it, an empty cup drops the tablet, a brew refill
   assert.equal(W.brew(n), false, "night 5 has one brew");
 });
 
+test("night grade: the worked check, the bands, and a trip", () => {
+  const bare = () => {
+    const n = W.newNight("pwr", 1);
+    n.events = [];
+    n.falseReports = 0;
+    n.findings = 0;
+    n.over = { why: "dawn", at: 360 };
+    return n;
+  };
+  const ev = (id, extra) => {
+    const def = W.siteWatch("pwr").events.find((e) => e.id === id);
+    return { def, start: 20, caughtAt: null, early: false, doneAt: null, ...extra };
+  };
+  const flash = bare();
+  flash.events = [ev("rcp-seal", { caughtAt: 40, early: false }), ev("porv", { caughtAt: 50, early: false }), ev("lhra-door", { doneAt: 70 })];
+  flash.findings = 1;
+  const g = W.grade(flash);
+  assert.equal(g.points, 76);
+  assert.equal(g.letter, "C");
+  const sweep = bare();
+  sweep.events = [ev("rcp-seal", { caughtAt: 16, early: true }), ev("porv", { caughtAt: 18, early: true }), ev("lhra-door", { caughtAt: 22, early: true })];
+  const a = W.grade(sweep);
+  assert.equal(a.points, 100);
+  assert.equal(a.letter, "A");
+  const trip = bare();
+  trip.over = { why: "trip", at: 40, cause: "x" };
+  assert.deepEqual(W.grade(trip), { points: 0, letter: "F" });
+  assert.equal(W.gradeLetter(95), "A");
+  assert.equal(W.gradeLetter(94), "B");
+  assert.equal(W.gradeLetter(85), "B");
+  assert.equal(W.gradeLetter(84), "C");
+  assert.equal(W.gradeLetter(72), "C");
+  assert.equal(W.gradeLetter(71), "D");
+  assert.equal(W.gradeLetter(60), "D");
+  assert.equal(W.gradeLetter(59), "F");
+  const low = bare();
+  low.falseReports = 20;
+  assert.equal(W.grade(low).points, 0);
+});
+
 test("surviving to 06:00 is dawn, with the score", () => {
   const n = W.newNight("bwr", 2);
   for (const e of n.events) e.caughtAt = e.def.start;

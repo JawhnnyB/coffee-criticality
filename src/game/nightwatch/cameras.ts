@@ -431,7 +431,19 @@ function oddities(g: G, t: number, v: Vis, r: Room, scene: string) {
     g.fillRect(x - 14 * s, y - 32 * s, 28 * s, 7 * s);
     g.fillRect(x - 12 * s, y - 62 * s, 24 * s, 30 * s);
   }
-  // The hard hat is the corridor state plate (aux camera). No code hat on the turbine.
+  // Corridor fallback when the hard-hat plate has not loaded. Never on the turbine.
+  if (v.has("hardhat") && scene !== "turbine" && !stateReady(scene, "hardhat")) {
+    const [x, y] = r.floor(0.05, 0.42);
+    g.fillStyle = "rgba(0,0,0,0.35)";
+    g.beginPath();
+    g.ellipse(x, y + 2, 14, 4, 0, 0, Math.PI * 2);
+    g.fill();
+    g.fillStyle = "#e8c21a";
+    g.beginPath();
+    g.ellipse(x, y - 10, 12, 8, 0, Math.PI, 0);
+    g.fill();
+    g.fillRect(x - 14, y - 10, 28, 4);
+  }
   if (v.has("flicker")) {
     // One fixture, not the whole frame. Quiet enough to stay an oddity.
     const off = hash(Math.floor(t * 9), 11) > 0.62 || Math.sin(t * 31) > 0.85;
@@ -877,7 +889,7 @@ const S: Record<string, Scene> = {
           if (col % 5 !== 2) {
             const a = 0.45 + 0.12 * Math.sin(t * 1.1 + x);
             g.globalCompositeOperation = "lighter";
-            g.fillStyle = lin(g, 0, 250, 0, 200, [[0, `rgba(150,210,255,${a})`], [0.45, `rgba(60,130,220,${a * 0.35})`], [1, "rgba(0,0,0,0)"]]);
+            g.fillStyle = lin(g, 0, 250, 0, 200, [[0, `rgba(80,160,255,${a})`], [0.45, `rgba(60,130,220,${a * 0.35})`], [1, "rgba(0,0,0,0)"]]);
             g.fillRect(x + 1, 200, 16, 50);
             g.globalCompositeOperation = "source-over";
           }

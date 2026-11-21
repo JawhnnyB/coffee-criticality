@@ -19,6 +19,25 @@
 import { thermalState } from "../plant";
 import type { SiteKind } from "../plantLoops";
 
+/**
+ * Night grade. Start at 100. Clamp 0–100.
+ * Early catch +6. Late catch +2. Miss −18. Finding −10 more. False report −8.
+ * A trip is F, whatever the arithmetic.
+ * A ≥ 95, B ≥ 85, C ≥ 72, D ≥ 60, else F.
+ * Worked check: two late catches and one silent miss that is a finding = 100 + 4 − 28 = 76, a C.
+ * Three early catches stay at 100, an A.
+ */
+export const GRADE_POINTS = { early: 6, late: 2, miss: -18, finding: -10, falseReport: -8 } as const;
+export type GradeLetter = "A" | "B" | "C" | "D" | "F";
+
+export function gradeLetter(score: number): GradeLetter {
+  if (score >= 95) return "A";
+  if (score >= 85) return "B";
+  if (score >= 72) return "C";
+  if (score >= 60) return "D";
+  return "F";
+}
+
 export type Category = "leak" | "radiation" | "equipment" | "electrical" | "access" | "foreign";
 
 export const CATEGORY_LABEL: Record<Category, string> = {
@@ -602,4 +621,20 @@ export function score(n: Night): Score {
     falseReports: n.falseReports,
     survived: n.over?.why === "dawn",
   };
+}
+
+/** Points, then a letter. A trip fails the night outright. */
+export function grade(n: Night): { points: number; letter: GradeLetter } {
+  if (n.over?.why === "trip") return { points: 0, letter: "F" };
+  let points = 100;
+  for (const e of n.events) {
+    if (e.caughtAt !== null) points += e.early ? GRADE_POINTS.early : GRADE_POINTS.late;
+    else if (e.doneAt !== null) {
+      points += GRADE_POINTS.miss;
+      if (e.def.consequence === "finding") points += GRADE_POINTS.finding;
+    }
+  }
+  points += n.falseReports * GRADE_POINTS.falseReport;
+  points = Math.max(0, Math.min(100, points));
+  return { points, letter: gradeLetter(points) };
 }

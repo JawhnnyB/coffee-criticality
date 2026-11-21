@@ -22,7 +22,7 @@ Branch made by Claude: `g/nw-plates` + `c/crew-outage-1118` merged. Full suite a
 
 ## Part B
 
-- B1 todo · Night grade
+- B1 done · grade() starts at 100. Early +6, late +2, miss −18, finding −10 more, false report −8, trip is F. Clamp 0–100. Bands A 95, B 85, C 72, D 60. Worked check is 76, a C. Three early stays 100, an A.
 - B2 todo · What a grade does
 - B3 todo · The 06:00 turnover (the teaching moment)
 - B4 todo · Teach scanning on night 1
