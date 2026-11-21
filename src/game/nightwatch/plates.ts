@@ -71,7 +71,7 @@ export const PLATES: Record<string, PlateSpec> = {
   intake: {
     file: "/nightwatch/plates/intake.webp",
     states: {
-      debris: { file: "/nightwatch/plates/intake-debris.webp", measured: [76, 42, 323, 213], box: [68, 34, 339, 229] },
+      debris: { file: "/nightwatch/plates/intake-debris.webp", measured: [0, 33, 476, 237], box: [0, 25, 480, 245] },
     },
   },
 };
