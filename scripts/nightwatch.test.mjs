@@ -9,7 +9,7 @@ import test from "node:test";
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const dir = mkdtempSync(join(tmpdir(), "cc-nw-"));
 const entry = join(dir, "entry.ts");
-writeFileSync(entry, `export * from ${JSON.stringify(join(root, "src/game/nightwatch/model.ts"))};\n`);
+writeFileSync(entry, `export * from ${JSON.stringify(join(root, "src/game/nightwatch/model.ts"))};\nexport * from ${JSON.stringify(join(root, "src/game/nightwatch/turnover.ts"))};\nexport * from ${JSON.stringify(join(root, "src/game/nightwatch/carryover.ts"))};\n`);
 const out = join(dir, "nw.mjs");
 const built = spawnSync(process.env.ESBUILD ?? "npx", [...(process.env.ESBUILD ? [] : ["esbuild"]), entry, "--bundle", "--platform=node", "--format=esm", `--outfile=${out}`], { encoding: "utf8", cwd: root });
 if (built.status !== 0) throw new Error(built.stderr || built.stdout);
@@ -64,9 +64,10 @@ test("a night is the same every time it is replayed, and nights get harder", () 
   const a = W.newNight("pwr", 3);
   const b = W.newNight("pwr", 3);
   assert.deepEqual(a.events.map((e) => [e.def.id, e.def.start]), b.events.map((e) => [e.def.id, e.def.start]));
-  const counts = [1, 2, 3, 4, 5].map((k) => W.newNight("pwr", k).events.length);
+  const counts = [1, 2, 3, 4].map((k) => W.newNight("pwr", k).events.length);
   assert.ok(counts.every((c, i) => i === 0 || c >= counts[i - 1]), counts.join(","));
-  assert.ok(W.NIGHTS[4].brews < W.NIGHTS[0].brews && W.NIGHTS[4].escalateScale < W.NIGHTS[0].escalateScale);
+  assert.equal(W.NIGHTS.length, 4);
+  assert.ok(W.NIGHTS[3].brews < W.NIGHTS[0].brews && W.NIGHTS[3].escalateScale < W.NIGHTS[0].escalateScale);
 });
 
 test("the right report on the right camera catches the event, early if before the alarm, and the readings recover", () => {
@@ -131,6 +132,89 @@ test("coffee: the tablet drains it, an empty cup drops the tablet, a brew refill
   assert.equal(n.coffee, W.COFFEE.max);
   assert.equal(n.brewsLeft, brews - 1);
   assert.equal(W.brew(n), false, "night 5 has one brew");
+});
+
+test("night 1 always has a silent event at 01:10 and one nudge; later nights do not nudge", () => {
+  for (const site of SITES) {
+    const n = W.newNight(site, 1, 3);
+    const silent = n.events.find((e) => e.def.id === "lhra-door" || e.def.id === "pool-fme");
+    assert.ok(silent, site);
+    assert.equal(silent.start, 70);
+    n.minute = 76;
+    const lines = W.radio(n);
+    assert.ok(lines.some((l) => l.includes("Jordan:") && l.includes("01:16")), lines.join(" | "));
+    const later = W.newNight(site, 2, 3);
+    later.minute = 200;
+    assert.equal(W.radio(later).some((l) => l.includes("looked wrong")), false);
+  }
+  const fin = W.newNight("pwr", 4, 1);
+  const stacked = fin.events.filter((e) => e.finale);
+  assert.equal(stacked.length, 2);
+  assert.ok(stacked.every((e) => e.start === 270));
+});
+
+test("a grade is stored once, C or better counts as done, a replay does not move trust", () => {
+  const flags = {};
+  const n = W.newNight("pwr", 1);
+  n.events = [];
+  n.over = { why: "dawn", at: 360 };
+  const a = W.recordNight(flags, n, 1, false);
+  assert.equal(a.letter, "A");
+  assert.equal(a.trust, 3);
+  assert.equal(flags["night:1:done"], true);
+  assert.equal(flags["night:1:grade:A"], true);
+  const again = W.recordNight(flags, n, 1, true);
+  assert.equal(again.trust, 0);
+  assert.equal(flags["night:1:grade:A"], true);
+  const bad = W.newNight("pwr", 1);
+  bad.events = [];
+  bad.falseReports = 6;
+  bad.over = { why: "dawn", at: 360 };
+  const flags2 = {};
+  const d = W.recordNight(flags2, bad, 2, false);
+  assert.ok(d.letter === "D" || d.letter === "F");
+  assert.equal(flags2["night:2:done"], undefined);
+});
+
+test("carryover follows the day week and a fresh week does not", () => {
+  const plain = { residue: { valve: "open", tag: "open", dose: "open", log: "open" }, maintDone: true, shuffleDone: false, ended: null, weekLog: [] };
+  const base = W.newNight("pwr", 1, 4);
+  const copy = W.newNight("pwr", 1, 4);
+  W.applyCarry(copy, W.carryover(plain, 1));
+  const ids = (n) => n.events.map((e) => e.def.id).sort();
+  assert.deepEqual(ids(copy), ids(base));
+  const hid = { ...plain, residue: { ...plain.residue, valve: "hid" } };
+  const n1 = W.newNight("pwr", 1, 4);
+  W.applyCarry(n1, W.carryover(hid, 1));
+  const weep = n1.events.find((e) => e.def.id === "valve-14");
+  assert.ok(weep);
+  assert.equal(weep.start, 100);
+  assert.equal(weep.fromDays, true);
+  assert.ok(weep.def.escalate < 50);
+  const held = W.carryover({ ...plain, residue: { ...plain.residue, valve: "caught" } }, 1);
+  assert.ok(held.radios.some((r) => r.text.includes("Valve 14 repack is holding")));
+  const n2 = W.newNight("pwr", 2, 4);
+  W.applyCarry(n2, W.carryover({ ...plain, residue: { ...plain.residue, tag: "hid" }, maintDone: false }, 2));
+  assert.ok(n2.events.some((e) => e.def.id === "tag-missing" && e.def.camera === "turbine"));
+  assert.ok(n2.events.some((e) => e.def.id === "feed-pump" && e.start === 150));
+  const n3 = W.newNight("pwr", 3, 9);
+  const before = n3.events.find((e) => e.def.accept.includes("radiation"));
+  const start = before?.start;
+  W.applyCarry(n3, W.carryover({ ...plain, residue: { ...plain.residue, dose: "hid" } }, 3));
+  const after = n3.events.find((e) => e.def.accept.includes("radiation"));
+  if (start !== undefined) assert.equal(after.start, Math.max(15, start - 45));
+  assert.ok(n3.carriedRadio.some((r) => r.text.includes("Dosimeter")));
+  const curt = W.carryover({ ...plain, residue: { ...plain.residue, log: "hid" } }, 1);
+  assert.equal(curt.curt, true);
+  const read = W.carryover({ ...plain, residue: { ...plain.residue, log: "caught" }, weekLog: [{ text: "Caught the valve." }] }, 1);
+  assert.ok(read.radios.some((r) => r.text.includes("Caught the valve.")));
+  const warm = W.carryover({ ...plain, ended: "a", shuffleDone: true }, 4);
+  assert.equal(warm.voice, "warm");
+  assert.ok(warm.radios.some((r) => r.text.includes("new core")));
+  const terse = W.carryover({ ...plain, ended: "c" }, 1);
+  assert.equal(terse.voice, "terse");
+  const again = W.carryover(hid, 1);
+  assert.deepEqual(again, W.carryover(hid, 1));
 });
 
 test("night grade: the worked check, the bands, and a trip", () => {

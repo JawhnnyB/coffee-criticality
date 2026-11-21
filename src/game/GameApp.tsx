@@ -37,6 +37,7 @@ import { ReactorBuilder } from "./ReactorBuilder";
 import { FuelShuffle } from "./FuelShuffle";
 import { MaintGame } from "./MaintGame";
 import { Desktop } from "./Desktop";
+import { NightRotation } from "./NightWatch";
 import { LakeScene } from "./LakeScene";
 import { PlantCutaway, STILL_CUTAWAY, sitePower } from "./PlantCutaway";
 import type { LiveRun } from "./cutawayPaint";
@@ -1644,6 +1645,18 @@ export function GameApp() {
                 <button
                   type="button"
                   className="paper-btn-primary"
+                  style={{ minHeight: 44 }}
+                  data-testid="rotate-nights"
+                  onClick={() => {
+                    s.flags["rot:nights"] = true;
+                    refresh();
+                  }}
+                >
+                  Rotate to nights
+                </button>
+                <button
+                  type="button"
+                  className="paper-btn-primary"
                   data-testid="new-shift-ending"
                   onClick={() => {
                     setWipeNext("desk");
@@ -1665,6 +1678,17 @@ export function GameApp() {
             </div>
           </div>
         )}
+
+        {s.flags["rot:nights"] ? (
+          <NightRotation
+            s={s}
+            onNewWeek={() => {
+              setWipeNext("desk");
+              setAskWipe(true);
+            }}
+            onMenu={() => goMenu("menu")}
+          />
+        ) : null}
 
         {mode === "play" && s.closePrompt && (
           <div className="pointer-events-none absolute inset-x-0 bottom-20 z-20 flex justify-center px-4 sm:bottom-12">

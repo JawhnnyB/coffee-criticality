@@ -322,13 +322,12 @@ export function siteWatch(site: SiteKind): SiteWatch {
   );
 }
 
-/** Night 1 to 5: how many events, how long they take to run their course, coffee. */
+/** Night 1 to 4. Night 1 teaches. Night 4 is the finale. */
 export const NIGHTS = [
   { events: 3, oddities: 2, escalateScale: 1.3, brews: 3 },
-  { events: 4, oddities: 3, escalateScale: 1.15, brews: 3 },
+  { events: 4, oddities: 3, escalateScale: 1.1, brews: 2 },
   { events: 5, oddities: 4, escalateScale: 1.0, brews: 2 },
-  { events: 6, oddities: 5, escalateScale: 0.9, brews: 2 },
-  { events: 7, oddities: 6, escalateScale: 0.8, brews: 1 },
+  { events: 6, oddities: 4, escalateScale: 0.85, brews: 1 },
 ];
 
 export const NIGHT_MINUTES = 360;
@@ -356,6 +355,10 @@ export interface ActiveEvent {
   early: boolean;
   /** Ran its course. */
   doneAt: number | null;
+  /** Came from the day week, not from tonight's draw. */
+  fromDays?: boolean;
+  /** Night 4's stacked pair. */
+  finale?: boolean;
 }
 
 export interface ActiveOddity {
@@ -381,6 +384,19 @@ export interface Night {
   log: string[];
   /** The night rover's rounds: who is on which camera, when. Not anomalies: reporting one is a false report. */
   rounds: Round[];
+  /** Minutes the tablet was up on each camera, in order. */
+  gaze: { camera: string; from: number; to: number }[];
+  /** How long the current camera has been up, in game minutes. */
+  streak: number;
+  streakCam: string;
+  /** A replay does not move trust or grade flags. */
+  replay: boolean;
+  /** Extra radio lines from the day week, spoken at a minute. */
+  carriedRadio: { at: number; text: string }[];
+  /** Elena's turnover is the short set when the day log was hidden. */
+  curt: boolean;
+  /** Jordan's radio voice, from how the week ended. */
+  voice: "plain" | "warm" | "terse";
   /** "trip" or "relieved" ends early; "dawn" is a survived night. */
   over: null | { why: "dawn" | "trip" | "relieved"; at: number; cause?: string };
 }
@@ -410,16 +426,56 @@ export function roundsFor(r: () => number): Round[] {
   return out;
 }
 
+/** Jordan, when the week ended well. */
+export const JORDAN_WARM = [
+  "Yard lights are on. I am starting at the turbine.",
+  "Aux corridor is quiet. Door latches look shut from here.",
+  "Pool deck is dry. I am walking the rail.",
+  "Containment entry is logged. Nobody else in the airlock.",
+  "Steam valve room is warm, nothing weeping.",
+  "Intake deck is clear. Screens are turning.",
+  "Switchyard is dark except the sodium lamp.",
+  "Back at the turbine. Call if a camera looks wrong.",
+];
+
+/** Jordan, when the week ended badly. */
+export const JORDAN_TERSE = [
+  "Rounds.",
+  "Turbine.",
+  "Aux.",
+  "Pool.",
+  "Core.",
+  "Steam line.",
+  "Intake.",
+  "Yard. Out.",
+];
+
 /** Radio traffic so far, oldest first: the rover calling in each space, the van at the gate. */
 export function radio(n: Night): string[] {
   const lines: string[] = ["00:00 Control, night watch on station."];
-  let last = -1;
-  for (const rd of n.rounds) {
-    if (rd.start > n.minute) break;
-    if (rd.start - last > 30) lines.push(`${clock(rd.start)} ${ROVER}: starting rounds.`);
-    lines.push(`${clock(rd.start)} ${ROVER}: ${cameraName(n, rd.camera).toLowerCase()}.`);
-    last = rd.start;
+  if (n.voice === "plain") {
+    let last = -1;
+    for (const rd of n.rounds) {
+      if (rd.start > n.minute) break;
+      if (rd.start - last > 30) lines.push(`${clock(rd.start)} ${ROVER}: starting rounds.`);
+      lines.push(`${clock(rd.start)} ${ROVER}: ${cameraName(n, rd.camera).toLowerCase()}.`);
+      last = rd.start;
+    }
+  } else {
+    const set = n.voice === "warm" ? JORDAN_WARM : JORDAN_TERSE;
+    set.forEach((text, i) => {
+      const at = 20 + i * 40;
+      if (n.minute >= at) lines.push(`${clock(at)} ${ROVER}: ${text}`);
+    });
   }
+  if (n.night === 1) {
+    const silent = n.events.find((e) => e.def.id === "lhra-door" || e.def.id === "pool-fme");
+    if (silent && n.minute >= silent.start + 6) {
+      const what = silent.def.id === "pool-fme" ? "tool bag by the pool looked wrong on my way past." : "aux corridor door looked wrong on my way past.";
+      lines.push(`${clock(silent.start + 6)} Jordan: ${what} Can you check the camera?`);
+    }
+  }
+  for (const line of n.carriedRadio) if (n.minute >= line.at) lines.push(line.text);
   if (n.minute >= VAN_AT) lines.push(`${clock(VAN_AT)} Gate: day shift supervisor on site.`);
   return lines;
 }
@@ -427,7 +483,7 @@ export function radio(n: Night): string[] {
 /** Lay out the night: events and oddities, spread so nothing starts in the first 15 or last 30 minutes. */
 export function newNight(site: SiteKind, night: number, seed = night * 7919 + site.length): Night {
   const watch = siteWatch(site);
-  const cfg = NIGHTS[Math.max(0, Math.min(4, night - 1))];
+  const cfg = NIGHTS[Math.max(0, Math.min(NIGHTS.length - 1, night - 1))];
   const r = rng(seed);
   const pool = watch.events.slice();
   const events: ActiveEvent[] = [];
@@ -442,6 +498,35 @@ export function newNight(site: SiteKind, night: number, seed = night * 7919 + si
     const def = watch.oddities[Math.floor(r() * watch.oddities.length)];
     const start = Math.round(20 + r() * (NIGHT_MINUTES - 80));
     oddities.push({ def, start, end: start + 25 + Math.round(r() * 35) });
+  }
+  if (night === 1) {
+    const silent = events.find((e) => e.def.id === "lhra-door" || e.def.id === "pool-fme");
+    if (silent) silent.start = 70;
+    else {
+      const def = watch.events.find((e) => e.id === "lhra-door") ?? watch.events.find((e) => e.id === "pool-fme");
+      if (def) {
+        events.pop();
+        events.push({ def: { ...def, escalate: Math.round(def.escalate * cfg.escalateScale) }, start: 70, caughtAt: null, early: false, doneAt: null });
+      }
+    }
+  }
+  if (night === 4) {
+    const want = ["lhra-door", "pool-level"];
+    for (const id of want) {
+      let hit = events.find((e) => e.def.id === id);
+      if (!hit) {
+        const def = watch.events.find((e) => e.id === id);
+        const idx = events.findIndex((e) => !want.includes(e.def.id));
+        if (def && idx >= 0) {
+          events[idx] = { def: { ...def, escalate: Math.round(def.escalate * cfg.escalateScale) }, start: 270, caughtAt: null, early: false, doneAt: null, finale: true };
+          hit = events[idx];
+        }
+      }
+      if (hit) {
+        hit.start = 270;
+        hit.finale = true;
+      }
+    }
   }
   return {
     site,
@@ -459,6 +544,13 @@ export function newNight(site: SiteKind, night: number, seed = night * 7919 + si
     falseReports: 0,
     findings: 0,
     log: [],
+    gaze: [],
+    streak: 0,
+    streakCam: watch.cameras[0].id,
+    replay: false,
+    carriedRadio: [],
+    curt: false,
+    voice: "plain",
     over: null,
   };
 }
@@ -563,6 +655,16 @@ export function tick(n: Night, dt: number): void {
     n.coffee = Math.max(0, n.coffee - (n.tablet ? COFFEE.tablet : COFFEE.desk) * dt);
     if (n.coffee === 0) n.tablet = false;
   }
+  if (n.tablet) {
+    const open = n.gaze[n.gaze.length - 1];
+    if (!open || open.camera !== n.camera) n.gaze.push({ camera: n.camera, from: n.minute - dt, to: n.minute });
+    else open.to = n.minute;
+    if (n.streakCam === n.camera) n.streak += dt;
+    else {
+      n.streakCam = n.camera;
+      n.streak = dt;
+    }
+  } else n.streak = 0;
   for (const e of n.events) {
     if (e.caughtAt !== null || e.doneAt !== null) continue;
     if (n.minute >= e.start + e.def.escalate) {
@@ -591,6 +693,17 @@ export function setTablet(n: Night, up: boolean): boolean {
   if (n.over || n.brewing > 0 || (up && n.coffee <= 0)) return false;
   n.tablet = up;
   return true;
+}
+
+/** 0 before four minutes on one feed, 1 after ten. The picture loses at most 15% contrast. */
+export function fatigueOf(n: Night): number {
+  if (n.streak <= 4) return 0;
+  return Math.min(1, (n.streak - 4) / 6);
+}
+
+/** How many times the tablet came up on this camera at or after a minute. */
+export function looksAfter(n: Night, camera: string, minute: number): number {
+  return n.gaze.filter((g) => g.camera === camera && g.from >= minute - 0.05).length;
 }
 
 export function cameraName(n: Night, id: string): string {

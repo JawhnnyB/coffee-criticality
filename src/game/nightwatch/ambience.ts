@@ -9,6 +9,9 @@ interface Running {
   stop: () => void;
   static: () => void;
   setTension: (x: number) => void;
+  chime: () => void;
+  squelch: () => void;
+  duck: (on: boolean) => void;
 }
 
 let live: Running | null = null;
@@ -88,8 +91,39 @@ export function startAmbience(): Running | null {
       s.start();
     },
     setTension(x: number) {
-      // With alarms on the board the hum rises a little: the room is the same, you are not.
       hum.gain.setTargetAtTime(0.05 + 0.04 * Math.max(0, Math.min(1, x)), c.currentTime, 2);
+    },
+    chime() {
+      const now = c.currentTime;
+      for (const [f, delay] of [[880, 0], [660, 0.12]] as const) {
+        const o = c.createOscillator();
+        const g = c.createGain();
+        o.type = "sine";
+        o.frequency.value = f;
+        g.gain.setValueAtTime(0.0001, now + delay);
+        g.gain.exponentialRampToValueAtTime(0.05, now + delay + 0.02);
+        g.gain.exponentialRampToValueAtTime(0.0001, now + delay + 0.28);
+        o.connect(g).connect(out);
+        o.start(now + delay);
+        o.stop(now + delay + 0.3);
+      }
+    },
+    squelch() {
+      const s = c.createBufferSource();
+      s.buffer = staticBuf;
+      const hp = c.createBiquadFilter();
+      hp.type = "highpass";
+      hp.frequency.value = 900;
+      const g = c.createGain();
+      g.gain.setValueAtTime(0.08, c.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001, c.currentTime + 0.12);
+      s.connect(hp).connect(g).connect(out);
+      s.start();
+      s.stop(c.currentTime + 0.12);
+    },
+    duck(on: boolean) {
+      hum.gain.setTargetAtTime(on ? 0.01 : 0.05, c.currentTime, 0.4);
+      airGain.gain.setTargetAtTime(on ? 0.015 : 0.06, c.currentTime, 0.4);
     },
   };
   return live;

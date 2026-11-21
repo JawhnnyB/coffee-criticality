@@ -20,6 +20,7 @@ import {
   alarms,
   brew,
   clock,
+  fatigueOf,
   newNight,
   radio,
   readings,
@@ -31,6 +32,8 @@ import {
   type Category,
   type Night,
 } from "./nightwatch/model";
+import { applyCarry, carryover } from "./nightwatch/carryover";
+import { elenaLine, oddityNotes, recordNight, turnoverRows } from "./nightwatch/turnover";
 
 /** Real seconds per game minute: a night is about seven and a half minutes. */
 const SECONDS_PER_MINUTE = 1.25;
@@ -48,7 +51,7 @@ function Btn({ onClick, children, danger, on, disabled, testId, title }: { onCli
       title={title}
       style={{
         ...MONO,
-        minHeight: 36,
+        minHeight: 44,
         padding: "4px 10px",
         background: danger ? PAL.bad : on ? PAL.gold : PAL.ink,
         color: danger || on ? PAL.ink : PAL.goldL,
@@ -72,39 +75,46 @@ export function nightsDone(flags: Record<string, boolean>): number {
 
 export function NightWatchApp({ s }: { s: GameState }) {
   const [running, setRunning] = useState<number | null>(null);
-  const done = nightsDone(s.flags);
   const site = siteKind(s.plant);
   useEffect(() => {
     void loadPlates();
   }, []);
-  if (running !== null) return <NightShift s={s} nightNo={running} onLeave={() => setRunning(null)} />;
+  if (running !== null) return <NightShift s={s} nightNo={running} replay onLeave={() => setRunning(null)} />;
+  if (!s.flags["rot:nights"]) {
+    return (
+      <div className="app-pad" data-testid="app-nightwatch" style={{ fontFamily: "var(--font-body)", color: PAL.ink, lineHeight: 1.5 }}>
+        <p style={{ margin: 0 }}>Night Watch · {SITE_LABEL[site]} Unit 1</p>
+        <p style={{ fontSize: "var(--text-small)" }}>Your night rotation starts after this week.</p>
+      </div>
+    );
+  }
+  const done = [1, 2, 3, 4].filter((k) => s.flags[`night:${k}:done`]);
   return (
     <div className="app-pad" data-testid="app-nightwatch" style={{ fontFamily: "var(--font-body)", color: PAL.ink, lineHeight: 1.5 }}>
-      <p style={{ margin: 0 }}>Night Watch · {SITE_LABEL[site]} Unit 1</p>
-      <p style={{ fontSize: "var(--text-small)" }}>
-        Midnight to six. Eight cameras, one annunciator wall, one coffee machine. Something on site will go wrong before the board knows it. Find it on a camera and report what you
-        see. Report the wrong thing, or a light that only flickers, and it counts against you. Three false reports and the supervisor sends you home.
-      </p>
-      <p style={{ fontSize: "var(--text-small)" }}>Watching the cameras drains your coffee. When it runs out the tablet goes down until you brew more.</p>
+      <p style={{ margin: 0 }}>Replay nights · {SITE_LABEL[site]} Unit 1</p>
+      <p style={{ fontSize: "var(--text-small)" }}>A replay does not change Elena's trust or the grade on the log.</p>
       <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 8 }}>
-        {[1, 2, 3, 4, 5].map((k) => (
-          <Btn key={k} onClick={() => setRunning(k)} disabled={k > done + 1} on={s.flags[`night:${k}:done`]} testId={`night-${k}`}>
-            Night {k}
-            {s.flags[`night:${k}:done`] ? " ✓" : ""}
+        {done.length === 0 ? <p style={{ fontSize: "var(--text-small)" }}>No night is on the log yet.</p> : null}
+        {done.map((k) => (
+          <Btn key={k} onClick={() => setRunning(k)} testId={`night-${k}`}>
+            Replay night {k}
           </Btn>
         ))}
       </div>
-      <p style={{ fontSize: "var(--text-small)", marginTop: 8 }}>
-        Keys: Space lifts the tablet, 1 to 8 switch cameras, R reports, B brews.
-      </p>
     </div>
   );
 }
 
-function NightShift({ s, nightNo, onLeave }: { s: GameState; nightNo: number; onLeave: () => void }) {
+function NightShift({ s, nightNo, onLeave, replay = false }: { s: GameState; nightNo: number; onLeave: () => void; replay?: boolean }) {
   const site = siteKind(s.plant);
   const night = useRef<Night>(newNight(site, nightNo));
   const n = night.current;
+  const carried = useRef(false);
+  if (!carried.current) {
+    carried.current = true;
+    n.replay = replay;
+    if (!replay) applyCarry(n, carryover({ residue: s.residue, maintDone: s.maintDone, shuffleDone: s.shuffleDone, ended: s.ended, weekLog: s.weekLog }, nightNo));
+  }
   const [, setFrame] = useState(0);
   const [reporting, setReporting] = useState(false);
   const [toast, setToast] = useState<string>("");
@@ -112,10 +122,14 @@ function NightShift({ s, nightNo, onLeave }: { s: GameState; nightNo: number; on
   useEffect(() => {
     void loadPlates();
     startAmbience();
+    calm.current = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     return () => stopAmbience();
   }, []);
   const canvas = useRef<HTMLCanvasElement | null>(null);
   const rewarded = useRef(false);
+  const calm = useRef(false);
+  const seenAlarm = useRef("");
+  const seenRadio = useRef(0);
 
   const rerender = () => setFrame((f) => f + 1);
   const say = (t: string) => {
@@ -167,7 +181,12 @@ function NightShift({ s, nightNo, onLeave }: { s: GameState; nightNo: number; on
         nextFeed = now + 1000 / 15;
         const cam = n.watch.cameras.find((x) => x.id === n.camera)!;
         c.setTransform(CAM_PX, 0, 0, CAM_PX, 0, 0);
-        paintCamera(c, cam.scene, visualsOn(n, cam.id), now / 1000, { switching: 0, tripped: n.over?.why === "trip" });
+        paintCamera(c, cam.scene, visualsOn(n, cam.id), now / 1000, {
+          switching: 0,
+          tripped: n.over?.why === "trip",
+          fatigue: calm.current ? 0 : fatigueOf(n),
+          calm: calm.current,
+        });
       }
       acc += dt;
       if (acc > 0.25) {
@@ -188,7 +207,7 @@ function NightShift({ s, nightNo, onLeave }: { s: GameState; nightNo: number; on
     if (!c || !n.tablet || switching <= 0) return;
     const cam = n.watch.cameras.find((x) => x.id === n.camera)!;
     c.setTransform(CAM_PX, 0, 0, CAM_PX, 0, 0);
-    paintCamera(c, cam.scene, visualsOn(n, cam.id), performance.now() / 1000, { switching, tripped: n.over?.why === "trip" });
+    paintCamera(c, cam.scene, visualsOn(n, cam.id), performance.now() / 1000, { switching: calm.current ? switching * 0.3 : switching, tripped: n.over?.why === "trip", calm: calm.current });
   });
 
   useEffect(() => {
@@ -211,11 +230,12 @@ function NightShift({ s, nightNo, onLeave }: { s: GameState; nightNo: number; on
 
   // A survived night: progress, and Elena's trust (she takes over at six).
   useEffect(() => {
-    if (n.over?.why !== "dawn" || rewarded.current) return;
+    if (!n.over || rewarded.current) return;
     rewarded.current = true;
-    s.flags[`night:${nightNo}:done`] = true;
-    bumpTrust(s, "elena", 2);
-    pushMsg(s, `Night ${nightNo} watched. Elena has the plant.`);
+    const g = recordNight(s.flags, n, nightNo, replay || n.replay);
+    if (!replay && !n.replay && g.trust) bumpTrust(s, "elena", g.trust);
+    if (!replay && !n.replay) pushMsg(s, g.done ? `Night ${nightNo} watched. Grade ${g.letter}.` : `Night ${nightNo} is a ${g.letter}. Elena sends you back.`);
+    startAmbience()?.duck(true);
   });
 
   const r = readings(n);
@@ -229,6 +249,16 @@ function NightShift({ s, nightNo, onLeave }: { s: GameState; nightNo: number; on
   useEffect(() => {
     startAmbience()?.setTension(tripped ? 1 : Math.min(1, lit.size / 3));
   }, [lit.size, tripped]);
+  const alarmKey = [...camAlarm].sort().join(",");
+  useEffect(() => {
+    if (alarmKey && alarmKey !== seenAlarm.current) startAmbience()?.chime();
+    seenAlarm.current = alarmKey;
+  }, [alarmKey]);
+  const radioLines = radio(n);
+  useEffect(() => {
+    if (seenRadio.current && radioLines.length > seenRadio.current) startAmbience()?.squelch();
+    seenRadio.current = radioLines.length;
+  }, [radioLines.length]);
   const cam = n.watch.cameras.find((c) => c.id === n.camera)!;
 
   return (
@@ -346,7 +376,7 @@ function NightShift({ s, nightNo, onLeave }: { s: GameState; nightNo: number; on
             </div>
           ) : null}
           <div data-testid="nw-radio" style={{ ...MONO, marginTop: 6, fontSize: 11, lineHeight: 1.5, color: PAL.goldL, opacity: 0.9 }}>
-            {radio(n)
+            {radioLines
               .slice(-3)
               .map((line, k, all) => (
                 <div key={line} style={{ opacity: k === all.length - 1 ? 1 : 0.55 }}>
@@ -402,35 +432,152 @@ function NightShift({ s, nightNo, onLeave }: { s: GameState; nightNo: number; on
 
 function Summary({ n, nightNo, onLeave }: { n: Night; nightNo: number; onLeave: () => void }) {
   const sc = score(n);
-  const head =
-    n.over?.why === "dawn"
-      ? "06:00. The van pulls into the lot."
-      : n.over?.why === "trip"
-        ? `${clock(n.over.at)}. The lights drop to emergency. The plant tripped.`
-        : `${clock(n.over!.at)}. The supervisor takes the chair.`;
-  const close =
-    n.over?.why === "dawn"
-      ? "Elena: \"Walk me through the log.\""
-      : n.over?.why === "trip"
-        ? `Nobody reported it: ${n.over.cause}. It found its own way to the board.`
-        : "Three reports about nothing. Tomorrow, report what is wrong, not what is strange.";
+  const g = recordNight({}, n, nightNo, true);
+  const rows = turnoverRows(n);
+  const notes = oddityNotes(n);
+  const head = n.over?.why === "trip" ? `${clock(n.over.at)}. The lights drop to emergency. Grade F.` : n.over?.why === "relieved" ? `${clock(n.over!.at)}. Elena takes the chair.` : "06:00 turnover.";
   return (
-    <div data-testid="nw-summary" style={{ margin: "0 10px 10px", padding: 10, border: `2px solid ${PAL.gold}`, background: PAL.ink, color: PAL.cream }}>
+    <div data-testid="nw-summary" style={{ margin: "0 10px 10px", padding: 10, border: `2px solid ${PAL.gold}`, background: PAL.ink, color: PAL.cream, maxHeight: "70vh", overflow: "auto" }}>
       <div style={{ fontSize: 16 }}>{head}</div>
-      <div style={{ marginTop: 4 }}>
-        Night {nightNo}: caught {sc.caught} ({sc.early} before the alarm) · ran their course {sc.missed} · false reports {sc.falseReports}
+      <div style={{ marginTop: 4 }} data-testid="nw-grade">
+        Grade {g.letter}. {elenaLine(g.letter, n.curt)}
       </div>
-      <div style={{ marginTop: 4 }}>{close}</div>
-      <div style={{ marginTop: 6, fontSize: 11, opacity: 0.85 }}>
-        {n.log.map((l, i) => (
-          <div key={i}>{l}</div>
+      <div style={{ marginTop: 4, fontSize: 12 }}>
+        Caught {sc.caught} ({sc.early} early) · missed {sc.missed} · false reports {sc.falseReports}
+      </div>
+      <div style={{ marginTop: 8 }}>
+        {rows.map((row) => (
+          <div key={`${row.time}-${row.title}`} style={{ marginTop: 8, fontSize: 12 }}>
+            <div>
+              {row.time} · CAM{String(row.camIndex + 1).padStart(2, "0")} {row.camera} · {row.title} · {row.how}
+              {row.fromDays ? " · from days" : ""}
+            </div>
+            {row.missed ? (
+              <div>
+                <Still n={n} camera={n.watch.cameras[row.camIndex]?.id ?? "aux"} minute={row.stillMinute} />
+                <div>
+                  It was on CAM{String(row.camIndex + 1).padStart(2, "0")} from {row.time}. You looked at CAM{String(row.camIndex + 1).padStart(2, "0")} {row.looks} times after that.
+                </div>
+              </div>
+            ) : null}
+          </div>
         ))}
+      </div>
+      <div style={{ marginTop: 8, fontSize: 12 }}>
+        {notes.map((line) => (
+          <div key={line}>{line}</div>
+        ))}
+        {n.log
+          .filter((l) => l.includes("False report") || l.includes("wrong kind"))
+          .map((l, i) => (
+            <div key={i}>{l}</div>
+          ))}
       </div>
       <div style={{ marginTop: 8 }}>
         <Btn onClick={onLeave} testId="nw-summary-leave">
-          Back to the desk
+          {n.over?.why === "dawn" && (g.letter === "A" || g.letter === "B" || g.letter === "C") ? "Sleep" : "Back"}
         </Btn>
       </div>
+    </div>
+  );
+}
+
+function Still({ n, camera, minute }: { n: Night; camera: string; minute: number }) {
+  const ref = useRef<HTMLCanvasElement | null>(null);
+  useEffect(() => {
+    const c = ref.current?.getContext("2d");
+    if (!c) return;
+    const cam = n.watch.cameras.find((x) => x.id === camera);
+    if (!cam) return;
+    c.setTransform(CAM_PX, 0, 0, CAM_PX, 0, 0);
+    paintCamera(c, cam.scene, visualsOn({ ...n, minute }, camera), minute, { calm: true });
+  }, [n, camera, minute]);
+  return <canvas ref={ref} width={CAM_W * CAM_PX} height={CAM_H * CAM_PX} style={{ width: "100%", maxWidth: 320, marginTop: 4 }} />;
+}
+
+const CARD: CSSProperties = { fontFamily: "var(--font-body)", color: "#16110d", lineHeight: 1.5, maxWidth: 560, width: "100%" };
+
+function bestLetter(flags: Record<string, boolean>, night: number): string {
+  for (const letter of ["A", "B", "C", "D", "F"]) if (flags[`night:${night}:grade:${letter}`]) return letter;
+  return "";
+}
+
+/** Days off, the night openers, the shifts, and the lot at dawn. Flags only. */
+export function NightRotation({ s, onNewWeek, onMenu }: { s: GameState; onNewWeek: () => void; onMenu: () => void }) {
+  const next = Math.min(4, nightsDone(s.flags) + 1);
+  const [phase, setPhase] = useState<"off" | "opener" | "shift" | "dawn">(() => {
+    if (s.flags["rot:dawn"]) return "dawn";
+    if (!s.flags["rot:reported"]) return "off";
+    return "opener";
+  });
+  const weekLine = s.ended === "a" ? "The week held. You still wake at the wrong hour." : s.hides >= 3 ? "You keep replaying the things you did not say." : "The plant is someone else's problem until midnight.";
+  const grades = [1, 2, 3, 4].map((k) => bestLetter(s.flags, k)).filter(Boolean);
+  const avg = grades.length ? grades.reduce((sum, letter) => sum + { A: 4, B: 3, C: 2, D: 1, F: 0 }[letter as "A"], 0) / grades.length : 2;
+  const dawnLine = avg >= 3.2 ? "The lot is pale. Elena nods once and keeps walking." : avg >= 2 ? "Dawn on the lot. The log is what it is." : "The lot is empty. A night like that has to be stood again.";
+  const last = (bestLetter(s.flags, 4) || "C") as "A";
+  if (phase === "shift") {
+    return (
+      <NightShift
+        s={s}
+        nightNo={next}
+        onLeave={() => {
+          if (s.flags["night:4:done"]) {
+            s.flags["rot:dawn"] = true;
+            setPhase("dawn");
+          } else setPhase("opener");
+        }}
+      />
+    );
+  }
+  return (
+    <div className="absolute inset-0 z-40 flex items-end justify-center overflow-y-auto overflow-x-hidden bg-bg/55 p-3 pb-28 sm:items-center sm:p-6">
+      {phase === "off" ? (
+        <div className="paper mx-auto w-full p-4 sm:p-5" style={CARD} data-testid="days-off">
+          <p className="font-mono text-[10px] tracking-widest text-[#6a4a32]">Days off</p>
+          <h2 className="font-display mt-2 text-3xl">Three days off</h2>
+          <p className="mt-3 text-sm leading-relaxed">Three days off. You sleep wrong for two of them.</p>
+          <p className="mt-2 text-sm leading-relaxed">{weekLine}</p>
+          <p className="mt-3 text-[11px] text-[#6a4a32]">Fatigue rules: no more than 16 hours on in any 24, and at least 34 hours off in any 9 days.</p>
+          <button
+            type="button"
+            className="paper-btn-primary mt-5 w-full"
+            style={{ minHeight: 44 }}
+            data-testid="report-nights"
+            onClick={() => {
+              s.flags["rot:reported"] = true;
+              setPhase("opener");
+            }}
+          >
+            Report for nights
+          </button>
+        </div>
+      ) : null}
+      {phase === "opener" ? (
+        <div className="paper mx-auto w-full p-4 sm:p-5" style={CARD} data-testid="night-opener">
+          <p className="font-mono text-[10px] tracking-widest text-[#6a4a32]">Night {next}</p>
+          <h2 className="font-display mt-2 text-3xl">18:00 turnover</h2>
+          <p className="mt-3 text-sm leading-relaxed">18:00 turnover. Quiet board. At midnight the watch desk is yours.</p>
+          <button type="button" className="paper-btn-primary mt-5 w-full" style={{ minHeight: 44 }} data-testid="start-night" onClick={() => setPhase("shift")}>
+            Take the watch
+          </button>
+        </div>
+      ) : null}
+      {phase === "dawn" ? (
+        <div className="paper mx-auto w-full p-4 sm:p-5" style={CARD} data-testid="dawn-lot">
+          <p className="font-mono text-[10px] tracking-widest text-[#6a4a32]">Dawn · Lot</p>
+          <h2 className="font-display mt-2 text-3xl">The lot at dawn</h2>
+          <p className="mt-3 text-sm leading-relaxed">{dawnLine}</p>
+          <p className="mt-2 text-sm leading-relaxed">Elena: {elenaLine(last, !!s.flags["log:curt"] || s.residue.log === "hid")}</p>
+          <div className="mt-5 flex flex-col gap-2">
+            <button type="button" className="paper-btn-primary" style={{ minHeight: 44 }} data-testid="dawn-new-week" onClick={onNewWeek}>
+              New week
+            </button>
+            <button type="button" className="paper-btn" style={{ minHeight: 44 }} onClick={onMenu}>
+              Menu
+            </button>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }

@@ -819,6 +819,16 @@ const S: Record<string, Scene> = {
         pumpSet(g, 410, H - 6, 0.55, !v.has("pumpStopped"), t);
       }
       if (v.has("pumpStopped")) beacon(g, 410, 120, t);
+      if (v.has("missingTag")) {
+        // The yellow clearance tag is not on feed pump B. The empty hook is the mark.
+        g.fillStyle = "#1a1a18";
+        g.fillRect(392, 150, 44, 22);
+        g.strokeStyle = "#e8c21a";
+        g.lineWidth = 2;
+        g.strokeRect(392, 150, 44, 22);
+        g.fillStyle = "#e8c21a";
+        g.fillRect(410, 142, 3, 10);
+      }
     },
   },
   corridor: {
@@ -1462,7 +1472,7 @@ export function resetFrameCaches() {
  * The static picture (photo or code base, state crops, plus the colour grade) is cached. A frame draws
  * that, then the live layer, then grain, the rolling bar and one cached scanline-and-vignette overlay.
  */
-export function paintCamera(g: G, scene: string, visuals: string[], t: number, opts: { switching?: number; tripped?: boolean } = {}) {
+export function paintCamera(g: G, scene: string, visuals: string[], t: number, opts: { switching?: number; tripped?: boolean; fatigue?: number; calm?: boolean } = {}) {
   const sc = S[scene] ?? S.corridor;
   const name = S[scene] ? scene : "corridor";
   const v = parseVis(visuals);
@@ -1503,8 +1513,9 @@ export function paintCamera(g: G, scene: string, visuals: string[], t: number, o
       g.fillRect(hash(k, tick + 1) * W, hash(tick + 2, k) * H, 1, 1);
     }
   }
+  const motion = opts.calm ? 0.3 : 1;
   const bar = ((t * 22) % (H + 60)) - 30;
-  g.fillStyle = lin(g, 0, bar - 20, 0, bar + 20, [[0, "rgba(255,255,255,0)"], [0.5, "rgba(255,255,255,0.035)"], [1, "rgba(255,255,255,0)"]]);
+  g.fillStyle = lin(g, 0, bar - 20, 0, bar + 20, [[0, "rgba(255,255,255,0)"], [0.5, `rgba(255,255,255,${0.035 * motion})`], [1, "rgba(255,255,255,0)"]]);
   g.fillRect(0, bar - 20, W, 40);
   const shade = lensOverlay();
   if (shade) g.drawImage(shade as CanvasImageSource, 0, 0, W, H);
@@ -1514,9 +1525,15 @@ export function paintCamera(g: G, scene: string, visuals: string[], t: number, o
     g.fillStyle = rad(g, W / 2, H / 2, W * 0.62, [[0.55, "rgba(0,0,0,0)"], [1, "rgba(0,0,0,0.75)"]]);
     g.fillRect(0, 0, W, H);
   }
+  if (!opts.calm && opts.fatigue && opts.fatigue > 0) {
+    g.globalAlpha = 0.15 * Math.min(1, opts.fatigue);
+    g.fillStyle = "#8a8a8a";
+    g.fillRect(0, 0, W, H);
+    g.globalAlpha = 1;
+  }
   if (opts.switching && opts.switching > 0) {
-    // Feed change: torn bands and snow.
-    const s = opts.switching;
+    // Feed change: torn bands and snow. Reduced motion keeps a third of it.
+    const s = opts.switching * (opts.calm ? 0.3 : 1);
     for (let k = 0; k < 10; k++) {
       const y = hash(k, Math.floor(t * 30)) * H;
       const c = hash(k, 3) > 0.5 ? 230 : 20;
