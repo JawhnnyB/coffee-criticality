@@ -1,0 +1,6 @@
+<!doctype html><body><canvas id=c width=960 height=540></canvas><script src="cam.js"></script><script>
+window.bench=async(scene,vis,n)=>{const g=document.getElementById('c').getContext('2d');g.setTransform(2,0,0,2,0,0);
+for(let i=0;i<10;i++)CAM.paintCamera(g,scene,vis,i/30,{});g.getImageData(0,0,1,1);
+const t0=performance.now();for(let i=0;i<n;i++){CAM.paintCamera(g,scene,vis,i/30,{});}g.getImageData(0,0,1,1);return (performance.now()-t0)/n;};
+CAM.loadPlates().then(()=>document.body.dataset.done=1);
+</script>
