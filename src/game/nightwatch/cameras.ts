@@ -729,14 +729,20 @@ const S: Record<string, Scene> = {
         }
       }
       if (v.has("shadow")) {
-        // A figure in the shield window. A pale rim, because darkening the photo's glass alone stays under the sensor noise.
-        g.fillStyle = "rgba(8,5,2,0.9)";
-        g.fillRect(214, 108, 28, 84);
-        g.fillRect(200, 92, 56, 30);
-        g.strokeStyle = "rgba(255,214,140,0.95)";
-        g.lineWidth = 3;
-        g.strokeRect(214, 108, 28, 84);
-        g.strokeRect(200, 92, 56, 30);
+        // Soft figure in the bright part of the glass. Multiply darkens about 30%, feathered 6px. No rim.
+        const x = 228 + Math.sin((t * Math.PI) / 2);
+        g.save();
+        g.globalCompositeOperation = "multiply";
+        g.shadowColor = "rgb(210,210,210)";
+        g.shadowBlur = 6;
+        g.shadowOffsetX = 0;
+        g.shadowOffsetY = 0;
+        g.fillStyle = "rgb(178,178,178)";
+        g.beginPath();
+        g.ellipse(x, 98, 8, 10, 0, 0, Math.PI * 2);
+        g.ellipse(x, 126, 13, 24, 0, 0, Math.PI * 2);
+        g.fill();
+        g.restore();
       }
     },
   },

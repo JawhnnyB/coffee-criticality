@@ -67,7 +67,7 @@ The same scene and visual draws the same frame on every site, so those rows shar
 | pebble | intake | intake | debris | event | 64294 | 11653 | 12.40 | pass | n/a |
 | pebble | intake | intake | gull | oddity | 3169 | 3168 | 0.61 | n/a | pass |
 | msr | core | cell | heaterDark | event | 46887 | 312 | 9.04 | pass | n/a |
-| msr | core | cell | shadow | oddity | 16293 | 16468 | 3.14 | n/a | FAIL >2.0% |
+| msr | core | cell | shadow | oddity | 839 | 4233 | 0.16 | n/a | pass; plate < half of code |
 | msr | pzr | freeze | frostGone | event | 46037 | 27320 | 8.88 | pass | n/a |
 | msr | steamline | offgas | beacon | event | 16445 | 15486 | 3.17 | pass | n/a |
 | msr | turbine | turbine | pumpStopped | event | 19612 | 18543 | 3.78 | pass | n/a |
@@ -88,4 +88,4 @@ The same scene and visual draws the same frame on every site, so those rows shar
 
 Page errors: 0.
 Every event clears 0.4%.
-15 oddities outside 0.12%–2.0%.
+14 oddities outside 0.12%–2.0%.
