@@ -1012,6 +1012,27 @@ const WALK: Record<string, { y: number; s: number }> = {
   cell: { y: 236, s: 0 },
 };
 
+function layers(g: G, scene: string, sc: Scene, v: Vis, t: number) {
+  sc.live(g, t, v);
+  // The rover walks through (the shielding window has nobody behind it).
+  const rv = v.at("rover");
+  const walk = WALK[scene];
+  if (rv !== null && walk && walk.s > 0) rover(g, rv, t, walk.y, walk.s);
+  oddities(g, t, v, GENERIC);
+}
+
+/**
+ * The scene without the camera pass: what the lens sees before grain, grade and vignette. Used to export
+ * reference plates (base only with no visuals, or with every layer) for art made to fit the same layout.
+ */
+export function paintReference(g: G, scene: string, visuals: string[], t: number, withLayers = true) {
+  const sc = S[scene] ?? S.corridor;
+  g.save();
+  sc.base(g);
+  if (withLayers) layers(g, scene, sc, parseVis(visuals), t);
+  g.restore();
+}
+
 /**
  * Draw one camera frame. visuals: the model's layers for this camera. switching: 0..1 static while changing
  * feed. After a reactor trip the plant goes to emergency lighting: darker, with a slow red cast.
@@ -1025,12 +1046,7 @@ export function paintCamera(g: G, scene: string, visuals: string[], t: number, o
   const base = baseFor(scene, sc);
   if (base) g.drawImage(base as CanvasImageSource, 0, 0);
   else sc.base(g);
-  sc.live(g, t, v);
-  // The rover walks through (the shielding window has nobody behind it).
-  const rv = v.at("rover");
-  const walk = WALK[scene];
-  if (rv !== null && walk && walk.s > 0) rover(g, rv, t, walk.y, walk.s);
-  oddities(g, t, v, GENERIC);
+  layers(g, scene, sc, v, t);
   if (opts.tripped) {
     g.fillStyle = "rgba(0,0,0,0.5)";
     g.fillRect(0, 0, W, H);
