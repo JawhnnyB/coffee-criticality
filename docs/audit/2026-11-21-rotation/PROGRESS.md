@@ -7,7 +7,7 @@ Branch made by Claude: `g/nw-plates` + `c/crew-outage-1118` merged. Full suite a
 
 ## Part A
 
-- A1 todo · Split the visibility rule in `scripts/nw-visible.mjs`
+- A1 done · Visibility rule split. Events fail under 0.4%. Oddities fail under 0.12% and over 2.0%. Table is `visible.md` with Event rule and Oddity rule columns. Every event clears 0.4%. Fifteen oddity rows are over 2% (flicker, fog, hard hat, warm glow, shadow). Those drawings are later items, not this rule.
 - A2 todo · Salt-cell `shadow` (oddity)
 - A3 todo · Tunnel `condensate` (event)
 - A4 todo · Puddles
