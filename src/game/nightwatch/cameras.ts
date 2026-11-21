@@ -561,8 +561,9 @@ const S: Record<string, Scene> = {
     live(g, t, v) {
       // The monitor's display: green normal, red with the reading high.
       const hi = v.has("beacon");
+      // Status strip sits in the lower margin of the rad-monitor board, not under it.
       g.fillStyle = hi ? `rgba(230,40,30,${0.6 + 0.4 * Math.sin(t * 6)})` : "rgba(60,200,90,0.85)";
-      g.fillRect(372, 102, 46, 8);
+      g.fillRect(364, 96, 64, 4);
       if (hi) beacon(g, 440, 40, t);
     },
   },
@@ -701,9 +702,10 @@ const S: Record<string, Scene> = {
     },
     live(g, t, v) {
       const jam = v.has("jam");
+      // Dark screen on the wall panel, measured on the plate: (87, 124, 19, 14).
       g.fillStyle = jam ? `rgba(230,40,30,${0.6 + 0.4 * Math.sin(t * 6)})` : "rgba(60,200,90,0.85)";
-      g.fillRect(100, 150, 50, 8);
-      if (jam) beacon(g, 125, 104, t);
+      g.fillRect(89, 128, 15, 6);
+      if (jam) beacon(g, 91, 108, t);
     },
   },
   cell: {
