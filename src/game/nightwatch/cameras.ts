@@ -861,25 +861,33 @@ const S: Record<string, Scene> = {
       // Racks on the bottom, glowing Cherenkov blue. A photo already has its own cells:
       // the code glow is placed on those cells, and the flat rectangles stay off.
       if (!usingPlate) {
+        let col = 0;
         for (let x = 40; x < W - 40; x += 22) {
           g.fillStyle = "#0b1822";
           g.fillRect(x, 196, 18, 60);
-          g.globalCompositeOperation = "lighter";
-          g.fillStyle = rad(g, x + 9, 226, 26, [[0, `rgba(80,160,255,${0.55 + 0.1 * Math.sin(t * 1.1 + x)})`], [1, "rgba(0,0,0,0)"]]);
-          g.fillRect(x - 20, 190, 58, 70);
-          g.globalCompositeOperation = "source-over";
+          // Some cells are empty. Light rises out of the others, brighter at the bottom. No discs.
+          if (col % 5 !== 2) {
+            const a = 0.45 + 0.12 * Math.sin(t * 1.1 + x);
+            g.globalCompositeOperation = "lighter";
+            g.fillStyle = lin(g, 0, 250, 0, 200, [[0, `rgba(150,210,255,${a})`], [0.45, `rgba(60,130,220,${a * 0.35})`], [1, "rgba(0,0,0,0)"]]);
+            g.fillRect(x + 1, 200, 16, 50);
+            g.globalCompositeOperation = "source-over";
+          }
+          col++;
         }
       } else {
-        const dot = cherenkovDot();
-        g.globalCompositeOperation = "lighter";
-        if (dot) {
-          for (const [x, y] of PLATES.pool.glow ?? []) {
-            g.globalAlpha = 0.5 + 0.12 * Math.sin(t * 1.1 + x);
-            g.drawImage(dot as CanvasImageSource, x - 16, y - 16, 32, 32);
-          }
+        const strip = cherenkovStrip();
+        const cells = PLATES.pool.glow ?? [];
+        if (strip) {
+          g.globalCompositeOperation = "lighter";
+          cells.forEach(([x, y], i) => {
+            if (i % 5 === 2) return;
+            g.globalAlpha = 0.35 + 0.2 * Math.sin(t * 1.1 + i);
+            g.drawImage(strip as CanvasImageSource, x - 6, y - 36, 12, 48);
+          });
           g.globalAlpha = 1;
+          g.globalCompositeOperation = "source-over";
         }
-        g.globalCompositeOperation = "source-over";
       }
       // Caustics on the surface.
       for (let k = 0; k < 26; k++) {
@@ -1126,23 +1134,25 @@ function parseVis(visuals: string[]): Vis {
   };
 }
 
-/** One Cherenkov blob, reused. Building a radial gradient per cell per frame was the pool's frame cost. */
+/** One vertical Cherenkov strip, brighter at the bottom. Reused so the pool does not build a gradient per cell. */
 let cherenkov: Surface | null | undefined;
-function cherenkovDot(): Surface | null {
+function cherenkovStrip(): Surface | null {
   if (cherenkov !== undefined) return cherenkov;
-  const s = 64;
+  const w = 16;
+  const h = 64;
   try {
-    const c: Surface | null = typeof OffscreenCanvas !== "undefined" ? new OffscreenCanvas(s, s) : null;
+    const c: Surface | null = typeof OffscreenCanvas !== "undefined" ? new OffscreenCanvas(w, h) : null;
     const g = c?.getContext("2d") as G | null | undefined;
     if (!c || !g) {
       cherenkov = null;
       return null;
     }
-    const gr = g.createRadialGradient(s / 2, s / 2, 0, s / 2, s / 2, s / 2);
-    gr.addColorStop(0, "rgba(80,160,255,1)");
-    gr.addColorStop(1, "rgba(80,160,255,0)");
+    const gr = g.createLinearGradient(0, h, 0, 0);
+    gr.addColorStop(0, "rgba(160,220,255,1)");
+    gr.addColorStop(0.45, "rgba(70,140,230,0.45)");
+    gr.addColorStop(1, "rgba(40,80,160,0)");
     g.fillStyle = gr;
-    g.fillRect(0, 0, s, s);
+    g.fillRect(0, 0, w, h);
     cherenkov = c;
     return c;
   } catch {
