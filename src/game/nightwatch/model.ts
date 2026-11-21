@@ -360,8 +360,49 @@ export interface Night {
   falseReports: number;
   findings: number;
   log: string[];
+  /** The night rover's rounds: who is on which camera, when. Not anomalies: reporting one is a false report. */
+  rounds: Round[];
   /** "trip" or "relieved" ends early; "dawn" is a survived night. */
   over: null | { why: "dawn" | "trip" | "relieved"; at: number; cause?: string };
+}
+
+export interface Round {
+  camera: string;
+  start: number;
+  end: number;
+}
+
+/** The rover walks the plant twice a night, along the same route, a camera at a time. */
+const ROUTE = ["turbine", "aux", "pool", "core", "pzr", "steamline", "intake", "yard"];
+export const ROVER = "Jordan";
+/** Elena's van: headlights on the yard camera before six. */
+export const VAN_AT = 345;
+
+export function roundsFor(r: () => number): Round[] {
+  const out: Round[] = [];
+  for (const start of [60 + Math.round(r() * 20), 210 + Math.round(r() * 20)]) {
+    let t = start;
+    for (const camera of ROUTE) {
+      const dur = 6 + Math.round(r() * 4);
+      out.push({ camera, start: t, end: t + dur });
+      t += dur + 3;
+    }
+  }
+  return out;
+}
+
+/** Radio traffic so far, oldest first: the rover calling in each space, the van at the gate. */
+export function radio(n: Night): string[] {
+  const lines: string[] = ["00:00 Control, night watch on station."];
+  let last = -1;
+  for (const rd of n.rounds) {
+    if (rd.start > n.minute) break;
+    if (rd.start - last > 30) lines.push(`${clock(rd.start)} ${ROVER}: starting rounds.`);
+    lines.push(`${clock(rd.start)} ${ROVER}: ${cameraName(n, rd.camera).toLowerCase()}.`);
+    last = rd.start;
+  }
+  if (n.minute >= VAN_AT) lines.push(`${clock(VAN_AT)} Gate: day shift supervisor on site.`);
+  return lines;
 }
 
 /** Lay out the night: events and oddities, spread so nothing starts in the first 15 or last 30 minutes. */
@@ -395,6 +436,7 @@ export function newNight(site: SiteKind, night: number, seed = night * 7919 + si
     camera: watch.cameras[0].id,
     events,
     oddities,
+    rounds: roundsFor(rng(seed * 31 + 7)),
     falseReports: 0,
     findings: 0,
     log: [],
@@ -455,6 +497,9 @@ export function visualsOn(n: Night, camera: string): string[] {
   }
   const o = oddityOn(n, camera);
   if (o) v.push(o.def.visual);
+  const rd = n.rounds.find((x) => x.camera === camera && n.minute >= x.start && n.minute < x.end);
+  if (rd) v.push(`rover:${((n.minute - rd.start) / (rd.end - rd.start)).toFixed(3)}`);
+  if (camera === "yard" && n.minute >= VAN_AT) v.push(`van:${Math.min(1, (n.minute - VAN_AT) / 12).toFixed(3)}`);
   return v;
 }
 

@@ -154,7 +154,6 @@ writeFileSync(
   [
     `export * from ${JSON.stringify(join(root, "src/game/nightwatch/cameras.ts"))};`,
     `export * from ${JSON.stringify(join(root, "src/game/nightwatch/monitor.ts"))};`,
-    `export { PAL } from ${JSON.stringify(join(root, "src/game/palette.ts"))};`,
   ].join("\n"),
 );
 const out2 = join(dir2, "c.mjs");
@@ -162,33 +161,106 @@ const built2 = spawnSync(process.env.ESBUILD ?? "npx", [...(process.env.ESBUILD 
 if (built2.status !== 0) throw new Error(built2.stderr || built2.stdout);
 const C = await import(out2);
 
-/** A stand-in 2D context that records every rectangle and its colour. */
+/**
+ * A stand-in 2D context that records every call and every property it is given. The camera feeds are drawn
+ * with gradients, paths and compositing (the owner's realism exception), so the record is the whole call log.
+ */
 function recorder() {
   const ops = [];
-  const g = { fillStyle: "", globalAlpha: 1, fillRect(x, y, w, h) { ops.push(`${this.fillStyle}@${this.globalAlpha.toFixed(2)}:${x},${y},${w},${h}`); } };
+  const props = { globalAlpha: 1, globalCompositeOperation: "source-over", fillStyle: "", strokeStyle: "", lineWidth: 1, font: "", textAlign: "start", textBaseline: "alphabetic" };
+  let grads = 0;
+  const g = new Proxy(props, {
+    get(target, key) {
+      if (key in target) return target[key];
+      if (key === "createLinearGradient" || key === "createRadialGradient")
+        return (...args) => {
+          const id = `grad${grads++}`;
+          ops.push(`${String(key)}(${args.map((x) => Math.round(x)).join(",")})`);
+          return { id, toString: () => id, addColorStop: (o, c) => ops.push(`${id}.stop(${o},${c})`) };
+        };
+      return (...args) => ops.push(`${String(key)}(${args.map((x) => (typeof x === "number" ? Math.round(x * 10) / 10 : String(x))).join(",")})`);
+    },
+    set(target, key, value) {
+      target[key] = value;
+      ops.push(`${String(key)}=${typeof value === "object" ? value.id : value}`);
+      return true;
+    },
+  });
   return { g, ops };
 }
 
-test("every event's visual changes its camera's picture; scenes use the palette; Cherenkov blue only in the fuel pool", () => {
-  const palette = new Set(Object.values(C.PAL).map((v) => String(v).toLowerCase()));
-  const cherenkov = new Set([C.PAL.cherenkovD, C.PAL.cherenkov, C.PAL.cherenkovL].map((v) => v.toLowerCase()));
+test("every event's, oddity's and visitor's visual changes its camera's picture", () => {
   for (const site of SITES) {
     const w = W.siteWatch(site);
     for (const cam of w.cameras) {
       const base = recorder();
       C.paintCamera(base.g, cam.scene, [], 3.21);
-      for (const op of base.ops) {
-        const col = op.split("@")[0].toLowerCase();
-        assert.ok(palette.has(col), `${cam.scene} paints ${col}, not in the palette`);
-        if (cherenkov.has(col)) assert.equal(cam.scene, "pool", `${cam.scene} uses a Cherenkov shade`);
-      }
-      for (const visual of new Set([...w.events.filter((e) => e.camera === cam.id).map((e) => e.visual), ...w.oddities.filter((o) => o.camera === cam.id).map((o) => o.visual)])) {
-        const with_ = recorder();
-        C.paintCamera(with_.g, cam.scene, [visual], 3.21);
-        assert.notDeepEqual(with_.ops, base.ops, `${site} ${cam.id}: "${visual}" draws nothing`);
+      assert.ok(base.ops.length > 200, `${cam.scene} draws a real picture`);
+      const layers = new Set([...w.events.filter((e) => e.camera === cam.id).map((e) => e.visual), ...w.oddities.filter((o) => o.camera === cam.id).map((o) => o.visual)]);
+      if (cam.scene !== "cell") layers.add("rover:0.5");
+      if (cam.id === "yard") layers.add("van:0.5");
+      for (const visual of layers) {
+        // Some layers flicker: the layer must show in at least one of a few frames.
+        const shows = [3.21, 0.4, 1.7, 2.9, 5.05, 7.3].some((t) => {
+          const b = recorder();
+          C.paintCamera(b.g, cam.scene, [], t);
+          const with_ = recorder();
+          C.paintCamera(with_.g, cam.scene, [visual], t);
+          return JSON.stringify(with_.ops) !== JSON.stringify(b.ops);
+        });
+        assert.ok(shows, `${site} ${cam.id}: "${visual}" draws nothing`);
       }
     }
   }
+});
+
+test("camera feeds: Cherenkov blue only in the fuel pool, infrared in the dark spaces, static while switching, red after a trip", () => {
+  for (const scene of C.SCENE_NAMES) {
+    const r = recorder();
+    C.paintCamera(r.g, scene, [], 1.5);
+    const blue = r.ops.some((op) => op.includes("rgba(80,160,255"));
+    assert.equal(blue, scene === "pool", `${scene}: Cherenkov glow`);
+  }
+  assert.equal(C.lookOf("tunnel"), "ir", "dark spaces: infrared");
+  assert.equal(C.lookOf("containment"), "fluor", "lit plant spaces: colour");
+  assert.equal(C.lookOf("corridor"), "sodium");
+  assert.equal(C.lookOf("pool"), "pool");
+  const calm = recorder();
+  C.paintCamera(calm.g, "turbine", [], 2);
+  const sw = recorder();
+  C.paintCamera(sw.g, "turbine", [], 2, { switching: 1 });
+  assert.ok(sw.ops.length > calm.ops.length, "switching adds static");
+  const trip = recorder();
+  C.paintCamera(trip.g, "turbine", [], 2, { tripped: true });
+  assert.ok(trip.ops.some((op) => op.startsWith("fillStyle=rgba(200,20,10")), "emergency lighting after a trip");
+  const odd = recorder();
+  assert.doesNotThrow(() => C.paintCamera(odd.g, "no-such-room", [], 0));
+});
+
+test("the rover walks two rounds a night, calls them in, and is not an anomaly; the day supervisor arrives before six", () => {
+  const n = W.newNight("pwr", 1);
+  assert.ok(n.rounds.length >= 10, "two passes along the route");
+  for (const rd of n.rounds) {
+    assert.ok(n.watch.cameras.some((c) => c.id === rd.camera), `${rd.camera} is a camera`);
+    assert.ok(rd.end > rd.start);
+  }
+  for (let k = 1; k < n.rounds.length; k++) assert.ok(n.rounds[k].start >= n.rounds[k - 1].end, "one place at a time");
+  assert.deepEqual(W.newNight("pwr", 1).rounds, n.rounds, "replayable");
+  assert.deepEqual(W.radio(n), ["00:00 Control, night watch on station."]);
+  n.events = [];
+  n.oddities = [];
+  const rd = n.rounds[0];
+  W.tick(n, rd.start + 1);
+  n.camera = rd.camera;
+  const v = W.visualsOn(n, rd.camera);
+  assert.ok(v.some((x) => x.startsWith("rover:")), "he is on camera");
+  assert.ok(W.radio(n).some((l) => l.includes(`${W.ROVER}: starting rounds`)));
+  const before = n.falseReports;
+  W.report(n, "foreign");
+  assert.equal(n.falseReports, before + 1, "reporting the rover is a false report");
+  W.tick(n, W.VAN_AT - n.minute + 6);
+  assert.ok(W.visualsOn(n, "yard").some((x) => x.startsWith("van:")), "headlights on the yard camera");
+  assert.match(W.radio(n).at(-1), /day shift supervisor/);
 });
 
 test("the passive monitor alarms on a trip and on high ΔT, never on plain low power", () => {

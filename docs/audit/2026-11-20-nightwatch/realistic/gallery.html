@@ -1,0 +1,7 @@
+<!doctype html><body style="background:#111;margin:0;display:grid;grid-template-columns:repeat(3,480px);gap:4px;color:#ccc;font:11px monospace">
+<script src="cam.js"></script><script>
+const V={containment:["puddle","rover:0.45"],pressurizer:["steamWisp"],msiv:["beacon"],drywell:["puddle"],torus:["steamWisp"],tunnel:["beacon","condensate"],cavity:["warmGlow"],blower:["shake","steamWisp"],discharge:["jam"],cell:["heaterDark","shadow"],freeze:["frostGone"],offgas:["beacon"],turbine:["pumpStopped","rover:0.6"],corridor:["doorAjar","chair","rover:0.35"],pool:["poolLow","toolBag"],yard:["arc","van:0.6"],intake:["debris","gull"]};
+const t=+(new URLSearchParams(location.search).get("t")||0.25);
+for(const s of CAM.SCENE_NAMES){for(const vis of [[],V[s]||[]]){const d=document.createElement("div");const c=document.createElement("canvas");c.width=480;c.height=270;d.append(c,document.createTextNode(s+" "+vis.join(",")));document.body.append(d);CAM.paintCamera(c.getContext("2d"),s,vis,t,{});}}
+document.body.dataset.done=1;
+</script>

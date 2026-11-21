@@ -9,7 +9,8 @@ import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 
 import { PAL } from "./palette";
 import { bumpTrust, pushMsg, type GameState } from "./sim";
 import { siteKind } from "./plantLoops";
-import { CAM_H, CAM_W, paintCamera } from "./nightwatch/cameras";
+import { CAM_H, CAM_W, lookOf, paintCamera } from "./nightwatch/cameras";
+import { startAmbience, stopAmbience } from "./nightwatch/ambience";
 import {
   CATEGORY_LABEL,
   COFFEE,
@@ -19,6 +20,7 @@ import {
   brew,
   clock,
   newNight,
+  radio,
   readings,
   report,
   score,
@@ -103,6 +105,10 @@ function NightShift({ s, nightNo, onLeave }: { s: GameState; nightNo: number; on
   const [reporting, setReporting] = useState(false);
   const [toast, setToast] = useState<string>("");
   const [switching, setSwitching] = useState(0);
+  useEffect(() => {
+    startAmbience();
+    return () => stopAmbience();
+  }, []);
   const canvas = useRef<HTMLCanvasElement | null>(null);
   const rewarded = useRef(false);
 
@@ -114,7 +120,10 @@ function NightShift({ s, nightNo, onLeave }: { s: GameState; nightNo: number; on
 
   const pickCamera = (id: string) => {
     if (!n.tablet) setTablet(n, true);
-    if (n.camera !== id) setSwitching(1);
+    if (n.camera !== id) {
+      setSwitching(1);
+      startAmbience()?.static();
+    }
     n.camera = id;
     setReporting(false);
     rerender();
@@ -207,6 +216,9 @@ function NightShift({ s, nightNo, onLeave }: { s: GameState; nightNo: number; on
     n.events.filter((e) => e.caughtAt === null && n.minute >= e.start && Object.keys(e.def.effect).some((id) => lit.has(id))).map((e) => e.def.camera),
   );
   const anyAlarm = lit.size > 0 || tripped;
+  useEffect(() => {
+    startAmbience()?.setTension(tripped ? 1 : Math.min(1, lit.size / 3));
+  }, [lit.size, tripped]);
   const cam = n.watch.cameras.find((c) => c.id === n.camera)!;
 
   return (
@@ -285,12 +297,18 @@ function NightShift({ s, nightNo, onLeave }: { s: GameState; nightNo: number; on
               width={CAM_W}
               height={CAM_H}
               data-testid="nw-canvas"
-              style={{ width: "100%", height: "100%", imageRendering: "pixelated", display: n.tablet ? "block" : "none" }}
+              style={{ width: "100%", height: "100%", imageRendering: "auto", display: n.tablet ? "block" : "none" }}
             />
             {n.tablet ? (
-              <div style={{ position: "absolute", left: 8, top: 6, fontSize: 11, color: PAL.cream, textShadow: `1px 1px 0 ${PAL.ink}` }}>
-                ● REC CAM {n.watch.cameras.indexOf(cam) + 1} · {cam.name.toUpperCase()} · {clock(n.minute)}
-              </div>
+              <>
+                <div style={{ ...MONO, position: "absolute", left: 10, top: 8, fontSize: 11, letterSpacing: 1, color: "#e8e8e0", textShadow: "0 0 2px #000, 1px 1px 0 #000" }}>
+                  <span style={{ color: "#ff3b30" }}>●</span> REC CAM{String(n.watch.cameras.indexOf(cam) + 1).padStart(2, "0")} {cam.name.toUpperCase()}
+                </div>
+                <div style={{ ...MONO, position: "absolute", right: 10, top: 8, fontSize: 11, letterSpacing: 1, color: "#e8e8e0", textShadow: "0 0 2px #000, 1px 1px 0 #000" }}>
+                  {lookOf(cam.scene) === "ir" ? "IR " : ""}
+                  {clock(n.minute)}:{String(Math.floor((n.minute % 1) * 60)).padStart(2, "0")}
+                </div>
+              </>
             ) : (
               <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", textAlign: "center", padding: 12, color: PAL.goldL }}>
                 {n.brewing > 0
@@ -317,6 +335,15 @@ function NightShift({ s, nightNo, onLeave }: { s: GameState; nightNo: number; on
               ))}
             </div>
           ) : null}
+          <div data-testid="nw-radio" style={{ ...MONO, marginTop: 6, fontSize: 11, lineHeight: 1.5, color: PAL.goldL, opacity: 0.9 }}>
+            {radio(n)
+              .slice(-3)
+              .map((line, k, all) => (
+                <div key={line} style={{ opacity: k === all.length - 1 ? 1 : 0.55 }}>
+                  📻 {line}
+                </div>
+              ))}
+          </div>
           {toast ? (
             <div data-testid="nw-toast" style={{ marginTop: 6, color: PAL.cream }}>
               {toast}
@@ -357,7 +384,7 @@ function NightShift({ s, nightNo, onLeave }: { s: GameState; nightNo: number; on
 
       {n.over ? <Summary n={n} nightNo={nightNo} onLeave={onLeave} /> : null}
       <div style={{ padding: "0 10px 10px", fontSize: 10, opacity: 0.7 }}>
-        {Math.max(0, Math.round(((NIGHT_MINUTES - n.minute) * SECONDS_PER_MINUTE) / 60))} min to six.
+        {Math.max(0, Math.round(((NIGHT_MINUTES - n.minute) * SECONDS_PER_MINUTE) / 60))} real min until 06:00.
       </div>
     </div>
   );
