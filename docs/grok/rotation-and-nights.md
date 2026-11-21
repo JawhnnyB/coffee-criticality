@@ -4,17 +4,33 @@
 
 **This is a build request to carry out, not a document to summarise.** Do not reply with a plan, a summary or questions. Run step 0 immediately, then work through the parts in order. The owner is not watching and will not answer questions.
 
-### Step 0 (run now)
+### Step 0 (run now; Claude already made the branch)
+
+Claude created **`g/rotation-nights`** for you: `g/nw-plates` with `c/crew-outage-1118` merged in, plus `docs/audit/2026-11-21-rotation/PROGRESS.md`. Do not merge or rebuild anything. Just:
 
 ```sh
-git fetch origin
-# If g/rotation-nights already exists, you are resuming: check it out and go to "Resuming" below.
-git checkout -b g/rotation-nights origin/g/nw-plates
-git merge --no-edit origin/c/crew-outage-1118   # clean merge, checked 21 November
-ESBUILD=$(command -v esbuild || echo node_modules/.bin/esbuild) node --test 'scripts/**/*.test.mjs' 2>&1 | tail -5   # expect the 9 baseline failures only
+git fetch origin g/rotation-nights          # small: you already have g/nw-plates
+git checkout -B g/rotation-nights origin/g/rotation-nights
+cat docs/audit/2026-11-21-rotation/PROGRESS.md
 ```
 
-Then create `docs/audit/2026-11-21-rotation/PROGRESS.md` with one line per part (A, B, C, D, E, F), each marked `todo`. Commit and push it straight away.
+Then start the first item marked `todo`.
+
+### The 25-second rule (why the last turns died)
+
+Each of your commands must finish in **under 25 seconds**. The repo is about 130 MB, and the full test suite takes about 2 minutes, so:
+
+- **Never run the full test suite in the foreground.** After each item, run only the Night Watch tests:
+  ```sh
+  ESBUILD=node_modules/.bin/esbuild node --test scripts/nightwatch*.test.mjs
+  ```
+  That takes about 2 seconds. Add the new test files you write.
+- **Anything long goes in the background with a log,** and you check the log in short reads:
+  - the full suite: `nohup sh -c "ESBUILD=node_modules/.bin/esbuild node --test 'scripts/**/*.test.mjs'" > /tmp/suite.log 2>&1 &`
+  - `npm run build`;
+  - every Playwright run.
+- **Never fetch or clone the whole repo again.** Fetch only `g/rotation-nights`.
+- **Read only what the current item needs.** Do not read the whole brief and all of the Night Watch code before your first commit. Read the part you are on, then the files that item touches.
 
 ### Checkpoints: commit and push after every part
 
@@ -22,7 +38,7 @@ The work is long, and your turn may end or time out at any point. Protect it:
 
 1. Do the parts **in order: A → B → C → D → E → F.** Each part is one checkpoint.
 2. At the end of each part:
-   - run the unit tests;
+   - start the full suite in the background and record its totals in `PROGRESS.md` when it finishes (the 9 baseline failures only);
    - mark the part `done` in `PROGRESS.md`, with one line on what changed and anything skipped;
    - commit as `Part X: <what>`;
    - `git push origin g/rotation-nights`.
@@ -31,8 +47,8 @@ The work is long, and your turn may end or time out at any point. Protect it:
 
 ### Resuming
 
-If the owner sends "continue", or you find `g/rotation-nights` already exists:
-1. Check it out.
+If the owner sends "continue":
+1. Run step 0 again (fetch and check out `g/rotation-nights`).
 2. Read `PROGRESS.md`.
 3. Start at the first part not marked `done`, at the first unchecked item.
 
