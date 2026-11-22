@@ -54,6 +54,7 @@ import { heartCount } from "./pixel";
 import { drawWorld, glyphWidth, paintGlyphs, preloadRoomArt } from "./render";
 import { DEFAULT_PLANT, plantTitle, thermalState, type PlantDesign } from "./plant";
 import { systemReducedMotion } from "./reducedMotion";
+import { frameChoice } from "./frameRate";
 import { hasSave, hydrateSave, peekSave, wipeSave, writeSave } from "./save";
 import { setNextNightSeed } from "./nightwatch/model";
 import { computeKeff } from "./nuclearLab";
@@ -611,7 +612,6 @@ export function GameApp() {
     let saveAcc = 0;
     let simAcc = 0;
     let pace: "full" | "half" = "full";
-    let fastSince: number | null = null;
     let lastWork = 0;
     let lastHold = 0;
     const gaps: { t: number; ms: number }[] = [];
@@ -619,12 +619,10 @@ export function GameApp() {
     let record: number[] | null = null;
     const STEP = 1 / 60;
     const HALF = 1000 / 30;
-    // Pictures stay on the display clock until a 2s run of them is later than 20 ms.
-    // A 4× CPU still presents every 16.7 ms. The hold on that run was 13 ms, and a
-    // 1× cafe frame about 2 ms, so the 20 ms gap never comes. Trip when the hold
-    // averages over 6 ms. Come back only after it stays under 4 ms.
-    const HOLD_SLOW = 6;
-    const HOLD_FAST = 4;
+    // Auto stays on the display clock. Drop to 30 only when a 2s run of pictures
+    // is later than 18 ms, or the thread hold averages over 14 ms. Come back
+    // after 2s under 10 ms. 60 and 30 in settings skip that and force a rate.
+    const choiceOf = () => frameChoice(stateRef.current.desktop);
     let holdOpen = false;
     let holdStart = 0;
     const holdBox = new MessageChannel();
@@ -635,18 +633,7 @@ export function GameApp() {
       const ms = t - holdStart;
       lastHold = ms;
       if (!(ms > 0 && ms < 80)) return;
-      if (pace === "half") {
-        if (ms < HOLD_FAST) {
-          if (fastSince == null) fastSince = t;
-          else if (t - fastSince >= 2000) {
-            pace = "full";
-            fastSince = null;
-            holds.length = 0;
-            gaps.length = 0;
-          }
-        } else fastSince = null;
-        return;
-      }
+      if (choiceOf() !== "auto") return;
       holds.push({ t, ms });
       const horizon = t - 2000;
       while (holds.length && holds[0].t < horizon) holds.shift();
@@ -655,9 +642,13 @@ export function GameApp() {
       if (span < 1900) return;
       let sum = 0;
       for (const h of holds) sum += h.ms;
-      if (sum / holds.length > HOLD_SLOW) {
+      const avg = sum / holds.length;
+      if (pace === "full" && avg > 14) {
         pace = "half";
-        fastSince = null;
+        holds.length = 0;
+        gaps.length = 0;
+      } else if (pace === "half" && avg < 10) {
+        pace = "full";
         holds.length = 0;
         gaps.length = 0;
       }
@@ -678,6 +669,7 @@ export function GameApp() {
       rate: () => pace,
       work: () => lastWork,
       hold: () => lastHold,
+      choice: () => choiceOf(),
       start: () => {
         record = [];
       },
@@ -692,9 +684,17 @@ export function GameApp() {
     };
     window.addEventListener("cc-plant-download", onPlantDl);
     const loop = (now: number) => {
-      // Full display rate until frames land later than 20 ms, or the thread hold
-      // says 60 pictures a second would sit over the shift budget. Then 30, with
-      // at least 31 ms between pictures so the gaps stay near 33 and do not jump to 50.
+      // Settings win. Auto drops only when pictures are late or the hold is over 14 ms.
+      const choice = choiceOf();
+      if (choice === "60" && pace !== "full") {
+        pace = "full";
+        holds.length = 0;
+        gaps.length = 0;
+      } else if (choice === "30" && pace !== "half") {
+        pace = "half";
+        holds.length = 0;
+        gaps.length = 0;
+      }
       if (pace === "half" && now - lastPaint < HALF - 2) {
         raf = requestAnimationFrame(loop);
         return;
@@ -705,14 +705,12 @@ export function GameApp() {
       if (gap > 0 && gap < 80) gaps.push({ t: now, ms: gap });
       const horizon = now - 2000;
       while (gaps.length && gaps[0].t < horizon) gaps.shift();
-      if (gaps.length > 1) {
+      if (choiceOf() === "auto" && pace === "full" && gaps.length > 1) {
         const span = gaps[gaps.length - 1].t - gaps[0].t;
         let sum = 0;
         for (const g of gaps) sum += g.ms;
-        const avg = sum / gaps.length;
-        if (pace === "full" && span >= 1900 && avg > 20) {
+        if (span >= 1900 && sum / gaps.length > 18) {
           pace = "half";
-          fastSince = null;
           holds.length = 0;
           gaps.length = 0;
         }
@@ -3341,6 +3339,7 @@ declare global {
       rate: () => string;
       work: () => number;
       hold: () => number;
+      choice: () => string;
       start: () => void;
       stop: () => number[];
     };

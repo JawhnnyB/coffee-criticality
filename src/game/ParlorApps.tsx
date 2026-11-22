@@ -14,8 +14,9 @@ import { NightWatchApp } from "./NightWatch";
 import { NewsApp } from "./NewsApp";
 import { ACADEMY } from "./content";
 import { NRC_ROWS, filterNrc } from "./nrcIndex";
-import type { DesktopSave, GameState, ResultsSave } from "./sim";
+import { frameChoice, framePatch } from "./frameRate";
 import type { PlantDesign } from "./plant";
+import type { DesktopSave, GameState, ResultsSave } from "./sim";
 import {
   ACCENTS,
   APPS,
@@ -478,6 +479,17 @@ function SettingsApp({ ctx }: { ctx: AppCtx }) {
       <Row label="Motion">
         <Chip on={d.reducedMotion} onClick={() => ctx.onPatch({ reducedMotion: !d.reducedMotion })} testId="reduced-motion">
           Reduced motion {d.reducedMotion ? "on" : "off"}
+        </Chip>
+      </Row>
+      <Row label="Frame rate" note="Auto follows the display. 60 stays on it. 30 is the slow picture.">
+        <Chip on={frameChoice(d) === "auto"} onClick={() => ctx.onPatch(framePatch("auto"))} testId="fps-auto">
+          Auto
+        </Chip>
+        <Chip on={frameChoice(d) === "60"} onClick={() => ctx.onPatch(framePatch("60"))} testId="fps-60">
+          60
+        </Chip>
+        <Chip on={frameChoice(d) === "30"} onClick={() => ctx.onPatch(framePatch("30"))} testId="fps-30">
+          30
         </Chip>
       </Row>
       <Row label="Reactor colours" note="Lightness and symbols, not hue alone.">

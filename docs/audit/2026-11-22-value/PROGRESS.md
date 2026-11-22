@@ -16,4 +16,6 @@ Brief: `docs/grok/value-100.md`. One step, one commit. Real-input proof in this 
 - Step 4b done · esbuild 0.28.2 is a pinned devDependency, the same line Vite asks for. The Vercel CLI fallback is gone. Suite: 308 pass, 0 fail, with no ESBUILD override. Proof in step-04b/.
 - Step 8b done · Week and four nights, R10 sweeper at 8×, seed 1. Desk A A A A. Phone A A A A. Dawn came up. No F. Proof in step-08b/.
 - Step 11 done · One desk week and four nights. Heap after a forced collection went from 6.0 MB to 7.5 MB (+1.5 MB). Limit was 50. Proof in step-11/.
+- Step 10c done · Auto stays at 60 unless pictures are late or the hold averages over 14 ms. 1× and 4× stayed at 16.67 ms. 6× stepped to a steady 33.33 ms. Settings can force Auto, 60, or 30, and the choice survived a reload. Proof in step-10c/.
+- Step 11b todo · Re-measure the week with renderer process memory, not only the JS heap.
 - Step 12 todo · Clean the console: zero warnings and errors in production.
