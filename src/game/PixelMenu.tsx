@@ -34,12 +34,14 @@ function useBox(ref: { current: HTMLElement | null }) {
 
 export function PixelMenu({
   saved,
+  saveNote,
   onBegin,
   onContinue,
   onHow,
   onCredits,
 }: {
   saved: boolean;
+  saveNote: string;
   onBegin: () => void;
   onContinue: () => void;
   onHow: () => void;
@@ -171,6 +173,11 @@ export function PixelMenu({
         <button type="button" data-testid="continue-shift" className="btn-ghost" disabled={!saved} onClick={() => activate(1)}>
           Continue
         </button>
+        {saveNote ? (
+          <p data-testid="save-note" style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-small)", color: "#f3e6d0", margin: 0 }}>
+            {saveNote}
+          </p>
+        ) : null}
         <button type="button" data-testid="menu-settings" className="btn-ghost" onClick={() => activate(2)}>
           Settings
         </button>

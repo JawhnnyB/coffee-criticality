@@ -227,6 +227,23 @@ function AuthChip() {
   );
 }
 
+/** What the menu says about the save on disk. Wall-clock time, then day or night. */
+function formatSaveNote(data: ReturnType<typeof peekSave>): string {
+  if (!data || !Number.isFinite(data.savedAt)) return "";
+  const d = new Date(data.savedAt);
+  const hh = String(d.getHours()).padStart(2, "0");
+  const mm = String(d.getMinutes()).padStart(2, "0");
+  const flags = data.flags ?? {};
+  let where = `Day ${data.day}`;
+  if (flags["rot:dawn"] || flags["rot:complete"]) where = "Dawn";
+  else if (flags["rot:nights"]) {
+    let n = 0;
+    while (flags[`night:${n + 1}:done`]) n += 1;
+    where = `Night ${Math.min(4, n + 1)}`;
+  }
+  return `Saved ${hh}:${mm}, ${where}`;
+}
+
 export function GameApp() {
   const wrapRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -1233,6 +1250,7 @@ export function GameApp() {
         {ART.menu && (mode === "menu" || (mode === "splash" && booted)) && (
           <PixelMenu
             saved={saved}
+            saveNote={formatSaveNote(saved ? peekSave() : null)}
             onBegin={() => {
               if (saved) {
                 setWipeNext("setup");
@@ -1290,6 +1308,7 @@ export function GameApp() {
             </p>
             <div className="mt-6 flex w-full max-w-xs flex-col gap-2">
               {saved ? (
+                <>
                 <button
                   type="button"
                   className={peekSave()?.ended ? "btn-ghost" : "btn-primary"}
@@ -1311,6 +1330,8 @@ export function GameApp() {
                 >
                   {peekSave()?.ended ? `Review week · Day ${peekSave()?.day ?? 1}` : `Continue · Day ${peekSave()?.day ?? 1}`}
                 </button>
+                <p className="text-sm text-muted" data-testid="save-note">{formatSaveNote(peekSave())}</p>
+                </>
               ) : null}
               <button
                 type="button"
