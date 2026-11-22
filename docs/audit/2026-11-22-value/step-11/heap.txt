@@ -1,0 +1,23 @@
+JS heap after a forced collection. One desk week, seed 1, R10 sweeper at 8×.
+Samples are JSHeapUsedSize.
+
+arrive 6.0 MB
+day 1 morning 6.0 MB
+day 1 eod 6.0 MB
+day 2 morning 6.1 MB
+day 2 eod 6.1 MB
+day 3 morning 6.2 MB
+day 3 eod 6.2 MB
+day 4 morning 6.2 MB
+day 4 eod 6.2 MB
+day 5 morning 6.3 MB
+day 5 eod 6.3 MB
+dusk 6.3 MB
+night 1 7.4 MB
+night 2 7.6 MB
+night 3 7.5 MB
+night 4 7.5 MB
+after nights 7.5 MB
+
+arrive 6.0 MB → after nights 7.5 MB (+1.5 MB). Limit is 50 MB.
+Dawn lot is up. Nights were A, A, A, A.

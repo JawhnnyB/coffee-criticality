@@ -269,6 +269,24 @@ async function runSize(name, contextOptions) {
   page.on("response", (r) => {
     if (r.status() >= 400) missing.push(`${r.status()} ${r.url()}`);
   });
+  const heapSamples = [];
+  let cdp = null;
+  const heapOf = async (label) => {
+    if (!process.env.HEAP) return;
+    if (!cdp) {
+      cdp = await context.newCDPSession(page);
+      await cdp.send("HeapProfiler.enable");
+      await cdp.send("Performance.enable");
+    }
+    await cdp.send("HeapProfiler.collectGarbage");
+    const metrics = await cdp.send("Performance.getMetrics");
+    const bytes = metrics.metrics.find((m) => m.name === "JSHeapUsedSize")?.value ?? 0;
+    const mb = bytes / (1024 * 1024);
+    heapSamples.push({ label, mb });
+    const line = `heap ${label} ${mb.toFixed(1)} MB`;
+    lines.push(line);
+    console.log(name, line);
+  };
   const note = async (label) => {
     const wide = await pageWide(page);
     const line = `${label} | ${await stateLine(page)} | page-wide ${wide}`;
@@ -276,6 +294,7 @@ async function runSize(name, contextOptions) {
     console.log(name, line);
     if (wide > 8) bugs.push(`${label} page wider than the window by ${wide}px`);
     if (await page.locator("[data-testid='plant-phone']").count()) bugs.push(`${label} plant phone`);
+    await heapOf(label);
   };
 
   const inPlay = await throughMenus(page, lines);
@@ -390,6 +409,7 @@ async function runSize(name, contextOptions) {
       if (await leave.count()) await leave.click();
       else bugs.push(`${label} no turnover leave`);
       await page.waitForTimeout(350);
+      await heapOf(label);
     }
     await shot(page, `${name}-after-nights`);
     await note("after nights");
@@ -404,7 +424,7 @@ async function runSize(name, contextOptions) {
   const phoneUp = await page.locator("[data-testid='plant-phone']").count();
   if (phoneUp) bugs.push("plant phone at the end");
   await context.close();
-  return { lines, bugs, errors: [...new Set(errors)], missing: [...new Set(missing)].slice(0, 40) };
+  return { lines, bugs, errors: [...new Set(errors)], missing: [...new Set(missing)].slice(0, 40), heap: heapSamples };
 }
 
 const only = process.argv[3] ?? "both";
@@ -439,6 +459,24 @@ for (const [name, part] of [["desk 1280×720", desk], ["phone 390×844", phone]]
   bugLines.push("");
 }
 writeFileSync(`${out}bugs.md`, bugLines.join("\n") + "\n");
+if (process.env.HEAP) {
+  const parts = [["desk", desk], ["phone", phone]].filter(([, part]) => part.heap && part.heap.length);
+  let over = false;
+  for (const [name, part] of parts) {
+    const first = part.heap[0];
+    const last = part.heap[part.heap.length - 1];
+    const growth = last.mb - first.mb;
+    const line = `${name} heap ${first.mb.toFixed(1)} MB at ${first.label} → ${last.mb.toFixed(1)} MB at ${last.label} (${growth >= 0 ? "+" : ""}${growth.toFixed(1)} MB)`;
+    console.log(line);
+    bugLines.push(line);
+    if (growth > 50) over = true;
+  }
+  writeFileSync(`${out}heap.txt`, bugLines.filter((l) => l.startsWith("desk") || l.startsWith("phone") || l.startsWith("##")).join("\n") + "\n");
+  if (over) {
+    console.log("FAIL heap");
+    process.exit(1);
+  }
+}
 await browser.close();
 console.log("PASS");
 console.log(bugLines.join("\n"));

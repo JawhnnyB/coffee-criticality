@@ -15,4 +15,5 @@ Brief: `docs/grok/value-100.md`. One step, one commit. Real-input proof in this 
 - Step 10b done · The picture stays at the display rate. It steps down to a steady 30 when the thread hold stays over 6 ms, which is what a 4× CPU does. 60 Hz intervals were 16.67 ms. 4× intervals were 33.33 ms, with no 50s mixed in. Busy time 33.6 percent. A one-second walk covered 70 px at either rate. Proof in step-10b/.
 - Step 4b done · esbuild 0.28.2 is a pinned devDependency, the same line Vite asks for. The Vercel CLI fallback is gone. Suite: 308 pass, 0 fail, with no ESBUILD override. Proof in step-04b/.
 - Step 8b done · Week and four nights, R10 sweeper at 8×, seed 1. Desk A A A A. Phone A A A A. Dawn came up. No F. Proof in step-08b/.
-- Step 11 todo · Hold memory flat across a full week: no growth over 50 MB.
+- Step 11 done · One desk week and four nights. Heap after a forced collection went from 6.0 MB to 7.5 MB (+1.5 MB). Limit was 50. Proof in step-11/.
+- Step 12 todo · Clean the console: zero warnings and errors in production.
