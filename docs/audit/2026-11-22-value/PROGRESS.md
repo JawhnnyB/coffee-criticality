@@ -7,4 +7,5 @@ Brief: `docs/grok/value-100.md`. One step, one commit. Real-input proof in this 
 - Step 3 done · The menu, under Continue, says "Saved 11:53, Night 2" (wall clock, then Day, Night, or Dawn). Proof in step-03/.
 - Step 4 done · The nine baseline failures pass. Cabinet and desk tests find esbuild. The head-injector tests pass a context object. The share card now expects og:title, and an old twitter card is replaced. Suite: 308 pass, 0 fail. Notes in step-04/NOTES.md.
 - Step 5 done · `npm run ship-check` runs typecheck, the production build, and the Nitro preview. Homepage HTTP 200. The command exits 0. Proof in step-05/.
-- Step 6 todo · Point `npm run preview` at the Nitro server, so a built game is one thing.
+- Step 6 done · `npm run preview` is the Nitro server (`node scripts/preview-built.mjs`). Homepage HTTP 200. `vite preview` is no longer the command. Proof in step-06/.
+- Step 7 todo · A crash shows a calm card: the plant phone rang, with Copy report.

@@ -12,7 +12,7 @@
     "build": "vite build && npm run db:migrate",
     "db:migrate": "node scripts/migrate.mjs",
     "build:dev": "vite build --mode development",
-    "preview": "vite preview --host 0.0.0.0 --port 8080",
+    "preview": "node scripts/preview-built.mjs",
     "ship-check": "node scripts/ship-check.mjs",
     "typecheck": "tsc --noEmit",
     "art:check": "python3 tools/artkit/check.py",
