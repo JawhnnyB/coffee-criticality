@@ -439,46 +439,45 @@ function Summary({ n, nightNo, onLeave }: { n: Night; nightNo: number; onLeave: 
   const notes = oddityNotes(n);
   const head = n.over?.why === "trip" ? `${clock(n.over.at)}. The lights drop to emergency. Grade F.` : n.over?.why === "relieved" ? `${clock(n.over!.at)}. Elena takes the chair.` : "06:00 turnover.";
   return (
-    <div data-testid="nw-summary" style={{ margin: "0 10px 10px", padding: 10, border: `2px solid ${PAL.gold}`, background: PAL.ink, color: PAL.cream, maxHeight: "70vh", overflow: "auto" }}>
-      <div style={{ fontSize: 16 }}>{head}</div>
-      <div style={{ marginTop: 4 }} data-testid="nw-grade">
-        Grade {g.letter}. {elenaLine(g.letter, n.curt)}
-      </div>
-      <div style={{ marginTop: 4, fontSize: 12 }}>
-        Caught {sc.caught} ({sc.early} early) · missed {sc.missed} · false reports {sc.falseReports}
-      </div>
-      <div style={{ marginTop: 8 }}>
-        {rows.map((row) => (
-          <div key={`${row.time}-${row.title}`} style={{ marginTop: 8, fontSize: 12 }}>
-            <div>
-              {row.time} · CAM{String(row.camIndex + 1).padStart(2, "0")} {row.camera} · {row.title} · {row.how}
-              {row.fromDays ? " · from days" : ""}
-            </div>
-            {row.missed ? (
+    <div data-testid="nw-summary" style={{ position: "fixed", inset: 0, zIndex: 80, display: "flex", padding: 12, background: "rgba(22,17,13,0.55)" }}>
+      <div className="paper" style={{ display: "flex", flexDirection: "column", flex: 1, maxWidth: 560, margin: "0 auto", minHeight: 0, width: "100%", padding: 16, fontFamily: "var(--font-body)", color: "#16110d", lineHeight: 1.45 }}>
+        <p className="font-mono text-[10px] tracking-widest text-[#6a4a32]" style={{ margin: 0 }}>{head}</p>
+        <h2 className="font-display text-3xl" style={{ margin: "8px 0 0" }} data-testid="nw-grade">Grade {g.letter}</h2>
+        <p style={{ margin: "8px 0 0", fontSize: 14 }}>{elenaLine(g.letter, n.curt)}</p>
+        <p style={{ margin: "8px 0 0", fontSize: 12, color: "#6a4a32" }}>
+          Caught {sc.caught} ({sc.early} early) · missed {sc.missed} · false reports {sc.falseReports}
+        </p>
+        <div style={{ overflowY: "auto", overflowX: "hidden", flex: "1 1 auto", minHeight: 0, marginTop: 8 }}>
+          {rows.map((row) => (
+            <div key={`${row.time}-${row.title}`} style={{ marginTop: 8, fontSize: 13 }}>
               <div>
-                <Still n={n} camera={n.watch.cameras[row.camIndex]?.id ?? "aux"} minute={row.stillMinute} />
-                <div>
-                  It was on CAM{String(row.camIndex + 1).padStart(2, "0")} from {row.time}. You looked at CAM{String(row.camIndex + 1).padStart(2, "0")} {row.looks} times after that.
-                </div>
+                {row.time} · CAM{String(row.camIndex + 1).padStart(2, "0")} {row.camera} · {row.title} · {row.how}
+                {row.fromDays ? " · from days" : ""}
               </div>
-            ) : null}
-          </div>
-        ))}
-      </div>
-      <div style={{ marginTop: 8, fontSize: 12 }}>
-        {notes.map((line) => (
-          <div key={line}>{line}</div>
-        ))}
-        {n.log
-          .filter((l) => l.includes("False report") || l.includes("wrong kind"))
-          .map((l, i) => (
-            <div key={i}>{l}</div>
+              {row.missed ? (
+                <div>
+                  <Still n={n} camera={n.watch.cameras[row.camIndex]?.id ?? "aux"} minute={row.stillMinute} />
+                  <div>
+                    It was on CAM{String(row.camIndex + 1).padStart(2, "0")} from {row.time}. You looked at CAM{String(row.camIndex + 1).padStart(2, "0")} {row.looks} times after that.
+                  </div>
+                </div>
+              ) : null}
+            </div>
           ))}
-      </div>
-      <div style={{ marginTop: 8 }}>
-        <Btn onClick={onLeave} testId="nw-summary-leave">
+          <div style={{ marginTop: 8, fontSize: 13 }}>
+            {notes.map((line) => (
+              <div key={line}>{line}</div>
+            ))}
+            {n.log
+              .filter((l) => l.includes("False report") || l.includes("wrong kind"))
+              .map((l, i) => (
+                <div key={i}>{l}</div>
+              ))}
+          </div>
+        </div>
+        <button type="button" className="paper-btn-primary" style={{ minHeight: 44, marginTop: 12, width: "100%", flex: "0 0 auto" }} data-testid="nw-summary-leave" onClick={onLeave}>
           {n.over?.why === "dawn" && (g.letter === "A" || g.letter === "B" || g.letter === "C") ? "Sleep" : "Back"}
-        </Btn>
+        </button>
       </div>
     </div>
   );

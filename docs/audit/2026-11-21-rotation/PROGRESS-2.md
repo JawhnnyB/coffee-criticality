@@ -3,7 +3,7 @@
 Brief: `docs/grok/rotation-fixes.md`. Start at the first `todo`. Mark each `done` or `blocked: <reason>`, with one line on what changed. Commit and push after every item.
 
 - R1 done · Rotate to nights stands on the dusk lot (play, so writeSave can run) and world keys do not reach the sim. The save is written on rotate, report, start, the grade, sleep, and dawn. Reload then Continue: days off, night 2's opener with grade A and trust 35, and the dawn card with trust 44. Page errors 0.
-- R2 todo · The turnover sheet is about 20 px tall at 1280×720
+- R2 done · The 06:00 sheet is a full paper card over the shift, list scrolls, Sleep stays at the bottom. A missed tool bag and a missed relief valve show the still and the look-count. Heights: 720, 900, and 844. No sideways scroll. Shots in visual/turnover-1280x720.png, turnover-1440x900.png, turnover-390x844.png.
 - R3 todo · A relieved night passes
 - R4 todo · The header says "NIGHT 2" while night 1's turnover is on screen
 - R5 todo · Leaving mid-night is a free retry
