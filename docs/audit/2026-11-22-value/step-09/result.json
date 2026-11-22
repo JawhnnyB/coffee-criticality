@@ -1,0 +1,63 @@
+{
+  "desk": {
+    "lines": [
+      "signed",
+      "walked in",
+      "arrive | mode play day 1 room cafe 412 | page-wide 0",
+      "day 1 morning | mode play day 1 room cafe 412 | page-wide 0",
+      "day 1 eod | mode eod day 1 room cafe 990 | page-wide 0",
+      "day 2 morning | mode play day 2 room gate 412 | page-wide 0",
+      "day 2 eod | mode eod day 2 room gate 990 | page-wide 0",
+      "day 3 morning | mode play day 3 room gate 412 | page-wide 0",
+      "day 3 eod | mode eod day 3 room gate 990 | page-wide 0",
+      "day 4 morning | mode play day 4 room gate 412 | page-wide 0",
+      "day 4 eod | mode eod day 4 room gate 990 | page-wide 0",
+      "day 5 morning | mode play day 5 room gate 412 | page-wide 0",
+      "day 5 eod | mode eod day 5 room gate 990 | page-wide 0",
+      "dusk | mode play day 5 room gate 1030 | page-wide 0",
+      "night 1 {\"grade\":\"Grade F\",\"stat\":\"Caught 1 (0 early) · missed 2 · false reports 0\",\"wide\":0,\"ms\":28152}",
+      "night 2 {\"grade\":\"Grade F\",\"stat\":\"Caught 1 (0 early) · missed 2 · false reports 0\",\"wide\":0,\"ms\":28222}",
+      "night 3 {\"grade\":\"Grade F\",\"stat\":\"Caught 1 (0 early) · missed 2 · false reports 0\",\"wide\":0,\"ms\":28306}",
+      "night 4 {\"grade\":\"Grade F\",\"stat\":\"Caught 1 (0 early) · missed 2 · false reports 0\",\"wide\":0,\"ms\":28155}",
+      "after nights | mode play day 5 room gate 1030 | page-wide 0",
+      "dawn lot is not up",
+      "after nights text: SOUND ON 17:10 D5 DUSK LESS LOT / CAMPUS HONEST Walk the empty shore. Night 1 is a F. Elena sends you back. Night 1, again STAND IT AGAIN Night 1, again. Elena wants it stood properly. Take the watch"
+    ],
+    "bugs": [],
+    "errors": [],
+    "missing": []
+  },
+  "phone": {
+    "lines": [
+      "signed",
+      "walked in",
+      "arrive | mode play day 1 room cafe 412 | page-wide 0",
+      "day 1 morning | mode play day 1 room cafe 412 | page-wide 0",
+      "day 1 eod | mode eod day 1 room cafe 990 | page-wide 0",
+      "short eod button scroll",
+      "day 2 morning | mode play day 2 room gate 412 | page-wide 0",
+      "day 2 eod | mode eod day 2 room gate 990 | page-wide 0",
+      "day 3 morning | mode play day 3 room gate 412 | page-wide 0",
+      "day 3 eod | mode eod day 3 room gate 990 | page-wide 0",
+      "day 4 morning | mode play day 4 room gate 412 | page-wide 0",
+      "day 4 eod | mode eod day 4 room gate 990 | page-wide 0",
+      "day 5 morning | mode play day 5 room gate 412 | page-wide 0",
+      "day 5 eod | mode eod day 5 room gate 990 | page-wide 0",
+      "dusk | mode play day 5 room gate 1030 | page-wide 0",
+      "nw-false ok",
+      "nw-brew ok",
+      "nw-tablet ok",
+      "nw-leave ok",
+      "night 1 {\"grade\":\"Grade F\",\"stat\":\"Caught 1 (0 early) · missed 2 · false reports 0\",\"wide\":0,\"ms\":28112}",
+      "night 2 {\"grade\":\"Grade F\",\"stat\":\"Caught 1 (0 early) · missed 2 · false reports 0\",\"wide\":0,\"ms\":28236}",
+      "night 3 {\"grade\":\"Grade F\",\"stat\":\"Caught 1 (0 early) · missed 2 · false reports 0\",\"wide\":0,\"ms\":28185}",
+      "night 4 {\"grade\":\"Grade F\",\"stat\":\"Caught 1 (0 early) · missed 2 · false reports 0\",\"wide\":0,\"ms\":31273}",
+      "after nights | mode play day 5 room gate 1030 | page-wide 0",
+      "dawn lot is not up",
+      "after nights text: SOUND ON 17:10 D5 DUSK MORE LOT / CAMPUS Night 1, again STAND IT AGAIN Night 1, again. Elena wants it stood properly. Take the watch"
+    ],
+    "bugs": [],
+    "errors": [],
+    "missing": []
+  }
+}

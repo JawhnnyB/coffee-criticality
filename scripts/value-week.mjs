@@ -9,7 +9,8 @@ import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { chromium, devices } from "../node_modules/playwright/index.mjs";
 
 const base = process.argv[2] ?? "http://127.0.0.1:8096/";
-const outDir = new URL("../docs/audit/2026-11-22-value/step-08/", import.meta.url);
+const step = process.env.VALUE_STEP ?? "08";
+const outDir = new URL(`../docs/audit/2026-11-22-value/step-${step}/`, import.meta.url);
 mkdirSync(outDir, { recursive: true });
 const out = outDir.pathname;
 
@@ -102,6 +103,27 @@ async function sweepNight(page) {
     return el.scrollWidth - el.clientWidth;
   });
   return { grade, stat: (stat.find((t) => t.includes("false")) || stat[0] || "").trim(), wide, ms: Date.now() - t0 };
+}
+
+async function fitOf(page, testid) {
+  return page.evaluate((id) => {
+    const el = document.querySelector(`[data-testid='${id}']`);
+    if (!el) return "missing";
+    const r = el.getBoundingClientRect();
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    if (r.width < 2 || r.height < 2) return "empty";
+    const fully = r.left >= -1 && r.top >= -1 && r.right <= vw + 1 && r.bottom <= vh + 1;
+    if (fully) return "ok";
+    let node = el.parentElement;
+    while (node) {
+      const s = getComputedStyle(node);
+      const scrolls = (s.overflowY === "auto" || s.overflowY === "scroll") && node.scrollHeight > node.clientHeight + 4;
+      if (scrolls && r.left >= -1 && r.right <= vw + 1) return "scroll";
+      node = node.parentElement;
+    }
+    return "cut";
+  }, testid);
 }
 
 async function pageWide(page) {
@@ -224,6 +246,17 @@ async function runSize(name, contextOptions) {
       await page.waitForTimeout(350);
       if (day === 1 || day === 5) await shot(page, `${name}-eod${day}`);
       await note(`day ${day} eod`);
+      if (name === "phone" && day === 1) {
+        await page.setViewportSize({ width: 390, height: 664 });
+        await page.waitForTimeout(200);
+        const shortFit = await fitOf(page, "eod-next");
+        lines.push(`short eod button ${shortFit}`);
+        console.log(name, "short eod", shortFit);
+        await shot(page, `${name}-eod-short`);
+        if (shortFit === "cut" || shortFit === "missing" || shortFit === "empty") bugs.push(`short phone end-of-day button is ${shortFit}`);
+        await page.setViewportSize({ width: 390, height: 844 });
+        await page.waitForTimeout(150);
+      }
       const label = day < 5 ? "Clock out · next morning" : "Walk the lot at dusk";
       const next = page.getByRole("button", { name: label });
       if (!(await next.count())) bugs.push(`day ${day} missing "${label}"`);
@@ -261,6 +294,15 @@ async function runSize(name, contextOptions) {
       }
       await start.click();
       await page.waitForTimeout(250);
+      if (name === "phone" && night === 1) {
+        for (const id of ["nw-false", "nw-brew", "nw-tablet", "nw-leave"]) {
+          const fit = await fitOf(page, id);
+          lines.push(`${id} ${fit}`);
+          console.log(name, id, fit);
+          if (fit !== "ok") bugs.push(`night bar ${id} is ${fit}`);
+        }
+        await shot(page, `${name}-night-bar`);
+      }
       const result = await sweepNight(page);
       lines.push(`night ${night} ${JSON.stringify(result)}`);
       console.log(name, "night", night, JSON.stringify(result));

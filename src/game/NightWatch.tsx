@@ -281,24 +281,26 @@ function NightShift({ s, nightNo: asked, onLeave, replay = false }: { s: GameSta
       style={{ position: "fixed", inset: 0, zIndex: 60, background: PAL.ink, color: PAL.goldL, display: "flex", flexDirection: "column", ...MONO, overflow: "auto" }}
     >
       <style>{`@keyframes nwflash { 0%,49% { background: ${PAL.bad}; color: ${PAL.ink} } 50%,100% { background: ${PAL.copperD}; color: ${PAL.goldL} } }`}</style>
-      <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 10, padding: "6px 10px", borderBottom: `2px solid ${PAL.copperD}` }}>
-        <span data-testid="nw-clock" style={{ fontSize: 18, color: PAL.cream }}>
-          {clock(n.minute)}
-        </span>
-        <span>
-          NIGHT {nightNo} · {SITE_LABEL[site].toUpperCase()} UNIT 1
-        </span>
-        <span title="Coffee" data-testid="nw-coffee" style={{ display: "inline-flex", alignItems: "center", gap: 4 }}>
-          ☕
-          <span style={{ display: "inline-block", width: 80, height: 8, background: PAL.copperD }}>
-            <span style={{ display: "block", height: 8, width: `${(n.coffee / COFFEE.max) * 80}px`, background: n.coffee < 20 ? PAL.bad : PAL.gold }} />
+      <div style={{ display: "flex", flexDirection: "column", gap: 8, padding: "6px 10px", borderBottom: `2px solid ${PAL.copperD}` }}>
+        <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 8 }}>
+          <span data-testid="nw-clock" style={{ fontSize: 18, color: PAL.cream }}>
+            {clock(n.minute)}
           </span>
-          {n.brewing > 0 ? "brewing…" : `${n.brewsLeft} pot${n.brewsLeft === 1 ? "" : "s"} left`}
-        </span>
-        <span data-testid="nw-false">
-          FALSE REPORTS {n.falseReports}/{FALSE_REPORT_LIMIT}
-        </span>
-        <span style={{ marginLeft: "auto", display: "flex", gap: 6 }}>
+          <span>
+            NIGHT {nightNo} · {SITE_LABEL[site].toUpperCase()} UNIT 1
+          </span>
+          <span title="Coffee" data-testid="nw-coffee" style={{ display: "inline-flex", alignItems: "center", gap: 4 }}>
+            ☕
+            <span style={{ display: "inline-block", width: 80, height: 8, background: PAL.copperD }}>
+              <span style={{ display: "block", height: 8, width: `${(n.coffee / COFFEE.max) * 80}px`, background: n.coffee < 20 ? PAL.bad : PAL.gold }} />
+            </span>
+            {n.brewing > 0 ? "brewing…" : `${n.brewsLeft} pot${n.brewsLeft === 1 ? "" : "s"} left`}
+          </span>
+          <span data-testid="nw-false">
+            FALSE REPORTS {n.falseReports}/{FALSE_REPORT_LIMIT}
+          </span>
+        </div>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
           <Btn onClick={doBrew} disabled={n.brewing > 0 || n.brewsLeft <= 0 || !!n.over} testId="nw-brew">
             Brew (B)
           </Btn>
@@ -314,7 +316,7 @@ function NightShift({ s, nightNo: asked, onLeave, replay = false }: { s: GameSta
           >
             {replay ? (n.over ? "Back to the desk" : "Leave the shift") : n.over ? "Back to the desk" : "Leave the watch"}
           </Btn>
-        </span>
+        </div>
       </div>
 
       <div style={{ display: "flex", flexWrap: "wrap", gap: 10, padding: 10, alignItems: "flex-start" }}>

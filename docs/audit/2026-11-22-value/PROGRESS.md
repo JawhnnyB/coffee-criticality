@@ -10,4 +10,5 @@ Brief: `docs/grok/value-100.md`. One step, one commit. Real-input proof in this 
 - Step 6 done · `npm run preview` is the Nitro server (`node scripts/preview-built.mjs`). Homepage HTTP 200. `vite preview` is no longer the command. Proof in step-06/.
 - Step 7 done · A render throw and a later throw each show one card: "The plant phone rang." Copy report is a real click and the clipboard reads back. Proof in step-07/.
 - Step 8 done · A week and four nights at 1280×720 and 390×844. Two bugs: the phone night bar cuts off the buttons, and a short phone window cuts the end-of-day sheet. No console errors. Proof in step-08/.
-- Step 9 todo · Fix those two bugs and run the week again.
+- Step 9 done · The phone night buttons are on screen. A short window scrolls the end-of-day sheet instead of cutting it. The week was run again. Proof in step-09/.
+- Step 10 todo · Profile a full day shift. Keep main-thread busy time under 40% on a 4× slower CPU.

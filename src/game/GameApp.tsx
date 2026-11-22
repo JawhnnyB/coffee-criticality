@@ -1587,7 +1587,8 @@ export function GameApp() {
         )}
 
         {mode === "eod" && (
-          <div className="absolute inset-0 z-30 flex items-end justify-center overflow-y-auto bg-bg/70 p-3 pb-28 sm:items-center sm:p-6">
+          <div className="absolute inset-0 z-30 overflow-y-auto bg-bg/70">
+            <div className="flex min-h-full items-start justify-center p-3 pb-28 sm:items-center sm:p-6">
             <div className="paper mx-auto w-full max-w-xl p-4 sm:p-5" data-testid="paper-eod">
               <div className="relative mb-3 h-[120px] w-[214px] max-w-full overflow-hidden border border-[#3a2818] sm:h-[180px] sm:w-[320px]" data-testid="eod-site">
                 <LakeScene season={seasonOrDefault(s.setup.season)} site={siteKind(s.plant)} power={sitePower(s.run)} testId="eod-lake" />
@@ -1651,6 +1652,7 @@ export function GameApp() {
                 <button
                   type="button"
                   className="paper-btn-primary"
+                  data-testid="eod-next"
                   onClick={() => {
                     nextDay(s);
                     applyMode(s.mode);
@@ -1661,11 +1663,13 @@ export function GameApp() {
                 </button>
               </div>
             </div>
+            </div>
           </div>
         )}
 
         {mode === "ending" && (
-          <div className="absolute inset-0 z-30 flex items-end justify-center overflow-y-auto bg-bg/55 p-3 pb-28 sm:items-center sm:p-6">
+          <div className="absolute inset-0 z-30 overflow-y-auto bg-bg/55">
+            <div className="flex min-h-full items-start justify-center p-3 pb-28 sm:items-center sm:p-6">
             <div className="paper mx-auto w-full max-w-xl p-4 sm:p-5" data-testid="paper-ending">
               <p className="font-mono text-[10px] tracking-widest text-[#6a4a32]">
                 Dusk · {s.timeLabel} · Lot · Lake north
@@ -1727,6 +1731,7 @@ export function GameApp() {
                   Main menu
                 </button>
               </div>
+            </div>
             </div>
           </div>
         )}
