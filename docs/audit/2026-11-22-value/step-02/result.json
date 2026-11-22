@@ -1,0 +1,62 @@
+[
+  {
+    "mode": "play",
+    "ok": true,
+    "before": {
+      "room": "control",
+      "minutes": 797.0025,
+      "day": 1
+    },
+    "after": {
+      "room": "control",
+      "minutes": 797.0266600000003,
+      "day": 1,
+      "mode": "play"
+    },
+    "errors": []
+  },
+  {
+    "mode": "desktop",
+    "ok": true,
+    "before": {
+      "clock24": true,
+      "mode": "desktop",
+      "minutes": 990.00083
+    },
+    "after": {
+      "clock24": true,
+      "mode": "play",
+      "minutes": 990.0266650000005
+    },
+    "beforeClock": "16:30",
+    "afterClock": "16:30",
+    "screen": "Continue returns to the world. The desktop is stored as play. Reopening it shows the same clock.",
+    "errors": []
+  },
+  {
+    "mode": "rotation",
+    "ok": true,
+    "opener": "Night 2 18:00 TURNOVER 18:00 turnover. Quiet board. At midnight the watch desk is yours. Take the watch",
+    "errors": []
+  },
+  {
+    "mode": "outage",
+    "ok": true,
+    "day": 4,
+    "cells": {
+      "from": [
+        "12.4",
+        "17.5"
+      ],
+      "swapped": [
+        "17.5",
+        "12.4"
+      ],
+      "back": [
+        "17.5",
+        "12.4"
+      ]
+    },
+    "errors": []
+  }
+]
