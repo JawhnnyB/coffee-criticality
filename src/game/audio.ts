@@ -123,23 +123,23 @@ function onGesture() {
 }
 
 export function unlockAudio() {
-  if (unlocked) {
-    onGesture();
-    return;
+  if (!unlocked) {
+    unlocked = true;
+    try {
+      if (localStorage.getItem("cc.mute") === "1") muted = true;
+    } catch {
+      /* ignore */
+    }
+    window.addEventListener("pointerdown", onGesture, { capture: true });
+    window.addEventListener("keydown", onGesture, { capture: true });
+    window.addEventListener("touchend", onGesture, { capture: true });
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "visible" && ctx?.state === "suspended") void ctx.resume();
+    });
   }
-  unlocked = true;
-  try {
-    if (localStorage.getItem("cc.mute") === "1") muted = true;
-  } catch {
-    /* ignore */
-  }
-  window.addEventListener("pointerdown", onGesture, { capture: true });
-  window.addEventListener("keydown", onGesture, { capture: true });
-  window.addEventListener("touchend", onGesture, { capture: true });
-  document.addEventListener("visibilitychange", () => {
-    if (document.visibilityState === "visible" && ctx?.state === "suspended") void ctx.resume();
-  });
-  onGesture();
+  // A context built on load, before any gesture, is the warning Chrome prints.
+  const act = typeof navigator !== "undefined" ? navigator.userActivation : undefined;
+  if (act?.isActive) onGesture();
 }
 
 function killVoice(v: Voice, when: number) {

@@ -18,4 +18,4 @@ Brief: `docs/grok/value-100.md`. One step, one commit. Real-input proof in this 
 - Step 11 done · One desk week and four nights. Heap after a forced collection went from 6.0 MB to 7.5 MB (+1.5 MB). Limit was 50. Proof in step-11/.
 - Step 10c done · Auto stays at 60 unless pictures are late or the hold averages over 14 ms. 1× and 4× stayed at 16.67 ms. 6× stepped to a steady 33.33 ms. Settings can force Auto, 60, or 30, and the choice survived a reload. Proof in step-10c/.
 - Step 11b done · Renderer RSS from day 1 morning to dawn grew 25.0 MB after a shift drops its plates and camera canvases. The first measure, which kept them, grew 98.1 MB. Limit was 50. Proof in step-11b/.
-- Step 12 todo · Clean the console: zero warnings and errors in production.
+- Step 12 done · A production new shift, through the intro and into the cafe, logged no warnings and no errors. The audio context waits for a gesture. Proof in step-12/.
