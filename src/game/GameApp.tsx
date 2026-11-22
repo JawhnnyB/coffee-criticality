@@ -3208,6 +3208,7 @@ declare global {
       getObjective: () => string;
       getCatch: () => number;
       setFlag: (k: string, v: boolean) => void;
+      setNightSpeed?: (n: number) => void;
       canClose: () => boolean;
       reportHere: () => void;
       travel: (room: string) => void;

@@ -18,10 +18,12 @@ import {
   COFFEE,
   FALSE_REPORT_LIMIT,
   NIGHT_MINUTES,
+  SECONDS_PER_MINUTE,
   alarms,
   brew,
   clock,
   fatigueOf,
+  gameMinutes,
   newNight,
   radio,
   readings,
@@ -37,8 +39,6 @@ import {
 import { applyCarry, carryover } from "./nightwatch/carryover";
 import { elenaLine, oddityNotes, openerLine, recordNight, turnoverRows } from "./nightwatch/turnover";
 
-/** Real seconds per game minute: a night is about seven and a half minutes. */
-const SECONDS_PER_MINUTE = 1.25;
 const SITE_LABEL = { pwr: "PWR", bwr: "BWR", pebble: "Pebble bed", msr: "Salt" } as const;
 
 const MONO: CSSProperties = { fontFamily: "var(--font-mono, monospace)" };
@@ -127,11 +127,19 @@ function NightShift({ s, nightNo: asked, onLeave, replay = false }: { s: GameSta
     void loadPlates();
     startAmbience();
     calm.current = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    return () => stopAmbience();
+    const api = window.__controlsTest;
+    if (api) api.setNightSpeed = (n: number) => {
+      speed.current = n;
+    };
+    return () => {
+      stopAmbience();
+      if (window.__controlsTest) delete window.__controlsTest.setNightSpeed;
+    };
   }, []);
   const canvas = useRef<HTMLCanvasElement | null>(null);
   const rewarded = useRef(false);
   const calm = useRef(false);
+  const speed = useRef(1);
   const seenAlarm = useRef("");
   const seenRadio = useRef(0);
 
@@ -178,7 +186,7 @@ function NightShift({ s, nightNo: asked, onLeave, replay = false }: { s: GameSta
     const loop = (now: number) => {
       const dt = Math.min(0.25, (now - last) / 1000);
       last = now;
-      if (!n.over) tick(n, dt / SECONDS_PER_MINUTE);
+      if (!n.over) tick(n, gameMinutes(dt, speed.current));
       setSwitching((v) => (v > 0 ? Math.max(0, v - dt * 3.5) : 0));
       const c = canvas.current?.getContext("2d");
       // Real CCTV is about 15 frames a second. The clock above this still moves every quarter second.
@@ -457,7 +465,7 @@ function NightShift({ s, nightNo: asked, onLeave, replay = false }: { s: GameSta
       ) : null}
       {n.over ? <Summary n={n} nightNo={nightNo} onLeave={onLeave} /> : null}
       <div style={{ padding: "0 10px 10px", fontSize: 10, opacity: 0.7 }}>
-        {Math.max(0, Math.round(((NIGHT_MINUTES - n.minute) * SECONDS_PER_MINUTE) / 60))} real min until 06:00.
+        {Math.max(0, Math.round(((NIGHT_MINUTES - n.minute) / Math.max(speed.current, 0.01)) * SECONDS_PER_MINUTE / 60))} real min until 06:00.
       </div>
     </div>
   );

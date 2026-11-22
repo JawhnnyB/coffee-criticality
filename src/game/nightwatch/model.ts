@@ -331,6 +331,13 @@ export const NIGHTS = [
 ];
 
 export const NIGHT_MINUTES = 360;
+/** Real seconds for one game minute at 1×. A night is about seven and a half minutes. */
+export const SECONDS_PER_MINUTE = 1.25;
+
+/** Game minutes from real seconds. Speed is the test hook only; 8 plays eight times faster. */
+export function gameMinutes(realSeconds: number, speed = 1): number {
+  return (realSeconds * Math.max(0, speed)) / SECONDS_PER_MINUTE;
+}
 /** Coffee drains per game minute while the tablet is up, and slowly while it is down. */
 export const COFFEE = { max: 100, tablet: 0.55, desk: 0.12, brewMinutes: 6 };
 export const FALSE_REPORT_LIMIT = 3;

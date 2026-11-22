@@ -289,6 +289,38 @@ test("being relieved is an F, an open event is a miss, and the C line is only at
   assert.equal(W.elenaLine("F", true, "relieved"), "Relieved. The night is not done.");
 });
 
+test("an 8× clock covers the same coffee, brew, fatigue and escalation as 1×", () => {
+  const close = (a, b, label) => assert.ok(Math.abs(a - b) < 1e-6, `${label} ${a} vs ${b}`);
+  assert.equal(W.gameMinutes(W.SECONDS_PER_MINUTE, 1), 1);
+  assert.equal(W.gameMinutes(W.SECONDS_PER_MINUTE, 8), 8);
+  const make = () => {
+    const n = W.newNight("pwr", 1);
+    const trip = W.siteWatch("pwr").events.find((e) => e.id === "porv");
+    const def = { ...trip, escalate: 5, consequence: "finding" };
+    n.events = [{ def, start: 0, caughtAt: null, early: false, doneAt: null }];
+    n.tablet = true;
+    n.camera = "pzr";
+    return n;
+  };
+  const slow = make();
+  const fast = make();
+  for (let i = 0; i < 80; i++) W.tick(slow, W.gameMinutes(0.125, 1));
+  for (let i = 0; i < 10; i++) W.tick(fast, W.gameMinutes(0.125, 8));
+  close(fast.minute, slow.minute, "minute");
+  close(fast.coffee, slow.coffee, "coffee");
+  close(W.fatigueOf(fast), W.fatigueOf(slow), "fatigue");
+  assert.ok(fast.events[0].doneAt != null && slow.events[0].doneAt != null);
+  assert.equal(fast.findings, slow.findings);
+  assert.equal(fast.over, null);
+  W.brew(slow);
+  W.brew(fast);
+  for (let i = 0; i < 40; i++) W.tick(slow, W.gameMinutes(0.125, 1));
+  for (let i = 0; i < 5; i++) W.tick(fast, W.gameMinutes(0.125, 8));
+  close(fast.brewing, slow.brewing, "brew");
+  close(fast.coffee, slow.coffee, "coffee after brew");
+  assert.equal(fast.tablet, slow.tablet);
+});
+
 test("a report on a camera just logged is not a false report", () => {
   const n = W.newNight("pwr", 1);
   const bag = W.siteWatch("pwr").events.find((e) => e.id === "pool-fme");
