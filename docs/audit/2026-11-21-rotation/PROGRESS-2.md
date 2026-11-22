@@ -7,7 +7,7 @@ Brief: `docs/grok/rotation-fixes.md`. Start at the first `todo`. Mark each `done
 - R3 done · Three false reports relieve you. That night is an F, not done, trust −2. An event that has already started and is still open is marked missed. The C line shows only at 06:00. A relieved night says "I have the chair. This night does not count." Unit test covers each.
 - R4 done · The shift freezes its night number on mount, so the header stays on night 1 after the grade flag is written.
 - R5 todo · Leaving mid-night is a free retry
-- R6 todo · Dawn → Menu probably cannot reach the menu
+- R6 done · After dawn the save sets rot:complete. The overlay hides on the menu and comes back on Continue. New week still asks before wiping. Checked in a browser: Menu leaves the dawn card, Continue shows it again.
 - R7 todo · A repeated night looks like a new one
 - R8 todo · Reporting an event you already logged is punished
 - R9 todo · A test-only fast clock,

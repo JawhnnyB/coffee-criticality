@@ -1697,7 +1697,7 @@ export function GameApp() {
           </div>
         )}
 
-        {s.flags["rot:nights"] ? (
+        {s.flags["rot:nights"] && (!s.flags["rot:complete"] || mode === "play") ? (
           <NightRotation
             s={s}
             onNewWeek={() => {

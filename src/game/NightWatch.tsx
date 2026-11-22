@@ -25,6 +25,7 @@ import {
   newNight,
   radio,
   readings,
+  relieve,
   report,
   score,
   setTablet,
@@ -119,6 +120,7 @@ function NightShift({ s, nightNo: asked, onLeave, replay = false }: { s: GameSta
   }
   const [, setFrame] = useState(0);
   const [reporting, setReporting] = useState(false);
+  const [leaving, setLeaving] = useState(false);
   const [toast, setToast] = useState<string>("");
   const [switching, setSwitching] = useState(0);
   useEffect(() => {
@@ -294,8 +296,14 @@ function NightShift({ s, nightNo: asked, onLeave, replay = false }: { s: GameSta
           <Btn onClick={toggleTablet} on={n.tablet} disabled={!!n.over} testId="nw-tablet">
             {n.tablet ? "Lower tablet" : "Lift tablet"} (Space)
           </Btn>
-          <Btn onClick={onLeave} testId="nw-leave">
-            {n.over ? "Back to the desk" : "Leave the shift"}
+          <Btn
+            onClick={() => {
+              if (replay || n.over) onLeave();
+              else setLeaving(true);
+            }}
+            testId="nw-leave"
+          >
+            {replay ? (n.over ? "Back to the desk" : "Leave the shift") : n.over ? "Back to the desk" : "Leave the watch"}
           </Btn>
         </span>
       </div>
@@ -425,6 +433,27 @@ function NightShift({ s, nightNo: asked, onLeave, replay = false }: { s: GameSta
 
       </div>
 
+      {leaving && !n.over && !replay ? (
+        <div data-testid="nw-leave-ask" style={{ margin: "8px 10px", padding: 10, border: `2px solid ${PAL.gold}`, background: PAL.ink }}>
+          <p style={{ margin: 0 }}>Leave the watch? Elena will log it as relieved.</p>
+          <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
+            <Btn
+              testId="nw-leave-yes"
+              danger
+              onClick={() => {
+                relieve(n);
+                setLeaving(false);
+                rerender();
+              }}
+            >
+              Yes
+            </Btn>
+            <Btn testId="nw-leave-no" onClick={() => setLeaving(false)}>
+              No
+            </Btn>
+          </div>
+        </div>
+      ) : null}
       {n.over ? <Summary n={n} nightNo={nightNo} onLeave={onLeave} /> : null}
       <div style={{ padding: "0 10px 10px", fontSize: 10, opacity: 0.7 }}>
         {Math.max(0, Math.round(((NIGHT_MINUTES - n.minute) * SECONDS_PER_MINUTE) / 60))} real min until 06:00.
@@ -525,6 +554,7 @@ export function NightRotation({ s, onNewWeek, onMenu }: { s: GameState; onNewWee
         onLeave={() => {
           if (s.flags["night:4:done"]) {
             s.flags["rot:dawn"] = true;
+            s.flags["rot:complete"] = true;
             writeSave(s, true);
             setPhase("dawn");
           } else {
@@ -579,7 +609,7 @@ export function NightRotation({ s, onNewWeek, onMenu }: { s: GameState; onNewWee
             <button type="button" className="paper-btn-primary" style={{ minHeight: 44 }} data-testid="dawn-new-week" onClick={onNewWeek}>
               New week
             </button>
-            <button type="button" className="paper-btn" style={{ minHeight: 44 }} onClick={onMenu}>
+            <button type="button" className="paper-btn" style={{ minHeight: 44 }} data-testid="dawn-menu" onClick={onMenu}>
               Menu
             </button>
           </div>
