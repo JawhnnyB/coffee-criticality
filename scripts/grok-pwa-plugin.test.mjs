@@ -26,7 +26,7 @@ test("injects before </head>", () => {
 });
 
 test("injects the extensions script without a project id", () => {
-  const out = injectGrokPwaHead("<html><head></head></html>", "Demo", "");
+  const out = injectGrokPwaHead("<html><head></head></html>", { appName: "Demo", projectId: "" });
   assert.match(out, /src="https:\/\/grok\.com\/grok-app-builder\/extensions\.js" defer/);
   assert.doesNotMatch(out, /grok-project-id/);
   assert.doesNotMatch(out, /data-project-id/);
@@ -34,15 +34,15 @@ test("injects the extensions script without a project id", () => {
 });
 
 test("injects project id on the script and meta when provided", () => {
-  const out = injectGrokPwaHead("<html><head></head></html>", "Demo", "proj-123");
+  const out = injectGrokPwaHead("<html><head></head></html>", { appName: "Demo", projectId: "proj-123" });
   assert.match(out, /name="grok-project-id" content="proj-123"/);
   assert.match(out, /data-project-id="proj-123"/);
   assert.match(out, /property="grok:app_id" content="proj-123"/);
 });
 
 test("does not duplicate grok:app_id", () => {
-  const once = injectGrokPwaHead("<html><head></head></html>", "Demo", "proj-123");
-  const twice = injectGrokPwaHead(once, "Demo", "proj-123");
+  const once = injectGrokPwaHead("<html><head></head></html>", { appName: "Demo", projectId: "proj-123" });
+  const twice = injectGrokPwaHead(once, { appName: "Demo", projectId: "proj-123" });
   assert.equal(once, twice);
   assert.equal(twice.split('property="grok:app_id"').length - 1, 1);
 });
@@ -50,12 +50,12 @@ test("does not duplicate grok:app_id", () => {
 test("omits x:creator tags without both creator values", () => {
   assert.deepEqual(grokXCreatorHeadTags("", "42"), []);
   assert.deepEqual(grokXCreatorHeadTags("@alice", ""), []);
-  const out = injectGrokPwaHead("<html><head></head></html>", "Demo", "", "@alice", "");
+  const out = injectGrokPwaHead("<html><head></head></html>", { appName: "Demo", creator: "@alice", creatorId: "" });
   assert.doesNotMatch(out, /property="x:creator"/);
 });
 
 test("injects x:creator tags when both creator values are set", () => {
-  const out = injectGrokPwaHead("<html><head></head></html>", "Demo", "", "@alice", "42");
+  const out = injectGrokPwaHead("<html><head></head></html>", { appName: "Demo", creator: "@alice", creatorId: "42" });
   assert.match(out, /property="x:creator" content="@alice"/);
   assert.match(out, /property="x:creator:id" content="42"/);
 });
@@ -73,8 +73,9 @@ test("escapes x:creator values", () => {
 });
 
 test("does not duplicate x:creator tags", () => {
-  const once = injectGrokPwaHead("<html><head></head></html>", "Demo", "", "@alice", "42");
-  const twice = injectGrokPwaHead(once, "Demo", "", "@alice", "42");
+  const ctx = { appName: "Demo", creator: "@alice", creatorId: "42" };
+  const once = injectGrokPwaHead("<html><head></head></html>", ctx);
+  const twice = injectGrokPwaHead(once, ctx);
   assert.equal(once, twice);
   assert.equal(twice.split('property="x:creator" content=').length - 1, 1);
   assert.equal(twice.split('property="x:creator:id"').length - 1, 1);
@@ -83,7 +84,8 @@ test("does not duplicate x:creator tags", () => {
 test("platform chrome injects twitter:card when the document has none", () => {
   const out = injectGrokPwaHead("<html><head><title>Hello World</title></head></html>");
   assert.match(out, /name="twitter:card" content="summary_large_image"/);
-  assert.doesNotMatch(out, /property="og:title"/);
+  // The share card is part of the same chrome. og:title follows the document title.
+  assert.match(out, /property="og:title" content="Hello World"/);
 });
 
 test("does not duplicate twitter:card", () => {
@@ -93,17 +95,19 @@ test("does not duplicate twitter:card", () => {
   assert.equal(twice.split('name="twitter:card"').length - 1, 1);
 });
 
-test("leaves an existing twitter:card alone", () => {
+test("replaces an existing twitter:card with the platform card", () => {
+  // The injector owns the share card. An old "summary" card is removed, not left beside the new one.
   const html = '<html><head><meta name="twitter:card" content="summary"></head></html>';
-  const out = injectGrokPwaHead(html, "Wild Race");
-  assert.match(out, /name="twitter:card" content="summary"/);
-  assert.doesNotMatch(out, /summary_large_image/);
+  const out = injectGrokPwaHead(html, { appName: "Wild Race" });
+  assert.match(out, /name="twitter:card" content="summary_large_image"/);
+  assert.doesNotMatch(out, /content="summary"/);
   assert.equal(out.split('name="twitter:card"').length - 1, 1);
 });
 
 test("does not duplicate the extensions script", () => {
-  const once = injectGrokPwaHead("<html><head></head></html>", "Demo", "proj-123");
-  const twice = injectGrokPwaHead(once, "Demo", "proj-123");
+  const ctx = { appName: "Demo", projectId: "proj-123" };
+  const once = injectGrokPwaHead("<html><head></head></html>", ctx);
+  const twice = injectGrokPwaHead(once, ctx);
   assert.equal(once, twice);
   assert.equal(twice.split("extensions.js").length - 1, 1);
 });
@@ -115,7 +119,7 @@ test("is idempotent", () => {
 });
 
 test("uses the app name in the injected title tag", () => {
-  const out = injectGrokPwaHead("<html><head></head></html>", "Wild Race");
+  const out = injectGrokPwaHead("<html><head></head></html>", { appName: "Wild Race" });
   assert.match(out, /apple-mobile-web-app-title" content="Wild Race"/);
 });
 

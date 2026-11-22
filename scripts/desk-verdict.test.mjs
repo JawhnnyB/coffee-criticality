@@ -5,13 +5,14 @@ import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
 import test from "node:test";
 import { dirname, join } from "node:path";
-import { fileURLToPath, pathToFileURL } from "node:url";
+import { fileURLToPath } from "node:url";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
+import { loadEsbuild } from "./esbuild-mod.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const out = join(mkdtempSync(join(tmpdir(), "cc-desk-")), "nuclearLab.mjs");
-const esb = await import(process.env.ESBUILD_PKG ? pathToFileURL(process.env.ESBUILD_PKG).href : "esbuild");
+const esb = await loadEsbuild();
 await esb.build({ entryPoints: [join(root, "src/game/nuclearLab.ts")], bundle: true, platform: "node", format: "esm", outfile: out, logLevel: "error" });
 const { verdictWords } = await import(out);
 

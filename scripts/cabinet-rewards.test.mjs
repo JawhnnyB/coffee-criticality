@@ -6,14 +6,14 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { dirname, join } from "node:path";
-import { fileURLToPath, pathToFileURL } from "node:url";
+import { fileURLToPath } from "node:url";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
+import { loadEsbuild } from "./esbuild-mod.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const out = join(mkdtempSync(join(tmpdir(), "cc-cabinets-")), "sim.mjs");
-// ESBUILD_PKG may point at esbuild's lib/main.js when the repo has no node_modules (sandbox).
-const esb = await import(process.env.ESBUILD_PKG ? pathToFileURL(process.env.ESBUILD_PKG).href : "esbuild");
+const esb = await loadEsbuild();
 await esb.build({
   entryPoints: [join(root, "src/game/sim.ts")],
   bundle: true,
