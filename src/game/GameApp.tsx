@@ -264,6 +264,8 @@ export function GameApp() {
     const edges = edgesRef.current;
 
     const down = (e: KeyboardEvent) => {
+      // Night rotation owns 1–8, Space, B, R and E. The lot underneath does not walk or pause.
+      if (stateRef.current.flags["rot:nights"]) return;
       applyWorldKey(e, modeRef.current, keys, edges, GAME_CODES);
     };
     const up = (e: KeyboardEvent) => keys.delete(e.code);
@@ -596,8 +598,15 @@ export function GameApp() {
           keys.delete(code);
         }
       }
-      const a = collectActions(keys, edges, stickRef.current);
-      if (edges.has("KeyK")) tryCloseShift(s);
+      if (s.flags["rot:nights"]) {
+        keys.clear();
+        edges.clear();
+        stickRef.current.x = 0;
+        stickRef.current.y = 0;
+        stickRef.current.active = false;
+      }
+      const a = s.flags["rot:nights"] ? emptyActions() : collectActions(keys, edges, stickRef.current);
+      if (!s.flags["rot:nights"] && edges.has("KeyK")) tryCloseShift(s);
       update(s, a, dt);
       // A conversation just opened: add the person's due scene after what they would have said anyway.
       if (s.mode === "dialogue" && s.dialogue !== talkRef.current.dialogue) {
@@ -1648,7 +1657,16 @@ export function GameApp() {
                   style={{ minHeight: 44 }}
                   data-testid="rotate-nights"
                   onClick={() => {
+                    // Ending mode is not a shift the menu can continue. Stand on the dusk lot, which can be saved.
+                    beginEndingWalk(s);
                     s.flags["rot:nights"] = true;
+                    s.closePrompt = false;
+                    keysRef.current.clear();
+                    edgesRef.current.clear();
+                    stickRef.current = { x: 0, y: 0, active: false };
+                    writeSave(s, true);
+                    setSaved(true);
+                    applyMode("play");
                     refresh();
                   }}
                 >
@@ -1707,7 +1725,7 @@ export function GameApp() {
           </div>
         )}
 
-        {touch && (mode === "play" || mode === "dialogue" || mode === "incident") && (
+        {touch && !s.flags["rot:nights"] && (mode === "play" || mode === "dialogue" || mode === "incident") && (
           <TouchPad stickRef={stickRef} edges={edgesRef} />
         )}
       </div>

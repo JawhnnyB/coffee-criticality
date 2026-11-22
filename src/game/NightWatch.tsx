@@ -8,6 +8,7 @@
 import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { PAL } from "./palette";
 import { bumpTrust, pushMsg, type GameState } from "./sim";
+import { writeSave } from "./save";
 import { siteKind } from "./plantLoops";
 import { CAM_H, CAM_PX, CAM_W, lookOf, paintCamera } from "./nightwatch/cameras";
 import { loadPlates } from "./nightwatch/plates";
@@ -235,6 +236,7 @@ function NightShift({ s, nightNo, onLeave, replay = false }: { s: GameState; nig
     const g = recordNight(s.flags, n, nightNo, replay || n.replay);
     if (!replay && !n.replay && g.trust) bumpTrust(s, "elena", g.trust);
     if (!replay && !n.replay) pushMsg(s, g.done ? `Night ${nightNo} watched. Grade ${g.letter}.` : `Night ${nightNo} is a ${g.letter}. Elena sends you back.`);
+    if (!replay && !n.replay) writeSave(s, true);
     startAmbience()?.duck(true);
   });
 
@@ -523,8 +525,12 @@ export function NightRotation({ s, onNewWeek, onMenu }: { s: GameState; onNewWee
         onLeave={() => {
           if (s.flags["night:4:done"]) {
             s.flags["rot:dawn"] = true;
+            writeSave(s, true);
             setPhase("dawn");
-          } else setPhase("opener");
+          } else {
+            writeSave(s, true);
+            setPhase("opener");
+          }
         }}
       />
     );
@@ -545,6 +551,7 @@ export function NightRotation({ s, onNewWeek, onMenu }: { s: GameState; onNewWee
             data-testid="report-nights"
             onClick={() => {
               s.flags["rot:reported"] = true;
+              writeSave(s, true);
               setPhase("opener");
             }}
           >
@@ -557,7 +564,7 @@ export function NightRotation({ s, onNewWeek, onMenu }: { s: GameState; onNewWee
           <p className="font-mono text-[10px] tracking-widest text-[#6a4a32]">Night {next}</p>
           <h2 className="font-display mt-2 text-3xl">18:00 turnover</h2>
           <p className="mt-3 text-sm leading-relaxed">18:00 turnover. Quiet board. At midnight the watch desk is yours.</p>
-          <button type="button" className="paper-btn-primary mt-5 w-full" style={{ minHeight: 44 }} data-testid="start-night" onClick={() => setPhase("shift")}>
+          <button type="button" className="paper-btn-primary mt-5 w-full" style={{ minHeight: 44 }} data-testid="start-night" onClick={() => { writeSave(s, true); setPhase("shift"); }}>
             Take the watch
           </button>
         </div>

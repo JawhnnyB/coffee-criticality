@@ -2,7 +2,7 @@
 
 Brief: `docs/grok/rotation-fixes.md`. Start at the first `todo`. Mark each `done` or `blocked: <reason>`, with one line on what changed. Commit and push after every item.
 
-- R1 todo · Nothing is saved after the week ends
+- R1 done · Rotate to nights stands on the dusk lot (play, so writeSave can run) and world keys do not reach the sim. The save is written on rotate, report, start, the grade, sleep, and dawn. Reload then Continue: days off, night 2's opener with grade A and trust 35, and the dawn card with trust 44. Page errors 0.
 - R2 todo · The turnover sheet is about 20 px tall at 1280×720
 - R3 todo · A relieved night passes
 - R4 todo · The header says "NIGHT 2" while night 1's turnover is on screen
