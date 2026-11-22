@@ -106,7 +106,8 @@ export function NightWatchApp({ s }: { s: GameState }) {
   );
 }
 
-function NightShift({ s, nightNo, onLeave, replay = false }: { s: GameState; nightNo: number; onLeave: () => void; replay?: boolean }) {
+function NightShift({ s, nightNo: asked, onLeave, replay = false }: { s: GameState; nightNo: number; onLeave: () => void; replay?: boolean }) {
+  const nightNo = useRef(asked).current;
   const site = siteKind(s.plant);
   const night = useRef<Night>(newNight(site, nightNo));
   const n = night.current;
