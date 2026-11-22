@@ -609,13 +609,22 @@ export function GameApp() {
     let last = performance.now();
     let raf = 0;
     let saveAcc = 0;
+    let paintAcc = 0;
     const onPlantDl = () => {
       writeSave(stateRef.current, false);
     };
     window.addEventListener("cc-plant-download", onPlantDl);
     const loop = (now: number) => {
-      const dt = Math.min(0.1, (now - last) / 1000);
+      const frameDt = Math.min(0.1, (now - last) / 1000);
       last = now;
+      // Thirty pictures a second. The day was over the budget at sixty on a slow CPU.
+      paintAcc += frameDt;
+      if (paintAcc < 1 / 30) {
+        raf = requestAnimationFrame(loop);
+        return;
+      }
+      const dt = Math.min(0.1, paintAcc);
+      paintAcc = 0;
       const s = stateRef.current;
       // A full-screen cabinet keeps the owner at "world". The desk, when it is open, sets its own.
       if (!s.deskHost && getKeyOwner() !== "world") setKeyOwner("world");

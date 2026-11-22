@@ -1,0 +1,7 @@
+Day shift, built game, CPU throttled to 4×.
+Boot into the cafe was labelled. The walk was real keys.
+standing in the cafe: busy 1.23s of 5.00s (24.5%)
+walking the cafe: busy 1.43s of 5.00s (28.5%)
+walking toward the floor: busy 1.53s of 5.01s (30.5%)
+Worst 30.5%. Target is under 40%.
+page errors: 0
