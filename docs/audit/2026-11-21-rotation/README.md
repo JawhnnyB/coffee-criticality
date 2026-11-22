@@ -4,12 +4,12 @@ Branch `g/rotation-nights`. Not merged.
 
 ## What was checked
 
-- Visibility: `docs/audit/2026-11-21-rotation/visible.md`. Events clear 0.4%. Oddities sit between 0.12% and 2.0%. The script exits 0.
+- Visibility: `docs/audit/2026-11-21-rotation/visible.md`, re-run after the lamp tweak. Events clear 0.4%. Oddities sit between 0.12% and 2.0%. The script exits 0. The van's headlights had shrunk under that floor (0.29%). They are a 26×18 lamp now, 0.58% of the frame, and 2 cells on the sweeper's thumbnail, under the 8-cell line.
 - Night Watch unit tests, including the grade worked check, night 1's silent event, four nights, carryover, relief, the fast clock, and a logged camera. 23 pass.
-- Full suite after the last paint change: 294 tests, 285 pass, 9 fail. Those 9 are the known baseline. No new failures.
+- Full suite after the fix pass: 300 tests, 291 pass, 9 fail. The 9 names match `docs/audit/2026-11-14-evidence/fail-baseline.txt`. No new failures.
 - `npm run typecheck` passes. `npm run build` passes.
 - The built game was served with `scripts/preview-built.mjs`. Homepage HTTP 200. `vite preview` cannot: `dist/server/server.js` is not in the build.
-- Frame time: `perf.txt`. Worst feed frame at 4× is the pool at 6.9 ms. Tablet up, main thread busy 27% over 5 s at 4×.
+- Frame time, retimed alone: `perf.txt`. Worst feed frame at 4× is the pool at 6.8 ms. The Cherenkov cache is still in. Tablet up, main thread busy 27% over 5 s at 4×.
 - Mark crops and the pressurizer sign are in `visual/`.
 
 ## What was not checked

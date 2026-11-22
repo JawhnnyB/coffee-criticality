@@ -29,7 +29,7 @@ The first table missed every target, so the game was tuned, not the policy:
 
 - A caught camera stays "already logged" for 40 game minutes. One lap at 8× is about 25, and the picture is still changing while the crew clears it.
 - The pool tool bag is painted yellow. On the dark deck it was only a few thumbnail cells, so the sweeper never filed it.
-- The van's headlights and the rover's torch are smaller. They were being filed as reports.
+- The van's headlights and the rover's torch are smaller. They were being filed as reports. The lamps were later opened to 26 by 18, enough to clear 0.4% of the frame. The sweeper's thumbnail moves 2 cells, under the line of 8.
 - Once the grid tile has crossed, the switchyard arc stays lit between sparks.
 
 The sweeper also files a red grid tile as electrical. The old check never ran, because the name "grid" matched the radiation test.

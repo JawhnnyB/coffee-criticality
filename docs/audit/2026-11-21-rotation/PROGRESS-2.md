@@ -15,4 +15,4 @@ Brief: `docs/grok/rotation-fixes.md`. Start at the first `todo`. Mark each `done
 - R11 done · Production build at 8×, real clicks. Desk: nights 1–3 A, night 4 F, stood again as A, then the dawn card. Reload between nights 2 and 3 still opened night 3 (plain opener, not "again"). Phone 390×844: night 1 A, night 4 A. Shots and grades in r11/.
 - R12 done · Hooks setResidue and setMaintDone. Night 1 with the valve hidden: aux camera at 01:44 shows the weep, and the sheet says Valve 14 packing weeping, from days. Night 2 with maintenance not done: turbine camera at 02:34, feedwater low, and the sheet says Feed pump B tripped at 02:30, from days. Shots in r12/.
 - R13 done · Every new line from R3, R5, R7, and R8 is listed in the rotation README for approval. The logged window is 40 game minutes and is not spoken.
-- R14 todo · Run the full suite once at the end,
+- R14 done · Full suite 300 tests, 291 pass, 9 fail. The 9 names match the baseline. Typecheck and build pass. Visibility exits 0 after the van lamps were opened from 18×12 to 26×18 (0.58% of the frame, 2 thumbnail cells). Pool paint at 4× is 6.8 ms. The plates-fix perf file was not kept.

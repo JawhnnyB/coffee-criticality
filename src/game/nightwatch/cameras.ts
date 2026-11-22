@@ -1043,9 +1043,9 @@ const S: Record<string, Scene> = {
         // Headlights coming up the access road.
         const x = 40 + van * 200;
         g.globalCompositeOperation = "lighter";
-        for (const dx of [0, 14]) {
-          g.fillStyle = rad(g, x + dx, 206, 16, [[0, "rgba(255,250,230,0.9)"], [0.5, "rgba(255,236,190,0.35)"], [1, "rgba(0,0,0,0)"]]);
-          g.fillRect(x + dx - 8, 198, 18, 12);
+        for (const dx of [0, 16]) {
+          g.fillStyle = rad(g, x + dx, 206, 22, [[0, "rgba(255,250,230,0.95)"], [0.45, "rgba(255,236,190,0.55)"], [1, "rgba(0,0,0,0)"]]);
+          g.fillRect(x + dx - 12, 196, 26, 18);
         }
         g.globalCompositeOperation = "source-over";
       }
