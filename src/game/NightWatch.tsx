@@ -164,6 +164,7 @@ function NightShift({ s, nightNo: asked, onLeave, replay = false }: { s: GameSta
     const r = report(n, c);
     setReporting(false);
     if (r.ok) say(r.early ? "Logged before the board knew. The crew is on it." : "Logged. The crew is on it.");
+    else if (r.reason === "logged") say("Already logged. The crew is on it.");
     else say(r.reason === "wrong-kind" ? "That is not what is wrong there. Logged as a false report." : "Nothing safety-related on this camera. Logged as a false report.");
     rerender();
   };

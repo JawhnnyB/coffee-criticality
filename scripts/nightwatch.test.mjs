@@ -289,6 +289,28 @@ test("being relieved is an F, an open event is a miss, and the C line is only at
   assert.equal(W.elenaLine("F", true, "relieved"), "Relieved. The night is not done.");
 });
 
+test("a report on a camera just logged is not a false report", () => {
+  const n = W.newNight("pwr", 1);
+  const bag = W.siteWatch("pwr").events.find((e) => e.id === "pool-fme");
+  const later = W.siteWatch("pwr").events.find((e) => e.id === "pool-level");
+  n.events = [{ def: bag, start: 10, caughtAt: null, early: false, doneAt: null }];
+  n.minute = 12;
+  n.camera = "pool";
+  assert.equal(W.report(n, "foreign").ok, true);
+  const second = W.report(n, "equipment");
+  assert.equal(second.ok, false);
+  assert.equal(second.reason, "logged");
+  assert.equal(n.falseReports, 0);
+  n.minute = 12 + 21;
+  assert.equal(W.report(n, "equipment").reason, "nothing");
+  assert.equal(n.falseReports, 1);
+  n.events.push({ def: later, start: 40, caughtAt: null, early: false, doneAt: null });
+  n.minute = 41;
+  const next = W.report(n, later.accept[0]);
+  assert.equal(next.ok, true);
+  assert.equal(n.falseReports, 1);
+});
+
 test("a D or an F opens the night again", () => {
   assert.equal(W.openerLine(2, true), "Night 2, again. Elena wants it stood properly.");
   assert.equal(W.openerLine(1, false).includes("again"), false);

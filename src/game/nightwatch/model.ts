@@ -617,7 +617,7 @@ export function visualsOn(n: Night, camera: string): string[] {
   return v;
 }
 
-export type ReportResult = { ok: true; event: ActiveEvent; early: boolean } | { ok: false; reason: "nothing" | "wrong-kind" };
+export type ReportResult = { ok: true; event: ActiveEvent; early: boolean } | { ok: false; reason: "nothing" | "wrong-kind" | "logged" };
 
 /** Elena takes the chair. Anything already on a camera and still open is a miss. The night is an F. */
 export function relieve(n: Night) {
@@ -635,6 +635,8 @@ export function report(n: Night, category: Category): ReportResult {
   if (n.over) return { ok: false, reason: "nothing" };
   const e = liveOn(n, n.camera);
   if (!e) {
+    const recent = n.events.some((ev) => ev.def.camera === n.camera && ev.caughtAt !== null && n.minute - ev.caughtAt <= 20);
+    if (recent) return { ok: false, reason: "logged" };
     n.falseReports += 1;
     n.log.push(`${clock(n.minute)} False report from ${cameraName(n, n.camera)}.`);
     if (n.falseReports >= FALSE_REPORT_LIMIT) relieve(n);

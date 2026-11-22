@@ -9,7 +9,7 @@ Brief: `docs/grok/rotation-fixes.md`. Start at the first `todo`. Mark each `done
 - R5 todo · Leaving mid-night is a free retry
 - R6 done · After dawn the save sets rot:complete. The overlay hides on the menu and comes back on Continue. New week still asks before wiping. Checked in a browser: Menu leaves the dawn card, Continue shows it again.
 - R7 done · After a D or an F the opener says "Night N, again. Elena wants it stood properly." A first try still uses the plain opener.
-- R8 todo · Reporting an event you already logged is punished
+- R8 done · A second report on a camera logged within 20 game minutes says "Already logged. The crew is on it." No penalty. A new event on that camera still counts. Unit test covers both.
 - R9 todo · A test-only fast clock,
 - R10 todo · Bot table (B6 and F5), at 8×, in the background
 - R11 todo · The full rotation (F3 and F4) with the fast clock
