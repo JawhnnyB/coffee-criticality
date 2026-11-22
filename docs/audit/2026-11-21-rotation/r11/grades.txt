@@ -1,0 +1,9 @@
+desk {"night":1,"grade":"Grade A","stat":"Caught 3 (2 early) · missed 0 · false reports 0","errors":0}
+desk {"night":2,"grade":"Grade A","stat":"Caught 5 (2 early) · missed 0 · false reports 1","errors":0}
+desk {"night":3,"grade":"Grade A","stat":"Caught 5 (2 early) · missed 0 · false reports 1","errors":0}
+desk {"night":4,"grade":"Grade F","stat":"Caught 5 (2 early) · missed 1 · false reports 3","errors":0}
+desk {"night":"4-again","grade":"Grade A","stat":"Caught 6 (2 early) · missed 0 · false reports 2","errors":0}
+desk DAWN Dawn · Lot THE LOT AT DAWN The lot is pale. Elena nods once and keeps walking. Elena: You caught them before the board did. That is the job. New week Menu errors 0
+EXIT:0
+phone night 1: Grade A, caught 3 (2 early), missed 0, false 0
+phone night 4: Grade A, caught 6 (2 early), missed 0, false 1
