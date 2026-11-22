@@ -1,9 +1,10 @@
 /**
- * Step 8. One week and four nights, desk and phone.
+ * One week and four nights, desk and phone.
  * Mornings, the dusk walk, end-of-day buttons, and nights are real clicks.
  * The day clock only moves while you walk, so each afternoon is the labelled
- * end-of-day hook. Nights use the labelled 16× clock and real camera clicks.
- *   node scripts/value-week.mjs http://127.0.0.1:8096/
+ * end-of-day hook. Nights use the R10 sweeper at 8× (thumbnail diff, 40-minute
+ * logged window). Set VALUE_STEP so a re-run does not overwrite an older proof.
+ *   VALUE_STEP=08b node scripts/value-week.mjs http://127.0.0.1:8098/
  */
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { chromium, devices } from "../node_modules/playwright/index.mjs";
@@ -35,74 +36,130 @@ function shot(page, name) {
 
 async function sweepNight(page) {
   await page.waitForFunction(() => typeof window.__controlsTest.setNightSpeed === "function");
-  await page.evaluate(() => window.__controlsTest.setNightSpeed(16));
+  // R10 policy. Labelled fast clock, this shift only. 8×, not 16×.
+  await page.evaluate(() => window.__controlsTest.setNightSpeed(8));
   const z = (ms) => page.waitForTimeout(ms);
   const cams = await page.locator("[data-testid^='nw-cam-']").evaluateAll((els) => els.map((e) => e.getAttribute("data-testid").slice(7)));
+  const thumb = () =>
+    page.evaluate(() => {
+      const c = document.querySelector("[data-testid='nw-canvas']");
+      if (!c) return null;
+      const t = document.createElement("canvas");
+      t.width = 32;
+      t.height = 18;
+      const g = t.getContext("2d");
+      g.drawImage(c, 0, 0, 32, 18);
+      return Array.from(g.getImageData(0, 0, 32, 18).data.filter((_, i) => i % 4 !== 3));
+    });
+  const diff = (a, b) => {
+    if (!a || !b) return 0;
+    let n = 0;
+    for (let i = 0; i < a.length; i += 3) {
+      const d = (Math.abs(a[i] - b[i]) + Math.abs(a[i + 1] - b[i + 1]) + Math.abs(a[i + 2] - b[i + 2])) / 3;
+      if (d > 22) n++;
+    }
+    return n;
+  };
   const report = async (id, cat) => {
     try {
-      await page.locator(`[data-testid='nw-cam-${id}']`).click({ timeout: 3000 });
-      await z(80);
+      await page.locator(`[data-testid='nw-cam-${id}']`).click({ timeout: 4000 });
+      await z(120);
       const btn = page.locator("[data-testid='nw-report']");
       if (!(await btn.isEnabled().catch(() => false))) {
         await page.keyboard.press(" ");
-        await z(80);
+        await z(100);
       }
       if (!(await btn.isEnabled().catch(() => false))) return "fail";
-      await btn.click({ timeout: 3000 });
-      await z(60);
+      await btn.click({ timeout: 4000 });
+      await z(80);
       const catBtn = page.locator(`[data-testid='nw-cat-${cat}']`);
       if (!(await catBtn.isEnabled().catch(() => false))) return "fail";
-      await catBtn.click({ timeout: 3000 });
-      await z(60);
+      await catBtn.click({ timeout: 4000 });
+      await z(80);
       const toast = await page.locator("[data-testid='nw-toast']").innerText().catch(() => "");
+      if (/false report/i.test(toast)) return "false";
       if (/logged/i.test(toast)) return "logged";
       return "false";
     } catch {
       return "fail";
     }
   };
+  const baseLine = {};
   const logged = {};
   let ci = 0;
   const t0 = Date.now();
-  while (Date.now() - t0 < 90000) {
-    if (await page.locator("[data-testid='plant-phone']").count()) return { grade: "crash", stat: "plant phone" };
-    if (await page.locator("[data-testid='nw-summary']").count()) break;
-    const coffee = await page.locator("[data-testid='nw-coffee']").innerText().catch(() => "");
-    const bar = await page.locator("[data-testid='nw-coffee'] span span").first().evaluate((e) => parseFloat(e.style.width)).catch(() => 80);
-    if (bar < 16 && coffee && !coffee.includes("brewing") && !coffee.includes("0 pot")) {
-      await page.keyboard.press("b");
-      await z(60);
-      continue;
-    }
-    if (coffee.includes("brewing")) {
-      await z(120);
-      continue;
-    }
-    const minute = mins(await page.locator("[data-testid='nw-clock']").innerText().catch(() => ""));
-    const flashing = await page.locator("[data-testid^='nw-cam-'][data-alarm='1']").evaluateAll((els) => els.map((e) => e.getAttribute("data-testid").slice(7)));
-    if (flashing.length) {
-      const id = flashing[0];
-      if (logged[id] == null || minute - logged[id] > 40) {
-        const red = await page.locator("[data-testid^='nw-tile-'][data-alarm='1']").evaluateAll((els) => els.map((e) => e.getAttribute("data-testid").slice(8)));
-        if ((await report(id, pick(red))) === "logged") logged[id] = minute;
+  while (Date.now() - t0 < 180000) {
+    try {
+      if (await page.locator("[data-testid='plant-phone']").count()) return { grade: "crash", stat: "plant phone", head: "", reason: "plant phone", wide: 0, ms: Date.now() - t0 };
+      if (await page.locator("[data-testid='nw-summary']").count()) break;
+      const coffee = await page.locator("[data-testid='nw-coffee']").innerText();
+      const bar = await page.locator("[data-testid='nw-coffee'] span span").first().evaluate((e) => parseFloat(e.style.width)).catch(() => 80);
+      if (bar < 16 && !coffee.includes("brewing") && !coffee.includes("0 pot")) {
+        await page.keyboard.press("b");
+        await z(80);
+        continue;
       }
-    }
-    const id = cams[ci++ % Math.max(1, cams.length)];
-    if (!id) {
+      if ((await page.locator("[data-testid='nw-coffee']").innerText()).includes("brewing")) {
+        await z(150);
+        continue;
+      }
+      const minute = mins(await page.locator("[data-testid='nw-clock']").innerText());
+      const flashing = await page.locator("[data-testid^='nw-cam-'][data-alarm='1']").evaluateAll((els) => els.map((e) => e.getAttribute("data-testid").slice(7)));
+      if (flashing.length) {
+        const id = flashing[0];
+        if (logged[id] == null || minute - logged[id] > 40) {
+          const red = await page.locator("[data-testid^='nw-tile-'][data-alarm='1']").evaluateAll((els) => els.map((e) => e.getAttribute("data-testid").slice(8)));
+          if ((await report(id, pick(red))) === "logged") {
+            logged[id] = minute;
+            baseLine[id] = null;
+          }
+        }
+      }
+      const id = cams[ci++ % cams.length];
+      const camBtn = page.locator(`[data-testid='nw-cam-${id}']`);
+      if (!(await camBtn.isEnabled().catch(() => false))) {
+        await z(40);
+        continue;
+      }
+      if (logged[id] != null && minute - logged[id] <= 40) {
+        await camBtn.click({ timeout: 4000 }).catch(() => {});
+        await z(480);
+        baseLine[id] = await thumb();
+        continue;
+      }
+      await camBtn.click({ timeout: 4000 });
+      await z(480);
+      const now = await thumb();
+      if (baseLine[id] && diff(baseLine[id], now) >= 8) {
+        const red = await page.locator("[data-testid^='nw-tile-'][data-alarm='1']").evaluateAll((els) => els.map((e) => e.getAttribute("data-testid").slice(8)));
+        const cat = red.length ? pick(red) : id === "aux" ? "access" : id === "pool" ? "foreign" : "equipment";
+        if ((await report(id, cat)) === "logged") logged[id] = minute;
+      }
+      baseLine[id] = await thumb();
+    } catch {
+      if (await page.locator("[data-testid='nw-summary']").count().catch(() => 0)) break;
       await z(80);
-      continue;
     }
-    await page.locator(`[data-testid='nw-cam-${id}']`).click({ timeout: 3000 }).catch(() => {});
-    await z(180);
   }
   const grade = await page.locator("[data-testid='nw-grade']").evaluate((e) => e.textContent || "").catch(() => "none");
-  const stat = await page.locator("[data-testid='nw-summary'] p").evaluateAll((els) => els.map((e) => e.textContent || "")).catch(() => []);
+  const paras = await page.locator("[data-testid='nw-summary'] p").evaluateAll((els) => els.map((e) => e.textContent || "")).catch(() => []);
+  const head = (paras[0] || "").trim();
+  const stat = (paras.find((t) => t.includes("false")) || paras[1] || "").trim();
   const wide = await page.evaluate(() => {
     const el = document.querySelector("[data-testid='nightwatch-shift']");
     if (!el) return 0;
     return el.scrollWidth - el.clientWidth;
   });
-  return { grade, stat: (stat.find((t) => t.includes("false")) || stat[0] || "").trim(), wide, ms: Date.now() - t0 };
+  let reason = "";
+  if (/F/.test(grade) || grade === "none" || grade === "crash") {
+    let why = "score";
+    if (/emergency/i.test(head)) why = "trip";
+    else if (/Elena takes/i.test(head)) why = "relieved";
+    else if (/missed [1-9]/.test(stat)) why = "misses";
+    else if (grade === "none") why = "no turnover";
+    reason = `${why}. ${head} ${stat}`.replace(/\s+/g, " ").trim();
+  }
+  return { grade, stat, head, reason, wide, ms: Date.now() - t0 };
 }
 
 async function fitOf(page, testid) {
@@ -282,19 +339,37 @@ async function runSize(name, contextOptions) {
     else await report.click();
     await page.waitForTimeout(300);
 
-    for (let night = 1; night <= 4; night++) {
-      await shot(page, `${name}-night${night}`);
+    let spins = 0;
+    while (spins < 8) {
+      spins += 1;
+      if (await page.getByTestId("dawn-lot").count()) break;
+      const opener = page.getByTestId("night-opener");
+      if (!(await opener.count())) {
+        const card = (await page.locator("body").innerText()).replace(/\s+/g, " ").slice(0, 240);
+        bugs.push("night card missing");
+        lines.push(`night card missing: ${card}`);
+        break;
+      }
+      const head = (await opener.locator("p").first().innerText()).replace(/\s+/g, " ").trim();
+      const shown = Number((head.match(/(\d+)/) || [])[1] || 0);
+      const again = /again/i.test(head);
+      if (!shown) {
+        bugs.push("night card had no number");
+        lines.push(`night card: ${head}`);
+        break;
+      }
+      const tag = again ? `${name}-night${shown}-again` : `${name}-night${shown}`;
+      await shot(page, tag);
       await page.evaluate(() => window.__controlsTest.setNightSeed(1));
       const start = page.getByTestId("start-night");
       if (!(await start.count())) {
-        bugs.push(`night ${night} start missing`);
-        const text = (await page.locator("body").innerText()).replace(/\s+/g, " ").slice(0, 240);
-        lines.push(`night ${night} stuck: ${text}`);
+        bugs.push(`night ${shown} start missing`);
+        lines.push(`night ${shown} stuck: ${head}`);
         break;
       }
       await start.click();
       await page.waitForTimeout(250);
-      if (name === "phone" && night === 1) {
+      if (name === "phone" && shown === 1 && !again) {
         for (const id of ["nw-false", "nw-brew", "nw-tablet", "nw-leave"]) {
           const fit = await fitOf(page, id);
           lines.push(`${id} ${fit}`);
@@ -304,14 +379,16 @@ async function runSize(name, contextOptions) {
         await shot(page, `${name}-night-bar`);
       }
       const result = await sweepNight(page);
-      lines.push(`night ${night} ${JSON.stringify(result)}`);
-      console.log(name, "night", night, JSON.stringify(result));
-      if (result.grade === "crash" || result.grade === "none") bugs.push(`night ${night} did not finish (${result.grade})`);
-      if ((result.wide ?? 0) > 8) bugs.push(`night ${night} board wider than its frame by ${result.wide}px`);
-      await shot(page, `${name}-night${night}-end`);
+      const label = again ? `night ${shown} again` : `night ${shown}`;
+      lines.push(`${label} seed 1 ${JSON.stringify(result)}`);
+      console.log(name, label, JSON.stringify(result));
+      if (result.grade === "crash" || result.grade === "none") bugs.push(`${label} did not finish (${result.grade})`);
+      if (result.reason) lines.push(`${label} F reason: ${result.reason}`);
+      if ((result.wide ?? 0) > 8) bugs.push(`${label} board wider than its frame by ${result.wide}px`);
+      await shot(page, `${tag}-turnover`);
       const leave = page.getByTestId("nw-summary-leave");
       if (await leave.count()) await leave.click();
-      else bugs.push(`night ${night} no turnover leave`);
+      else bugs.push(`${label} no turnover leave`);
       await page.waitForTimeout(350);
     }
     await shot(page, `${name}-after-nights`);

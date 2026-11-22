@@ -1,0 +1,61 @@
+{
+  "desk": {
+    "lines": [
+      "signed",
+      "walked in",
+      "arrive | mode play day 1 room cafe 412 | page-wide 0",
+      "day 1 morning | mode play day 1 room cafe 412 | page-wide 0",
+      "day 1 eod | mode eod day 1 room cafe 990 | page-wide 0",
+      "day 2 morning | mode play day 2 room gate 412 | page-wide 0",
+      "day 2 eod | mode eod day 2 room gate 990 | page-wide 0",
+      "day 3 morning | mode play day 3 room gate 412 | page-wide 0",
+      "day 3 eod | mode eod day 3 room gate 990 | page-wide 0",
+      "day 4 morning | mode play day 4 room gate 412 | page-wide 0",
+      "day 4 eod | mode eod day 4 room gate 990 | page-wide 0",
+      "day 5 morning | mode play day 5 room gate 412 | page-wide 0",
+      "day 5 eod | mode eod day 5 room gate 990 | page-wide 0",
+      "dusk | mode play day 5 room gate 1030 | page-wide 0",
+      "night 1 seed 1 {\"grade\":\"Grade A\",\"stat\":\"Caught 3 (2 early) · missed 0 · false reports 0\",\"head\":\"06:00 turnover.\",\"reason\":\"\",\"wide\":0,\"ms\":56428}",
+      "night 2 seed 1 {\"grade\":\"Grade A\",\"stat\":\"Caught 5 (2 early) · missed 0 · false reports 1\",\"head\":\"06:00 turnover.\",\"reason\":\"\",\"wide\":0,\"ms\":56736}",
+      "night 3 seed 1 {\"grade\":\"Grade A\",\"stat\":\"Caught 5 (2 early) · missed 0 · false reports 2\",\"head\":\"06:00 turnover.\",\"reason\":\"\",\"wide\":0,\"ms\":56659}",
+      "night 4 seed 1 {\"grade\":\"Grade A\",\"stat\":\"Caught 6 (2 early) · missed 0 · false reports 0\",\"head\":\"06:00 turnover.\",\"reason\":\"\",\"wide\":0,\"ms\":60317}",
+      "after nights | mode play day 5 room gate 1030 | page-wide 0",
+      "dawn lot is up"
+    ],
+    "bugs": [],
+    "errors": [],
+    "missing": []
+  },
+  "phone": {
+    "lines": [
+      "signed",
+      "walked in",
+      "arrive | mode play day 1 room cafe 412 | page-wide 0",
+      "day 1 morning | mode play day 1 room cafe 412 | page-wide 0",
+      "day 1 eod | mode eod day 1 room cafe 990 | page-wide 0",
+      "short eod button scroll",
+      "day 2 morning | mode play day 2 room gate 412 | page-wide 0",
+      "day 2 eod | mode eod day 2 room gate 990 | page-wide 0",
+      "day 3 morning | mode play day 3 room gate 412 | page-wide 0",
+      "day 3 eod | mode eod day 3 room gate 990 | page-wide 0",
+      "day 4 morning | mode play day 4 room gate 412 | page-wide 0",
+      "day 4 eod | mode eod day 4 room gate 990 | page-wide 0",
+      "day 5 morning | mode play day 5 room gate 412 | page-wide 0",
+      "day 5 eod | mode eod day 5 room gate 990 | page-wide 0",
+      "dusk | mode play day 5 room gate 1030 | page-wide 0",
+      "nw-false ok",
+      "nw-brew ok",
+      "nw-tablet ok",
+      "nw-leave ok",
+      "night 1 seed 1 {\"grade\":\"Grade A\",\"stat\":\"Caught 3 (2 early) · missed 0 · false reports 0\",\"head\":\"06:00 turnover.\",\"reason\":\"\",\"wide\":0,\"ms\":56691}",
+      "night 2 seed 1 {\"grade\":\"Grade A\",\"stat\":\"Caught 5 (2 early) · missed 0 · false reports 0\",\"head\":\"06:00 turnover.\",\"reason\":\"\",\"wide\":0,\"ms\":56714}",
+      "night 3 seed 1 {\"grade\":\"Grade A\",\"stat\":\"Caught 5 (2 early) · missed 0 · false reports 1\",\"head\":\"06:00 turnover.\",\"reason\":\"\",\"wide\":0,\"ms\":56879}",
+      "night 4 seed 1 {\"grade\":\"Grade A\",\"stat\":\"Caught 6 (2 early) · missed 0 · false reports 0\",\"head\":\"06:00 turnover.\",\"reason\":\"\",\"wide\":0,\"ms\":60857}",
+      "after nights | mode play day 5 room gate 1030 | page-wide 0",
+      "dawn lot is up"
+    ],
+    "bugs": [],
+    "errors": [],
+    "missing": []
+  }
+}
