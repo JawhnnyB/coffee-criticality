@@ -13,6 +13,6 @@ Brief: `docs/grok/rotation-fixes.md`. Start at the first `todo`. Mark each `done
 - R9 done · __controlsTest.setNightSpeed(n) speeds the current shift only. Coffee, brewing, fatigue and escalation all follow game minutes, so 8× matches 1×. Not on any button.
 - R10 done · Flash and sweeper, nights 1–4, seeds 1 and 2, at 8×. Flash average rank 1.50 (C or worse). Sweeper 3.50 (B or better). False reports 0.56 a night. Table in bots.md. A caught camera stays logged for 40 game minutes, the tool bag is yellow, the van and the rover's torch are smaller, and the switchyard arc stays lit once the grid tile has crossed.
 - R11 done · Production build at 8×, real clicks. Desk: nights 1–3 A, night 4 F, stood again as A, then the dawn card. Reload between nights 2 and 3 still opened night 3 (plain opener, not "again"). Phone 390×844: night 1 A, night 4 A. Shots and grades in r11/.
-- R12 todo · Prove the day week reaches the nights in a browser,
+- R12 done · Hooks setResidue and setMaintDone. Night 1 with the valve hidden: aux camera at 01:44 shows the weep, and the sheet says Valve 14 packing weeping, from days. Night 2 with maintenance not done: turbine camera at 02:34, feedwater low, and the sheet says Feed pump B tripped at 02:30, from days. Shots in r12/.
 - R13 todo · Copy:
 - R14 todo · Run the full suite once at the end,

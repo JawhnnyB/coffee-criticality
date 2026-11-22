@@ -392,6 +392,15 @@ export function GameApp() {
       setNightSeed: (n: number) => {
         setNextNightSeed(n);
       },
+      setResidue: (key: string, how: string) => {
+        const s = stateRef.current;
+        if (key !== "valve" && key !== "tag" && key !== "dose" && key !== "log") return;
+        if (how !== "open" && how !== "caught" && how !== "hid") return;
+        s.residue[key] = how;
+      },
+      setMaintDone: (v: boolean) => {
+        stateRef.current.maintDone = v;
+      },
       canClose: () => canCloseShift(stateRef.current),
       reportHere: () => {
         const s = stateRef.current;
@@ -3214,6 +3223,8 @@ declare global {
       setFlag: (k: string, v: boolean) => void;
       setNightSeed?: (n: number) => void;
       setNightSpeed?: (n: number) => void;
+      setResidue?: (key: string, how: string) => void;
+      setMaintDone?: (v: boolean) => void;
       canClose: () => boolean;
       reportHere: () => void;
       travel: (room: string) => void;
