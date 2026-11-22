@@ -26,6 +26,10 @@ const RANK: Record<GradeLetter, number> = { F: 0, D: 1, C: 2, B: 3, A: 4 };
 export const ELENA_RELIEVED = "I have the chair. This night does not count.";
 export const ELENA_RELIEVED_CURT = "Relieved. The night is not done.";
 
+export function openerLine(night: number, again: boolean): string {
+  return again ? `Night ${night}, again. Elena wants it stood properly.` : "18:00 turnover. Quiet board. At midnight the watch desk is yours.";
+}
+
 export function elenaLine(letter: GradeLetter, curt: boolean, why?: string): string {
   if (why === "relieved") return curt ? ELENA_RELIEVED_CURT : ELENA_RELIEVED;
   if (letter === "C" && why != null && why !== "dawn") return curt ? "You did not reach six." : "Six is the end of the night. This one ended early.";

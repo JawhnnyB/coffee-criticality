@@ -289,6 +289,26 @@ test("being relieved is an F, an open event is a miss, and the C line is only at
   assert.equal(W.elenaLine("F", true, "relieved"), "Relieved. The night is not done.");
 });
 
+test("a D or an F opens the night again", () => {
+  assert.equal(W.openerLine(2, true), "Night 2, again. Elena wants it stood properly.");
+  assert.equal(W.openerLine(1, false).includes("again"), false);
+});
+
+test("leaving the watch is the same as being relieved", () => {
+  const n = W.newNight("pwr", 1);
+  const open = W.siteWatch("pwr").events.find((e) => e.id === "porv");
+  n.events = [{ def: open, start: 10, caughtAt: null, early: false, doneAt: null }];
+  n.minute = 20;
+  W.relieve(n);
+  assert.equal(n.over?.why, "relieved");
+  assert.equal(n.events[0].doneAt, 20);
+  assert.equal(W.grade(n).letter, "F");
+  const flags = {};
+  const g = W.recordNight(flags, n, 1, false);
+  assert.equal(g.done, false);
+  assert.equal(g.trust, -2);
+});
+
 test("surviving to 06:00 is dawn, with the score", () => {
   const n = W.newNight("bwr", 2);
   for (const e of n.events) e.caughtAt = e.def.start;

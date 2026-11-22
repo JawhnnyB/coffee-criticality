@@ -35,7 +35,7 @@ import {
   type Night,
 } from "./nightwatch/model";
 import { applyCarry, carryover } from "./nightwatch/carryover";
-import { elenaLine, oddityNotes, recordNight, turnoverRows } from "./nightwatch/turnover";
+import { elenaLine, oddityNotes, openerLine, recordNight, turnoverRows } from "./nightwatch/turnover";
 
 /** Real seconds per game minute: a night is about seven and a half minutes. */
 const SECONDS_PER_MINUTE = 1.25;
@@ -541,6 +541,7 @@ export function NightRotation({ s, onNewWeek, onMenu }: { s: GameState; onNewWee
     if (!s.flags["rot:reported"]) return "off";
     return "opener";
   });
+  const again = bestLetter(s.flags, next) === "D" || bestLetter(s.flags, next) === "F";
   const weekLine = s.ended === "a" ? "The week held. You still wake at the wrong hour." : s.hides >= 3 ? "You keep replaying the things you did not say." : "The plant is someone else's problem until midnight.";
   const grades = [1, 2, 3, 4].map((k) => bestLetter(s.flags, k)).filter(Boolean);
   const avg = grades.length ? grades.reduce((sum, letter) => sum + { A: 4, B: 3, C: 2, D: 1, F: 0 }[letter as "A"], 0) / grades.length : 2;
@@ -591,9 +592,9 @@ export function NightRotation({ s, onNewWeek, onMenu }: { s: GameState; onNewWee
       ) : null}
       {phase === "opener" ? (
         <div className="paper mx-auto w-full p-4 sm:p-5" style={CARD} data-testid="night-opener">
-          <p className="font-mono text-[10px] tracking-widest text-[#6a4a32]">Night {next}</p>
-          <h2 className="font-display mt-2 text-3xl">18:00 turnover</h2>
-          <p className="mt-3 text-sm leading-relaxed">18:00 turnover. Quiet board. At midnight the watch desk is yours.</p>
+          <p className="font-mono text-[10px] tracking-widest text-[#6a4a32]">{again ? `Night ${next}, again` : `Night ${next}`}</p>
+          <h2 className="font-display mt-2 text-3xl">{again ? "Stand it again" : "18:00 turnover"}</h2>
+          <p className="mt-3 text-sm leading-relaxed">{openerLine(next, again)}</p>
           <button type="button" className="paper-btn-primary mt-5 w-full" style={{ minHeight: 44 }} data-testid="start-night" onClick={() => { writeSave(s, true); setPhase("shift"); }}>
             Take the watch
           </button>
