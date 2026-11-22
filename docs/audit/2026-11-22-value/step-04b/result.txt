@@ -1,0 +1,71 @@
+TAP version 13
+# Subtest: winning CATCH twice in one day pays culture once and adds no catch
+ok 1 - winning CATCH twice in one day pays culture once and adds no catch
+  ---
+  duration_ms: 1.601523
+  type: 'test'
+  ...
+# Subtest: CATCH culture pays again the next day
+ok 2 - CATCH culture pays again the next day
+  ---
+  duration_ms: 0.224454
+  type: 'test'
+  ...
+# Subtest: a losing CATCH run still reads as a lie, and its consolation pays once per day
+ok 3 - a losing CATCH run still reads as a lie, and its consolation pays once per day
+  ---
+  duration_ms: 0.298761
+  type: 'test'
+  ...
+# Subtest: a delay survival pays culture once per day, not per replay
+ok 4 - a delay survival pays culture once per day, not per replay
+  ---
+  duration_ms: 0.326348
+  type: 'test'
+  ...
+# Subtest: a good bowl round pays Jordan trust and culture once
+ok 5 - a good bowl round pays Jordan trust and culture once
+  ---
+  duration_ms: 0.261015
+  type: 'test'
+  ...
+# Subtest: a good golf round pays Mabel trust; a poor one pays nothing
+ok 6 - a good golf round pays Mabel trust; a poor one pays nothing
+  ---
+  duration_ms: 0.246289
+  type: 'test'
+  ...
+# Subtest: a runaway core is never called holding
+ok 7 - a runaway core is never called holding
+  ---
+  duration_ms: 0.878883
+  type: 'test'
+  ...
+# Subtest: the holding band reads as holding, with the number
+ok 8 - the holding band reads as holding, with the number
+  ---
+  duration_ms: 0.185479
+  type: 'test'
+  ...
+# Subtest: below one the crowd shrinks, and far below it dies out
+ok 9 - below one the crowd shrinks, and far below it dies out
+  ---
+  duration_ms: 0.122178
+  type: 'test'
+  ...
+# Subtest: the leakage line says what the edge takes
+ok 10 - the leakage line says what the edge takes
+  ---
+  duration_ms: 0.099492
+  type: 'test'
+  ...
+1..10
+# tests 10
+# suites 0
+# pass 10
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 218.960378
+EXIT:0
