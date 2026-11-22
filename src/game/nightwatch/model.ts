@@ -487,11 +487,19 @@ export function radio(n: Night): string[] {
   return lines;
 }
 
+/** One night's seed, consumed by the next newNight. Test hook only. Never a button. */
+let pendingSeed: number | null = null;
+export function setNextNightSeed(seed: number | null) {
+  pendingSeed = seed;
+}
+
 /** Lay out the night: events and oddities, spread so nothing starts in the first 15 or last 30 minutes. */
 export function newNight(site: SiteKind, night: number, seed = night * 7919 + site.length): Night {
+  const use = pendingSeed ?? seed;
+  pendingSeed = null;
   const watch = siteWatch(site);
   const cfg = NIGHTS[Math.max(0, Math.min(NIGHTS.length - 1, night - 1))];
-  const r = rng(seed);
+  const r = rng(use);
   const pool = watch.events.slice();
   const events: ActiveEvent[] = [];
   const span = NIGHT_MINUTES - 120;
@@ -642,7 +650,7 @@ export function report(n: Night, category: Category): ReportResult {
   if (n.over) return { ok: false, reason: "nothing" };
   const e = liveOn(n, n.camera);
   if (!e) {
-    const recent = n.events.some((ev) => ev.def.camera === n.camera && ev.caughtAt !== null && n.minute - ev.caughtAt <= 20);
+    const recent = n.events.some((ev) => ev.def.camera === n.camera && ev.caughtAt !== null && n.minute - ev.caughtAt <= 40);
     if (recent) return { ok: false, reason: "logged" };
     n.falseReports += 1;
     n.log.push(`${clock(n.minute)} False report from ${cameraName(n, n.camera)}.`);

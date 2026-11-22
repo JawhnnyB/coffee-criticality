@@ -289,6 +289,16 @@ test("being relieved is an F, an open event is a miss, and the C line is only at
   assert.equal(W.elenaLine("F", true, "relieved"), "Relieved. The night is not done.");
 });
 
+test("a pending seed is used for one night only", () => {
+  const ids = (n) => n.events.map((e) => `${e.def.id}@${e.start}`).join(",");
+  const a = W.newNight("pwr", 1, 1);
+  W.setNextNightSeed(99);
+  const b = W.newNight("pwr", 1);
+  const c = W.newNight("pwr", 1, 1);
+  assert.notEqual(ids(a), ids(b));
+  assert.equal(ids(a), ids(c));
+});
+
 test("an 8× clock covers the same coffee, brew, fatigue and escalation as 1×", () => {
   const close = (a, b, label) => assert.ok(Math.abs(a - b) < 1e-6, `${label} ${a} vs ${b}`);
   assert.equal(W.gameMinutes(W.SECONDS_PER_MINUTE, 1), 1);
@@ -333,7 +343,10 @@ test("a report on a camera just logged is not a false report", () => {
   assert.equal(second.ok, false);
   assert.equal(second.reason, "logged");
   assert.equal(n.falseReports, 0);
-  n.minute = 12 + 21;
+  n.minute = 12 + 30;
+  assert.equal(W.report(n, "equipment").reason, "logged");
+  assert.equal(n.falseReports, 0);
+  n.minute = 12 + 41;
   assert.equal(W.report(n, "equipment").reason, "nothing");
   assert.equal(n.falseReports, 1);
   n.events.push({ def: later, start: 40, caughtAt: null, early: false, doneAt: null });

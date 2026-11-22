@@ -367,8 +367,8 @@ function rover(g: G, p: number, t: number, floorY: number, s = 1) {
   g.save();
   g.translate(x + 18 * s, floorY);
   g.scale(1, 0.25);
-  g.fillStyle = rad(g, 30 * s, 0, 46 * s, [[0, "rgba(255,250,220,0.28)"], [1, "rgba(0,0,0,0)"]]);
-  g.fillRect(-60 * s, -60 * s, 160 * s, 120 * s);
+  g.fillStyle = rad(g, 18 * s, 0, 20 * s, [[0, "rgba(255,250,220,0.22)"], [1, "rgba(0,0,0,0)"]]);
+  g.fillRect(-6 * s, -14 * s, 44 * s, 28 * s);
   g.restore();
   g.globalCompositeOperation = "source-over";
   g.fillStyle = "rgba(0,0,0,0.35)";
@@ -954,6 +954,13 @@ const S: Record<string, Scene> = {
         g.fillStyle = "#151515";
         g.fillRect(392, 70, 20, 6);
       }
+      if (v.has("toolBag")) {
+        // Yellow, and big enough that a quick look catches it. A dark bag on a dark deck disappears.
+        g.fillStyle = "#f0c020";
+        g.fillRect(392, 72, 72, 32);
+        g.fillStyle = "#1a1a1a";
+        g.fillRect(412, 64, 22, 10);
+      }
     },
   },
   yard: {
@@ -1005,6 +1012,14 @@ const S: Record<string, Scene> = {
       g.globalCompositeOperation = "source-over";
     },
     live(g, t, v) {
+      const arcAt = v.at("arc");
+      if (arcAt !== null && arcAt >= 0.5) {
+        // Once the grid tile has crossed, the flashover stays lit between sparks.
+        g.globalCompositeOperation = "lighter";
+        g.fillStyle = "rgba(190,210,255,0.45)";
+        g.fillRect(220, 36, 120, 80);
+        g.globalCompositeOperation = "source-over";
+      }
       if (v.has("arc") && Math.abs(hash(Math.floor(t * 14), 7)) > 0.3) {
         // hash() is signed, so a raw "> 0.6" never fired and the flashover never showed.
         g.globalCompositeOperation = "lighter";
@@ -1028,9 +1043,9 @@ const S: Record<string, Scene> = {
         // Headlights coming up the access road.
         const x = 40 + van * 200;
         g.globalCompositeOperation = "lighter";
-        for (const dx of [0, 18]) {
-          g.fillStyle = rad(g, x + dx, 214, 60, [[0, "rgba(255,250,230,0.8)"], [0.15, "rgba(255,240,200,0.35)"], [1, "rgba(0,0,0,0)"]]);
-          g.fillRect(x + dx - 60, 154, 120, 120);
+        for (const dx of [0, 14]) {
+          g.fillStyle = rad(g, x + dx, 206, 16, [[0, "rgba(255,250,230,0.9)"], [0.5, "rgba(255,236,190,0.35)"], [1, "rgba(0,0,0,0)"]]);
+          g.fillRect(x + dx - 8, 198, 18, 12);
         }
         g.globalCompositeOperation = "source-over";
       }

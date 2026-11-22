@@ -11,7 +11,7 @@ Brief: `docs/grok/rotation-fixes.md`. Start at the first `todo`. Mark each `done
 - R7 done · After a D or an F the opener says "Night N, again. Elena wants it stood properly." A first try still uses the plain opener.
 - R8 done · A second report on a camera logged within 20 game minutes says "Already logged. The crew is on it." No penalty. A new event on that camera still counts. Unit test covers both.
 - R9 done · __controlsTest.setNightSpeed(n) speeds the current shift only. Coffee, brewing, fatigue and escalation all follow game minutes, so 8× matches 1×. Not on any button.
-- R10 todo · Bot table (B6 and F5), at 8×, in the background
+- R10 done · Flash and sweeper, nights 1–4, seeds 1 and 2, at 8×. Flash average rank 1.50 (C or worse). Sweeper 3.50 (B or better). False reports 0.56 a night. Table in bots.md. A caught camera stays logged for 40 game minutes, the tool bag is yellow, the van and the rover's torch are smaller, and the switchyard arc stays lit once the grid tile has crossed.
 - R11 todo · The full rotation (F3 and F4) with the fast clock
 - R12 todo · Prove the day week reaches the nights in a browser,
 - R13 todo · Copy:

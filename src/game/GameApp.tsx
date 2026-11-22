@@ -55,6 +55,7 @@ import { drawWorld, glyphWidth, paintGlyphs, preloadRoomArt } from "./render";
 import { DEFAULT_PLANT, plantTitle, thermalState, type PlantDesign } from "./plant";
 import { systemReducedMotion } from "./reducedMotion";
 import { hasSave, hydrateSave, peekSave, wipeSave, writeSave } from "./save";
+import { setNextNightSeed } from "./nightwatch/model";
 import { computeKeff } from "./nuclearLab";
 import { NuclearDesk } from "./NuclearDesk";
 import { anatomyLines, hallBlurb, siteLine } from "./siteText";
@@ -387,6 +388,9 @@ export function GameApp() {
       getCatch: () => stateRef.current.catches,
       setFlag: (k: string, v: boolean) => {
         stateRef.current.flags[k] = v;
+      },
+      setNightSeed: (n: number) => {
+        setNextNightSeed(n);
       },
       canClose: () => canCloseShift(stateRef.current),
       reportHere: () => {
@@ -3208,6 +3212,7 @@ declare global {
       getObjective: () => string;
       getCatch: () => number;
       setFlag: (k: string, v: boolean) => void;
+      setNightSeed?: (n: number) => void;
       setNightSpeed?: (n: number) => void;
       canClose: () => boolean;
       reportHere: () => void;
