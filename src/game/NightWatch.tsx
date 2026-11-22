@@ -10,8 +10,8 @@ import { PAL } from "./palette";
 import { bumpTrust, pushMsg, type GameState } from "./sim";
 import { writeSave } from "./save";
 import { siteKind } from "./plantLoops";
-import { CAM_H, CAM_PX, CAM_W, lookOf, paintCamera } from "./nightwatch/cameras";
-import { loadPlates } from "./nightwatch/plates";
+import { CAM_H, CAM_PX, CAM_W, lookOf, paintCamera, resetFrameCaches } from "./nightwatch/cameras";
+import { loadPlates, releasePlates } from "./nightwatch/plates";
 import { startAmbience, stopAmbience } from "./nightwatch/ambience";
 import {
   CATEGORY_LABEL,
@@ -123,6 +123,7 @@ function NightShift({ s, nightNo: asked, onLeave, replay = false }: { s: GameSta
   const [leaving, setLeaving] = useState(false);
   const [toast, setToast] = useState<string>("");
   const [switching, setSwitching] = useState(0);
+  const canvas = useRef<HTMLCanvasElement | null>(null);
   useEffect(() => {
     void loadPlates();
     startAmbience();
@@ -132,11 +133,17 @@ function NightShift({ s, nightNo: asked, onLeave, replay = false }: { s: GameSta
       speed.current = n;
     };
     return () => {
+      const el = canvas.current;
+      if (el) {
+        el.width = 0;
+        el.height = 0;
+      }
       stopAmbience();
+      resetFrameCaches();
+      releasePlates();
       if (window.__controlsTest) delete window.__controlsTest.setNightSpeed;
     };
   }, []);
-  const canvas = useRef<HTMLCanvasElement | null>(null);
   const rewarded = useRef(false);
   const calm = useRef(false);
   const speed = useRef(1);

@@ -70,12 +70,20 @@ export function startAmbience(): Running | null {
   const staticBuf = noiseBuffer(c, 0.35);
   live = {
     stop() {
-      out.gain.setTargetAtTime(0, c.currentTime, 0.3);
-      const at = c.currentTime + 1.5;
-      for (const o of oscs) o.stop(at);
-      lfo.stop(at);
-      air.stop(at);
-      setTimeout(() => out.disconnect(), 1800);
+      const now = c.currentTime;
+      try {
+        for (const o of oscs) o.stop(now);
+        lfo.stop(now);
+        air.stop(now);
+      } catch {
+        /* already stopped */
+      }
+      air.buffer = null;
+      try {
+        out.disconnect();
+      } catch {
+        /* already disconnected */
+      }
       live = null;
     },
     static() {

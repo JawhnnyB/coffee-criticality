@@ -6,7 +6,7 @@
  * logged window). Set VALUE_STEP so a re-run does not overwrite an older proof.
  *   VALUE_STEP=08b node scripts/value-week.mjs http://127.0.0.1:8098/
  */
-import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { chromium, devices } from "../node_modules/playwright/index.mjs";
 
 const base = process.argv[2] ?? "http://127.0.0.1:8096/";
@@ -29,6 +29,64 @@ const mins = (text) => {
 const browser = await chromium.launch({
   args: ["--disable-background-timer-throttling", "--disable-renderer-backgrounding", "--disable-backgrounding-occluded-windows"],
 });
+
+function rendererRssMb() {
+  const ppid = new Map();
+  const rss = new Map();
+  const cmd = new Map();
+  for (const name of readdirSync("/proc")) {
+    if (!/^\d+$/.test(name)) continue;
+    let status = "";
+    try {
+      status = readFileSync(`/proc/${name}/status`, "utf8");
+    } catch {
+      continue;
+    }
+    const parent = status.match(/^PPid:\s+(\d+)/m);
+    const used = status.match(/^VmRSS:\s+(\d+)/m);
+    if (parent) ppid.set(name, parent[1]);
+    if (used) rss.set(name, Number(used[1]));
+    try {
+      cmd.set(name, readFileSync(`/proc/${name}/cmdline`).toString());
+    } catch {
+      cmd.set(name, "");
+    }
+  }
+  // Playwright 1.62 has no browser.process(). The shell is a child of this node.
+  const me = String(process.pid);
+  let root = "";
+  for (const [pid, parent] of ppid) {
+    if (parent !== me) continue;
+    const line = cmd.get(pid) || "";
+    if (line.includes("--type=")) continue;
+    if (line.includes("chrome") || line.includes("headless") || line.includes("chromium")) {
+      root = pid;
+      break;
+    }
+  }
+  const want = new Set(root ? [root] : []);
+  if (root) {
+    let grew = true;
+    while (grew) {
+      grew = false;
+      for (const [pid, parent] of ppid) {
+        if (want.has(parent) && !want.has(pid)) {
+          want.add(pid);
+          grew = true;
+        }
+      }
+    }
+  }
+  let sum = 0;
+  let n = 0;
+  for (const [pid, line] of cmd) {
+    if (!line.includes("--type=renderer")) continue;
+    if (!root || !want.has(pid)) continue;
+    sum += rss.get(pid) || 0;
+    n += 1;
+  }
+  return { mb: sum / 1024, n };
+}
 
 function shot(page, name) {
   return page.screenshot({ path: `${out}${name}.png` }).catch(() => {});
@@ -282,8 +340,9 @@ async function runSize(name, contextOptions) {
     const metrics = await cdp.send("Performance.getMetrics");
     const bytes = metrics.metrics.find((m) => m.name === "JSHeapUsedSize")?.value ?? 0;
     const mb = bytes / (1024 * 1024);
-    heapSamples.push({ label, mb });
-    const line = `heap ${label} ${mb.toFixed(1)} MB`;
+    const rss = rendererRssMb();
+    heapSamples.push({ label, mb, rss: rss.mb, renderers: rss.n });
+    const line = `heap ${label} ${mb.toFixed(1)} MB, renderer ${rss.mb.toFixed(1)} MB (${rss.n})`;
     lines.push(line);
     console.log(name, line);
   };
@@ -415,6 +474,7 @@ async function runSize(name, contextOptions) {
     await note("after nights");
     const dawn = await page.locator("[data-testid='dawn-lot']").count();
     lines.push(dawn ? "dawn lot is up" : "dawn lot is not up");
+    if (dawn) await heapOf("dawn");
     if (!dawn) {
       const text = (await page.locator("body").innerText()).replace(/\s+/g, " ").slice(0, 280);
       lines.push(`after nights text: ${text}`);
@@ -463,13 +523,17 @@ if (process.env.HEAP) {
   const parts = [["desk", desk], ["phone", phone]].filter(([, part]) => part.heap && part.heap.length);
   let over = false;
   for (const [name, part] of parts) {
-    const first = part.heap[0];
+    const first = part.heap.find((s) => String(s.label).startsWith("day 1")) ?? part.heap[0];
     const last = part.heap[part.heap.length - 1];
     const growth = last.mb - first.mb;
+    const rssGrowth = (last.rss ?? 0) - (first.rss ?? 0);
     const line = `${name} heap ${first.mb.toFixed(1)} MB at ${first.label} → ${last.mb.toFixed(1)} MB at ${last.label} (${growth >= 0 ? "+" : ""}${growth.toFixed(1)} MB)`;
+    const rssLine = `${name} renderer ${first.rss.toFixed(1)} MB at ${first.label} → ${last.rss.toFixed(1)} MB at ${last.label} (${rssGrowth >= 0 ? "+" : ""}${rssGrowth.toFixed(1)} MB, n ${last.renderers ?? 0})`;
     console.log(line);
-    bugLines.push(line);
-    if (growth > 50) over = true;
+    console.log(rssLine);
+    bugLines.push(line, rssLine);
+    const dawnUp = (part.lines || []).some((l) => String(l).includes("dawn lot is up"));
+    if (growth > 50 || rssGrowth >= 50 || !dawnUp || !(last.renderers > 0) || !(first.rss > 0)) over = true;
   }
   writeFileSync(`${out}heap.txt`, bugLines.filter((l) => l.startsWith("desk") || l.startsWith("phone") || l.startsWith("##")).join("\n") + "\n");
   if (over) {

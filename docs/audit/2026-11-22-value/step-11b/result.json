@@ -1,0 +1,165 @@
+{
+  "desk": {
+    "lines": [
+      "signed",
+      "walked in",
+      "arrive | mode play day 1 room cafe 412 | page-wide 0",
+      "heap arrive 6.0 MB, renderer 155.8 MB (1)",
+      "day 1 morning | mode play day 1 room cafe 412 | page-wide 0",
+      "heap day 1 morning 6.0 MB, renderer 155.0 MB (1)",
+      "day 1 eod | mode eod day 1 room cafe 990 | page-wide 0",
+      "heap day 1 eod 6.1 MB, renderer 161.6 MB (1)",
+      "day 2 morning | mode play day 2 room gate 412 | page-wide 0",
+      "heap day 2 morning 6.1 MB, renderer 165.3 MB (1)",
+      "day 2 eod | mode eod day 2 room gate 990 | page-wide 0",
+      "heap day 2 eod 6.1 MB, renderer 166.6 MB (1)",
+      "day 3 morning | mode play day 3 room gate 412 | page-wide 0",
+      "heap day 3 morning 6.2 MB, renderer 164.7 MB (1)",
+      "day 3 eod | mode eod day 3 room gate 990 | page-wide 0",
+      "heap day 3 eod 6.2 MB, renderer 167.9 MB (1)",
+      "day 4 morning | mode play day 4 room gate 412 | page-wide 0",
+      "heap day 4 morning 6.2 MB, renderer 166.1 MB (1)",
+      "day 4 eod | mode eod day 4 room gate 990 | page-wide 0",
+      "heap day 4 eod 6.2 MB, renderer 167.2 MB (1)",
+      "day 5 morning | mode play day 5 room gate 412 | page-wide 0",
+      "heap day 5 morning 6.3 MB, renderer 166.1 MB (1)",
+      "day 5 eod | mode eod day 5 room gate 990 | page-wide 0",
+      "heap day 5 eod 6.3 MB, renderer 168.1 MB (1)",
+      "dusk | mode play day 5 room gate 1030 | page-wide 0",
+      "heap dusk 6.3 MB, renderer 165.7 MB (1)",
+      "night 1 seed 1 {\"grade\":\"Grade A\",\"stat\":\"Caught 3 (2 early) · missed 0 · false reports 0\",\"head\":\"06:00 turnover.\",\"reason\":\"\",\"wide\":0,\"ms\":56611}",
+      "heap night 1 7.5 MB, renderer 175.7 MB (1)",
+      "night 2 seed 1 {\"grade\":\"Grade A\",\"stat\":\"Caught 5 (2 early) · missed 0 · false reports 2\",\"head\":\"06:00 turnover.\",\"reason\":\"\",\"wide\":0,\"ms\":56524}",
+      "heap night 2 7.6 MB, renderer 177.6 MB (1)",
+      "night 3 seed 1 {\"grade\":\"Grade A\",\"stat\":\"Caught 5 (2 early) · missed 0 · false reports 2\",\"head\":\"06:00 turnover.\",\"reason\":\"\",\"wide\":0,\"ms\":56327}",
+      "heap night 3 7.5 MB, renderer 178.9 MB (1)",
+      "night 4 seed 1 {\"grade\":\"Grade A\",\"stat\":\"Caught 6 (2 early) · missed 0 · false reports 1\",\"head\":\"06:00 turnover.\",\"reason\":\"\",\"wide\":0,\"ms\":60743}",
+      "heap night 4 7.5 MB, renderer 181.5 MB (1)",
+      "after nights | mode play day 5 room gate 1030 | page-wide 0",
+      "heap after nights 7.5 MB, renderer 180.4 MB (1)",
+      "dawn lot is up",
+      "heap dawn 7.5 MB, renderer 180.0 MB (1)"
+    ],
+    "bugs": [],
+    "errors": [],
+    "missing": [],
+    "heap": [
+      {
+        "label": "arrive",
+        "mb": 6.029792785644531,
+        "rss": 155.8046875,
+        "renderers": 1
+      },
+      {
+        "label": "day 1 morning",
+        "mb": 6.031982421875,
+        "rss": 155.01953125,
+        "renderers": 1
+      },
+      {
+        "label": "day 1 eod",
+        "mb": 6.051410675048828,
+        "rss": 161.6171875,
+        "renderers": 1
+      },
+      {
+        "label": "day 2 morning",
+        "mb": 6.119976043701172,
+        "rss": 165.328125,
+        "renderers": 1
+      },
+      {
+        "label": "day 2 eod",
+        "mb": 6.115352630615234,
+        "rss": 166.5703125,
+        "renderers": 1
+      },
+      {
+        "label": "day 3 morning",
+        "mb": 6.195171356201172,
+        "rss": 164.71875,
+        "renderers": 1
+      },
+      {
+        "label": "day 3 eod",
+        "mb": 6.182777404785156,
+        "rss": 167.85546875,
+        "renderers": 1
+      },
+      {
+        "label": "day 4 morning",
+        "mb": 6.2174072265625,
+        "rss": 166.0546875,
+        "renderers": 1
+      },
+      {
+        "label": "day 4 eod",
+        "mb": 6.212215423583984,
+        "rss": 167.2265625,
+        "renderers": 1
+      },
+      {
+        "label": "day 5 morning",
+        "mb": 6.265663146972656,
+        "rss": 166.0703125,
+        "renderers": 1
+      },
+      {
+        "label": "day 5 eod",
+        "mb": 6.260719299316406,
+        "rss": 168.1484375,
+        "renderers": 1
+      },
+      {
+        "label": "dusk",
+        "mb": 6.277732849121094,
+        "rss": 165.66796875,
+        "renderers": 1
+      },
+      {
+        "label": "night 1",
+        "mb": 7.512546539306641,
+        "rss": 175.66015625,
+        "renderers": 1
+      },
+      {
+        "label": "night 2",
+        "mb": 7.6437225341796875,
+        "rss": 177.6015625,
+        "renderers": 1
+      },
+      {
+        "label": "night 3",
+        "mb": 7.540069580078125,
+        "rss": 178.8671875,
+        "renderers": 1
+      },
+      {
+        "label": "night 4",
+        "mb": 7.529338836669922,
+        "rss": 181.50390625,
+        "renderers": 1
+      },
+      {
+        "label": "after nights",
+        "mb": 7.528160095214844,
+        "rss": 180.41015625,
+        "renderers": 1
+      },
+      {
+        "label": "dawn",
+        "mb": 7.528755187988281,
+        "rss": 179.98828125,
+        "renderers": 1
+      }
+    ]
+  },
+  "phone": {
+    "lines": [],
+    "bugs": [
+      "phone size not run"
+    ],
+    "errors": [],
+    "missing": []
+  }
+}

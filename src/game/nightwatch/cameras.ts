@@ -1516,10 +1516,35 @@ function lensOverlay(): Surface | null {
   return c;
 }
 
-/** Drop cached frames. The audit page uses this when it turns plates on and off. */
+/** Drop cached frames. A finished shift calls this so the canvases can leave memory. */
 export function resetFrameCaches() {
-  gradedCache.clear();
+  const blank = (surface: Surface | null | undefined) => {
+    if (!surface) return;
+    try {
+      surface.width = 0;
+      surface.height = 0;
+    } catch {
+      /* already gone */
+    }
+  };
+  for (const c of cache.values()) blank(c);
+  cache.clear();
+  for (const c of plateCache.values()) blank(c);
   plateCache.clear();
+  for (const c of gradedCache.values()) blank(c);
+  gradedCache.clear();
+  if (noise) for (const c of noise) blank(c);
+  noise = null;
+  noiseTried = false;
+  blank(cherenkov);
+  cherenkov = undefined;
+  if (poolGlow) for (const c of poolGlow) blank(c);
+  poolGlow = undefined;
+  blank(stampB);
+  stampB = undefined;
+  blank(maskB);
+  maskB = undefined;
+  blank(lens ?? null);
   lens = undefined;
 }
 

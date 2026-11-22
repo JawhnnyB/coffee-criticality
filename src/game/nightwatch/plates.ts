@@ -79,26 +79,42 @@ export const PLATES: Record<string, PlateSpec> = {
 /** Eight walk frames, 96×192 each, facing right. */
 export const ROVER_SHEET = "/nightwatch/rover.webp";
 
-const loaded = new Map<string, HTMLImageElement>();
+const loaded = new Map<string, ImageBitmap | HTMLImageElement>();
 let platesOn = true;
+let generation = 0;
 
 /** The visibility audit turns this off to measure the code drawing. The game leaves it on. */
 export function setPlatesEnabled(on: boolean) {
   platesOn = on;
 }
 
-function ready(img: HTMLImageElement | undefined): HTMLImageElement | null {
-  return img && img.complete && img.naturalWidth > 0 ? img : null;
+function ready(img: ImageBitmap | HTMLImageElement | undefined): (ImageBitmap | HTMLImageElement) | null {
+  if (!img) return null;
+  if ("close" in img) return img.width > 0 ? img : null;
+  return img.complete && img.naturalWidth > 0 ? img : null;
 }
 
 function preload(src: string): Promise<void> {
   if (typeof Image === "undefined") return Promise.resolve();
   if (ready(loaded.get(src))) return Promise.resolve();
+  const gen = generation;
   return new Promise((resolve) => {
     const img = new Image();
     img.onload = () => {
-      loaded.set(src, img);
-      resolve();
+      const keep = (bmp: ImageBitmap | HTMLImageElement) => {
+        if (gen !== generation) {
+          if ("close" in bmp) bmp.close();
+          img.src = "";
+          resolve();
+          return;
+        }
+        loaded.set(src, bmp);
+        if (bmp !== img) img.src = "";
+        resolve();
+      };
+      if (typeof createImageBitmap === "function") {
+        createImageBitmap(img).then(keep).catch(() => keep(img));
+      } else keep(img);
     };
     // A missing plate is the code drawing. Do not reject the shift for it.
     img.onerror = () => resolve();
@@ -116,19 +132,38 @@ export function loadPlates(): Promise<void> {
   return Promise.all(files.map(preload)).then(() => undefined);
 }
 
-export function plateFor(scene: string): HTMLImageElement | null {
+export function plateFor(scene: string): ImageBitmap | HTMLImageElement | null {
   if (!platesOn) return null;
   const spec = PLATES[scene];
   return spec ? ready(loaded.get(spec.file)) : null;
 }
 
-export function stateFor(scene: string, visual: string): HTMLImageElement | null {
+export function stateFor(scene: string, visual: string): ImageBitmap | HTMLImageElement | null {
   if (!platesOn) return null;
   const st = PLATES[scene]?.states?.[visual];
   return st ? ready(loaded.get(st.file)) : null;
 }
 
-export function roverSheet(): HTMLImageElement | null {
+export function roverSheet(): ImageBitmap | HTMLImageElement | null {
   if (!platesOn) return null;
   return ready(loaded.get(ROVER_SHEET));
+}
+
+/** Drop decoded plates. close() frees the pixels. A finished shift does not keep the photos. */
+export function releasePlates() {
+  generation += 1;
+  for (const img of loaded.values()) {
+    if ("close" in img) {
+      try {
+        img.close();
+      } catch {
+        /* already closed */
+      }
+    } else {
+      img.onload = null;
+      img.onerror = null;
+      img.src = "";
+    }
+  }
+  loaded.clear();
 }
