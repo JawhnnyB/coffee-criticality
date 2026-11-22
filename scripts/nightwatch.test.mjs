@@ -257,6 +257,38 @@ test("night grade: the worked check, the bands, and a trip", () => {
   assert.equal(W.grade(low).points, 0);
 });
 
+test("being relieved is an F, an open event is a miss, and the C line is only at 06:00", () => {
+  const n = W.newNight("pwr", 1);
+  const open = W.siteWatch("pwr").events.find((e) => e.id === "porv");
+  const later = W.siteWatch("pwr").events.find((e) => e.id === "pool-fme");
+  n.events = [
+    { def: open, start: 10, caughtAt: null, early: false, doneAt: null },
+    { def: later, start: 200, caughtAt: null, early: false, doneAt: null },
+  ];
+  n.minute = 40;
+  n.camera = "yard";
+  for (let k = 0; k < 3; k++) W.report(n, "leak");
+  assert.equal(n.over?.why, "relieved");
+  assert.equal(n.events[0].doneAt, 40);
+  assert.equal(n.events[1].doneAt, null);
+  assert.deepEqual(W.grade(n), { points: 0, letter: "F" });
+  const flags = {};
+  const g = W.recordNight(flags, n, 1, false);
+  assert.equal(g.letter, "F");
+  assert.equal(g.done, false);
+  assert.equal(g.trust, -2);
+  assert.equal(flags["night:1:done"], undefined);
+  assert.equal(flags["night:1:grade:F"], true);
+  const row = W.turnoverRows(n).find((r) => r.title.includes("relief"));
+  assert.equal(row.missed, true);
+  assert.equal(row.how, "missed");
+  assert.equal(W.elenaLine("C", false, "dawn"), "You made six. The ones you missed were already on a camera.");
+  assert.equal(W.elenaLine("C", false).includes("You made six"), true);
+  assert.equal(W.elenaLine("C", false, "relieved").includes("You made six"), false);
+  assert.equal(W.elenaLine("F", false, "relieved").includes("!"), false);
+  assert.equal(W.elenaLine("F", true, "relieved"), "Relieved. The night is not done.");
+});
+
 test("surviving to 06:00 is dawn, with the score", () => {
   const n = W.newNight("bwr", 2);
   for (const e of n.events) e.caughtAt = e.def.start;

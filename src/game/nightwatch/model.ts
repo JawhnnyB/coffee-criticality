@@ -619,6 +619,17 @@ export function visualsOn(n: Night, camera: string): string[] {
 
 export type ReportResult = { ok: true; event: ActiveEvent; early: boolean } | { ok: false; reason: "nothing" | "wrong-kind" };
 
+/** Elena takes the chair. Anything already on a camera and still open is a miss. The night is an F. */
+export function relieve(n: Night) {
+  if (n.over) return;
+  for (const e of n.events) {
+    if (e.caughtAt !== null || e.doneAt !== null || n.minute < e.start) continue;
+    e.doneAt = n.minute;
+    if (e.def.consequence === "finding") n.findings += 1;
+  }
+  n.over = { why: "relieved", at: n.minute };
+}
+
 /** File a report from the camera being watched. */
 export function report(n: Night, category: Category): ReportResult {
   if (n.over) return { ok: false, reason: "nothing" };
@@ -626,13 +637,13 @@ export function report(n: Night, category: Category): ReportResult {
   if (!e) {
     n.falseReports += 1;
     n.log.push(`${clock(n.minute)} False report from ${cameraName(n, n.camera)}.`);
-    if (n.falseReports >= FALSE_REPORT_LIMIT) n.over = { why: "relieved", at: n.minute };
+    if (n.falseReports >= FALSE_REPORT_LIMIT) relieve(n);
     return { ok: false, reason: "nothing" };
   }
   if (!e.def.accept.includes(category)) {
     n.falseReports += 1;
     n.log.push(`${clock(n.minute)} Report from ${cameraName(n, n.camera)} named the wrong kind of problem.`);
-    if (n.falseReports >= FALSE_REPORT_LIMIT) n.over = { why: "relieved", at: n.minute };
+    if (n.falseReports >= FALSE_REPORT_LIMIT) relieve(n);
     return { ok: false, reason: "wrong-kind" };
   }
   e.caughtAt = n.minute;
@@ -736,9 +747,9 @@ export function score(n: Night): Score {
   };
 }
 
-/** Points, then a letter. A trip fails the night outright. */
+/** Points, then a letter. A trip or a relief fails the night outright. */
 export function grade(n: Night): { points: number; letter: GradeLetter } {
-  if (n.over?.why === "trip") return { points: 0, letter: "F" };
+  if (n.over?.why === "trip" || n.over?.why === "relieved") return { points: 0, letter: "F" };
   let points = 100;
   for (const e of n.events) {
     if (e.caughtAt !== null) points += e.early ? GRADE_POINTS.early : GRADE_POINTS.late;
