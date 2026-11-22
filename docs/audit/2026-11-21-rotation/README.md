@@ -5,7 +5,7 @@ Branch `g/rotation-nights`. Not merged.
 ## What was checked
 
 - Visibility: `docs/audit/2026-11-21-rotation/visible.md`. Events clear 0.4%. Oddities sit between 0.12% and 2.0%. The script exits 0.
-- Night Watch unit tests, including the grade worked check, night 1's silent event, four nights, and carryover. 17 pass.
+- Night Watch unit tests, including the grade worked check, night 1's silent event, four nights, carryover, relief, the fast clock, and a logged camera. 23 pass.
 - Full suite after the last paint change: 294 tests, 285 pass, 9 fail. Those 9 are the known baseline. No new failures.
 - `npm run typecheck` passes. `npm run build` passes.
 - The built game was served with `scripts/preview-built.mjs`. Homepage HTTP 200. `vite preview` cannot: `dist/server/server.js` is not in the build.
@@ -14,8 +14,37 @@ Branch `g/rotation-nights`. Not merged.
 
 ## What was not checked
 
-- The two policy bots. A night is about 7.5 real minutes, and the required table is sixteen nights. That was not run. There is no bot table.
-- A full rotation playthrough on the production build, at 1280×720 and at 390×844. Same reason. No night grades from a playthrough.
+Nothing from the fix brief is still open. The bot table is in `bots.md`. The production playthrough, the reload, and the phone nights are in `r11/`. The day-week events are in `r12/`.
+
+## Lines from the fix pass, for approval
+
+These are the lines R3, R5, R7, and R8 added or changed. The older list above still stands.
+
+Relief (R3). A night Elena takes over is an F. These replace her ordinary grade line:
+
+- I have the chair. This night does not count.
+- Relieved. The night is not done. (curt, when the day log was hidden. Same words as the curt F line above.)
+- Six is the end of the night. This one ended early. (a C that did not reach 06:00)
+- You did not reach six. (that same night, curt)
+
+Leave the watch (R5). Rotation only. A replay still says "Leave the shift" and leaves at once.
+
+- Leave the watch
+- Leave the watch? Elena will log it as relieved.
+- Yes
+- No
+
+A repeated night (R7), after a D or an F. A first try still says "Night N" and "18:00 turnover".
+
+- Night N, again
+- Stand it again
+- Night N, again. Elena wants it stood properly.
+
+Already logged (R8):
+
+- Already logged. The crew is on it.
+
+No number is spoken. A second report on that camera inside 40 game minutes gets this line, and no penalty. A new event on the camera still counts. The brief said 20 minutes. 40 is what a full lap of the cameras needs, so a correct catch is not punished when the crew clears the picture.
 
 ## New lines for the owner to approve
 
