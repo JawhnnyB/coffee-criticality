@@ -606,25 +606,120 @@ export function GameApp() {
       },
     };
 
-    let last = performance.now();
+    let lastPaint = performance.now();
     let raf = 0;
     let saveAcc = 0;
-    let paintAcc = 0;
+    let simAcc = 0;
+    let pace: "full" | "half" = "full";
+    let fastSince: number | null = null;
+    let lastWork = 0;
+    let lastHold = 0;
+    const gaps: { t: number; ms: number }[] = [];
+    const holds: { t: number; ms: number }[] = [];
+    let record: number[] | null = null;
+    const STEP = 1 / 60;
+    const HALF = 1000 / 30;
+    // Pictures stay on the display clock until a 2s run of them is later than 20 ms.
+    // A 4× CPU still presents every 16.7 ms. The hold on that run was 13 ms, and a
+    // 1× cafe frame about 2 ms, so the 20 ms gap never comes. Trip when the hold
+    // averages over 6 ms. Come back only after it stays under 4 ms.
+    const HOLD_SLOW = 6;
+    const HOLD_FAST = 4;
+    let holdOpen = false;
+    let holdStart = 0;
+    const holdBox = new MessageChannel();
+    holdBox.port1.onmessage = () => {
+      if (!holdOpen) return;
+      holdOpen = false;
+      const t = performance.now();
+      const ms = t - holdStart;
+      lastHold = ms;
+      if (!(ms > 0 && ms < 80)) return;
+      if (pace === "half") {
+        if (ms < HOLD_FAST) {
+          if (fastSince == null) fastSince = t;
+          else if (t - fastSince >= 2000) {
+            pace = "full";
+            fastSince = null;
+            holds.length = 0;
+            gaps.length = 0;
+          }
+        } else fastSince = null;
+        return;
+      }
+      holds.push({ t, ms });
+      const horizon = t - 2000;
+      while (holds.length && holds[0].t < horizon) holds.shift();
+      if (holds.length < 8) return;
+      const span = holds[holds.length - 1].t - holds[0].t;
+      if (span < 1900) return;
+      let sum = 0;
+      for (const h of holds) sum += h.ms;
+      if (sum / holds.length > HOLD_SLOW) {
+        pace = "half";
+        fastSince = null;
+        holds.length = 0;
+        gaps.length = 0;
+      }
+    };
+    const held = (a: Actions): Actions => ({
+      moveX: a.moveX,
+      moveY: a.moveY,
+      interact: false,
+      peer: false,
+      report: false,
+      hide: false,
+      confirm: false,
+      heldConfirm: a.heldConfirm,
+      back: false,
+      pause: false,
+    });
+    window.__framePace = {
+      rate: () => pace,
+      work: () => lastWork,
+      hold: () => lastHold,
+      start: () => {
+        record = [];
+      },
+      stop: () => {
+        const out = record ? record.slice() : [];
+        record = null;
+        return out;
+      },
+    };
     const onPlantDl = () => {
       writeSave(stateRef.current, false);
     };
     window.addEventListener("cc-plant-download", onPlantDl);
     const loop = (now: number) => {
-      const frameDt = Math.min(0.1, (now - last) / 1000);
-      last = now;
-      // Thirty pictures a second. The day was over the budget at sixty on a slow CPU.
-      paintAcc += frameDt;
-      if (paintAcc < 1 / 30) {
+      // Full display rate until frames land later than 20 ms, or the thread hold
+      // says 60 pictures a second would sit over the shift budget. Then 30, with
+      // at least 31 ms between pictures so the gaps stay near 33 and do not jump to 50.
+      if (pace === "half" && now - lastPaint < HALF - 2) {
         raf = requestAnimationFrame(loop);
         return;
       }
-      const dt = Math.min(0.1, paintAcc);
-      paintAcc = 0;
+      const gap = now - lastPaint;
+      lastPaint = now;
+      if (record && gap > 0 && gap < 500) record.push(gap);
+      if (gap > 0 && gap < 80) gaps.push({ t: now, ms: gap });
+      const horizon = now - 2000;
+      while (gaps.length && gaps[0].t < horizon) gaps.shift();
+      if (gaps.length > 1) {
+        const span = gaps[gaps.length - 1].t - gaps[0].t;
+        let sum = 0;
+        for (const g of gaps) sum += g.ms;
+        const avg = sum / gaps.length;
+        if (pace === "full" && span >= 1900 && avg > 20) {
+          pace = "half";
+          fastSince = null;
+          holds.length = 0;
+          gaps.length = 0;
+        }
+      }
+      const work0 = performance.now();
+      const frameSec = gap > 80 ? STEP : Math.min(0.05, gap / 1000);
+      simAcc = Math.min(0.1, simAcc + frameSec);
       const s = stateRef.current;
       // A full-screen cabinet keeps the owner at "world". The desk, when it is open, sets its own.
       if (!s.deskHost && getKeyOwner() !== "world") setKeyOwner("world");
@@ -646,7 +741,16 @@ export function GameApp() {
       }
       const a = s.flags["rot:nights"] ? emptyActions() : collectActions(keys, edges, stickRef.current);
       if (!s.flags["rot:nights"] && edges.has("KeyK")) tryCloseShift(s);
-      update(s, a, dt);
+      // Fixed 1/60 step. A 30 Hz picture runs two of them, so walking speed does not change.
+      let edge = true;
+      let steps = 0;
+      while (simAcc >= STEP - 1e-4 && steps < 4) {
+        update(s, edge ? a : held(a), STEP);
+        edge = false;
+        simAcc -= STEP;
+        steps += 1;
+      }
+      const dt = steps * STEP;
       // A conversation just opened: add the person's due scene after what they would have said anyway.
       if (s.mode === "dialogue" && s.dialogue !== talkRef.current.dialogue) {
         talkRef.current.dialogue = s.dialogue;
@@ -737,6 +841,12 @@ export function GameApp() {
           veil.style.pointerEvents = "none";
         }
       }
+      lastWork = performance.now() - work0;
+      if (!holdOpen) {
+        holdStart = work0;
+        holdOpen = true;
+        holdBox.port2.postMessage(null);
+      }
       raf = requestAnimationFrame(loop);
     };
     raf = requestAnimationFrame(loop);
@@ -746,7 +856,10 @@ export function GameApp() {
       window.removeEventListener("keyup", up);
       window.removeEventListener("blur", clear);
       window.removeEventListener("cc-plant-download", onPlantDl);
+      holdBox.port1.close();
+      holdBox.port2.close();
       delete window.__controlsTest;
+      delete window.__framePace;
     };
   }, []);
 
@@ -3224,6 +3337,13 @@ function paint(
 
 declare global {
   interface Window {
+    __framePace?: {
+      rate: () => string;
+      work: () => number;
+      hold: () => number;
+      start: () => void;
+      stop: () => number[];
+    };
     __controlsTest?: {
       getX: () => number;
       getY: () => number;
