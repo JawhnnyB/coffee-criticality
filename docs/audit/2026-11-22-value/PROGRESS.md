@@ -8,4 +8,5 @@ Brief: `docs/grok/value-100.md`. One step, one commit. Real-input proof in this 
 - Step 4 done · The nine baseline failures pass. Cabinet and desk tests find esbuild. The head-injector tests pass a context object. The share card now expects og:title, and an old twitter card is replaced. Suite: 308 pass, 0 fail. Notes in step-04/NOTES.md.
 - Step 5 done · `npm run ship-check` runs typecheck, the production build, and the Nitro preview. Homepage HTTP 200. The command exits 0. Proof in step-05/.
 - Step 6 done · `npm run preview` is the Nitro server (`node scripts/preview-built.mjs`). Homepage HTTP 200. `vite preview` is no longer the command. Proof in step-06/.
-- Step 7 todo · A crash shows a calm card: the plant phone rang, with Copy report.
+- Step 7 done · A render throw and a later throw each show one card: "The plant phone rang." Copy report is a real click and the clipboard reads back. Proof in step-07/.
+- Step 8 todo · A full week and four nights, at 1280×720 and 390×844, fast clock. Log every bug.

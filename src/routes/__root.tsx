@@ -1,6 +1,7 @@
 import { createRootRoute, HeadContent, Outlet, Scripts } from "@tanstack/react-router";
 import { AuthProvider } from "@/lib/auth/provider";
 import { PreviewHostBridge } from "@/components/preview-host-bridge";
+import { CrashSwitch, PlantPhoneBoundary, PlantPhoneWatch } from "@/game/plantPhone";
 import appCss from "../styles.css?url";
 
 // Dev serves /src/styles.css as a JS module unless the request asks for CSS.
@@ -57,9 +58,13 @@ export const Route = createRootRoute({
       </head>
       <body>
         <PreviewHostBridge />
-        <AuthProvider>
-          <Outlet />
-        </AuthProvider>
+        <PlantPhoneBoundary>
+          <CrashSwitch />
+          <AuthProvider>
+            <Outlet />
+          </AuthProvider>
+        </PlantPhoneBoundary>
+        <PlantPhoneWatch />
         <Scripts />
       </body>
     </html>

@@ -1,0 +1,22 @@
+{
+  "render": {
+    "name": "render",
+    "title": "The plant phone rang.",
+    "message": "Render proof. The shift threw.",
+    "clipHead": [
+      "Coffee & Criticality",
+      "The plant phone rang.",
+      "Render proof. The shift threw."
+    ]
+  },
+  "event": {
+    "name": "event",
+    "title": "The plant phone rang.",
+    "message": "Event proof. The shift threw.",
+    "clipHead": [
+      "Coffee & Criticality",
+      "The plant phone rang.",
+      "Event proof. The shift threw."
+    ]
+  }
+}
