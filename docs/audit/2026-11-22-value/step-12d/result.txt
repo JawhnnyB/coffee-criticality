@@ -1,0 +1,9 @@
+AudioContext running.
+Level before the fade: 0.007892.
+Samples after stop, ms and rms: 0:0.007892 41:0.007053 81:0.005926 121:0.005127 161:0.004166 201:0.003111 241:0.002145 282:0.001082 322:0.0003384 362:0 402:0 442:0.
+At ~40 ms 0.007053, at ~150 ms 0.004166, at ~400 ms 0.
+The level is falling through the 0.3 s ramp.
+By 0.4 s the hum is gone.
+No click after the ramp. The peak stays under half the level at the start of the fade.
+Page errors: 0.
+Console: 0.

@@ -71,20 +71,32 @@ export function startAmbience(): Running | null {
   live = {
     stop() {
       const now = c.currentTime;
+      const end = now + 0.3;
+      // Ramp to silence before the nodes stop, so leaving a shift does not click.
       try {
-        for (const o of oscs) o.stop(now);
-        lfo.stop(now);
-        air.stop(now);
+        out.gain.cancelScheduledValues(now);
+        out.gain.setValueAtTime(out.gain.value, now);
+        out.gain.linearRampToValueAtTime(0, end);
+      } catch {
+        /* already gone */
+      }
+      const halt = end + 0.02;
+      try {
+        for (const o of oscs) o.stop(halt);
+        lfo.stop(halt);
+        air.stop(halt);
       } catch {
         /* already stopped */
       }
-      air.buffer = null;
-      try {
-        out.disconnect();
-      } catch {
-        /* already disconnected */
-      }
       live = null;
+      setTimeout(() => {
+        air.buffer = null;
+        try {
+          out.disconnect();
+        } catch {
+          /* already disconnected */
+        }
+      }, 320);
     },
     static() {
       const s = c.createBufferSource();
