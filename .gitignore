@@ -3,6 +3,9 @@ node_modules/
 *.log
 .DS_Store
 coffee-and-criticality-web.zip
+dist-desktop/
+src-tauri/target/
+src-tauri/gen/
 
 __pycache__/
 *.pyc

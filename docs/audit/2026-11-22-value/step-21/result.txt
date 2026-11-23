@@ -1,0 +1,2 @@
+Desktop frontend build: 299 modules, dist-desktop/index.html.
+rustc 1.99.0. cargo check failed: pkg-config was not found (glib-2.0). WebKit and GTK are not installed, and this sandbox cannot apt-install them. The Linux, Windows, and macOS binaries are the GitHub Actions artifacts.

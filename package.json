@@ -14,6 +14,8 @@
     "build:dev": "vite build --mode development",
     "preview": "node scripts/preview-built.mjs",
     "ship-check": "node scripts/ship-check.mjs",
+    "desktop:build": "VITE_AUTH_ENABLED=false vite build --config vite.desktop.config.ts",
+    "desktop:dev": "VITE_AUTH_ENABLED=false vite --config vite.desktop.config.ts --port 1420 --strictPort",
     "typecheck": "tsc --noEmit",
     "art:check": "python3 tools/artkit/check.py",
     "test": "node --test 'scripts/**/*.test.mjs'",
@@ -75,6 +77,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.20.0",
+    "@tauri-apps/cli": "^2.12.6",
     "@types/node": "^22.16.5",
     "@types/pg": "^8.11.10",
     "@types/react": "^19.2.0",
