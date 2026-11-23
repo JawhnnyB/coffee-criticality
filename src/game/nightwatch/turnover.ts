@@ -84,10 +84,22 @@ export function turnoverRows(n: Night): TurnRow[] {
 }
 
 export function oddityNotes(n: Night): string[] {
+  const name: Record<string, string> = {
+    chair: "the chair",
+    hardhat: "the hard hat",
+    gull: "the gull",
+    fog: "the fog",
+    flicker: "the flicker",
+    moth: "the moth",
+    glove: "the glove",
+    bulb: "the bulb",
+    cup: "the cup",
+    hangtag: "the tag",
+    boot: "the print",
+    clipboard: "the clipboard",
+    cable: "the cable",
+  };
   return n.oddities
     .filter((o) => n.minute >= o.start)
-    .map((o) => {
-      const name = o.def.visual === "chair" ? "the chair" : o.def.visual === "hardhat" ? "the hard hat" : o.def.visual === "gull" ? "the gull" : o.def.visual === "fog" ? "the fog" : o.def.visual === "flicker" ? "the flicker" : "it";
-      return `You left ${name}. Good.`;
-    });
+    .map((o) => `You left ${name[o.def.visual] ?? "it"}. Good.`);
 }

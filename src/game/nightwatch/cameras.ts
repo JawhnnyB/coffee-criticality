@@ -488,6 +488,50 @@ function oddities(g: G, t: number, v: Vis, r: Room, scene: string) {
       g.restore();
     }
   }
+  // Eight small things. Kept in a few dozen pixels so they stay inside the oddity band.
+  if (v.has("moth")) {
+    g.fillStyle = "#f4efe4";
+    g.fillRect(188, 148, 18, 7);
+    g.fillRect(206, 152, 34, 8);
+    g.fillRect(238, 148, 18, 7);
+  }
+  if (v.has("glove")) {
+    g.fillStyle = "#c46a32";
+    g.fillRect(64, 196, 26, 14);
+    g.fillRect(88, 200, 10, 8);
+  }
+  if (v.has("bulb")) {
+    g.fillStyle = "#fff6d4";
+    g.fillRect(34, 28, 26, 12);
+    g.fillRect(44, 40, 6, 14);
+  }
+  if (v.has("cup")) {
+    g.fillStyle = "#efe6d4";
+    g.fillRect(312, 176, 18, 24);
+    g.fillRect(330, 182, 8, 10);
+  }
+  if (v.has("hangtag")) {
+    g.fillStyle = "#e2b43a";
+    g.fillRect(124, 72, 2, 12);
+    g.fillRect(116, 84, 18, 28);
+  }
+  if (v.has("boot")) {
+    g.fillStyle = "#241c16";
+    g.fillRect(348, 206, 36, 10);
+    g.fillRect(372, 196, 14, 12);
+  }
+  if (v.has("clipboard")) {
+    g.fillStyle = "#f7f3ea";
+    g.fillRect(246, 154, 24, 30);
+    g.fillStyle = "#6e7376";
+    g.fillRect(252, 150, 12, 5);
+  }
+  if (v.has("cable")) {
+    g.fillStyle = "#161616";
+    g.fillRect(150, 214, 64, 4);
+    g.fillRect(210, 196, 4, 22);
+    g.fillRect(210, 196, 22, 4);
+  }
 }
 
 /* ---------------------------------------------------------------- equipment */

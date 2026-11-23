@@ -47,6 +47,7 @@ Brief: `docs/grok/value-100.md`. One step, one commit. Real-input proof in this 
 - Step 38 done · Night pace is Relaxed, Standard, or Nuke. It is a setting, not part of the week. Proof in step-38/.
 - Step 39 done · A careful first night is a B (92). Night 4 is a C (82). One silent event a night. Proof in step-39/.
 - Step 40 done · Six more events on each site, using pictures the cameras already draw. Proof in step-40/.
+- Step 41 done · Eight faint oddities, all inside 0.12% to 2%. The accepted arc, sheen, and tool bag were not changed. Proof in step-41/.
 
 
 

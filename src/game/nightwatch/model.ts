@@ -206,6 +206,14 @@ const SHARED_ODDITIES: Oddity[] = [
   { id: "fog", camera: "yard", visual: "fog" },
   { id: "gull", camera: "intake", visual: "gull" },
   { id: "pool-ripple", camera: "pool", visual: "ripple" },
+  { id: "moth", camera: "aux", visual: "moth" },
+  { id: "glove", camera: "aux", visual: "glove" },
+  { id: "bulb", camera: "turbine", visual: "bulb" },
+  { id: "cup", camera: "turbine", visual: "cup" },
+  { id: "hangtag", camera: "pool", visual: "hangtag" },
+  { id: "boot", camera: "intake", visual: "boot" },
+  { id: "clipboard", camera: "yard", visual: "clipboard" },
+  { id: "cable", camera: "aux", visual: "cable" },
 ];
 
 function shared(prefix: Metric[], cams: Camera[], events: EventDef[], oddities: Oddity[]): SiteWatch {
