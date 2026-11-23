@@ -45,6 +45,7 @@ export function FishGame({ onDone, onAbort, level = 1 }: { onDone: (score: numbe
     });
 
     const mouse = { x: W / 2, y: H / 2, in: false };
+    const held = new Set<string>();
     let kind: Kind | null = null;
     let fx = 20;
     let fy = 70;
@@ -100,14 +101,28 @@ export function FishGame({ onDone, onAbort, level = 1 }: { onDone: (score: numbe
     const onClick = () => {
       if (!kind && casts < 6) spawn();
     };
+    const onKey = (e: KeyboardEvent) => {
+      held.add(e.code);
+      if (e.code === "Enter" || e.code === "Space") onClick();
+    };
+    const onUp = (e: KeyboardEvent) => held.delete(e.code);
     canvas.addEventListener("mousemove", onMove);
     canvas.addEventListener("mousedown", onClick);
+    window.addEventListener("keydown", onKey);
+    window.addEventListener("keyup", onUp);
 
     const loop = (now: number) => {
       const dt = Math.min(0.05, (now - last) / 1000);
       last = now;
       if (kind) {
         twitchT += dt;
+        if (held.has("ArrowLeft") || held.has("KeyA")) mouse.x = Math.max(0, mouse.x - 70 * dt);
+        if (held.has("ArrowRight") || held.has("KeyD")) mouse.x = Math.min(W, mouse.x + 70 * dt);
+        if (held.has("ArrowUp") || held.has("KeyW")) mouse.y = Math.max(0, mouse.y - 70 * dt);
+        if (held.has("ArrowDown") || held.has("KeyS")) mouse.y = Math.min(H, mouse.y + 70 * dt);
+        if (held.has("ArrowLeft") || held.has("ArrowRight") || held.has("ArrowUp") || held.has("ArrowDown") || held.has("KeyA") || held.has("KeyD") || held.has("KeyW") || held.has("KeyS")) {
+          mouse.in = true;
+        }
         if (twitchT > 1 / Math.max(0.2, kind.twitch)) {
           twitchT = 0;
           ang += (Math.random() - 0.5) * (0.6 + kind.twitch * 0.7);
@@ -171,6 +186,8 @@ export function FishGame({ onDone, onAbort, level = 1 }: { onDone: (score: numbe
       cancelAnimationFrame(raf);
       canvas.removeEventListener("mousemove", onMove);
       canvas.removeEventListener("mousedown", onClick);
+      window.removeEventListener("keydown", onKey);
+      window.removeEventListener("keyup", onUp);
     };
   }, [done]);
 

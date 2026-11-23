@@ -1,0 +1,4 @@
+Menu arrow. In menu true. Tag BUTTON. Text Begin. Next Settings.
+Pad down. Focus Sound on.
+Pause click. Card has stick true. Card has mouse true.
+Page errors: 0.

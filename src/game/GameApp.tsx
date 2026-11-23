@@ -39,6 +39,7 @@ import { siteKind, type CutawayKind } from "./plantLoops";
 import { seasonOrDefault, type Season } from "./parlorOS";
 import { maintenanceSteamOn } from "./steamRule";
 import { applyWorldKey, CABINET_MODES, getKeyOwner, setKeyOwner } from "./keyGate";
+import { applyPad, arrowNav, dirOf, emptyPad, isKeyMode, isPadEcho, moveFocus, readPad } from "./screenNav";
 import { BootLog, SetupScreen } from "./ParlorApps";
 import { isMuted, playBed, playBlip, setMuted, unlockAudio, syncWorld, getAudioProbe, bedForRoom } from "./audio";
 import { isRevealing, requestSkip } from "./chatter";
@@ -62,6 +63,7 @@ import { TeachMeta, TeachPriya, TYPE_THUMB } from "./TeachFrame";
 import { ART } from "./artFlags";
 import { PixelMenu, PixelRead } from "./PixelMenu";
 import { SettingsFields } from "./SettingsFields";
+import { ControlsCard } from "./ControlsCard";
 import { CastFace, PixelBadge, PixelBeat, PixelBrief } from "./IntroScreens";
 import {
   abortOverlay,
@@ -271,6 +273,7 @@ export function GameApp() {
   const keysRef = useRef<Set<string>>(new Set());
   const edgesRef = useRef<Set<string>>(new Set());
   const stickRef = useRef({ x: 0, y: 0, active: false });
+  const padRef = useRef(emptyPad());
   const modeRef = useRef<Mode>("splash");
   const sigRef = useRef("");
   const talkRef = useRef<{ dialogue: Line[] | null; acc: number }>({ dialogue: null, acc: 0 });
@@ -303,12 +306,36 @@ export function GameApp() {
     const edges = edgesRef.current;
 
     const down = (e: KeyboardEvent) => {
+      const nights = !!stateRef.current.flags["rot:nights"];
+      if (isPadEcho() && (arrowNav(modeRef.current, nights) || isKeyMode(modeRef.current))) return;
       // Night rotation owns 1–8, Space, B, R and E. The lot underneath does not walk or pause.
-      if (stateRef.current.flags["rot:nights"]) return;
+      if (nights) return;
       applyWorldKey(e, modeRef.current, keys, edges, GAME_CODES);
+    };
+    const nav = (e: KeyboardEvent) => {
+      const tag = (e.target as HTMLElement | null)?.tagName;
+      if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
+      const nights = !!stateRef.current.flags["rot:nights"];
+      if (!arrowNav(modeRef.current, nights)) return;
+      const dir = dirOf(e.code);
+      if (dir) {
+        e.preventDefault();
+        e.stopPropagation();
+        moveFocus(dir);
+        return;
+      }
+      if (modeRef.current === "menu" && (e.code === "Enter" || e.code === "Space")) {
+        const el = document.activeElement as HTMLElement | null;
+        if (el && el.tagName === "BUTTON" && el.closest("[data-testid=pixel-menu]")) {
+          e.preventDefault();
+          e.stopPropagation();
+          el.click();
+        }
+      }
     };
     const up = (e: KeyboardEvent) => keys.delete(e.code);
     const clear = () => keys.clear();
+    window.addEventListener("keydown", nav, true);
     window.addEventListener("keydown", down);
     window.addEventListener("keyup", up);
     window.addEventListener("blur", clear);
@@ -757,6 +784,11 @@ export function GameApp() {
         stickRef.current.y = 0;
         stickRef.current.active = false;
       }
+      padRef.current = applyPad(padRef.current, readPad(), {
+        mode: s.mode,
+        nights: !!s.flags["rot:nights"],
+        edges,
+      });
       const a = s.flags["rot:nights"] ? emptyActions() : collectActions(keys, edges, stickRef.current);
       if (!s.flags["rot:nights"] && edges.has("KeyK")) tryCloseShift(s);
       // Fixed 1/60 step. A 30 Hz picture runs two of them, so walking speed does not change.
@@ -870,6 +902,7 @@ export function GameApp() {
     raf = requestAnimationFrame(loop);
     return () => {
       cancelAnimationFrame(raf);
+      window.removeEventListener("keydown", nav, true);
       window.removeEventListener("keydown", down);
       window.removeEventListener("keyup", up);
       window.removeEventListener("blur", clear);
@@ -1501,28 +1534,12 @@ export function GameApp() {
 
         {mode === "how" && ART.menu && (
           <PixelRead title="HOW TO PLAY" onBack={() => goMenu("menu")}>
-            <ul>
-              <li>New shift starts at the academic designer. You build the core you will walk. It discards a saved week.</li>
-              <li>WASD or the stick to walk. A is left, D is right. The clock pauses while you talk, study, or play.</li>
-              <li>E is the near prompt. P peer-checks. R reports. H hides. Three hides close the week as unfinished power.</li>
-              <li>ESC pauses for the plant map, hearts, Academy, and the arcade. K closes the shift.</li>
-              <li>Teaching model only. Not a real plant. Not a license.</li>
-            </ul>
+            <ControlsCard />
           </PixelRead>
         )}
         {mode === "how" && !ART.menu && (
           <Panel>
-            <h2 className="font-display text-2xl">How to play</h2>
-            <ul className="mt-4 max-w-md space-y-2 text-sm leading-relaxed text-muted">
-              <li>New shift starts at the academic designer — you build the core you will walk. It discards a saved week.</li>
-              <li>WASD or stick — walk. A is left, D is right. Clock pauses while you talk, study, or play.</li>
-              <li>E — the near prompt (Talk / Academy / Hang tag / Shuffle / Look / Catch).</li>
-              <li>P — peer-check. R — report. H — hide (three hides close the week as unfinished power).</li>
-              <li>ESC — pause for the plant map, hearts, Academy, arcade. K closes the shift.</li>
-              <li>Mabel's parlor: same bezel, different jobs. North wall is Unit 1. South is after-shift. Pebble is a comparison.</li>
-              <li>Academy in Control. Priya's ΔT bench. Tommy's LOTOTO. Day 5: fuel shuffle.</li>
-              <li>Teaching model only — not a real plant, not a license.</li>
-            </ul>
+            <ControlsCard />
             <button type="button" className="btn-primary mt-6" onPointerDown={() => goMenu("menu")}>
               Back
             </button>
@@ -2815,6 +2832,7 @@ function PauseStage({
   onTravel: (id: RoomId) => void;
 }) {
   const [focus, setFocus] = useState<RoomId>(s.room);
+  const [help, setHelp] = useState(false);
   const here = npcsHere(s);
   const ties = floorTies(s.residue, s.flags);
   const k = s.plant ? computeKeff(s.plant) : null;
@@ -2940,6 +2958,10 @@ function PauseStage({
               Save shift
             </button>
             <MuteToggle />
+            <button type="button" className="btn-ghost" data-testid="pause-controls" onClick={() => setHelp(true)}>
+              Controls
+            </button>
+            {help ? <ControlsCard onClose={() => setHelp(false)} /> : null}
             <SettingsFields />
             <FrameRateRow />
             <button type="button" className="btn-ghost" onClick={onAcademy}>
@@ -3342,7 +3364,6 @@ function collectActions(
       if (pad.buttons[13]?.pressed) a.moveY += 1;
       if (pad.buttons[14]?.pressed) a.moveX -= 1;
       if (pad.buttons[15]?.pressed) a.moveX += 1;
-      if (pad.buttons[0]?.pressed) edges.add("KeyE");
     }
   }
   if (stick.active) {

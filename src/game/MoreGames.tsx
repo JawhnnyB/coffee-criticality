@@ -141,12 +141,15 @@ export function GolfGame({ onDone, onAbort, level = 1 }: { onDone: (score: numbe
     let mx = W / 2;
     let my = H / 2;
 
+    const held = new Set<string>();
     const down = (e: KeyboardEvent) => {
       if (!hostOwnsKey("mini", e.code)) return;
+      held.add(e.code);
       if (e.code === "Escape") onAbort();
       if (e.code === "Space") charging = true;
     };
     const up = (e: KeyboardEvent) => {
+      held.delete(e.code);
       if (!hostOwnsKey("mini", e.code)) {
         charging = false;
         return;
@@ -188,7 +191,11 @@ export function GolfGame({ onDone, onAbort, level = 1 }: { onDone: (score: numbe
       const dt = Math.min(0.04, (now - last) / 1000);
       last = now;
       const hole = HOLES[holeI];
-      aim = Math.atan2(my - y, mx - x);
+      if (held.has("ArrowLeft") || held.has("KeyA")) aim -= 1.6 * dt;
+      if (held.has("ArrowRight") || held.has("KeyD")) aim += 1.6 * dt;
+      else if (!held.has("ArrowLeft") && !held.has("KeyA") && !held.has("ArrowRight") && !held.has("KeyD")) {
+        aim = Math.atan2(my - y, mx - x);
+      }
       if (charging) power = Math.min(1, power + dt * 0.9);
 
       const speed = Math.hypot(vx, vy);

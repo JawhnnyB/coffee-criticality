@@ -62,6 +62,9 @@ export function MaintGame({
     let last = performance.now();
     let raf = 0;
     let over = false;
+    let aimX = W / 2;
+    let aimY = H / 2;
+    const held = new Set<string>();
 
     const hit = (mx: number, my: number) => {
       if (over) return;
@@ -105,17 +108,28 @@ export function MaintGame({
     };
     const key = (e: KeyboardEvent) => {
       if (!hostOwnsKey("mini", e.code)) return;
+      held.add(e.code);
       if (e.code === "Escape") onAbort();
+      if (e.code === "Enter" || e.code === "Space") {
+        const r = canvas.getBoundingClientRect();
+        hit(r.left + (aimX / W) * r.width, r.top + (aimY / H) * r.height);
+      }
     };
+    const keyUp = (e: KeyboardEvent) => held.delete(e.code);
     canvas.addEventListener("mousedown", click);
     canvas.addEventListener("touchend", touch, { passive: true });
     window.addEventListener("keydown", key);
+    window.addEventListener("keyup", keyUp);
 
     const loop = (now: number) => {
       if (over) return;
       const dt = Math.min(0.05, (now - last) / 1000);
       last = now;
       clock -= dt;
+      if (held.has("ArrowLeft") || held.has("KeyA")) aimX = Math.max(4, aimX - 90 * dt);
+      if (held.has("ArrowRight") || held.has("KeyD")) aimX = Math.min(W - 4, aimX + 90 * dt);
+      if (held.has("ArrowUp") || held.has("KeyW")) aimY = Math.max(4, aimY - 90 * dt);
+      if (held.has("ArrowDown") || held.has("KeyS")) aimY = Math.min(H - 4, aimY + 90 * dt);
       flash = Math.max(0, flash - dt);
       hitFlash = Math.max(0, hitFlash - dt);
       shake = Math.max(0, shake - dt);
@@ -166,6 +180,8 @@ export function MaintGame({
       ctx.fillText(`LOTOTO  hunt  ${clock.toFixed(1)}s  ·  catch the orange`, 6, 11);
       ctx.fillStyle = "#8a7864";
       ctx.fillText("IN SERVICE does not hang here.", 6, H - 6);
+      ctx.strokeStyle = "#f3e6d0";
+      ctx.strokeRect(aimX - 4, aimY - 4, 8, 8);
       ctx.restore();
       raf = requestAnimationFrame(loop);
     };
@@ -175,6 +191,7 @@ export function MaintGame({
       canvas.removeEventListener("mousedown", click);
       canvas.removeEventListener("touchend", touch);
       window.removeEventListener("keydown", key);
+      window.removeEventListener("keyup", keyUp);
     };
   }, [phase, onAbort, lieAt]);
 

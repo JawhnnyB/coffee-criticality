@@ -610,6 +610,14 @@ export function Arcade({
     let raf = 0;
     let over = false;
     let tPlay = 0;
+    let aimX = CW / 2;
+    let aimY = CH / 2;
+    const held = new Set<string>();
+
+    const aimHit = () => {
+      const r = canvas.getBoundingClientRect();
+      hit(r.left + (aimX / CW) * r.width, r.top + (aimY / CH) * r.height);
+    };
 
     const hit = (mx: number, my: number) => {
       if (over) return;
@@ -657,7 +665,9 @@ export function Arcade({
     };
     const key = (e: KeyboardEvent) => {
       if (!hostOwnsKey("mini", e.code)) return;
+      held.add(e.code);
       if (e.code === "Escape") onAbort();
+      if (e.code === "Enter" || (e.code === "Space" && !board.clean)) aimHit();
       if (e.code === "Space" && !over && board.clean) {
         // Signing a clean board is a catch too: you did not cry wolf and you still read it.
         caught += 1;
@@ -667,9 +677,11 @@ export function Arcade({
         advance();
       }
     };
+    const keyUp = (e: KeyboardEvent) => held.delete(e.code);
     canvas.addEventListener("mousedown", click);
     canvas.addEventListener("touchend", touch, { passive: true });
     window.addEventListener("keydown", key);
+    window.addEventListener("keyup", keyUp);
 
     const loop = (now: number) => {
       if (over) return;
@@ -677,6 +689,10 @@ export function Arcade({
       last = now;
       tPlay += dt;
       clock -= dt;
+      if (held.has("ArrowLeft") || held.has("KeyA")) aimX = Math.max(4, aimX - 90 * dt);
+      if (held.has("ArrowRight") || held.has("KeyD")) aimX = Math.min(CW - 4, aimX + 90 * dt);
+      if (held.has("ArrowUp") || held.has("KeyW")) aimY = Math.max(4, aimY - 90 * dt);
+      if (held.has("ArrowDown") || held.has("KeyS")) aimY = Math.min(CH - 4, aimY + 90 * dt);
       flash = Math.max(0, flash - dt);
       hitFlash = Math.max(0, hitFlash - dt);
       shake = Math.max(0, shake - dt);
@@ -722,6 +738,8 @@ export function Arcade({
       ctx.fillText(`CATCH  ${round + 1}/${BOARDS}   ${clock.toFixed(1)}s   caught ${caught}   miss ${miss}`, 6, 11);
       ctx.fillStyle = "#e8d8b8";
       ctx.fillText(board.prompt, 6, CH - 6);
+      ctx.strokeStyle = "#f3e6d0";
+      ctx.strokeRect(aimX - 4, aimY - 4, 8, 8);
       ctx.restore();
 
       raf = requestAnimationFrame(loop);
@@ -732,6 +750,7 @@ export function Arcade({
       canvas.removeEventListener("mousedown", click);
       canvas.removeEventListener("touchend", touch);
       window.removeEventListener("keydown", key);
+      window.removeEventListener("keyup", keyUp);
     };
   }, [phase, onAbort, day]);
 
