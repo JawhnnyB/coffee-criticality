@@ -46,6 +46,7 @@ Brief: `docs/grok/value-100.md`. One step, one commit. Real-input proof in this 
 - Step 37 done · Night 1 is a silent door, a gull, and one flashing camera. One line at a time. Proof in step-37/.
 - Step 38 done · Night pace is Relaxed, Standard, or Nuke. It is a setting, not part of the week. Proof in step-38/.
 - Step 39 done · A careful first night is a B (92). Night 4 is a C (82). One silent event a night. Proof in step-39/.
+- Step 40 done · Six more events on each site, using pictures the cameras already draw. Proof in step-40/.
 
 
 
