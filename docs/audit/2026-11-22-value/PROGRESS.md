@@ -29,6 +29,8 @@ Brief: `docs/grok/value-100.md`. One step, one commit. Real-input proof in this 
 - Step 12g done · The pool waterline drops on a new plate, with a wet band and the cells kept. The drips land in the band. The insulator glow is 384 pixels (the line is 389) and the grating sheen is 229. Neither was enlarged. The far-rail tool bag is 236. Proof in step-12g/.
 - Step 14 done · Volume, text size, reduced motion, and screen shake are on the menu and on pause. A new week keeps them. Proof in step-14/.
 - Step 15 done · Arrows, the mouse, and a pad reach the menus and the cabinets. The controls card is on pause. Proof in step-15/.
+- Step 16 done · Keys can be changed in Settings. Esc still pauses. A reload keeps the bind. Proof in step-16/.
+
 
 
 

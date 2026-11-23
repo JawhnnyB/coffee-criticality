@@ -9,6 +9,7 @@ const LINES = [
   "Menus: arrows or the stick, then Enter or A.",
   "Night: Space is the tablet. 1 to 8 pick cameras. B brews.",
   "Cabinets: arrows aim. Space or Enter acts. Mouse still works.",
+  "Keys can be changed in Settings. Esc still pauses.",
 ];
 
 export function ControlsCard({ onClose }: { onClose?: () => void }) {

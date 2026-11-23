@@ -1,6 +1,7 @@
 "use client";
 
 import { TUNE, type CabLevel } from "./cabLevels";
+import { actHeld } from "./binds";
 import { cabContext, cabFont } from "./cabCanvas";
 import { useEffect, useRef, useState } from "react";
 import { PAL } from "./palette";
@@ -116,11 +117,16 @@ export function FishGame({ onDone, onAbort, level = 1 }: { onDone: (score: numbe
       last = now;
       if (kind) {
         twitchT += dt;
-        if (held.has("ArrowLeft") || held.has("KeyA")) mouse.x = Math.max(0, mouse.x - 70 * dt);
-        if (held.has("ArrowRight") || held.has("KeyD")) mouse.x = Math.min(W, mouse.x + 70 * dt);
-        if (held.has("ArrowUp") || held.has("KeyW")) mouse.y = Math.max(0, mouse.y - 70 * dt);
-        if (held.has("ArrowDown") || held.has("KeyS")) mouse.y = Math.min(H, mouse.y + 70 * dt);
-        if (held.has("ArrowLeft") || held.has("ArrowRight") || held.has("ArrowUp") || held.has("ArrowDown") || held.has("KeyA") || held.has("KeyD") || held.has("KeyW") || held.has("KeyS")) {
+        if (actHeld((c) => held.has(c), "left", "ArrowLeft")) mouse.x = Math.max(0, mouse.x - 70 * dt);
+        if (actHeld((c) => held.has(c), "right", "ArrowRight")) mouse.x = Math.min(W, mouse.x + 70 * dt);
+        if (actHeld((c) => held.has(c), "up", "ArrowUp")) mouse.y = Math.max(0, mouse.y - 70 * dt);
+        if (actHeld((c) => held.has(c), "down", "ArrowDown")) mouse.y = Math.min(H, mouse.y + 70 * dt);
+        if (
+          actHeld((c) => held.has(c), "left", "ArrowLeft") ||
+          actHeld((c) => held.has(c), "right", "ArrowRight") ||
+          actHeld((c) => held.has(c), "up", "ArrowUp") ||
+          actHeld((c) => held.has(c), "down", "ArrowDown")
+        ) {
           mouse.in = true;
         }
         if (twitchT > 1 / Math.max(0.2, kind.twitch)) {

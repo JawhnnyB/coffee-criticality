@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { refreshMix, unlockAudio } from "./audio";
+import { ACTS, binds, keyLabel, setBind, type Act } from "./binds";
 import {
   mixLevels,
   reducedMotionOn,
@@ -34,6 +35,23 @@ export function SettingsFields() {
   const [text, setText] = useState<TextSize>(() => textSize());
   const [motion, setMotion] = useState(() => reducedMotionOn());
   const [shake, setShake] = useState(() => shakeOn());
+  const [bound, setBound] = useState(() => binds());
+  const [listen, setListen] = useState<Act | null>(null);
+
+  useEffect(() => {
+    if (!listen) return;
+    const onKey = (e: KeyboardEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      if (e.code !== "Escape") {
+        setBind(listen, e.code);
+        setBound(binds());
+      }
+      setListen(null);
+    };
+    window.addEventListener("keydown", onKey, true);
+    return () => window.removeEventListener("keydown", onKey, true);
+  }, [listen]);
 
   const slide = (key: keyof Mix, raw: string) => {
     unlockAudio();
@@ -103,6 +121,19 @@ export function SettingsFields() {
       >
         {shake ? "Screen shake on" : "Screen shake off"}
       </button>
+      <p className="font-mono text-[10px] tracking-widest text-subtle">Keys</p>
+      {ACTS.map((row) => (
+        <button
+          key={row.id}
+          type="button"
+          className="btn-ghost"
+          data-testid={`bind-${row.id}`}
+          onClick={() => setListen(row.id)}
+        >
+          {listen === row.id ? `${row.label}: press a key` : `${row.label}: ${keyLabel(bound[row.id])}`}
+        </button>
+      ))}
+      <p className="text-[11px] text-subtle">Esc still pauses. Arrows still walk.</p>
     </div>
   );
 }

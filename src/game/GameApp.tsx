@@ -39,6 +39,7 @@ import { siteKind, type CutawayKind } from "./plantLoops";
 import { seasonOrDefault, type Season } from "./parlorOS";
 import { maintenanceSteamOn } from "./steamRule";
 import { applyWorldKey, CABINET_MODES, getKeyOwner, setKeyOwner } from "./keyGate";
+import { binds } from "./binds";
 import { applyPad, arrowNav, dirOf, emptyPad, isKeyMode, isPadEcho, moveFocus, readPad } from "./screenNav";
 import { BootLog, SetupScreen } from "./ParlorApps";
 import { isMuted, playBed, playBlip, setMuted, unlockAudio, syncWorld, getAudioProbe, bedForRoom } from "./audio";
@@ -776,6 +777,7 @@ export function GameApp() {
         for (const code of ["KeyW", "KeyA", "KeyS", "KeyD", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "Space", "Enter"]) {
           keys.delete(code);
         }
+        for (const code of Object.values(binds())) keys.delete(code);
       }
       if (s.flags["rot:nights"]) {
         keys.clear();
@@ -3344,10 +3346,13 @@ function collectActions(
   stick: { x: number; y: number; active: boolean },
 ): Actions {
   const a = emptyActions();
-  if (keys.has("KeyA") || keys.has("ArrowLeft")) a.moveX -= 1;
-  if (keys.has("KeyD") || keys.has("ArrowRight")) a.moveX += 1;
-  if (keys.has("KeyW") || keys.has("ArrowUp")) a.moveY -= 1;
-  if (keys.has("KeyS") || keys.has("ArrowDown")) a.moveY += 1;
+  const b = binds();
+  const down = (code: string) => !!code && keys.has(code);
+  const hit = (code: string) => !!code && edges.has(code);
+  if (down(b.left) || keys.has("ArrowLeft")) a.moveX -= 1;
+  if (down(b.right) || keys.has("ArrowRight")) a.moveX += 1;
+  if (down(b.up) || keys.has("ArrowUp")) a.moveY -= 1;
+  if (down(b.down) || keys.has("ArrowDown")) a.moveY += 1;
   if (typeof navigator !== "undefined") {
     const pads = navigator.getGamepads?.() ?? [];
     for (const pad of pads) {
@@ -3372,12 +3377,12 @@ function collectActions(
   }
   a.moveX = Math.max(-1, Math.min(1, a.moveX));
   a.moveY = Math.max(-1, Math.min(1, a.moveY));
-  a.interact = edges.has("KeyE");
-  a.peer = edges.has("KeyP");
-  a.report = edges.has("KeyR");
-  a.hide = edges.has("KeyH");
-  a.confirm = edges.has("Space") || edges.has("Enter");
-  a.heldConfirm = keys.has("Space") || keys.has("Enter");
+  a.interact = hit(b.interact);
+  a.peer = hit(b.peer);
+  a.report = hit(b.report);
+  a.hide = hit(b.hide);
+  a.confirm = hit(b.confirm) || edges.has("Enter");
+  a.heldConfirm = down(b.confirm) || keys.has("Enter");
   a.back = edges.has("Escape");
   a.pause = edges.has("Escape");
   return a;

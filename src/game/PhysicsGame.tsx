@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { Bezel } from "./Arcade";
 import { duckHit, playHuntHit, playPeriodTick } from "./audio";
 import { hostOwnsKey, readHeld } from "./keyGate";
+import { actHeld } from "./binds";
 import type { PlantType } from "./plant";
 
 const W = 320;
@@ -418,8 +419,8 @@ export function PhysicsGame({
           duckHit();
           evI += 1;
         }
-        if (readHeld("mini", keys, "KeyW") || readHeld("mini", keys, "ArrowUp")) insert = Math.min(1, insert + 0.55 * dt);
-        if (readHeld("mini", keys, "KeyS") || readHeld("mini", keys, "ArrowDown")) insert = Math.max(0, insert - 0.55 * dt);
+        if (actHeld((c) => readHeld("mini", keys, c), "up", "ArrowUp")) insert = Math.min(1, insert + 0.55 * dt);
+        if (actHeld((c) => readHeld("mini", keys, c), "down", "ArrowDown")) insert = Math.max(0, insert - 0.55 * dt);
         if (pointer) insert = Math.max(0, Math.min(1, below ? 1 - (my - 18) / 130 : (my - 18) / 130));
       } else if (board === "diff") {
         while (evI < DIFF_EV.length && tPlay >= DIFF_EV[evI].at) {
@@ -439,8 +440,8 @@ export function PhysicsGame({
           duckHit();
           evI += 1;
         }
-        if (readHeld("mini", keys, "KeyA") || readHeld("mini", keys, "ArrowLeft")) curtain -= 90 * dt;
-        if (readHeld("mini", keys, "KeyD") || readHeld("mini", keys, "ArrowRight")) curtain += 90 * dt;
+        if (actHeld((c) => readHeld("mini", keys, c), "left", "ArrowLeft")) curtain -= 90 * dt;
+        if (actHeld((c) => readHeld("mini", keys, c), "right", "ArrowRight")) curtain += 90 * dt;
         if (pointer) curtain += (mx - curtain) * 8 * dt;
         curtain = Math.max(28, Math.min(W - 28, curtain));
       } else {
@@ -457,8 +458,8 @@ export function PhysicsGame({
           duckHit();
           evI += 1;
         }
-        if (readHeld("mini", keys, "KeyW") || readHeld("mini", keys, "ArrowUp")) insert = Math.min(1, insert + 0.55 * dt);
-        if (readHeld("mini", keys, "KeyS") || readHeld("mini", keys, "ArrowDown")) insert = Math.max(0, insert - 0.55 * dt);
+        if (actHeld((c) => readHeld("mini", keys, c), "up", "ArrowUp")) insert = Math.min(1, insert + 0.55 * dt);
+        if (actHeld((c) => readHeld("mini", keys, c), "down", "ArrowDown")) insert = Math.max(0, insert - 0.55 * dt);
         if (pointer && !bankReady) insert = Math.max(0, Math.min(1, below ? 1 - (my - 18) / 130 : (my - 18) / 130));
       }
 

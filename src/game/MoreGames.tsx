@@ -5,6 +5,7 @@ import { cabContext, cabFont } from "./cabCanvas";
 import { useEffect, useRef, useState } from "react";
 import { Bezel } from "./Arcade";
 import { hostOwnsKey, readHeld } from "./keyGate";
+import { actHeld } from "./binds";
 
 const W = 320;
 const H = 180;
@@ -191,9 +192,9 @@ export function GolfGame({ onDone, onAbort, level = 1 }: { onDone: (score: numbe
       const dt = Math.min(0.04, (now - last) / 1000);
       last = now;
       const hole = HOLES[holeI];
-      if (held.has("ArrowLeft") || held.has("KeyA")) aim -= 1.6 * dt;
-      if (held.has("ArrowRight") || held.has("KeyD")) aim += 1.6 * dt;
-      else if (!held.has("ArrowLeft") && !held.has("KeyA") && !held.has("ArrowRight") && !held.has("KeyD")) {
+      if (actHeld((c) => held.has(c), "left", "ArrowLeft")) aim -= 1.6 * dt;
+      if (actHeld((c) => held.has(c), "right", "ArrowRight")) aim += 1.6 * dt;
+      else if (!actHeld((c) => held.has(c), "left", "ArrowLeft") && !actHeld((c) => held.has(c), "right", "ArrowRight")) {
         aim = Math.atan2(my - y, mx - x);
       }
       if (charging) power = Math.min(1, power + dt * 0.9);
@@ -567,8 +568,8 @@ export function PebbleGame({ onDone, onAbort, level = 1 }: { onDone: (score: num
       if (!hostOwnsKey("mini", e.code)) return;
       if (e.code === "Escape") onAbort();
       if (e.code === "Space" || e.code === "KeyE") drop();
-      if (e.code === "KeyA" || e.code === "ArrowLeft") dropX -= 16;
-      if (e.code === "KeyD" || e.code === "ArrowRight") dropX += 16;
+      if (e.code === "ArrowLeft" || actHeld((c) => c === e.code, "left", "ArrowLeft")) dropX -= 16;
+      if (e.code === "ArrowRight" || actHeld((c) => c === e.code, "right", "ArrowRight")) dropX += 16;
     };
     const move = (e: MouseEvent) => {
       const r = canvas.getBoundingClientRect();
@@ -791,8 +792,8 @@ export function BowlGame({ onDone, onAbort, level = 1 }: { onDone: (score: numbe
       if (!hostOwnsKey("mini", e.code)) return;
       if (e.code === "Escape") onAbort();
       if (e.code === "Space") charging = true;
-      if (e.code === "KeyA" || e.code === "ArrowLeft") aim -= 0.08;
-      if (e.code === "KeyD" || e.code === "ArrowRight") aim += 0.08;
+      if (e.code === "ArrowLeft" || actHeld((c) => c === e.code, "left", "ArrowLeft")) aim -= 0.08;
+      if (e.code === "ArrowRight" || actHeld((c) => c === e.code, "right", "ArrowRight")) aim += 0.08;
     };
     const up = (e: KeyboardEvent) => {
       if (!hostOwnsKey("mini", e.code)) {

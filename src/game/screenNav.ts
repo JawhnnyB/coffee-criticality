@@ -2,6 +2,7 @@
  * Keyboard focus and the gamepad, for screens that are buttons and for
  * games that already read keys. The walking sim still reads the stick itself.
  */
+import { binds } from "./binds";
 
 export type PadSnap = { axes: number[]; buttons: boolean[] };
 
@@ -230,10 +231,11 @@ export function applyPad(
       else emit("keydown", "Escape");
     }
   } else if (ctx.mode === "play") {
-    if (step.edge.confirm) ctx.edges.add("KeyE");
-    if (step.edge.peer) ctx.edges.add("KeyP");
-    if (step.edge.report) ctx.edges.add("KeyR");
-    if (step.edge.hide) ctx.edges.add("KeyH");
+    const b = binds();
+    if (step.edge.confirm) ctx.edges.add(b.interact);
+    if (step.edge.peer) ctx.edges.add(b.peer);
+    if (step.edge.report) ctx.edges.add(b.report);
+    if (step.edge.hide) ctx.edges.add(b.hide);
     if (step.edge.back || step.edge.start) ctx.edges.add("Escape");
   }
 

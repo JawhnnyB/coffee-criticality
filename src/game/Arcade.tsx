@@ -5,6 +5,7 @@ import { cabContext, cabFont } from "./cabCanvas";
 import { type ReactNode, useEffect, useRef, useState } from "react";
 import { playHuntHit, playHuntMiss } from "./audio";
 import { shakeOn } from "./frameRate";
+import { actHeld } from "./binds";
 import { hostOwnsKey } from "./keyGate";
 
 export type CabId = "catch" | "fish" | "plot" | "horde" | "delay" | "golf" | "rods" | "pebble" | "bowl" | "phys" | "load";
@@ -689,10 +690,10 @@ export function Arcade({
       last = now;
       tPlay += dt;
       clock -= dt;
-      if (held.has("ArrowLeft") || held.has("KeyA")) aimX = Math.max(4, aimX - 90 * dt);
-      if (held.has("ArrowRight") || held.has("KeyD")) aimX = Math.min(CW - 4, aimX + 90 * dt);
-      if (held.has("ArrowUp") || held.has("KeyW")) aimY = Math.max(4, aimY - 90 * dt);
-      if (held.has("ArrowDown") || held.has("KeyS")) aimY = Math.min(CH - 4, aimY + 90 * dt);
+      if (actHeld((c) => held.has(c), "left", "ArrowLeft")) aimX = Math.max(4, aimX - 90 * dt);
+      if (actHeld((c) => held.has(c), "right", "ArrowRight")) aimX = Math.min(CW - 4, aimX + 90 * dt);
+      if (actHeld((c) => held.has(c), "up", "ArrowUp")) aimY = Math.max(4, aimY - 90 * dt);
+      if (actHeld((c) => held.has(c), "down", "ArrowDown")) aimY = Math.min(CH - 4, aimY + 90 * dt);
       flash = Math.max(0, flash - dt);
       hitFlash = Math.max(0, hitFlash - dt);
       shake = Math.max(0, shake - dt);

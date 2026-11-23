@@ -1,0 +1,3 @@
+After press. Label Use: F. Store {"binds":{"up":"KeyW","down":"KeyS","left":"KeyA","right":"KeyD","interact":"KeyF","peer":"KeyP","report":"KeyR","hide":"KeyH","confirm":"Space"}}.
+Reload. Label Use: F.
+Page errors: 0.

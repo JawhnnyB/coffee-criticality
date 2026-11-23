@@ -14,6 +14,7 @@ import { CAM_H, CAM_PX, CAM_W, lookOf, paintCamera, resetFrameCaches } from "./n
 import { loadPlates, releasePlates } from "./nightwatch/plates";
 import { startAmbience, stopAmbience } from "./nightwatch/ambience";
 import { prefersReducedMotion } from "./reducedMotion";
+import { binds } from "./binds";
 import {
   CATEGORY_LABEL,
   COFFEE,
@@ -226,13 +227,14 @@ function NightShift({ s, nightNo: asked, onLeave, replay = false }: { s: GameSta
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (n.over) return;
-      if (e.key === " ") {
+      const b = binds();
+      if (e.key === " " || e.code === b.confirm) {
         e.preventDefault();
         toggleTablet();
       } else if (/^[1-8]$/.test(e.key)) {
         const cam = n.watch.cameras[Number(e.key) - 1];
         if (cam) pickCamera(cam.id);
-      } else if (e.key === "r" || e.key === "R") {
+      } else if (e.code === b.report || e.key === "r" || e.key === "R") {
         if (n.tablet) setReporting((v) => !v);
       } else if (e.key === "b" || e.key === "B") doBrew();
     };

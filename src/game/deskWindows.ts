@@ -2,6 +2,7 @@
  * Window math and key routing for the desktop. Pure functions, so the rules are tested in node.
  * The desktop is the only caller. Nothing here touches the DOM.
  */
+import { isBound } from "./binds";
 
 export const MIN_W = 240;
 export const MIN_H = 160;
@@ -125,7 +126,7 @@ export type FocusKind = "none" | "static" | "sim-app" | "mini" | "world";
  */
 export function keyRoute(focus: FocusKind, code: string): "game" | "desktop" | "block" {
   if (code === "Escape") return focus === "mini" ? "game" : "desktop";
-  if (!GAME_CODES.has(code)) return "desktop";
+  if (!GAME_CODES.has(code) && !isBound(code)) return "desktop";
   if (focus === "mini" || focus === "sim-app" || focus === "world") return "game";
   return "block";
 }
