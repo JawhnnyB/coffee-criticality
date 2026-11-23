@@ -1,0 +1,4 @@
+After E. Down label Down: E. Use label Use: S.
+Store down KeyE. Store use KeyS. None false.
+After reset. Down Down: S. Use Use: E.
+Page errors: 0.

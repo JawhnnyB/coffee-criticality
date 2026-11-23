@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { refreshMix, unlockAudio } from "./audio";
-import { ACTS, binds, keyLabel, setBind, type Act } from "./binds";
+import { ACTS, binds, keyLabel, resetBinds, setBind, type Act } from "./binds";
 import { UI } from "./uiStrings";
 import {
   mixLevels,
@@ -134,6 +134,18 @@ export function SettingsFields() {
           {listen === row.id ? `${row.label}: press a key` : `${row.label}: ${keyLabel(bound[row.id])}`}
         </button>
       ))}
+      <button
+        type="button"
+        className="btn-ghost"
+        data-testid="bind-reset"
+        onClick={() => {
+          resetBinds();
+          setBound(binds());
+          setListen(null);
+        }}
+      >
+        {UI.resetKeys}
+      </button>
       <p className="text-[11px] text-subtle">{UI.keysNote}</p>
     </div>
   );

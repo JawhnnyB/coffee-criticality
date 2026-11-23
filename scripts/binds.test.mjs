@@ -40,10 +40,29 @@ test("defaults and a saved bind", () => {
   assert.equal(JSON.parse(store.get("cc.settings")).binds.interact, "KeyF");
 });
 
-test("a new load keeps the bind and drops a duplicate", async () => {
+test("a new load keeps the bind and a clash swaps", async () => {
   const second = await load("b.mjs");
   assert.equal(second.binds().interact, "KeyF");
   second.setBind("report", "KeyF");
   assert.equal(second.binds().report, "KeyF");
-  assert.notEqual(second.binds().interact, "KeyF");
+  assert.equal(second.binds().interact, "KeyR");
+});
+
+test("Down takes E and Use gets S. Reset puts them back. Nobody is None", async () => {
+  const third = await load("c.mjs");
+  third.resetBinds();
+  third.setBind("down", "KeyE");
+  const swapped = third.binds();
+  assert.equal(swapped.down, "KeyE");
+  assert.equal(swapped.interact, "KeyS");
+  for (const code of Object.values(swapped)) {
+    assert.ok(code);
+    assert.notEqual(code, "Escape");
+  }
+  third.setBind("up", "Escape");
+  assert.equal(third.binds().up, "KeyW");
+  third.resetBinds();
+  assert.equal(third.binds().down, "KeyS");
+  assert.equal(third.binds().interact, "KeyE");
+  assert.equal(third.binds().up, "KeyW");
 });

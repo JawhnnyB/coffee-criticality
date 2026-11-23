@@ -72,12 +72,35 @@ export function isBound(code: string): boolean {
 export function setBind(act: Act, code: string) {
   if (!code || code === "Escape" || code.length > 24) return;
   const next = { ...binds() };
-  for (const id of Object.keys(next) as Act[]) {
-    if (id !== act && next[id] === code) next[id] = DEFAULTS[id] === code ? "" : DEFAULTS[id];
-  }
+  if (next[act] === code) return;
+  const old = next[act];
+  const holders = (Object.keys(next) as Act[]).filter((id) => id !== act && next[id] === code);
   next[act] = code;
+  if (holders.length) {
+    next[holders[0]] = old && old !== code ? old : spare(next, code);
+    for (const extra of holders.slice(1)) next[extra] = spare(next, code);
+  }
+  for (const id of Object.keys(next) as Act[]) {
+    if (!next[id] || next[id] === "Escape") next[id] = spare(next, code);
+  }
   cache = next;
   writeAll({ ...readAll(), binds: next });
+}
+
+/** Every action gets a key again. Escape stays unused. */
+export function resetBinds() {
+  cache = { ...DEFAULTS };
+  writeAll({ ...readAll(), binds: { ...DEFAULTS } });
+}
+
+function spare(next: Record<Act, string>, avoid: string): string {
+  const used = new Set<string>(Object.values(next));
+  used.add(avoid);
+  for (const id of Object.keys(DEFAULTS) as Act[]) {
+    const code = DEFAULTS[id];
+    if (!used.has(code)) return code;
+  }
+  return "F13";
 }
 
 export function keyLabel(code: string): string {

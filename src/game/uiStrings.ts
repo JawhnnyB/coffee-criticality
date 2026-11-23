@@ -29,6 +29,7 @@ export const UI = {
   howTitle: "How to play",
   knownIssues: "Known issues",
   keys: "Keys",
+  resetKeys: "Reset keys",
 } as const;
 
 export const CONTROL_LINES = [
