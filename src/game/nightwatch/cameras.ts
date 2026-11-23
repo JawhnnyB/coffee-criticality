@@ -309,23 +309,29 @@ function room(g: G, o: RoomSpec): Room {
 
 function puddle(g: G, cx: number, cy: number, rFull: number, t: number, grow = 1) {
   const r = Math.max(22, rFull * (0.35 + 0.65 * grow));
+  // A slight darkening of the floor, not a painted oval.
   g.save();
   g.translate(cx, cy);
   g.scale(1, 0.28);
   g.globalCompositeOperation = "multiply";
-  g.fillStyle = rad(g, 0, 0, r, [[0, "rgb(165,165,165)"], [0.72, "rgb(200,200,200)"], [1, "rgb(255,255,255)"]]);
+  g.fillStyle = rad(g, 0, 0, r, [[0, "rgb(185,185,185)"], [0.7, "rgb(225,225,225)"], [1, "rgb(255,255,255)"]]);
   g.beginPath();
   g.arc(0, 0, r, 0, Math.PI * 2);
   g.fill();
   g.restore();
+  // The ceiling light, caught on the wet floor. Soft, not a box.
   g.save();
   g.globalCompositeOperation = "lighter";
-  g.fillStyle = rad(g, cx - r * 0.12, cy, r * 0.4, [[0, `rgba(255,248,220,${0.28 + 0.06 * Math.sin(t * 1.7)})`], [1, "rgba(255,248,220,0)"]]);
-  g.fillRect(cx - r * 0.45, cy - 8, r * 0.9, 16);
+  g.translate(cx - r * 0.12, cy);
+  g.scale(1, 0.32);
+  g.fillStyle = rad(g, 0, 0, r * 0.42, [[0, `rgba(255,248,220,${0.22 + 0.05 * Math.sin(t * 1.7)})`], [1, "rgba(255,248,220,0)"]]);
+  g.beginPath();
+  g.arc(0, 0, r * 0.42, 0, Math.PI * 2);
+  g.fill();
   g.restore();
   const ph = (t * 0.9) % 1;
-  g.fillStyle = "rgba(200,214,222,0.7)";
-  g.fillRect(cx + r * 0.08, cy - 110 + ph * 110, 1, 2);
+  g.fillStyle = "rgba(200,214,222,0.55)";
+  g.fillRect(cx + r * 0.08, cy - 70 + ph * 70, 1, 2);
 }
 
 /** Steam or vapour rising from (x, y), spreading and thinning. */
@@ -634,12 +640,20 @@ const S: Record<string, Scene> = {
             g.fillStyle = `rgba(186,198,206,${0.28 * (1 - s / streak)})`;
             g.fillRect(x, 116 + fall + s, 1, 2);
           }
-          const pr = 16 + grow * 8;
+          const pr = 10 + grow * 6;
+          const fy = H - 16;
           g.save();
           g.globalCompositeOperation = "multiply";
-          g.fillStyle = rad(g, x, H - 18, pr, [[0, "rgb(50,50,50)"], [0.7, "rgb(110,110,110)"], [1, "rgb(255,255,255)"]]);
+          g.fillStyle = rad(g, x, fy, pr, [[0, "rgb(188,188,188)"], [0.7, "rgb(228,228,228)"], [1, "rgb(255,255,255)"]]);
           g.beginPath();
-          g.ellipse(x, H - 18, pr, pr * 0.34, 0, 0, Math.PI * 2);
+          g.ellipse(x, fy, pr, pr * 0.22, 0, 0, Math.PI * 2);
+          g.fill();
+          g.restore();
+          g.save();
+          g.globalCompositeOperation = "lighter";
+          g.fillStyle = rad(g, x - 1, fy - 1, pr * 0.4, [[0, "rgba(220,228,232,0.2)"], [1, "rgba(220,228,232,0)"]]);
+          g.beginPath();
+          g.ellipse(x - 1, fy - 1, pr * 0.32, pr * 0.1, 0, 0, Math.PI * 2);
           g.fill();
           g.restore();
         }
@@ -954,13 +968,6 @@ const S: Record<string, Scene> = {
         g.fillStyle = "#151515";
         g.fillRect(392, 70, 20, 6);
       }
-      if (v.has("toolBag")) {
-        // Yellow, and big enough that a quick look catches it. A dark bag on a dark deck disappears.
-        g.fillStyle = "#f0c020";
-        g.fillRect(392, 72, 72, 32);
-        g.fillStyle = "#1a1a1a";
-        g.fillRect(412, 64, 22, 10);
-      }
     },
   },
   yard: {
@@ -1040,14 +1047,30 @@ const S: Record<string, Scene> = {
       }
       const van = v.at("van");
       if (van !== null) {
-        // Headlights coming up the access road.
+        // Two lamps and a cone on the gravel. The cone lengthens as the van comes up the road.
         const x = 40 + van * 200;
+        const y = 204;
+        const near = 0.35 + 0.65 * van;
+        g.save();
         g.globalCompositeOperation = "lighter";
+        g.beginPath();
+        g.moveTo(x + 8, y + 2);
+        g.lineTo(x + 8 - 26 * near, y + 36 * near);
+        g.lineTo(x + 8 + 26 * near, y + 36 * near);
+        g.closePath();
+        const cone = g.createLinearGradient(x + 8, y, x + 8, y + 36 * near);
+        cone.addColorStop(0, `rgba(255,244,210,${0.28 * near})`);
+        cone.addColorStop(1, "rgba(255,244,210,0)");
+        g.fillStyle = cone;
+        g.fill();
         for (const dx of [0, 16]) {
-          g.fillStyle = rad(g, x + dx, 206, 22, [[0, "rgba(255,250,230,0.95)"], [0.45, "rgba(255,236,190,0.55)"], [1, "rgba(0,0,0,0)"]]);
-          g.fillRect(x + dx - 12, 196, 26, 18);
+          const r = 6 + 3 * near;
+          g.fillStyle = rad(g, x + dx, y, r * 1.6, [[0, "rgba(255,252,236,0.85)"], [0.35, "rgba(255,236,190,0.28)"], [1, "rgba(255,236,190,0)"]]);
+          g.beginPath();
+          g.arc(x + dx, y, r * 1.6, 0, Math.PI * 2);
+          g.fill();
         }
-        g.globalCompositeOperation = "source-over";
+        g.restore();
       }
     },
   },
