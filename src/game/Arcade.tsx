@@ -6,6 +6,7 @@ import { type ReactNode, useEffect, useRef, useState } from "react";
 import { playHuntHit, playHuntMiss } from "./audio";
 import { shakeOn } from "./frameRate";
 import { actHeld } from "./binds";
+import { shiftHeld } from "./hold";
 import { hostOwnsKey } from "./keyGate";
 
 export type CabId = "catch" | "fish" | "plot" | "horde" | "delay" | "golf" | "rods" | "pebble" | "bowl" | "phys" | "load";
@@ -685,6 +686,11 @@ export function Arcade({
     window.addEventListener("keyup", keyUp);
 
     const loop = (now: number) => {
+      if (shiftHeld()) {
+        last = now;
+        raf = requestAnimationFrame(loop);
+        return;
+      }
       if (over) return;
       const dt = Math.min(0.05, (now - last) / 1000);
       last = now;

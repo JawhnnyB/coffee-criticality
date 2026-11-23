@@ -40,6 +40,7 @@ import { seasonOrDefault, type Season } from "./parlorOS";
 import { maintenanceSteamOn } from "./steamRule";
 import { applyWorldKey, CABINET_MODES, getKeyOwner, setKeyOwner } from "./keyGate";
 import { binds } from "./binds";
+import { setShiftHeld, shiftHeld } from "./hold";
 import { applyPad, arrowNav, dirOf, emptyPad, isKeyMode, isPadEcho, moveFocus, readPad } from "./screenNav";
 import { BootLog, SetupScreen } from "./ParlorApps";
 import { isMuted, playBed, playBlip, setMuted, unlockAudio, syncWorld, getAudioProbe, bedForRoom } from "./audio";
@@ -288,6 +289,7 @@ export function GameApp() {
   const [look, setLook] = useState<PlayerLook>(DEFAULT_PLAYER_LOOK);
   const [, bump] = useState(0);
   const refresh = () => bump((n) => n + 1);
+  const [hold, setHold] = useState(false);
   const quietMotion = usePrefersReducedMotion();
 
   const applyMode = (next: Mode) => {
@@ -313,6 +315,27 @@ export function GameApp() {
       if (nights) return;
       applyWorldKey(e, modeRef.current, keys, edges, GAME_CODES);
     };
+    const holdKey = (e: KeyboardEvent) => {
+      if (e.code !== "Escape") return;
+      const tag = (e.target as HTMLElement | null)?.tagName;
+      if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
+      const mode = modeRef.current;
+      const nights = !!stateRef.current.flags["rot:nights"];
+      if (shiftHeld()) {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        setShiftHeld(false);
+        setHold(false);
+        return;
+      }
+      if (mode === "desktop" || mode === "menu" || mode === "splash" || mode === "pause") return;
+      const cabinet = CABINET_MODES.has(mode);
+      if (!nights && !cabinet) return;
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      setShiftHeld(true);
+      setHold(true);
+    };
     const nav = (e: KeyboardEvent) => {
       const tag = (e.target as HTMLElement | null)?.tagName;
       if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
@@ -336,6 +359,7 @@ export function GameApp() {
     };
     const up = (e: KeyboardEvent) => keys.delete(e.code);
     const clear = () => keys.clear();
+    window.addEventListener("keydown", holdKey, true);
     window.addEventListener("keydown", nav, true);
     window.addEventListener("keydown", down);
     window.addEventListener("keyup", up);
@@ -732,6 +756,11 @@ export function GameApp() {
     };
     window.addEventListener("cc-plant-download", onPlantDl);
     const loop = (now: number) => {
+      if (shiftHeld()) {
+        lastPaint = now;
+        raf = requestAnimationFrame(loop);
+        return;
+      }
       // Settings win. Auto drops only when pictures are late or the hold is over 14 ms.
       const choice = choiceOf();
       if (choice === "60" && pace !== "full") {
@@ -904,6 +933,7 @@ export function GameApp() {
     raf = requestAnimationFrame(loop);
     return () => {
       cancelAnimationFrame(raf);
+      window.removeEventListener("keydown", holdKey, true);
       window.removeEventListener("keydown", nav, true);
       window.removeEventListener("keydown", down);
       window.removeEventListener("keyup", up);
@@ -1379,6 +1409,17 @@ export function GameApp() {
       </header>
 
       <div ref={wrapRef} className="relative min-h-0 flex-1">
+        {hold ? (
+          <div className="absolute inset-0 z-50 flex items-center justify-center bg-bg/80" data-testid="hold-pause">
+            <div className="cc-sheet">
+              <h2 className="cc-title">Paused</h2>
+              <p className="mt-2 text-sm text-fg">The clock is stopped.</p>
+              <button type="button" className="btn-primary mt-3" data-testid="hold-resume" onClick={() => { setShiftHeld(false); setHold(false); }}>
+                Resume
+              </button>
+            </div>
+          </div>
+        ) : null}
         {!playing && !deskShown && !(ART.menu && (mode === "role" || mode === "intro" || mode === "brief")) && (
           <MenuBackdrop season={seasonOrDefault(s.setup.season)} site={siteKind(s.plant)} power={sitePower(s.run)} />
         )}

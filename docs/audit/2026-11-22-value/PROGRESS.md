@@ -30,6 +30,8 @@ Brief: `docs/grok/value-100.md`. One step, one commit. Real-input proof in this 
 - Step 14 done · Volume, text size, reduced motion, and screen shake are on the menu and on pause. A new week keeps them. Proof in step-14/.
 - Step 15 done · Arrows, the mouse, and a pad reach the menus and the cabinets. The controls card is on pause. Proof in step-15/.
 - Step 16 done · Keys can be changed in Settings. Esc still pauses. A reload keeps the bind. Proof in step-16/.
+- Step 17 done · Escape pauses a cabinet and a night without leaving. Resume stays in the game. The delay rods are frozen and keep moving. Proof in step-17/.
+
 
 
 

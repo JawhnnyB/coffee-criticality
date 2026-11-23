@@ -1,0 +1,4 @@
+Opened fish.
+Escape. Mode fish. Card up.
+Resume. Mode fish. Card down.
+Page errors: 0.

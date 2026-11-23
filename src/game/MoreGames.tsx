@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import { Bezel } from "./Arcade";
 import { hostOwnsKey, readHeld } from "./keyGate";
 import { actHeld } from "./binds";
+import { shiftHeld } from "./hold";
 
 const W = 320;
 const H = 180;
@@ -188,6 +189,11 @@ export function GolfGame({ onDone, onAbort, level = 1 }: { onDone: (score: numbe
     window.addEventListener("mouseup", mu);
 
     const loop = (now: number) => {
+      if (shiftHeld()) {
+        last = now;
+        raf = requestAnimationFrame(loop);
+        return;
+      }
       if (doneRef.current) return;
       const dt = Math.min(0.04, (now - last) / 1000);
       last = now;
@@ -391,6 +397,11 @@ export function RodsGame({ onDone, onAbort, level = 1 }: { onDone: (score: numbe
     });
 
     const loop = (now: number) => {
+      if (shiftHeld()) {
+        last = now;
+        raf = requestAnimationFrame(loop);
+        return;
+      }
       if (endRef.current) return;
       const dt = Math.min(0.05, (now - last) / 1000);
       last = now;
@@ -587,6 +598,11 @@ export function PebbleGame({ onDone, onAbort, level = 1 }: { onDone: (score: num
     canvas.addEventListener("mousedown", md);
 
     const loop = (now: number) => {
+      if (shiftHeld()) {
+        last = now;
+        raf = requestAnimationFrame(loop);
+        return;
+      }
       if (endRef.current) return;
       const dt = Math.min(0.04, (now - last) / 1000);
       last = now;
@@ -830,6 +846,11 @@ export function BowlGame({ onDone, onAbort, level = 1 }: { onDone: (score: numbe
     };
 
     const loop = (now: number) => {
+      if (shiftHeld()) {
+        last = now;
+        raf = requestAnimationFrame(loop);
+        return;
+      }
       if (endRef.current) return;
       const dt = Math.min(0.04, (now - last) / 1000);
       last = now;

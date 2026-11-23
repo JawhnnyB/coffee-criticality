@@ -2,6 +2,7 @@
 
 import { TUNE, type CabLevel } from "./cabLevels";
 import { actHeld } from "./binds";
+import { shiftHeld } from "./hold";
 import { cabContext, cabFont } from "./cabCanvas";
 import { useEffect, useRef, useState } from "react";
 import { PAL } from "./palette";
@@ -113,6 +114,11 @@ export function FishGame({ onDone, onAbort, level = 1 }: { onDone: (score: numbe
     window.addEventListener("keyup", onUp);
 
     const loop = (now: number) => {
+      if (shiftHeld()) {
+        last = now;
+        raf = requestAnimationFrame(loop);
+        return;
+      }
       const dt = Math.min(0.05, (now - last) / 1000);
       last = now;
       if (kind) {
@@ -348,6 +354,11 @@ export function PlotGame({ onDone, onAbort, level = 1 }: { onDone: (score: numbe
     let t: number = TUNE.plotClock[level - 1];
     let raf = 0;
     const loop = (now: number) => {
+      if (shiftHeld()) {
+        last = now;
+        raf = requestAnimationFrame(loop);
+        return;
+      }
       if (doneRef.current) return;
       const dt = Math.min(0.05, (now - last) / 1000);
       last = now;

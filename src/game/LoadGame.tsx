@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { Bezel } from "./Arcade";
 import { playBlip, playCatch, playHuntMiss } from "./audio";
 import { hostOwnsKey } from "./keyGate";
+import { shiftHeld } from "./hold";
 import {
   CH,
   CW,
@@ -302,6 +303,11 @@ export function LoadGame({ onDone, onAbort }: { onDone: (score: number) => void;
     canvas.addEventListener("touchstart", touch, { passive: true });
 
     const loop = (now: number) => {
+      if (shiftHeld()) {
+        last = now;
+        raf = requestAnimationFrame(loop);
+        return;
+      }
       if (endRef.current && resolving <= 0 && !failRef.current) {
         paint();
         return;

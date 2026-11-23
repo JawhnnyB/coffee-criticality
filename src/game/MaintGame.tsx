@@ -6,6 +6,7 @@ import { Bezel } from "./Arcade";
 import { playHuntHit, playHuntMiss } from "./audio";
 import { shakeOn } from "./frameRate";
 import { actHeld } from "./binds";
+import { shiftHeld } from "./hold";
 import { hostOwnsKey } from "./keyGate";
 
 const W = 320;
@@ -123,6 +124,11 @@ export function MaintGame({
     window.addEventListener("keyup", keyUp);
 
     const loop = (now: number) => {
+      if (shiftHeld()) {
+        last = now;
+        raf = requestAnimationFrame(loop);
+        return;
+      }
       if (over) return;
       const dt = Math.min(0.05, (now - last) / 1000);
       last = now;

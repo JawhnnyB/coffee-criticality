@@ -7,6 +7,7 @@ import { Bezel } from "./Arcade";
 import { HORDE_MAPS } from "./hordeMaps";
 import { hostOwnsKey, readHeld } from "./keyGate";
 import { actHeld } from "./binds";
+import { shiftHeld } from "./hold";
 
 type GunId = "pistol" | "pump" | "db" | "ak" | "m16" | "lmg";
 type ZedKind = "chase" | "flank" | "rush" | "wander";
@@ -299,6 +300,11 @@ export function HordeGame({ onDone, onAbort, level = 1 }: { onDone: (score: numb
     };
 
     const loop = (now: number) => {
+      if (shiftHeld()) {
+        last = now;
+        raf = requestAnimationFrame(loop);
+        return;
+      }
       if (endRef.current) return;
       const dt = Math.min(0.05, (now - last) / 1000);
       last = now;

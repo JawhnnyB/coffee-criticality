@@ -15,6 +15,7 @@ import { loadPlates, releasePlates } from "./nightwatch/plates";
 import { startAmbience, stopAmbience } from "./nightwatch/ambience";
 import { prefersReducedMotion } from "./reducedMotion";
 import { binds } from "./binds";
+import { shiftHeld } from "./hold";
 import {
   CATEGORY_LABEL,
   COFFEE,
@@ -185,6 +186,11 @@ function NightShift({ s, nightNo: asked, onLeave, replay = false }: { s: GameSta
     let nextFeed = 0;
     let raf = 0;
     const loop = (now: number) => {
+      if (shiftHeld()) {
+        last = now;
+        raf = requestAnimationFrame(loop);
+        return;
+      }
       const dt = Math.min(0.25, (now - last) / 1000);
       last = now;
       if (!n.over) tick(n, gameMinutes(dt, speed.current));

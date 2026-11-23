@@ -6,6 +6,7 @@ import { Bezel } from "./Arcade";
 import { duckHit, playHuntHit, playPeriodTick } from "./audio";
 import { hostOwnsKey, readHeld } from "./keyGate";
 import { actHeld } from "./binds";
+import { shiftHeld } from "./hold";
 import type { PlantType } from "./plant";
 
 const W = 320;
@@ -388,6 +389,11 @@ export function PhysicsGame({
     const bins = new Array(16).fill(0);
 
     const loop = (now: number) => {
+      if (shiftHeld()) {
+        last = now;
+        raf = requestAnimationFrame(loop);
+        return;
+      }
       if (endRef.current) return;
       const dt = Math.min(0.04, (now - last) / 1000);
       last = now;
