@@ -341,6 +341,7 @@ function NightShift({ s, nightNo: asked, onLeave, replay = false }: { s: GameSta
                   disabled={!!n.over}
                   data-testid={`nw-cam-${c.id}`}
                   data-alarm={flash ? "1" : "0"}
+                  aria-label={flash ? `${c.name}, alarm` : c.name}
                   style={{
                     ...MONO,
                     minHeight: 36,
@@ -354,7 +355,7 @@ function NightShift({ s, nightNo: asked, onLeave, replay = false }: { s: GameSta
                     cursor: "pointer",
                   }}
                 >
-                  CAM {k + 1}
+                  CAM {k + 1}{flash ? " ▲" : ""}
                   <br />
                   {c.name}
                 </button>

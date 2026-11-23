@@ -111,7 +111,8 @@ export function BootLog({ reduced, onDone }: { reduced: boolean; onDone: () => v
         finish();
       }}
       data-testid="boot-log"
-      role="presentation"
+      role="status"
+      aria-label="Starting the plant"
     >
       <div className="mx-auto w-full max-w-xl" style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-body)", lineHeight: 1.5 }}>
         {BOOT_LINES.slice(0, shown).map((line, i) => (

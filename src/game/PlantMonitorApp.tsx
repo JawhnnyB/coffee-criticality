@@ -23,7 +23,7 @@ export function PlantMonitorApp({ s }: { s: GameState }) {
       <div style={{ display: "flex", flexWrap: "wrap", gap: 12, alignItems: "baseline" }}>
         <span style={{ fontSize: 16, color: PAL.cream }}>PLANT MONITOR · UNIT 1</span>
         <span data-testid="pm-shift">{st.shift.toUpperCase()} SHIFT</span>
-        <span>{st.alarms.length ? `${st.alarms.length} ALARM${st.alarms.length > 1 ? "S" : ""}` : "ALL NORMAL"}</span>
+        <span role="status">{st.alarms.length ? `${st.alarms.length} ALARM${st.alarms.length > 1 ? "S" : ""}` : "ALL NORMAL"}</span>
       </div>
 
       {/* 24 hours: night shaded, now marked. */}
@@ -39,13 +39,13 @@ export function PlantMonitorApp({ s }: { s: GameState }) {
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))", gap: 4, marginTop: 14 }}>
-        <div data-testid="pm-tile-trip" style={{ padding: "4px 6px", border: `1px solid ${PAL.copperD}`, animation: st.tripped ? "pmflash 0.8s infinite" : undefined }}>
-          <div style={{ fontSize: 10 }}>REACTOR TRIP</div>
+        <div data-testid="pm-tile-trip" role="status" aria-label={st.tripped ? "Reactor trip, alarm" : "Reactor trip, normal"} style={{ padding: "4px 6px", border: `1px solid ${PAL.copperD}`, animation: st.tripped ? "pmflash 0.8s infinite" : undefined }}>
+          <div style={{ fontSize: 10 }}>{st.tripped ? "▲ " : ""}REACTOR TRIP</div>
           <div style={{ fontSize: 14 }}>{st.tripped ? "TRIPPED" : "NORMAL"}</div>
         </div>
         {st.values.map(({ m, v, alarm }) => (
-          <div key={m.id} data-testid={`pm-tile-${m.id}`} data-alarm={alarm ? "1" : "0"} style={{ padding: "4px 6px", border: `1px solid ${PAL.copperD}`, animation: alarm ? "pmflash 0.8s infinite" : undefined }}>
-            <div style={{ fontSize: 10, opacity: 0.85 }}>{m.label.toUpperCase()}</div>
+          <div key={m.id} data-testid={`pm-tile-${m.id}`} data-alarm={alarm ? "1" : "0"} role="status" aria-label={alarm ? `${m.label}, alarm` : m.label} style={{ padding: "4px 6px", border: `1px solid ${PAL.copperD}`, animation: alarm ? "pmflash 0.8s infinite" : undefined }}>
+            <div style={{ fontSize: 10, opacity: 0.85 }}>{alarm ? "▲ " : ""}{m.label.toUpperCase()}</div>
             <div style={{ fontSize: 14 }}>{m.ratio ? `×${v.toFixed(1)} normal` : `${v.toFixed(m.digits)} ${m.unit}`}</div>
           </div>
         ))}

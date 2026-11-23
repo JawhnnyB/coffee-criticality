@@ -144,7 +144,7 @@ export function PixelMenu({
   };
 
   return (
-    <div ref={host} className="absolute inset-0 z-30" style={{ background: "#16110d", overflow: "clip" }} data-testid="pixel-menu">
+    <div ref={host} className="absolute inset-0 z-30" style={{ background: "#16110d", overflow: "clip" }} data-testid="pixel-menu" role="menu" aria-label="Main menu">
       <img
         src="/art/ui/menu-scene.png"
         alt=""

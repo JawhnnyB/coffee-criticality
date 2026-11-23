@@ -644,12 +644,13 @@ function Taskbar({
       <button
         type="button"
         onClick={onStart}
+        aria-label={alarmApps?.size ? "Start, alarm" : "Start"}
         aria-expanded={startOpen}
         data-testid="start-button"
         data-alarm={alarmApps?.size ? "1" : "0"}
         style={{ animation: alarmApps?.size ? "deskalarm 0.8s infinite" : undefined, height: 26, padding: "0 10px", background: PAL.copper, color: PAL.ink, border: `2px solid ${PAL.outline}`, fontFamily: "var(--font-body)", fontSize: "var(--text-small)", lineHeight: "1.2", cursor: "pointer" }}
       >
-        Start
+        {alarmApps?.size ? "▲ " : ""}Start
       </button>
       <div className="flex min-w-0 flex-1 items-center gap-1 overflow-hidden">
         {wins.map((w) => (
