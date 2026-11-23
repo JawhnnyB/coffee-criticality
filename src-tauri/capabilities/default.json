@@ -10,6 +10,9 @@
     "core:window:allow-set-size",
     "core:window:allow-inner-size",
     "core:window:allow-scale-factor",
-    "core:window:allow-current-monitor"
+    "core:window:allow-current-monitor",
+    "allow-read-save-file",
+    "allow-write-save-file",
+    "allow-remove-save-file"
   ]
 }
