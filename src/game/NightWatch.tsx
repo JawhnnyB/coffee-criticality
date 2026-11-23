@@ -37,6 +37,7 @@ import {
   type Night,
 } from "./nightwatch/model";
 import { applyCarry, carryover } from "./nightwatch/carryover";
+import { nightsDone } from "./nightwatch/progress";
 import { elenaLine, oddityNotes, openerLine, recordNight, turnoverRows } from "./nightwatch/turnover";
 
 const SITE_LABEL = { pwr: "PWR", bwr: "BWR", pebble: "Pebble bed", msr: "Salt" } as const;
@@ -69,18 +70,9 @@ function Btn({ onClick, children, danger, on, disabled, testId, title }: { onCli
   );
 }
 
-export function nightsDone(flags: Record<string, boolean>): number {
-  let n = 0;
-  while (flags[`night:${n + 1}:done`]) n++;
-  return n;
-}
-
 export function NightWatchApp({ s }: { s: GameState }) {
   const [running, setRunning] = useState<number | null>(null);
   const site = siteKind(s.plant);
-  useEffect(() => {
-    void loadPlates();
-  }, []);
   if (running !== null) return <NightShift s={s} nightNo={running} replay onLeave={() => setRunning(null)} />;
   if (!s.flags["rot:nights"]) {
     return (

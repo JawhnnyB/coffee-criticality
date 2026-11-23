@@ -7,7 +7,7 @@ import { PAL } from "./palette";
 import type { GameState } from "./sim";
 import { siteKind } from "./plantLoops";
 import { monitorState } from "./nightwatch/monitor";
-import { nightsDone } from "./NightWatch";
+import { nightsDone } from "./nightwatch/progress";
 
 const MONO: CSSProperties = { fontFamily: "var(--font-mono, monospace)" };
 

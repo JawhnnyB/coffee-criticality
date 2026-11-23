@@ -24,4 +24,4 @@ Brief: `docs/grok/value-100.md`. One step, one commit. Real-input proof in this 
 - Step 12c done · Events are judged by the largest changed region on a 480×270 pair, and the sheet is in step-12c/. Five pictures fail that look. They were not redrawn.
 - Step 12d done · The night hum fades for 0.3 s, then the buffer is dropped. No click on the way out. Proof in step-12d/.
 - Step 12e done · Frame rate is a global setting, on the main menu and on pause. New week does not clear it. Proof in step-12e/.
-- Step 13 todo · Cut first load: lazy-load Night Watch plates, the outage data and minigames. Target under 3 MB before the menu shows.
+- Step 13 done · The menu loads without the night plates, the outage data, or the minigames. 0.39 MB transferred before the menu. Proof in step-13/.

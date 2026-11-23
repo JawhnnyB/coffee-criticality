@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, type MutableRefObject, type ReactNode } from "react";
+import { useEffect, useRef, useState, lazy, Suspense, type MutableRefObject, type ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
 import { UserButton } from "@/lib/auth/gates";
 import { authEnabled } from "@/lib/auth/client";
@@ -26,18 +26,11 @@ import {
   type RoomId,
 } from "./content";
 import { Arcade, ArcadeHall } from "./Arcade";
-import { FishGame, PlotGame } from "./Leisure";
-import { HordeGame } from "./Horde";
-import { DelayGame } from "./DelayGame";
-import { PhysicsGame } from "./PhysicsGame";
-import { BowlGame, GolfGame, PebbleGame, RodsGame } from "./MoreGames";
-import { LoadGame } from "./LoadGame";
 import { ReactorTrainer } from "./ReactorTrainer";
 import { ReactorBuilder } from "./ReactorBuilder";
 import { FuelShuffle } from "./FuelShuffle";
 import { MaintGame } from "./MaintGame";
 import { Desktop } from "./Desktop";
-import { NightRotation } from "./NightWatch";
 import { LakeScene } from "./LakeScene";
 import { PlantCutaway, STILL_CUTAWAY, sitePower } from "./PlantCutaway";
 import type { LiveRun } from "./cutawayPaint";
@@ -244,6 +237,30 @@ function formatSaveNote(data: ReturnType<typeof peekSave>): string {
   }
   return `Saved ${hh}:${mm}, ${where}`;
 }
+
+/** A screen that is not part of the menu. Its module loads the first time it is shown. */
+function later(load: () => Promise<{ default: (props: any) => ReactNode }>) {
+  const Inner = lazy(load);
+  return function Later(props: any) {
+    return (
+      <Suspense fallback={null}>
+        <Inner {...props} />
+      </Suspense>
+    );
+  };
+}
+
+const FishGame = later(() => import("./Leisure").then((m) => ({ default: m.FishGame })));
+const PlotGame = later(() => import("./Leisure").then((m) => ({ default: m.PlotGame })));
+const HordeGame = later(() => import("./Horde").then((m) => ({ default: m.HordeGame })));
+const DelayGame = later(() => import("./DelayGame").then((m) => ({ default: m.DelayGame })));
+const PhysicsGame = later(() => import("./PhysicsGame").then((m) => ({ default: m.PhysicsGame })));
+const GolfGame = later(() => import("./MoreGames").then((m) => ({ default: m.GolfGame })));
+const RodsGame = later(() => import("./MoreGames").then((m) => ({ default: m.RodsGame })));
+const PebbleGame = later(() => import("./MoreGames").then((m) => ({ default: m.PebbleGame })));
+const BowlGame = later(() => import("./MoreGames").then((m) => ({ default: m.BowlGame })));
+const LoadGame = later(() => import("./LoadGame").then((m) => ({ default: m.LoadGame })));
+const NightRotation = later(() => import("./NightWatch").then((m) => ({ default: m.NightRotation })));
 
 export function GameApp() {
   const wrapRef = useRef<HTMLDivElement>(null);

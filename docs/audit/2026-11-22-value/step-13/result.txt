@@ -1,0 +1,39 @@
+Before the menu. 32 responses.
+Transferred 412239 bytes (0.39 MB).
+Decoded 1156264 bytes (1.10 MB).
+Target is under 3 MB transferred.
+Under 3 MB.
+Page errors: 0.
+
+107343	395756	/assets/index-DaDcF9ny.js
+76166	298286	/assets/routes-D7BMGuf1.js
+44510	51018	/art/rooms/gate/atlas.png
+39733	130194	/assets/progress-CL2-6Jb2.js
+16754	60344	/assets/audio-0i34I_iI.js
+12792	12955	/art/rooms/reactor/atlas.png
+11205	34573	/assets/Arcade-HJQIadnV.js
+10888	31666	/assets/client-BosXG_T8.js
+10182	55874	/assets/styles-pj4jJOb5.css
+8755	8824	/art/rooms/cafe/atlas.png
+8720	9000	/art/rooms/parlor/atlas.png
+8075	7877	/art/ui/menu-scene.png
+7996	7692	/fonts/pixelify-sans-latin-400-normal.woff2
+7974	8016	/art/rooms/engineering/atlas.png
+5835	6114	/art/rooms/maintenance/atlas.png
+5646	5935	/art/rooms/control/atlas.png
+5536	5449	/art/rooms/breakroom/atlas.png
+4600	4601	/art/rooms/corridor/atlas.png
+4280	3980	/
+3180	8430	/assets/jsx-runtime-Cltr0gcK.js
+1236	939	/art/ui/menu-parts.png
+1215	988	/art/gen/sprites/mabel_walk4.png
+1212	947	/art/gen/sprites/elena_walk4.png
+1204	949	/art/gen/sprites/holt_walk4.png
+1184	948	/art/gen/sprites/priya_walk4.png
+1181	935	/art/gen/sprites/tommy_walk4.png
+1179	937	/art/gen/sprites/marcus_walk4.png
+1174	928	/art/gen/sprites/player_walk4.png
+1166	919	/art/gen/sprites/jordan_walk4.png
+762	938	/assets/palette-DqhgJIyP.js
+556	252	/art/ui/menu-chips.png
+0	0	https://grok.com/grok-app-builder/extensions.js

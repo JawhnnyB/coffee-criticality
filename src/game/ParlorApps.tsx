@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
+import { useEffect, useRef, useState, lazy, Suspense, type CSSProperties, type ReactNode } from "react";
 import { PAL } from "./palette";
 import { ReactorBuilder } from "./ReactorBuilder";
 import { NuclearDesk } from "./NuclearDesk";
@@ -8,9 +8,7 @@ import { TrackPlayer, TRACKS } from "./parlorMusic";
 import { setMuted, isMuted, unlockAudio } from "./audio";
 import { hostOwnsKey } from "./keyGate";
 import { CoreCamApp, CoreMapApp, ResultsApp } from "./ReactorApps";
-import { OutageApp } from "./OutageApp";
 import { PlantMonitorApp } from "./PlantMonitorApp";
-import { NightWatchApp } from "./NightWatch";
 import { NewsApp } from "./NewsApp";
 import { ACADEMY } from "./content";
 import { NRC_ROWS, filterNrc } from "./nrcIndex";
@@ -36,6 +34,9 @@ import {
   DEFAULT_SEASON,
   DEFAULT_STANCE,
 } from "./parlorOS";
+
+const OutageApp = lazy(() => import("./OutageApp").then((m) => ({ default: m.OutageApp })));
+const NightWatchApp = lazy(() => import("./NightWatch").then((m) => ({ default: m.NightWatchApp })));
 
 /* ---------------------------------------------------------------- boot */
 
@@ -281,9 +282,19 @@ export function AppBody({ app, ctx }: { app: AppDef; ctx: AppCtx }) {
   if (app.id === "settings") return <SettingsApp ctx={ctx} />;
   if (app.id === "music") return <MusicApp ctx={ctx} />;
   if (app.id === "design") return <DesignApp ctx={ctx} />;
-  if (app.id === "outage") return <OutageApp s={ctx.s} />;
+  if (app.id === "outage")
+    return (
+      <Suspense fallback={null}>
+        <OutageApp s={ctx.s} />
+      </Suspense>
+    );
   if (app.id === "monitor") return <PlantMonitorApp s={ctx.s} />;
-  if (app.id === "nightwatch") return <NightWatchApp s={ctx.s} />;
+  if (app.id === "nightwatch")
+    return (
+      <Suspense fallback={null}>
+        <NightWatchApp s={ctx.s} />
+      </Suspense>
+    );
   if (app.id === "cam") return <CoreCamApp s={ctx.s} />;
   if (app.id === "results") return <ResultsApp s={ctx.s} />;
   if (app.id === "coremap") return <CoreMapApp s={ctx.s} onResults={ctx.onResults} />;
