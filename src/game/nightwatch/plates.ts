@@ -58,12 +58,12 @@ export const PLATES: Record<string, PlateSpec> = {
   pool: {
     file: "/nightwatch/plates/pool.webp",
     glow: [
-      [70, 170], [150, 170], [230, 170], [310, 170], [390, 170],
-      [70, 210], [150, 210], [230, 210], [310, 210], [390, 210],
-      [70, 250], [150, 250], [230, 250], [310, 250], [390, 250],
+      [85, 204], [149, 205], [183, 172], [292, 157],
+      [311, 173], [344, 204], [394, 206], [419, 204],
     ],
     states: {
-      toolBag: { file: "/nightwatch/plates/pool-toolBag.webp", measured: [401, 87, 70, 65], box: [393, 79, 86, 81] },
+      poolLow: { file: "/nightwatch/plates/pool-poolLow.webp", measured: [0, 144, 480, 126], box: [0, 136, 480, 134] },
+      toolBag: { file: "/nightwatch/plates/pool-toolBag.webp", measured: [375, 43, 51, 28], box: [367, 35, 67, 44] },
     },
   },
   yard: { file: "/nightwatch/plates/yard.webp" },

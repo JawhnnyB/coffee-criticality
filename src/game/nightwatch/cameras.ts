@@ -334,6 +334,31 @@ function puddle(g: G, cx: number, cy: number, rFull: number, t: number, grow = 1
   g.fillRect(cx + r * 0.08, cy - 70 + ph * 70, 1, 2);
 }
 
+/** Wet grating: a flat sheen on the floor, darker in the middle, with the ceiling light in it. */
+function grateSheen(g: G, cx: number, cy: number, rFull: number, t: number, grow = 1) {
+  const r = Math.max(26, rFull * (0.45 + 0.55 * grow));
+  g.save();
+  g.translate(cx, cy);
+  g.scale(1, 0.32);
+  g.globalCompositeOperation = "multiply";
+  const dark = Math.round(148 - grow * 18);
+  g.fillStyle = rad(g, 0, 0, r, [[0, `rgb(${dark},${dark + 2},${dark + 8})`], [0.55, "rgb(206,208,210)"], [1, "rgb(255,255,255)"]]);
+  g.beginPath();
+  g.arc(0, 0, r, 0, Math.PI * 2);
+  g.fill();
+  g.restore();
+  g.save();
+  g.globalCompositeOperation = "lighter";
+  g.translate(cx - r * 0.08, cy - 1);
+  g.scale(1, 0.3);
+  const flick = 0.28 + 0.06 * Math.sin(t * 1.7) + grow * 0.22;
+  g.fillStyle = rad(g, 0, 0, r * 0.55, [[0, `rgba(255,248,224,${flick})`], [0.45, `rgba(255,244,210,${flick * 0.35})`], [1, "rgba(255,248,224,0)"]]);
+  g.beginPath();
+  g.arc(0, 0, r * 0.46, 0, Math.PI * 2);
+  g.fill();
+  g.restore();
+}
+
 /** Steam or vapour rising from (x, y), spreading and thinning. */
 function plume(g: G, x: number, y: number, t: number, scale = 1) {
   for (let k = 0; k < 14; k++) {
@@ -535,8 +560,9 @@ const S: Record<string, Scene> = {
       if (usingPlate) shaftGlint(g, W / 2, H - 28, 0.95, true, t);
       else pumpSet(g, W / 2, H - 28, 0.95, true, t);
       if (v.has("puddle")) {
-        puddle(g, W / 2, H - 16, 90, t, v.at("puddle") ?? 1);
-        plume(g, W / 2 + 10, H - 70, t, 0.8);
+        // Wet grating in front of the pump, not a mark on the bottom edge of the frame.
+        grateSheen(g, 240, 252, 72, t, v.at("puddle") ?? 1);
+        plume(g, 248, 168, t, 0.45);
       }
     },
   },
@@ -632,31 +658,45 @@ const S: Record<string, Scene> = {
       if (v.has("beacon")) beacon(g, W / 2, 70, t);
       if (v.has("condensate")) {
         const grow = v.at("condensate") ?? 0.7;
-        for (let k = 0; k < 4; k++) {
-          const x = 148 + k * 52;
-          const fall = (t * 22 + k * 19) % 70;
-          const streak = 5;
-          for (let s = 0; s < streak; s++) {
-            g.fillStyle = `rgba(186,198,206,${0.28 * (1 - s / streak)})`;
-            g.fillRect(x, 116 + fall + s, 1, 2);
+        // Threads off the steam lines. One pixel wide, long enough to see, not a painted oval.
+        const drips = [
+          [118, 78],
+          [156, 86],
+          [318, 84],
+          [356, 80],
+        ];
+        for (let k = 0; k < drips.length; k++) {
+          const [x, y0] = drips[k];
+          const fall = (t * 16 + k * 23) % 78;
+          const len = 18 + Math.round(grow * 14);
+          for (let s = 0; s < len; s++) {
+            g.fillStyle = `rgba(220,228,232,${0.62 * (1 - s / len)})`;
+            g.fillRect(x, y0 + fall + s, 1, 1);
           }
-          const pr = 10 + grow * 6;
-          const fy = H - 16;
-          g.save();
-          g.globalCompositeOperation = "multiply";
-          g.fillStyle = rad(g, x, fy, pr, [[0, "rgb(188,188,188)"], [0.7, "rgb(228,228,228)"], [1, "rgb(255,255,255)"]]);
-          g.beginPath();
-          g.ellipse(x, fy, pr, pr * 0.22, 0, 0, Math.PI * 2);
-          g.fill();
-          g.restore();
-          g.save();
-          g.globalCompositeOperation = "lighter";
-          g.fillStyle = rad(g, x - 1, fy - 1, pr * 0.4, [[0, "rgba(220,228,232,0.2)"], [1, "rgba(220,228,232,0)"]]);
-          g.beginPath();
-          g.ellipse(x - 1, fy - 1, pr * 0.32, pr * 0.1, 0, 0, Math.PI * 2);
-          g.fill();
-          g.restore();
         }
+        // The patch under the drips darkens as they land, and takes a little of the ceiling light.
+        const px = 240;
+        const py = 214;
+        const pr = 22 + grow * 14;
+        g.save();
+        g.globalCompositeOperation = "multiply";
+        g.translate(px, py);
+        g.scale(1, 0.32);
+        const dark = Math.round(168 - grow * 28);
+        g.fillStyle = rad(g, 0, 0, pr, [[0, `rgb(${dark},${dark},${dark + 6})`], [0.7, "rgb(220,220,222)"], [1, "rgb(255,255,255)"]]);
+        g.beginPath();
+        g.arc(0, 0, pr, 0, Math.PI * 2);
+        g.fill();
+        g.restore();
+        g.save();
+        g.globalCompositeOperation = "lighter";
+        g.translate(px - 3, py - 1);
+        g.scale(1, 0.28);
+        g.fillStyle = rad(g, 0, 0, pr * 0.42, [[0, `rgba(230,236,240,${0.22 + grow * 0.16})`], [1, "rgba(230,236,240,0)"]]);
+        g.beginPath();
+        g.arc(0, 0, pr * 0.4, 0, Math.PI * 2);
+        g.fill();
+        g.restore();
       }
     },
   },
@@ -890,10 +930,9 @@ const S: Record<string, Scene> = {
     },
     live(g, t, v) {
       const low = v.has("poolLow");
-      // A loaded plate keeps its own water. The drop is one wet band in the middle of the near edge.
-      // With no plate, the whole surface is drawn lower.
+      // A loaded plate keeps its own water. The low plate is the same camera with the line dropped.
       const photo = usingPlate;
-      const top = photo ? 106 : low ? 122 : 106;
+      const top = photo ? (low && stateReady("pool", "poolLow") ? 167 : 144) : low ? 122 : 106;
       if (!photo) {
         // Exposed liner where the level dropped.
         if (low) {
@@ -920,7 +959,7 @@ const S: Record<string, Scene> = {
           }
           col++;
         }
-      } else {
+      } else if (!(low && stateReady("pool", "poolLow"))) {
         const frame = poolGlowFrame(t);
         if (frame) {
           g.globalCompositeOperation = "lighter";
@@ -943,7 +982,7 @@ const S: Record<string, Scene> = {
           const age = (t * 0.3 + k / 3) % 1;
           const rxr = 16 + age * 34;
           const ryr = 5 + age * 7;
-          const y = 188 + k * 8;
+          const y = (img ? 158 : 188) + k * 6;
           g.save();
           g.beginPath();
           g.ellipse(rx, y, rxr, ryr, 0, 0, Math.PI * 2);
@@ -963,13 +1002,13 @@ const S: Record<string, Scene> = {
           g.restore();
         }
       }
-      if (v.has("toolBag") && !stateReady("pool", "toolBag")) {
+      if (v.has("toolBag") && !photo && !stateReady("pool", "toolBag")) {
         g.fillStyle = lin(g, 0, 70, 0, 96, [[0, "#7a2e1c"], [1, "#3e170e"]]);
         g.fillRect(380, 76, 44, 22);
         g.fillStyle = "#151515";
         g.fillRect(392, 70, 20, 6);
       }
-      if (low && photo) paintPoolLevel(g);
+      if (low && photo && !stateReady("pool", "poolLow")) paintPoolLevel(g);
     },
   },
   yard: {
@@ -1021,26 +1060,49 @@ const S: Record<string, Scene> = {
       g.globalCompositeOperation = "source-over";
     },
     live(g, t, v) {
-      const arcAt = v.at("arc");
-      if (arcAt !== null && arcAt >= 0.5) {
-        // Once the grid tile has crossed, the flashover stays lit between sparks.
+      if (v.has("arc")) {
+        // Middle tower, right insulator string. A glow, and a short crackle when it flashes. No box.
+        const flash = Math.abs(hash(Math.floor(t * 14), 7)) > 0.3;
+        const ix = 265;
+        const iy = 60;
+        const reach = flash ? 13 : 10;
+        const core = flash ? 0.9 : 0.7;
+        g.save();
         g.globalCompositeOperation = "lighter";
-        g.fillStyle = "rgba(190,210,255,0.45)";
-        g.fillRect(220, 36, 120, 80);
-        g.globalCompositeOperation = "source-over";
-      }
-      if (v.has("arc") && Math.abs(hash(Math.floor(t * 14), 7)) > 0.3) {
-        // hash() is signed, so a raw "> 0.6" never fired and the flashover never showed.
+        g.translate(ix, iy);
+        g.scale(0.72, 1.45);
+        g.fillStyle = rad(g, 0, 0, reach, [
+          [0, `rgba(236,244,255,${core})`],
+          [0.4, `rgba(180,210,255,${core * 0.45})`],
+          [1, "rgba(170,200,255,0)"],
+        ]);
+        g.beginPath();
+        g.arc(0, 0, reach, 0, Math.PI * 2);
+        g.fill();
+        g.restore();
+        g.save();
         g.globalCompositeOperation = "lighter";
-        g.fillStyle = rad(g, 278, 62, 90, [[0, "rgba(200,220,255,0.9)"], [0.2, "rgba(160,190,255,0.4)"], [1, "rgba(0,0,0,0)"]]);
-        g.fillRect(180, 0, 200, 160);
-        g.globalCompositeOperation = "source-over";
+        g.strokeStyle = `rgba(246,250,255,${flash ? 0.95 : 0.5})`;
+        g.lineWidth = 1;
+        g.beginPath();
+        const tick = Math.floor(t * 14);
+        const unit = (n: number, m: number) => Math.abs(hash(n, m));
+        const jx = (n: number, s: number) => ix + Math.round((unit(n, tick) - 0.5) * s);
+        const jy = (n: number, s: number) => iy + Math.round((unit(tick, n) - 0.5) * s * 1.4);
+        const span = flash ? 8 : 5;
+        g.moveTo(jx(1, span), jy(2, span));
+        g.lineTo(ix, iy);
+        g.lineTo(jx(3, span), jy(4, span));
+        g.moveTo(ix, iy + 4);
+        g.lineTo(jx(5, span), jy(6, span));
+        g.stroke();
+        g.restore();
       }
       if (v.has("fog") || v.has("arc")) {
-        const n = v.has("arc") ? 3 : 2;
+        const n = 2;
         for (let k = 0; k < n; k++) {
           const x = 140 + k * 160 + Math.sin(t * 0.4 + k) * 8;
-          const a = v.has("arc") ? 0.4 : 0.34;
+          const a = v.has("arc") ? 0.16 : 0.34;
           g.fillStyle = rad(g, x, 158, 40, [[0, `rgba(200,190,170,${a})`], [1, "rgba(0,0,0,0)"]]);
           g.beginPath();
           g.ellipse(x, 158, 34, 12, 0, 0, Math.PI * 2);
@@ -1231,10 +1293,10 @@ function cherenkovStrip(): Surface | null {
 }
 
 /** Glow cells sit in this box. One baked frame is blitted instead of a strip per cell. */
-const GLOW_X = 60;
-const GLOW_Y = 128;
-const GLOW_W = 344;
-const GLOW_H = 140;
+const GLOW_X = 70;
+const GLOW_Y = 110;
+const GLOW_W = 370;
+const GLOW_H = 120;
 const GLOW_N = 16;
 let poolGlow: Surface[] | null | undefined;
 
@@ -1258,7 +1320,6 @@ function poolGlowFrame(t: number): Surface | null {
           cg.globalCompositeOperation = "lighter";
           const tt = (f / GLOW_N) * period;
           for (let i = 0; i < cells.length; i++) {
-            if (i % 5 === 2) continue;
             const [x, y] = cells[i];
             cg.globalAlpha = 0.35 + 0.2 * Math.sin(tt * 1.1 + i);
             cg.drawImage(strip as CanvasImageSource, x - 6 - GLOW_X, y - 36 - GLOW_Y, 12, 48);
