@@ -5,6 +5,8 @@ import { useEffect, useRef, useState } from "react";
 import { Bezel } from "./Arcade";
 import { duckHit, playPeriodTick } from "./audio";
 import { hostOwnsKey, readHeld } from "./keyGate";
+import { actHeld } from "./binds";
+import { shiftHeld } from "./hold";
 
 /** Classroom Keepin U-235 thermal 6-group. Lambdas sped ~8× so a cabinet can feel them. Not a license.
  * LAMBDA is the generation time. Smaller means power responds faster, so a $0.5 step climbs from n 1.0
@@ -143,6 +145,11 @@ export function DelayGame({ onDone, onAbort }: { onDone: (score: number) => void
 
     const loop = (now: number) => {
       if (endRef.current) return;
+      if (shiftHeld()) {
+        last = now;
+        raf = requestAnimationFrame(loop);
+        return;
+      }
       const dt = Math.min(0.04, (now - last) / 1000);
       last = now;
       tPlay += dt;
@@ -180,8 +187,8 @@ export function DelayGame({ onDone, onAbort }: { onDone: (score: number) => void
       bannerT = Math.max(0, bannerT - dt);
       lockInsert = Math.max(0, lockInsert - dt);
 
-      if (readHeld("mini", keys, "KeyA") || readHeld("mini", keys, "ArrowLeft")) rodX -= 90 * dt;
-      if (readHeld("mini", keys, "KeyD") || readHeld("mini", keys, "ArrowRight")) rodX += 90 * dt;
+      if (actHeld((c) => readHeld("mini", keys, c), "left", "ArrowLeft")) rodX -= 90 * dt;
+      if (actHeld((c) => readHeld("mini", keys, c), "right", "ArrowRight")) rodX += 90 * dt;
       if (readHeld("mini", keys, "KeyW") || readHeld("mini", keys, "ArrowUp")) insert = Math.min(1, insert + 0.55 * dt);
       if (readHeld("mini", keys, "KeyS") || readHeld("mini", keys, "ArrowDown")) insert = Math.max(0, insert - 0.55 * dt);
       if (pointer && lockInsert <= 0) {
