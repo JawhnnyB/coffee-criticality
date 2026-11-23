@@ -1,0 +1,5 @@
+Mapping standard. Menu focus menu-settings.
+Walk x 152 to 202.16666666666626.
+Pause visible true.
+Cabinet fish. Keys ArrowRight Space.
+Page errors: 0.
