@@ -43,6 +43,7 @@ import {
 } from "./nightwatch/model";
 import { nightCoachLine } from "./nightwatch/nightCoach";
 import { applyCarry, carryover } from "./nightwatch/carryover";
+import { noteEndless, readEndless } from "./nightwatch/endless";
 import { nightsDone } from "./nightwatch/progress";
 import { elenaLine, oddityNotes, openerLine, recordNight, turnoverRows } from "./nightwatch/turnover";
 
@@ -105,10 +106,10 @@ export function NightWatchApp({ s }: { s: GameState }) {
   );
 }
 
-function NightShift({ s, nightNo: asked, onLeave, replay = false }: { s: GameState; nightNo: number; onLeave: () => void; replay?: boolean }) {
+function NightShift({ s, nightNo: asked, onLeave, onStay, replay = false, endless = false, seed }: { s: GameState; nightNo: number; onLeave: () => void; onStay?: () => void; replay?: boolean; endless?: boolean; seed?: number }) {
   const nightNo = useRef(asked).current;
   const site = siteKind(s.plant);
-  const night = useRef<Night>(newNight(site, nightNo));
+  const night = useRef<Night>(newNight(site, nightNo, seed));
   const n = night.current;
   const carried = useRef(false);
   if (!carried.current) {
@@ -121,6 +122,7 @@ function NightShift({ s, nightNo: asked, onLeave, replay = false }: { s: GameSta
   const [leaving, setLeaving] = useState(false);
   const [toast, setToast] = useState<string>("");
   const [switching, setSwitching] = useState(0);
+  const [bestNights, setBestNights] = useState<number | null>(null);
   const canvas = useRef<HTMLCanvasElement | null>(null);
   useEffect(() => {
     void loadPlates();
@@ -257,6 +259,11 @@ function NightShift({ s, nightNo: asked, onLeave, replay = false }: { s: GameSta
     if (!n.over || rewarded.current) return;
     rewarded.current = true;
     const g = recordNight(s.flags, n, nightNo, replay || n.replay);
+    if (endless && n.over) {
+      const passed = n.over.why === "dawn" && (g.letter === "A" || g.letter === "B" || g.letter === "C");
+      const survived = passed ? Math.max(0, nightNo - 4) : Math.max(0, nightNo - 5);
+      setBestNights(noteEndless(survived, passed ? g.points : 0).nights);
+    }
     if (!replay && !n.replay && g.trust) bumpTrust(s, "elena", g.trust);
     if (!replay && !n.replay) pushMsg(s, g.done ? `Night ${nightNo} watched. Grade ${g.letter}.` : `Night ${nightNo} is a ${g.letter}. Elena sends you back.`);
     if (!replay && !n.replay) writeSave(s, true);
@@ -498,7 +505,7 @@ function NightShift({ s, nightNo: asked, onLeave, replay = false }: { s: GameSta
           </div>
         </div>
       ) : null}
-      {n.over ? <Summary n={n} nightNo={nightNo} onLeave={onLeave} /> : null}
+      {n.over ? <Summary n={n} nightNo={nightNo} onLeave={onLeave} onStay={onStay} endless={endless} best={bestNights} /> : null}
       <div style={{ padding: "0 10px 10px", fontSize: 10, opacity: 0.7 }}>
         {Math.max(0, Math.round(((NIGHT_MINUTES - n.minute) / Math.max(speed.current, 0.01)) * SECONDS_PER_MINUTE / 60))} real min until 06:00.
       </div>
@@ -506,11 +513,12 @@ function NightShift({ s, nightNo: asked, onLeave, replay = false }: { s: GameSta
   );
 }
 
-function Summary({ n, nightNo, onLeave }: { n: Night; nightNo: number; onLeave: () => void }) {
+function Summary({ n, nightNo, onLeave, onStay, endless, best }: { n: Night; nightNo: number; onLeave: () => void; onStay?: () => void; endless?: boolean; best: number | null }) {
   const sc = score(n);
   const g = recordNight({}, n, nightNo, true);
   const rows = turnoverRows(n);
   const notes = oddityNotes(n);
+  const passed = n.over?.why === "dawn" && (g.letter === "A" || g.letter === "B" || g.letter === "C");
   const head = n.over?.why === "trip" ? `${clock(n.over.at)}. The lights drop to emergency. Grade F.` : n.over?.why === "relieved" ? `${clock(n.over!.at)}. Elena takes the chair.` : "06:00 turnover.";
   return (
     <div data-testid="nw-summary" style={{ position: "fixed", inset: 0, zIndex: 80, display: "flex", padding: 12, background: "rgba(22,17,13,0.55)" }}>
@@ -518,6 +526,11 @@ function Summary({ n, nightNo, onLeave }: { n: Night; nightNo: number; onLeave: 
         <p className="font-mono text-[10px] tracking-widest text-[#6a4a32]" style={{ margin: 0 }}>{head}</p>
         <h2 className="font-display text-3xl" style={{ margin: "8px 0 0" }} data-testid="nw-grade">Grade {g.letter}</h2>
         <p data-testid="nw-seed" style={{ margin: "4px 0 0", fontSize: 12, color: "#6a4a32" }}>Seed {n.seed}</p>
+        {endless ? (
+          <p data-testid="endless-best" style={{ margin: "4px 0 0", fontSize: 12 }}>
+            Best: {best ?? 0} nights.
+          </p>
+        ) : null}
         <p style={{ margin: "8px 0 0", fontSize: 14 }}>{elenaLine(g.letter, n.curt, n.over?.why)}</p>
         <p style={{ margin: "8px 0 0", fontSize: 12, color: "#6a4a32" }}>
           Caught {sc.caught} ({sc.early} early) · missed {sc.missed} · false reports {sc.falseReports}
@@ -550,6 +563,11 @@ function Summary({ n, nightNo, onLeave }: { n: Night; nightNo: number; onLeave: 
               ))}
           </div>
         </div>
+        {endless && passed && onStay ? (
+          <button type="button" className="paper-btn" style={{ minHeight: 44, marginTop: 8, width: "100%", flex: "0 0 auto" }} data-testid="endless-stay" onClick={onStay}>
+            Stay
+          </button>
+        ) : null}
         <button type="button" className="paper-btn-primary" style={{ minHeight: 44, marginTop: 12, width: "100%", flex: "0 0 auto" }} data-testid="nw-summary-leave" onClick={onLeave}>
           {n.over?.why === "dawn" && (g.letter === "A" || g.letter === "B" || g.letter === "C") ? "Sleep" : "Back"}
         </button>
@@ -586,12 +604,26 @@ export function NightRotation({ s, onNewWeek, onMenu }: { s: GameState; onNewWee
     if (!s.flags["rot:reported"]) return "off";
     return "opener";
   });
+  const [endless, setEndless] = useState(0);
   const again = bestLetter(s.flags, next) === "D" || bestLetter(s.flags, next) === "F";
   const weekLine = s.ended === "a" ? "The week held. You still wake at the wrong hour." : s.hides >= 3 ? "You keep replaying the things you did not say." : "The plant is someone else's problem until midnight.";
   const grades = [1, 2, 3, 4].map((k) => bestLetter(s.flags, k)).filter(Boolean);
   const avg = grades.length ? grades.reduce((sum, letter) => sum + { A: 4, B: 3, C: 2, D: 1, F: 0 }[letter as "A"], 0) / grades.length : 2;
   const dawnLine = avg >= 3.2 ? "The lot is pale. Elena nods once and keeps walking." : avg >= 2 ? "Dawn on the lot. The log is what it is." : "The lot is empty. A night like that has to be stood again.";
   const last = (bestLetter(s.flags, 4) || "C") as "A";
+  if (endless > 0) {
+    return (
+      <NightShift
+        key={endless}
+        s={s}
+        nightNo={endless}
+        replay
+        endless
+        onStay={() => setEndless(endless + 1)}
+        onLeave={() => setEndless(0)}
+      />
+    );
+  }
   if (phase === "shift") {
     return (
       <NightShift
@@ -655,6 +687,12 @@ export function NightRotation({ s, onNewWeek, onMenu }: { s: GameState; onNewWee
             <button type="button" className="paper-btn-primary" style={{ minHeight: 44 }} data-testid="dawn-new-week" onClick={onNewWeek}>
               New week
             </button>
+            <button type="button" className="paper-btn" style={{ minHeight: 44 }} data-testid="dawn-endless" onClick={() => setEndless(5)}>
+              Night Shift Endless
+            </button>
+            <p data-testid="endless-best" className="text-sm">
+              Best: {readEndless().nights} nights.
+            </p>
             <button type="button" className="paper-btn" style={{ minHeight: 44 }} data-testid="dawn-menu" onClick={onMenu}>
               Menu
             </button>

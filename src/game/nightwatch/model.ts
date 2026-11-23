@@ -357,13 +357,26 @@ export function siteWatch(site: SiteKind): SiteWatch {
   );
 }
 
-/** Night 1 to 4. Night 1 teaches. Night 4 is the finale. */
+/** Night 1 to 4. Night 1 teaches. Night 4 is the finale. Later nights are the endless watch. */
 export const NIGHTS = [
   { events: 3, oddities: 2, escalateScale: 1.3, brews: 3 },
   { events: 4, oddities: 3, escalateScale: 1.1, brews: 2 },
   { events: 5, oddities: 4, escalateScale: 1.0, brews: 2 },
   { events: 6, oddities: 4, escalateScale: 0.85, brews: 1 },
 ];
+
+/** Nights 1 to 4 are the rotation. After that, more events and a faster board, one pot. */
+export function nightPlan(night: number): { events: number; oddities: number; escalateScale: number; brews: number } {
+  const base = NIGHTS[Math.max(0, Math.min(NIGHTS.length - 1, night - 1))];
+  if (night <= NIGHTS.length) return base;
+  const extra = night - NIGHTS.length;
+  return {
+    events: Math.min(8, base.events + extra),
+    oddities: Math.min(6, base.oddities + Math.floor(extra / 2)),
+    escalateScale: Math.max(0.45, Math.round((base.escalateScale - extra * 0.08) * 100) / 100),
+    brews: 1,
+  };
+}
 
 /** Applied when the night is dealt. Relaxed stretches the events and adds a pot. Nuke does the opposite. */
 export function paceMods(pace: NightPace = nightPace()): { esc: number; brews: number; drain: number } {
@@ -568,7 +581,7 @@ export function newNight(site: SiteKind, night: number, seed = night * 7919 + si
   const use = pendingSeed ?? seed;
   pendingSeed = null;
   const watch = siteWatch(site);
-  const cfg = NIGHTS[Math.max(0, Math.min(NIGHTS.length - 1, night - 1))];
+  const cfg = nightPlan(night);
   const pace = paceMods();
   const scale = cfg.escalateScale * pace.esc;
   const r = rng(use);
