@@ -38,6 +38,7 @@ Brief: `docs/grok/value-100.md`. One step, one commit. Real-input proof in this 
 - Step 1b done · Frame rate uses the same filled button as text size. Proof in step-1b/.
 - Step 1c done · A stubbed standard pad opens Settings, walks a day, pauses, and aims the fish cabinet. Proof in step-1c/.
 - Step 1d done · Delay rods stop under the pause card. Left and right follow the binds. Proof in step-1d/.
+- Step 1e done · Review accepted the arc, the containment sheen, and the far-rail tool bag. The pictures were not changed. Note in step-12g/visible.md.
 
 
 

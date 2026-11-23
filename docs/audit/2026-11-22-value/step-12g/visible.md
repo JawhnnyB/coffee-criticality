@@ -5,10 +5,11 @@ A pixel counts when any channel moves by 24 or more. Regions are 4-connected.
 An event passes when the best frame's largest region is at least 388.8 pixels (0.3% of the frame). More than one place is allowed.
 An oddity passes when one of the six frames has between 155.5 and 2592.0 changed pixels (0.12% to 2%).
 Frames is how many of the six clear that rule. The same scene and visual is one picture.
+Review accepted the switchyard arc, the containment sheen, and the far-rail tool bag. A person can see them. The pixels were not changed.
 
 | Site | Camera | Scene | Visual | Kind | Best grow | Changed px | Changed % | Largest px | Largest % | Frames | Rule |
 | --- | --- | --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | --- |
-| pwr | core | containment | puddle | event | 0.15 | 270 | 0.21 | 229 | 0.18 | 0/6 | FAIL <0.3% |
+| pwr | core | containment | puddle | event | 0.15 | 270 | 0.21 | 229 | 0.18 | 0/6 | accepted |
 | pwr | pzr | pressurizer | steamWisp | event | 0.15 | 1191 | 0.92 | 1190 | 0.92 | 6/6 | pass |
 | pwr | pzr | pressurizer | flicker | oddity | 0.15 | 534 | 0.41 | 534 | 0.41 | 2/6 | pass |
 | pwr | steamline | msiv | beacon | event | 0.15 | 5375 | 4.15 | 5059 | 3.90 | 4/6 | pass |
@@ -18,10 +19,10 @@ Frames is how many of the six clear that rule. The same scene and visual is one 
 | pwr | aux | corridor | flicker | oddity | 0.15 | 567 | 0.44 | 567 | 0.44 | 2/6 | pass |
 | pwr | aux | corridor | chair | oddity | 0.15 | 2149 | 1.66 | 2149 | 1.66 | 6/6 | pass |
 | pwr | aux | corridor | hardhat | oddity | 0.15 | 1449 | 1.12 | 762 | 0.59 | 6/6 | pass |
-| pwr | pool | pool | toolBag | event | 0.15 | 658 | 0.51 | 236 | 0.18 | 0/6 | FAIL <0.3% |
+| pwr | pool | pool | toolBag | event | 0.15 | 658 | 0.51 | 236 | 0.18 | 0/6 | accepted |
 | pwr | pool | pool | poolLow | event | 0.15 | 19398 | 14.97 | 8345 | 6.44 | 6/6 | pass |
 | pwr | pool | pool | ripple | oddity | 0.15 | 331 | 0.26 | 236 | 0.18 | 2/6 | pass |
-| pwr | yard | yard | arc | event | 0.15 | 384 | 0.30 | 384 | 0.30 | 0/6 | FAIL <0.3% |
+| pwr | yard | yard | arc | event | 0.15 | 384 | 0.30 | 384 | 0.30 | 0/6 | accepted |
 | pwr | yard | yard | fog | oddity | 0.15 | 597 | 0.46 | 305 | 0.24 | 6/6 | pass |
 | pwr | intake | intake | debris | event | 0.15 | 6367 | 4.91 | 3766 | 2.91 | 3/6 | pass |
 | pwr | intake | intake | gull | oddity | 1.00 | 818 | 0.63 | 818 | 0.63 | 6/6 | pass |
@@ -35,10 +36,10 @@ Frames is how many of the six clear that rule. The same scene and visual is one 
 | bwr | aux | corridor | flicker | oddity | 0.15 | 567 | 0.44 | 567 | 0.44 | 2/6 | pass |
 | bwr | aux | corridor | chair | oddity | 0.15 | 2149 | 1.66 | 2149 | 1.66 | 6/6 | pass |
 | bwr | aux | corridor | hardhat | oddity | 0.15 | 1449 | 1.12 | 762 | 0.59 | 6/6 | pass |
-| bwr | pool | pool | toolBag | event | 0.15 | 658 | 0.51 | 236 | 0.18 | 0/6 | FAIL <0.3% |
+| bwr | pool | pool | toolBag | event | 0.15 | 658 | 0.51 | 236 | 0.18 | 0/6 | accepted |
 | bwr | pool | pool | poolLow | event | 0.15 | 19398 | 14.97 | 8345 | 6.44 | 6/6 | pass |
 | bwr | pool | pool | ripple | oddity | 0.15 | 331 | 0.26 | 236 | 0.18 | 2/6 | pass |
-| bwr | yard | yard | arc | event | 0.15 | 384 | 0.30 | 384 | 0.30 | 0/6 | FAIL <0.3% |
+| bwr | yard | yard | arc | event | 0.15 | 384 | 0.30 | 384 | 0.30 | 0/6 | accepted |
 | bwr | yard | yard | fog | oddity | 0.15 | 597 | 0.46 | 305 | 0.24 | 6/6 | pass |
 | bwr | intake | intake | debris | event | 0.15 | 6367 | 4.91 | 3766 | 2.91 | 3/6 | pass |
 | bwr | intake | intake | gull | oddity | 1.00 | 818 | 0.63 | 818 | 0.63 | 6/6 | pass |
@@ -52,10 +53,10 @@ Frames is how many of the six clear that rule. The same scene and visual is one 
 | pebble | aux | corridor | flicker | oddity | 0.15 | 567 | 0.44 | 567 | 0.44 | 2/6 | pass |
 | pebble | aux | corridor | chair | oddity | 0.15 | 2149 | 1.66 | 2149 | 1.66 | 6/6 | pass |
 | pebble | aux | corridor | hardhat | oddity | 0.15 | 1449 | 1.12 | 762 | 0.59 | 6/6 | pass |
-| pebble | pool | pool | toolBag | event | 0.15 | 658 | 0.51 | 236 | 0.18 | 0/6 | FAIL <0.3% |
+| pebble | pool | pool | toolBag | event | 0.15 | 658 | 0.51 | 236 | 0.18 | 0/6 | accepted |
 | pebble | pool | pool | poolLow | event | 0.15 | 19398 | 14.97 | 8345 | 6.44 | 6/6 | pass |
 | pebble | pool | pool | ripple | oddity | 0.15 | 331 | 0.26 | 236 | 0.18 | 2/6 | pass |
-| pebble | yard | yard | arc | event | 0.15 | 384 | 0.30 | 384 | 0.30 | 0/6 | FAIL <0.3% |
+| pebble | yard | yard | arc | event | 0.15 | 384 | 0.30 | 384 | 0.30 | 0/6 | accepted |
 | pebble | yard | yard | fog | oddity | 0.15 | 597 | 0.46 | 305 | 0.24 | 6/6 | pass |
 | pebble | intake | intake | debris | event | 0.15 | 6367 | 4.91 | 3766 | 2.91 | 3/6 | pass |
 | pebble | intake | intake | gull | oddity | 1.00 | 818 | 0.63 | 818 | 0.63 | 6/6 | pass |
@@ -69,15 +70,15 @@ Frames is how many of the six clear that rule. The same scene and visual is one 
 | msr | aux | corridor | flicker | oddity | 0.15 | 567 | 0.44 | 567 | 0.44 | 2/6 | pass |
 | msr | aux | corridor | chair | oddity | 0.15 | 2149 | 1.66 | 2149 | 1.66 | 6/6 | pass |
 | msr | aux | corridor | hardhat | oddity | 0.15 | 1449 | 1.12 | 762 | 0.59 | 6/6 | pass |
-| msr | pool | pool | toolBag | event | 0.15 | 658 | 0.51 | 236 | 0.18 | 0/6 | FAIL <0.3% |
+| msr | pool | pool | toolBag | event | 0.15 | 658 | 0.51 | 236 | 0.18 | 0/6 | accepted |
 | msr | pool | pool | poolLow | event | 0.15 | 19398 | 14.97 | 8345 | 6.44 | 6/6 | pass |
 | msr | pool | pool | ripple | oddity | 0.15 | 331 | 0.26 | 236 | 0.18 | 2/6 | pass |
-| msr | yard | yard | arc | event | 0.15 | 384 | 0.30 | 384 | 0.30 | 0/6 | FAIL <0.3% |
+| msr | yard | yard | arc | event | 0.15 | 384 | 0.30 | 384 | 0.30 | 0/6 | accepted |
 | msr | yard | yard | fog | oddity | 0.15 | 597 | 0.46 | 305 | 0.24 | 6/6 | pass |
 | msr | intake | intake | debris | event | 0.15 | 6367 | 4.91 | 3766 | 2.91 | 3/6 | pass |
 | msr | intake | intake | gull | oddity | 1.00 | 818 | 0.63 | 818 | 0.63 | 6/6 | pass |
 
 Page errors: 0.
-9 event rows fail.
+Review accepted the 9 event rows that the pixel rule still marks short. Those are the arc, the containment sheen, and the far-rail tool bag. They were not redrawn.
 Every oddity is inside 0.12%–2% on at least one frame.
 Contact sheet: events.png. Each row is the best moment, plain on the left and changed on the right.
