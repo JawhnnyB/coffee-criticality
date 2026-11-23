@@ -40,6 +40,7 @@ Brief: `docs/grok/value-100.md`. One step, one commit. Real-input proof in this 
 - Step 1d done · Delay rods stop under the pause card. Left and right follow the binds. Proof in step-1d/.
 - Step 1e done · Review accepted the arc, the containment sheen, and the far-rail tool bag. The pictures were not changed. Note in step-12g/visible.md.
 - Steps 21–23 done · Tauri shell for Windows, Linux, and unsigned macOS, built on GitHub Actions. The sandbox has Rust but not WebKit, so the Linux binary is the CI artifact. Proof in step-21/.
+- Step 24 done · Windowed, fullscreen, and borderless. The size is remembered and is not in the week save. Proof in step-24/.
 
 
 

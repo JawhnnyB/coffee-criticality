@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { refreshMix, unlockAudio } from "./audio";
 import { ACTS, binds, keyLabel, resetBinds, setBind, type Act } from "./binds";
 import { UI } from "./uiStrings";
+import { applyWindow, isDesktop, readWindow, type WindowMode } from "./windowMode";
 import {
   mixLevels,
   reducedMotionOn,
@@ -30,6 +31,12 @@ const SIZES: { id: TextSize; label: string }[] = [
   { id: "large", label: UI.large },
 ];
 
+const WINDOWS: { id: WindowMode; label: string }[] = [
+  { id: "windowed", label: UI.windowed },
+  { id: "fullscreen", label: UI.fullscreen },
+  { id: "borderless", label: UI.borderless },
+];
+
 /** Volume, text size, motion, and screen shake. Saved in cc.settings, not the week. */
 export function SettingsFields() {
   const [mix, setMix] = useState<Mix>(() => mixLevels());
@@ -38,6 +45,8 @@ export function SettingsFields() {
   const [shake, setShake] = useState(() => shakeOn());
   const [bound, setBound] = useState(() => binds());
   const [listen, setListen] = useState<Act | null>(null);
+  const [desk, setDesk] = useState(() => isDesktop());
+  const [win, setWin] = useState(() => readWindow().mode);
 
   useEffect(() => {
     if (!listen) return;
@@ -122,6 +131,31 @@ export function SettingsFields() {
       >
         {shake ? UI.shakeOn : UI.shakeOff}
       </button>
+      {desk ? (
+        <>
+          <p className="font-mono text-[10px] tracking-widest text-subtle">{UI.window}</p>
+          <div className="grid grid-cols-3 gap-2">
+            {WINDOWS.map((row) => (
+              <button
+                key={row.id}
+                type="button"
+                className={win === row.id ? "btn-primary" : "btn-ghost"}
+                data-testid={`window-${row.id}`}
+                aria-pressed={win === row.id}
+                onClick={() => {
+                  const prev = readWindow();
+                  void applyWindow({ ...prev, mode: row.id }).then((next) => {
+                    setWin(next.mode);
+                    setDesk(isDesktop());
+                  });
+                }}
+              >
+                {row.label}
+              </button>
+            ))}
+          </div>
+        </>
+      ) : null}
       <p className="font-mono text-[10px] tracking-widest text-subtle">{UI.keys}</p>
       {ACTS.map((row) => (
         <button

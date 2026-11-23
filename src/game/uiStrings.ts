@@ -30,6 +30,10 @@ export const UI = {
   knownIssues: "Known issues",
   keys: "Keys",
   resetKeys: "Reset keys",
+  window: "Window",
+  windowed: "Windowed",
+  fullscreen: "Fullscreen",
+  borderless: "Borderless",
 } as const;
 
 export const CONTROL_LINES = [
