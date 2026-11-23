@@ -517,6 +517,7 @@ function Summary({ n, nightNo, onLeave }: { n: Night; nightNo: number; onLeave: 
       <div className="paper" style={{ display: "flex", flexDirection: "column", flex: 1, maxWidth: 560, margin: "0 auto", minHeight: 0, width: "100%", padding: 16, fontFamily: "var(--font-body)", color: "#16110d", lineHeight: 1.45 }}>
         <p className="font-mono text-[10px] tracking-widest text-[#6a4a32]" style={{ margin: 0 }}>{head}</p>
         <h2 className="font-display text-3xl" style={{ margin: "8px 0 0" }} data-testid="nw-grade">Grade {g.letter}</h2>
+        <p data-testid="nw-seed" style={{ margin: "4px 0 0", fontSize: 12, color: "#6a4a32" }}>Seed {n.seed}</p>
         <p style={{ margin: "8px 0 0", fontSize: 14 }}>{elenaLine(g.letter, n.curt, n.over?.why)}</p>
         <p style={{ margin: "8px 0 0", fontSize: 12, color: "#6a4a32" }}>
           Caught {sc.caught} ({sc.early} early) · missed {sc.missed} · false reports {sc.falseReports}

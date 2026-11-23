@@ -419,6 +419,8 @@ export interface ActiveOddity {
 export interface Night {
   site: SiteKind;
   night: number;
+  /** The number that dealt this night. Shown on the turnover so a night can be shared. */
+  seed: number;
   watch: SiteWatch;
   minute: number;
   coffee: number;
@@ -632,6 +634,7 @@ export function newNight(site: SiteKind, night: number, seed = night * 7919 + si
   return {
     site,
     night,
+    seed: use,
     watch,
     minute: 0,
     coffee: COFFEE.max,
