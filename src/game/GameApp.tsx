@@ -66,6 +66,7 @@ import { ART } from "./artFlags";
 import { PixelMenu, PixelRead } from "./PixelMenu";
 import { SettingsFields } from "./SettingsFields";
 import { ControlsCard } from "./ControlsCard";
+import { UI } from "./uiStrings";
 import { CastFace, PixelBadge, PixelBeat, PixelBrief } from "./IntroScreens";
 import {
   abortOverlay,
@@ -1412,10 +1413,10 @@ export function GameApp() {
         {hold ? (
           <div className="absolute inset-0 z-50 flex items-center justify-center bg-bg/80" data-testid="hold-pause">
             <div className="cc-sheet">
-              <h2 className="cc-title">Paused</h2>
-              <p className="mt-2 text-sm text-fg">The clock is stopped.</p>
+              <h2 className="cc-title">{UI.paused}</h2>
+              <p className="mt-2 text-sm text-fg">{UI.clockStopped}</p>
               <button type="button" className="btn-primary mt-3" data-testid="hold-resume" onClick={() => { setShiftHeld(false); setHold(false); }}>
-                Resume
+                {UI.resume}
               </button>
             </div>
           </div>
@@ -1511,7 +1512,7 @@ export function GameApp() {
                 goMenu("menu");
               }}
             >
-              Begin
+              {UI.menuBegin}
             </button>
           </Panel>
         )}
@@ -1565,7 +1566,7 @@ export function GameApp() {
                 New shift
               </button>
               <button type="button" className="btn-ghost" onClick={() => goMenu("how")} onPointerDown={() => goMenu("how")}>
-                How to play
+                {UI.howTitle}
               </button>
               <button type="button" className="btn-ghost" onClick={() => goMenu("credits")} onPointerDown={() => goMenu("credits")}>
                 Thesis / credits
@@ -1584,7 +1585,7 @@ export function GameApp() {
           <Panel>
             <ControlsCard />
             <button type="button" className="btn-primary mt-6" onPointerDown={() => goMenu("menu")}>
-              Back
+              {UI.back}
             </button>
           </Panel>
         )}
@@ -1613,7 +1614,7 @@ export function GameApp() {
               Lake Master. Education is frozen teaching content — not a license.
             </p>
             <button type="button" className="btn-primary mt-6" onPointerDown={() => goMenu("menu")}>
-              Back
+              {UI.back}
             </button>
           </Panel>
         )}
@@ -2815,7 +2816,7 @@ function MuteToggle() {
   }
   return (
     <button type="button" data-testid="mute" className="btn-ghost" onClick={toggle}>
-      {mute ? "Sound off" : "Sound on"}
+      {mute ? UI.soundOff : UI.soundOn}
     </button>
   );
 }
@@ -2839,7 +2840,7 @@ function FrameRateRow() {
   );
   return (
     <div className="flex flex-col gap-2" data-testid="pause-frame-rate">
-      <p className="font-mono text-[10px] tracking-widest text-subtle">Frame rate</p>
+      <p className="font-mono text-[10px] tracking-widest text-subtle">{UI.frameRate}</p>
       <div className="grid grid-cols-3 gap-2">
         {chip("auto", "Auto")}
         {chip("60", "60")}
@@ -3002,7 +3003,7 @@ function PauseStage({
             </button>
             <MuteToggle />
             <button type="button" className="btn-ghost" data-testid="pause-controls" onClick={() => setHelp(true)}>
-              Controls
+              {UI.controls}
             </button>
             {help ? <ControlsCard onClose={() => setHelp(false)} /> : null}
             <SettingsFields />

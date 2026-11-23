@@ -32,6 +32,7 @@ Brief: `docs/grok/value-100.md`. One step, one commit. Real-input proof in this 
 - Step 16 done · Keys can be changed in Settings. Esc still pauses. A reload keeps the bind. Proof in step-16/.
 - Step 17 done · Escape pauses a cabinet and a night without leaving. Resume stays in the game. The delay rods are frozen and keep moving. Proof in step-17/.
 - Step 18 done · Alarms use a triangle as well as colour. The menu has a name. Focus is a 3 px amber ring. Proof in step-18/.
+- Step 19 done · Menu, settings, pause, and the controls card read one chrome file. Lines stay under two phone rows. Scene text was not moved. Proof in step-19/.
 
 
 

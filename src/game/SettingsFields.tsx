@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { refreshMix, unlockAudio } from "./audio";
 import { ACTS, binds, keyLabel, setBind, type Act } from "./binds";
+import { UI } from "./uiStrings";
 import {
   mixLevels,
   reducedMotionOn,
@@ -17,16 +18,16 @@ import {
 } from "./frameRate";
 
 const ROWS: { key: keyof Mix; label: string; test: string }[] = [
-  { key: "master", label: "Master", test: "vol-master" },
-  { key: "music", label: "Music", test: "vol-music" },
-  { key: "sound", label: "Sound", test: "vol-sound" },
-  { key: "ambience", label: "Ambience", test: "vol-ambience" },
+  { key: "master", label: UI.master, test: "vol-master" },
+  { key: "music", label: UI.music, test: "vol-music" },
+  { key: "sound", label: UI.sound, test: "vol-sound" },
+  { key: "ambience", label: UI.ambience, test: "vol-ambience" },
 ];
 
 const SIZES: { id: TextSize; label: string }[] = [
-  { id: "small", label: "Small" },
-  { id: "normal", label: "Normal" },
-  { id: "large", label: "Large" },
+  { id: "small", label: UI.small },
+  { id: "normal", label: UI.normal },
+  { id: "large", label: UI.large },
 ];
 
 /** Volume, text size, motion, and screen shake. Saved in cc.settings, not the week. */
@@ -77,7 +78,7 @@ export function SettingsFields() {
           />
         </label>
       ))}
-      <p className="font-mono text-[10px] tracking-widest text-subtle">Text size</p>
+      <p className="font-mono text-[10px] tracking-widest text-subtle">{UI.textSize}</p>
       <div className="grid grid-cols-3 gap-2">
         {SIZES.map((row) => (
           <button
@@ -106,7 +107,7 @@ export function SettingsFields() {
           setMotion(next);
         }}
       >
-        {motion ? "Reduced motion on" : "Reduced motion off"}
+        {motion ? UI.motionOn : UI.motionOff}
       </button>
       <button
         type="button"
@@ -119,9 +120,9 @@ export function SettingsFields() {
           setShake(next);
         }}
       >
-        {shake ? "Screen shake on" : "Screen shake off"}
+        {shake ? UI.shakeOn : UI.shakeOff}
       </button>
-      <p className="font-mono text-[10px] tracking-widest text-subtle">Keys</p>
+      <p className="font-mono text-[10px] tracking-widest text-subtle">{UI.keys}</p>
       {ACTS.map((row) => (
         <button
           key={row.id}
@@ -133,7 +134,7 @@ export function SettingsFields() {
           {listen === row.id ? `${row.label}: press a key` : `${row.label}: ${keyLabel(bound[row.id])}`}
         </button>
       ))}
-      <p className="text-[11px] text-subtle">Esc still pauses. Arrows still walk.</p>
+      <p className="text-[11px] text-subtle">{UI.keysNote}</p>
     </div>
   );
 }

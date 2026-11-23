@@ -5,6 +5,7 @@ import { integerCover, integerScale } from "./artScale";
 import { isMuted, setMuted, unlockAudio } from "./audio";
 import { frameChoice, setFrameChoice, bootSettings, type FrameChoice } from "./frameRate";
 import { SettingsFields } from "./SettingsFields";
+import { UI } from "./uiStrings";
 import { hostOwnsKey } from "./keyGate";
 
 /** Native layout from tools/artkit/menu.py. Do not redraw it. */
@@ -176,10 +177,10 @@ export function PixelMenu({
         }
       >
         <button type="button" data-testid="new-shift" className="btn-primary" onClick={() => activate(0)}>
-          Begin
+          {UI.menuBegin}
         </button>
         <button type="button" data-testid="continue-shift" className="btn-ghost" disabled={!saved} onClick={() => activate(1)}>
-          Continue
+          {UI.menuContinue}
         </button>
         {saveNote ? (
           <p data-testid="save-note" style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-small)", color: "#f3e6d0", margin: 0 }}>
@@ -187,20 +188,20 @@ export function PixelMenu({
           </p>
         ) : null}
         <button type="button" data-testid="menu-settings" className="btn-ghost" onClick={() => activate(2)}>
-          Settings
+          {UI.menuSettings}
         </button>
         <button type="button" data-testid="mute" className="btn-ghost" onClick={toggleMute}>
-          {mute ? "Sound off" : "Sound on"}
+          {mute ? UI.soundOff : UI.soundOn}
         </button>
         <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-small)", color: "#f3e6d0", margin: 0 }}>
-          Teaching model, not a license
+          {UI.teaching}
         </p>
       </div>
       {sheet ? (
         <div className="absolute inset-0 z-10 flex items-center justify-center" style={{ background: "rgba(22,17,13,0.72)" }}>
           <div className="cc-sheet" style={{ maxHeight: "92vh", overflowY: "auto" }}>
             <h2 className="cc-title">SETTINGS</h2>
-            <p style={{ fontFamily: "\"CCPixel3x5\", monospace", fontSize: 16, margin: "10px 0 0", color: "#f3e6d0" }}>Frame rate</p>
+            <p style={{ fontFamily: "\"CCPixel3x5\", monospace", fontSize: 16, margin: "10px 0 0", color: "#f3e6d0" }}>{UI.frameRate}</p>
             <button type="button" className="cc-btn" data-testid="fps-auto" aria-pressed={fps === "auto"} onClick={() => { setFrameChoice("auto"); setFps("auto"); }}>
               {fps === "auto" ? "Auto · on" : "Auto"}
             </button>

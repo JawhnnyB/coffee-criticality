@@ -1,0 +1,4 @@
+Begin reads Begin.
+Settings shows Text size. Frame rate count 1.
+Card has stick true. Card has mouse true.
+Page errors: 0.
