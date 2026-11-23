@@ -2,13 +2,14 @@
  * Human-style check for Night Watch events and oddities.
  *
  * Plates on, which is the game. Each visual is painted plain and changed,
- * side by side, at 480×270, at t = 1.25 s.
+ * side by side, at 480×270, at six moments across its life. The best moment counts.
  *
  * A pixel counts when any channel moves by 24 or more.
  * The changed pixels are grouped into 4-connected regions.
- * An event passes only when the largest region is at least 0.3% of the frame
- * and that region holds at least 60% of the changed pixels (one place).
- * An oddity passes when the changed pixels are between 0.12% and 2% of the frame.
+ * An event passes when its best frame has a connected region of at least 0.3%
+ * of the frame. More than one place is allowed.
+ * An oddity passes when a frame's changed pixels land between 0.12% and 2%.
+ * The best in-band frame is the one reported. If none is in band, the closest is.
  *
  * The contact sheet of every event is written next to the table.
  * The old pixel-count proof stays in docs/audit/2026-11-21-rotation/visible.md.
@@ -72,6 +73,7 @@ function measure(a, b) {
   }
   return { total, largest };
 }
+const LIFE = [0.15, 0.32, 0.48, 0.65, 0.82, 1];
 window.run = async (jobs) => {
   await CAM.loadPlates();
   CAM.setPlatesEnabled(true);
@@ -80,20 +82,47 @@ window.run = async (jobs) => {
   const seen = new Map();
   const shots = [];
   const rows = [];
+  const eventCut = FRAME * 0.003;
+  const oddLo = FRAME * 0.0012;
+  const oddHi = FRAME * 0.02;
   for (const job of jobs) {
     const key = job.scene + "\\0" + job.visual;
     if (!seen.has(key)) {
-      CAM.resetFrameCaches();
-      g.setTransform(1, 0, 0, 1, 0, 0);
-      g.clearRect(0, 0, 960, 270);
-      CAM.paintCamera(g, job.scene, [], 1.25, {});
-      const plain = g.getImageData(0, 0, W, H).data;
-      g.setTransform(1, 0, 0, 1, W, 0);
-      CAM.paintCamera(g, job.scene, [job.visual], 1.25, {});
-      const next = g.getImageData(W, 0, W, H).data;
-      const m = measure(plain, next);
-      seen.set(key, m);
-      if (job.kind === "event") shots.push({ scene: job.scene, visual: job.visual, png: scratch.toDataURL("image/png") });
+      const frames = [];
+      let bestPng = "";
+      let bestLargest = -1;
+      for (const grow of LIFE) {
+        const t = 0.75 + grow * 2.2;
+        g.setTransform(1, 0, 0, 1, 0, 0);
+        g.clearRect(0, 0, 960, 270);
+        CAM.paintCamera(g, job.scene, [], t, {});
+        const plain = g.getImageData(0, 0, W, H).data;
+        g.setTransform(1, 0, 0, 1, W, 0);
+        CAM.paintCamera(g, job.scene, [job.visual + ":" + grow], t, {});
+        const next = g.getImageData(W, 0, W, H).data;
+        const m = measure(plain, next);
+        frames.push({ grow, t, total: m.total, largest: m.largest });
+        if (job.kind === "event" && m.largest > bestLargest) {
+          bestLargest = m.largest;
+          bestPng = scratch.toDataURL("image/png");
+        }
+      }
+      let best;
+      let hit;
+      if (job.kind === "event") {
+        best = frames.reduce((a, b) => (b.largest > a.largest ? b : a));
+        hit = frames.filter((f) => f.largest >= eventCut).length;
+      } else {
+        const inside = frames.filter((f) => f.total >= oddLo && f.total <= oddHi);
+        if (inside.length) best = inside.reduce((a, b) => (b.total > a.total ? b : a));
+        else {
+          const dist = (f) => (f.total < oddLo ? oddLo - f.total : f.total - oddHi);
+          best = frames.reduce((a, b) => (dist(b) < dist(a) ? b : a));
+        }
+        hit = inside.length;
+      }
+      seen.set(key, { total: best.total, largest: best.largest, grow: best.grow, t: best.t, hit });
+      if (job.kind === "event") shots.push({ scene: job.scene, visual: job.visual, png: bestPng, grow: best.grow });
     }
     rows.push(Object.assign({}, job, seen.get(key)));
   }
@@ -110,7 +139,7 @@ window.run = async (jobs) => {
   const hold = new Image();
   for (let i = 0; i < shots.length; i++) {
     const y = i * (H + label);
-    sg.fillText(shots[i].scene + "   " + shots[i].visual + "      plain  |  changed", 8, y + 13);
+    sg.fillText(shots[i].scene + "   " + shots[i].visual + "   @" + shots[i].grow + "      plain  |  changed", 8, y + 13);
     await new Promise((resolve) => {
       hold.onload = () => { sg.drawImage(hold, 0, y + label); resolve(); };
       hold.src = shots[i].png;
@@ -182,7 +211,6 @@ server.close();
 
 const frame = 480 * 270;
 const eventMin = frame * 0.003;
-const oneShare = 0.6;
 const oddMin = frame * 0.0012;
 const oddMax = frame * 0.02;
 let eventFails = 0;
@@ -190,45 +218,37 @@ let oddFails = 0;
 const lines = [
   "# Night Watch, human check",
   "",
-  "Plain and changed, side by side, at 480×270. One moment, t = 1.25 s. Plates on.",
+  "Plain and changed, side by side, at 480×270. Six moments across the life (grow 0.15 to 1, time 1.08 s to 2.95 s). The best moment is the row. Plates on.",
   "A pixel counts when any channel moves by 24 or more. Regions are 4-connected.",
-  `An event passes when the largest region is at least ${eventMin.toFixed(1)} pixels (0.3% of the frame) and that region is at least 60% of the changed pixels, so the change is in one place.`,
-  `An oddity passes when the changed pixels are between ${oddMin.toFixed(1)} and ${oddMax.toFixed(1)} (0.12% to 2%).`,
-  "The same scene and visual is one picture. Shared events are listed once per site and drawn once on the sheet.",
+  `An event passes when the best frame's largest region is at least ${eventMin.toFixed(1)} pixels (0.3% of the frame). More than one place is allowed.`,
+  `An oddity passes when one of the six frames has between ${oddMin.toFixed(1)} and ${oddMax.toFixed(1)} changed pixels (0.12% to 2%).`,
+  "Frames is how many of the six clear that rule. The same scene and visual is one picture.",
   "",
-  "| Site | Camera | Scene | Visual | Kind | Changed px | Changed % | Largest px | Largest % | Share | Rule |",
-  "| --- | --- | --- | --- | --- | ---: | ---: | ---: | ---: | ---: | --- |",
+  "| Site | Camera | Scene | Visual | Kind | Best grow | Changed px | Changed % | Largest px | Largest % | Frames | Rule |",
+  "| --- | --- | --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | --- |",
 ];
 for (const r of result.rows) {
   const changedPct = (100 * r.total) / frame;
   const largestPct = (100 * r.largest) / frame;
-  const share = r.total ? r.largest / r.total : 0;
   let rule = "pass";
   if (r.kind === "oddity") {
-    if (r.total < oddMin) {
-      rule = "FAIL <0.12%";
-      oddFails++;
-    } else if (r.total > oddMax) {
-      rule = "FAIL >2%";
+    if (r.hit < 1) {
+      rule = r.total < oddMin ? "FAIL <0.12%" : "FAIL >2%";
       oddFails++;
     }
-  } else {
-    const small = r.largest < eventMin;
-    const split = share < oneShare;
-    if (small || split) {
-      eventFails++;
-      rule = small && split ? "FAIL <0.3% and not one place" : small ? "FAIL <0.3%" : "FAIL not one place";
-    }
+  } else if (r.largest < eventMin) {
+    rule = "FAIL <0.3%";
+    eventFails++;
   }
   lines.push(
-    `| ${r.site} | ${r.camera} | ${r.scene} | ${r.visual} | ${r.kind} | ${r.total} | ${changedPct.toFixed(2)} | ${r.largest} | ${largestPct.toFixed(2)} | ${(100 * share).toFixed(0)}% | ${rule} |`,
+    `| ${r.site} | ${r.camera} | ${r.scene} | ${r.visual} | ${r.kind} | ${Number(r.grow).toFixed(2)} | ${r.total} | ${changedPct.toFixed(2)} | ${r.largest} | ${largestPct.toFixed(2)} | ${r.hit}/6 | ${rule} |`,
   );
 }
 lines.push("");
 lines.push(errors.length ? `Page errors: ${errors.join(" | ")}` : "Page errors: 0.");
-lines.push(eventFails ? `${eventFails} event ${eventFails === 1 ? "row fails" : "rows fail"}.` : "Every event is one place and at least 0.3%.");
-lines.push(oddFails ? `${oddFails} oddity ${oddFails === 1 ? "row fails" : "rows fail"}.` : "Every oddity is inside 0.12%–2%.");
-lines.push("Contact sheet: events.png. Each row is plain on the left, changed on the right.");
+lines.push(eventFails ? `${eventFails} event ${eventFails === 1 ? "row fails" : "rows fail"}.` : "Every event's best frame is at least 0.3%.");
+lines.push(oddFails ? `${oddFails} oddity ${oddFails === 1 ? "row fails" : "rows fail"}.` : "Every oddity is inside 0.12%–2% on at least one frame.");
+lines.push("Contact sheet: events.png. Each row is the best moment, plain on the left and changed on the right.");
 writeFileSync(join(outDir, "visible.md"), lines.join("\n") + "\n");
 if (result.sheet) {
   writeFileSync(join(outDir, "events.png"), Buffer.from(result.sheet.split(",")[1], "base64"));

@@ -25,3 +25,5 @@ Brief: `docs/grok/value-100.md`. One step, one commit. Real-input proof in this 
 - Step 12d done · The night hum fades for 0.3 s, then the buffer is dropped. No click on the way out. Proof in step-12d/.
 - Step 12e done · Frame rate is a global setting, on the main menu and on pause. New week does not clear it. Proof in step-12e/.
 - Step 13 done · The menu loads without the night plates, the outage data, or the minigames. 0.39 MB transferred before the menu. Proof in step-13/.
+- Step 12f done · An event passes on its best of six frames if the largest connected change is at least 0.3%. More than one place is allowed. Condensate is still too faint. Proof in step-12f/.
+
