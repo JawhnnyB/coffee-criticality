@@ -1,0 +1,5 @@
+Menu click 30. Store {"frameRate":"30"}. Choice 30. Pace half.
+Pause click 60. Choice 60.
+New week. Store {"frameRate":"30"}. Choice 30. Pace half. Mode desktop.
+Reload. Store {"frameRate":"30"}. Choice 30. Pace half.
+Page errors: 0.

@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { integerCover, integerScale } from "./artScale";
 import { isMuted, setMuted, unlockAudio } from "./audio";
+import { frameChoice, setFrameChoice, type FrameChoice } from "./frameRate";
 import { hostOwnsKey } from "./keyGate";
 
 /** Native layout from tools/artkit/menu.py. Do not redraw it. */
@@ -55,6 +56,7 @@ export function PixelMenu({
   const [sel, setSel] = useState(0);
   const [mute, setMute] = useState(isMuted());
   const [sheet, setSheet] = useState(false);
+  const [fps, setFps] = useState<FrameChoice>("auto");
   const sceneRef = useRef<HTMLImageElement | null>(null);
   const partsRef = useRef<HTMLImageElement | null>(null);
   const chipsRef = useRef<HTMLImageElement | null>(null);
@@ -108,7 +110,10 @@ export function PixelMenu({
     if (i === 0) onBegin();
     else if (i === 1) {
       if (saved) onContinue();
-    } else setSheet(true);
+    } else {
+      setFps(frameChoice());
+      setSheet(true);
+    }
   };
 
   useEffect(() => {
@@ -192,6 +197,16 @@ export function PixelMenu({
         <div className="absolute inset-0 z-10 flex items-center justify-center" style={{ background: "rgba(22,17,13,0.72)" }}>
           <div className="cc-sheet">
             <h2 className="cc-title">SETTINGS</h2>
+            <p style={{ fontFamily: "\"CCPixel3x5\", monospace", fontSize: 16, margin: "10px 0 0", color: "#f3e6d0" }}>Frame rate</p>
+            <button type="button" className="cc-btn" data-testid="fps-auto" aria-pressed={fps === "auto"} onClick={() => { setFrameChoice("auto"); setFps("auto"); }}>
+              {fps === "auto" ? "Auto · on" : "Auto"}
+            </button>
+            <button type="button" className="cc-btn" data-testid="fps-60" aria-pressed={fps === "60"} onClick={() => { setFrameChoice("60"); setFps("60"); }}>
+              {fps === "60" ? "60 · on" : "60"}
+            </button>
+            <button type="button" className="cc-btn" data-testid="fps-30" aria-pressed={fps === "30"} onClick={() => { setFrameChoice("30"); setFps("30"); }}>
+              {fps === "30" ? "30 · on" : "30"}
+            </button>
             <button type="button" className="cc-btn" onClick={onHow}>
               HOW TO PLAY
             </button>

@@ -54,7 +54,7 @@ import { heartCount } from "./pixel";
 import { drawWorld, glyphWidth, paintGlyphs, preloadRoomArt } from "./render";
 import { DEFAULT_PLANT, plantTitle, thermalState, type PlantDesign } from "./plant";
 import { systemReducedMotion } from "./reducedMotion";
-import { frameChoice } from "./frameRate";
+import { frameChoice, setFrameChoice, type FrameChoice } from "./frameRate";
 import { hasSave, hydrateSave, peekSave, wipeSave, writeSave } from "./save";
 import { setNextNightSeed } from "./nightwatch/model";
 import { computeKeff } from "./nuclearLab";
@@ -2740,6 +2740,35 @@ function MuteToggle() {
   );
 }
 
+function FrameRateRow() {
+  const [fps, setFps] = useState<FrameChoice>(() => frameChoice());
+  const pick = (v: FrameChoice) => {
+    setFrameChoice(v);
+    setFps(v);
+  };
+  const chip = (id: FrameChoice, label: string) => (
+    <button
+      type="button"
+      className={fps === id ? "btn-primary" : "btn-ghost"}
+      data-testid={`fps-${id}`}
+      aria-pressed={fps === id}
+      onClick={() => pick(id)}
+    >
+      {label}
+    </button>
+  );
+  return (
+    <div className="flex flex-col gap-2" data-testid="pause-frame-rate">
+      <p className="font-mono text-[10px] tracking-widest text-subtle">Frame rate</p>
+      <div className="grid grid-cols-3 gap-2">
+        {chip("auto", "Auto")}
+        {chip("60", "60")}
+        {chip("30", "30")}
+      </div>
+    </div>
+  );
+}
+
 function PauseStage({
   s,
   stage,
@@ -2891,6 +2920,7 @@ function PauseStage({
               Save shift
             </button>
             <MuteToggle />
+            <FrameRateRow />
             <button type="button" className="btn-ghost" onClick={onAcademy}>
               Academy
             </button>
