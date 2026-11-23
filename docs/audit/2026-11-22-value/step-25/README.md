@@ -7,3 +7,5 @@ Live file: `cc.save.v2`. The three older copies, newest first: `cc.save.v2.1`, `
 The proof is two processes and a folder, not a launched window. The first process writes week-a, week-b, week-c, week-d, then week-d again. The second process reads live week-d, then week-c, week-b, week-a. `node --test scripts/desk-save.test.mjs` passed.
 
 The desktop bundle that includes the bridge built here (308 modules). The Tauri process was not started. This sandbox has no WebKit, and `cargo check` still cannot see glib. A restart of the real window is the GitHub Actions artifact, once that run is green.
+
+Run [45158042305](https://github.com/JawhnnyB/coffee-criticality/actions/runs/45158042305) compiled far enough to reject the capability: `allow-read-save-file` was not a known permission. The three commands are now listed in `src-tauri/build.rs`, which is what generates those names.
