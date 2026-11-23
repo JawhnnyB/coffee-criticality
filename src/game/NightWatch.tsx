@@ -44,6 +44,7 @@ import {
 import { nightCoachLine } from "./nightwatch/nightCoach";
 import { applyCarry, carryover } from "./nightwatch/carryover";
 import { noteEndless, readEndless } from "./nightwatch/endless";
+import { readDaily, recordDaily } from "./nightwatch/daily";
 import { nightsDone } from "./nightwatch/progress";
 import { elenaLine, oddityNotes, openerLine, recordNight, turnoverRows } from "./nightwatch/turnover";
 
@@ -79,34 +80,52 @@ function Btn({ onClick, children, danger, on, disabled, testId, title }: { onCli
 
 export function NightWatchApp({ s }: { s: GameState }) {
   const [running, setRunning] = useState<number | null>(null);
+  const [daily, setDaily] = useState(false);
   const site = siteKind(s.plant);
-  if (running !== null) return <NightShift s={s} nightNo={running} replay onLeave={() => setRunning(null)} />;
-  if (!s.flags["rot:nights"]) {
+  const board = readDaily();
+  if (running !== null || daily) {
     return (
-      <div className="app-pad" data-testid="app-nightwatch" style={{ fontFamily: "var(--font-body)", color: PAL.ink, lineHeight: 1.5 }}>
-        <p style={{ margin: 0 }}>Night Watch · {SITE_LABEL[site]} Unit 1</p>
-        <p style={{ fontSize: "var(--text-small)" }}>Your night rotation starts after this week.</p>
-      </div>
+      <NightShift
+        s={s}
+        nightNo={running ?? 2}
+        replay
+        daily={daily}
+        seed={daily ? board.seed : undefined}
+        onLeave={() => {
+          setRunning(null);
+          setDaily(false);
+        }}
+      />
     );
   }
-  const done = [1, 2, 3, 4].filter((k) => s.flags[`night:${k}:done`]);
+  const open = !!s.flags["rot:nights"];
+  const done = open ? [1, 2, 3, 4].filter((k) => s.flags[`night:${k}:done`]) : [];
   return (
     <div className="app-pad" data-testid="app-nightwatch" style={{ fontFamily: "var(--font-body)", color: PAL.ink, lineHeight: 1.5 }}>
-      <p style={{ margin: 0 }}>Replay nights · {SITE_LABEL[site]} Unit 1</p>
-      <p style={{ fontSize: "var(--text-small)" }}>A replay does not change Elena's trust or the grade on the log.</p>
+      <p style={{ margin: 0 }}>{open ? `Replay nights · ${SITE_LABEL[site]} Unit 1` : `Night Watch · ${SITE_LABEL[site]} Unit 1`}</p>
+      <p style={{ fontSize: "var(--text-small)" }}>{open ? "A replay does not change Elena's trust or the grade on the log." : "Your night rotation starts after this week."}</p>
       <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 8 }}>
-        {done.length === 0 ? <p style={{ fontSize: "var(--text-small)" }}>No night is on the log yet.</p> : null}
+        {open && done.length === 0 ? <p style={{ fontSize: "var(--text-small)" }}>No night is on the log yet.</p> : null}
         {done.map((k) => (
           <Btn key={k} onClick={() => setRunning(k)} testId={`night-${k}`}>
             Replay night {k}
           </Btn>
         ))}
+        <Btn onClick={() => setDaily(true)} testId="night-daily">
+          Daily night
+        </Btn>
+      </div>
+      <p data-testid="daily-seed" style={{ fontSize: "var(--text-small)", marginTop: 8 }}>
+        Seed {board.seed}
+      </p>
+      <div data-testid="daily-board" style={{ fontSize: "var(--text-small)" }}>
+        {board.rows.length === 0 ? <p style={{ margin: 0 }}>No score yet today.</p> : board.rows.map((row, i) => <p key={`${row.at}-${i}`} style={{ margin: 0 }}>{row.points} {row.letter}</p>)}
       </div>
     </div>
   );
 }
 
-function NightShift({ s, nightNo: asked, onLeave, onStay, replay = false, endless = false, seed }: { s: GameState; nightNo: number; onLeave: () => void; onStay?: () => void; replay?: boolean; endless?: boolean; seed?: number }) {
+function NightShift({ s, nightNo: asked, onLeave, onStay, replay = false, endless = false, daily = false, seed }: { s: GameState; nightNo: number; onLeave: () => void; onStay?: () => void; replay?: boolean; endless?: boolean; daily?: boolean; seed?: number }) {
   const nightNo = useRef(asked).current;
   const site = siteKind(s.plant);
   const night = useRef<Night>(newNight(site, nightNo, seed));
@@ -264,6 +283,7 @@ function NightShift({ s, nightNo: asked, onLeave, onStay, replay = false, endles
       const survived = passed ? Math.max(0, nightNo - 4) : Math.max(0, nightNo - 5);
       setBestNights(noteEndless(survived, passed ? g.points : 0).nights);
     }
+    if (daily) recordDaily(g.points, g.letter);
     if (!replay && !n.replay && g.trust) bumpTrust(s, "elena", g.trust);
     if (!replay && !n.replay) pushMsg(s, g.done ? `Night ${nightNo} watched. Grade ${g.letter}.` : `Night ${nightNo} is a ${g.letter}. Elena sends you back.`);
     if (!replay && !n.replay) writeSave(s, true);

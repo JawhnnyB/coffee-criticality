@@ -50,6 +50,7 @@ Brief: `docs/grok/value-100.md`. One step, one commit. Real-input proof in this 
 - Step 41 done · Eight faint oddities, all inside 0.12% to 2%. The accepted arc, sheen, and tool bag were not changed. Proof in step-41/.
 - Step 42 done · The turnover shows the seed that dealt the night. Proof in step-42/.
 - Step 43 done · Endless starts at night 5 from the dawn lot. The high score is not in the week save. Proof in step-43/.
+- Step 44 done · Daily night uses one UTC seed and a local board. No Steam board. Proof in step-44/.
 
 
 
