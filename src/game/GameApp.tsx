@@ -117,6 +117,7 @@ import {
   type ParlorScores,
 } from "./sim";
 import type { AcademyTier, Choice, Line, NpcId, RoleId } from "./content";
+import { coachLine } from "./dayCoach";
 import { addScene, knownAbout, nextHint, tierOf, TIER_NAME, type Tier } from "./social";
 import { cabLevel, LADDERS, recordCab } from "./cabLevels";
 
@@ -482,6 +483,7 @@ export function GameApp() {
       getCatch: () => stateRef.current.catches,
       setFlag: (k: string, v: boolean) => {
         stateRef.current.flags[k] = v;
+        bump((n) => n + 1);
       },
       setNightSeed: (n: number) => {
         setNextNightSeed(n);
@@ -1300,6 +1302,15 @@ export function GameApp() {
             hide={dayIncident(s).hide}
             time={s.timeLabel}
             room={ROOMS[s.room].name}
+            coach={coachLine({
+              day: s.day,
+              mode,
+              moved: true,
+              mabel: !!s.flags.mabelTalked,
+              entered: !!s.flags.plantEntered,
+              holt: !!s.flags.holtTalked,
+              resolved: s.incidentResolved,
+            })}
             onReport={() => {
               playBlip("ok");
               keysRef.current.clear();
@@ -1450,6 +1461,15 @@ export function GameApp() {
             toast={s.toastT > 0 ? s.toast : ""}
             objective={s.objective}
             day={s.day}
+            coach={coachLine({
+              day: s.day,
+              mode,
+              moved: s.room !== "cafe" || Math.hypot(s.x - 152, s.y - 220) > 8,
+              mabel: !!s.flags.mabelTalked,
+              entered: !!s.flags.plantEntered,
+              holt: !!s.flags.holtTalked,
+              resolved: s.incidentResolved,
+            })}
             nearLabel={hallLabel(s.nearLabel, siteKind(s.plant), s.room)}
           />
         )}
@@ -2184,6 +2204,7 @@ function IncidentStage({
   hide,
   time,
   room,
+  coach,
   onReport,
   onPeer,
   onHide,
@@ -2196,6 +2217,7 @@ function IncidentStage({
   hide: string;
   time: string;
   room: string;
+  coach: string | null;
   onReport: () => void;
   onPeer: () => void;
   onHide: () => void;
@@ -2217,6 +2239,11 @@ function IncidentStage({
             A catch changes the board. A hide leaves it wrong. Three hides end the week unfinished.
           </p>
           <p className="mt-1 text-[11px] text-[#6a4a32]">The cheaper truth. Teaching model — not a license.</p>
+          {coach ? (
+            <p className="mt-2 font-mono text-[12px] text-[#3a2818]" data-testid="day-coach">
+              {coach}
+            </p>
+          ) : null}
           <div className="mt-4 flex flex-col gap-2">
             <button type="button" className="paper-btn" onPointerDown={onReport}>
               <span className="font-mono text-[11px] text-[#6a4a32]">R · Report.</span> Your name goes on it. The board changes.
@@ -3210,6 +3237,7 @@ function Hud({
   toast,
   objective,
   day,
+  coach,
   nearLabel,
 }: {
   room: string;
@@ -3222,6 +3250,7 @@ function Hud({
   toast: string;
   objective: string;
   day: number;
+  coach: string | null;
   nearLabel: string;
 }) {
   const hud = MAP_HUD[roomId] ?? MAP_HUD.cafe;
@@ -3283,6 +3312,11 @@ function Hud({
               <span style={{ display: "block", fontFamily: "var(--font-body)", fontSize: "var(--text-small)", lineHeight: 1.4, color: "#3a2818" }}>{obj}</span>
             </div>
           </>
+        ) : null}
+        {coach ? (
+          <span data-testid="day-coach" style={{ display: "block", marginTop: 4, fontFamily: "var(--font-mono, monospace)", fontSize: "var(--text-small)", lineHeight: 1.4, color: "#6a4a32" }}>
+            {coach}
+          </span>
         ) : null}
       </div>
       {nearLabel ? (

@@ -42,6 +42,7 @@ Brief: `docs/grok/value-100.md`. One step, one commit. Real-input proof in this 
 - Steps 21–23 done · Tauri shell for Windows, Linux, and unsigned macOS, built on GitHub Actions. The sandbox has Rust but not WebKit, so the Linux binary is the CI artifact. Proof in step-21/.
 - Step 24 done · Windowed, fullscreen, and borderless. The size is remembered and is not in the week save. Proof in step-24/.
 - Step 25 done · Desktop weeks live in the OS app-data folder, with three older copies. The browser still uses localStorage. Proof in step-25/. The Tauri window was not opened here.
+- Step 36 done · Day 1 teaches one control at a time, and the line goes away when it is done. Proof in step-36/.
 
 
 
