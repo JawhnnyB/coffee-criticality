@@ -63,7 +63,6 @@ export const PLATES: Record<string, PlateSpec> = {
       [70, 250], [150, 250], [230, 250], [310, 250], [390, 250],
     ],
     states: {
-      poolLow: { file: "/nightwatch/plates/pool-poolLow.webp", measured: [28, 131, 444, 139], box: [20, 123, 460, 147] },
       toolBag: { file: "/nightwatch/plates/pool-toolBag.webp", measured: [401, 87, 70, 65], box: [393, 79, 86, 81] },
     },
   },

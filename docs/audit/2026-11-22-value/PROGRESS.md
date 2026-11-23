@@ -20,7 +20,7 @@ Brief: `docs/grok/value-100.md`. One step, one commit. Real-input proof in this 
 - Step 11b done · Renderer RSS from day 1 morning to dawn grew 25.0 MB after a shift drops its plates and camera canvases. The first measure, which kept them, grew 98.1 MB. Limit was 50. Proof in step-11b/.
 - Step 12 done · A production new shift, through the intro and into the cafe, logged no warnings and no errors. The audio context waits for a gesture. Proof in step-12/.
 - Step 12a done · The yellow tool-bag box, the van rectangles, the solid condensate ovals, and the drywell puddle rectangle are gone. Proof in step-12a/.
-- Step 12b todo · Make the pool level drop a lower waterline with a wet band, in one place.
+- Step 12b done · The pool level drops in the middle of the near edge: wet liner, then a lower waterline. The full-frame low plate is not used. Proof in step-12b/.
 - Step 12c todo · Judge events by the largest changed region, and show a contact sheet.
 - Step 12d todo · Fade the night hum out over 0.3 s.
 - Step 12e todo · Frame rate on a global settings screen, from the menu and from pause.

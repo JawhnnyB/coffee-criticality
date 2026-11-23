@@ -890,9 +890,10 @@ const S: Record<string, Scene> = {
     },
     live(g, t, v) {
       const low = v.has("poolLow");
-      const top = low ? 122 : 106;
-      // A loaded plate already has the water. The flat fill comes back if the low-level variant is missing.
-      const photo = usingPlate && !(low && !stateReady("pool", "poolLow"));
+      // A loaded plate keeps its own water. The drop is one wet band in the middle of the near edge.
+      // With no plate, the whole surface is drawn lower.
+      const photo = usingPlate;
+      const top = photo ? 106 : low ? 122 : 106;
       if (!photo) {
         // Exposed liner where the level dropped.
         if (low) {
@@ -968,6 +969,7 @@ const S: Record<string, Scene> = {
         g.fillStyle = "#151515";
         g.fillRect(392, 70, 20, 6);
       }
+      if (low && photo) paintPoolLevel(g);
     },
   },
   yard: {
@@ -1473,6 +1475,89 @@ function applyGrade(g: G, look: Look) {
   g.globalCompositeOperation = "source-over";
 }
 
+/**
+ * The near edge of the pool, logical pixels. The level drop lives here:
+ * liner from above the water, shifted down, with a wet darkening and a tide line.
+ */
+const POOL_BAND = { x: 176, y: 108, w: 128, h: 52, drop: 22 };
+/** Where the photo's water meets the liner, logical y. The drop is measured from here. */
+const POOL_LINE = 114;
+let poolLevelPatch: Surface | null | undefined;
+
+function paintPoolLevel(g: G) {
+  const patch = poolLevelPatchCanvas();
+  if (!patch) return;
+  g.drawImage(patch as CanvasImageSource, POOL_BAND.x, POOL_BAND.y, POOL_BAND.w, POOL_BAND.h);
+}
+
+function poolLevelPatchCanvas(): Surface | null {
+  if (poolLevelPatch !== undefined) return poolLevelPatch;
+  const img = plateFor("pool");
+  if (!img) return null;
+  const { x, y, w, h, drop } = POOL_BAND;
+  const pw = w * CAM_PX;
+  const ph = h * CAM_PX;
+  let c: Surface | null = null;
+  try {
+    if (typeof OffscreenCanvas !== "undefined") c = new OffscreenCanvas(pw, ph);
+    else if (typeof document !== "undefined") {
+      const el = document.createElement("canvas");
+      el.width = pw;
+      el.height = ph;
+      c = el;
+    }
+  } catch {
+    c = null;
+  }
+  const cg = c?.getContext("2d") as G | null | undefined;
+  if (!c || !cg) {
+    poolLevelPatch = null;
+    return null;
+  }
+  cg.drawImage(img, x * CAM_PX, (y - drop) * CAM_PX, pw, ph, 0, 0, pw, ph);
+  // Wet only the liner that now sits where the water was. The wall above stays as it was.
+  const exposed = (POOL_LINE - y) * CAM_PX;
+  const band = drop * CAM_PX;
+  cg.save();
+  cg.globalCompositeOperation = "multiply";
+  const wet = cg.createLinearGradient(0, exposed, 0, exposed + band);
+  wet.addColorStop(0, "rgb(158,173,189)");
+  wet.addColorStop(0.7, "rgb(190,205,216)");
+  wet.addColorStop(1, "rgb(255,255,255)");
+  cg.fillStyle = wet;
+  cg.fillRect(0, exposed, pw, band);
+  cg.restore();
+  // Ceiling light on the new waterline, before the same grade as the still.
+  cg.globalCompositeOperation = "lighter";
+  cg.fillStyle = "rgba(48,66,84,0.9)";
+  cg.fillRect(0, exposed + band, pw, 2 * CAM_PX);
+  const grade = GRADE.pool;
+  cg.globalCompositeOperation = "multiply";
+  cg.fillStyle = grade.tint;
+  cg.fillRect(0, 0, pw, ph);
+  cg.globalCompositeOperation = "screen";
+  cg.fillStyle = grade.lift;
+  cg.fillRect(0, 0, pw, ph);
+  cg.globalCompositeOperation = "destination-in";
+  const hz = cg.createLinearGradient(0, 0, pw, 0);
+  hz.addColorStop(0, "rgba(255,255,255,0)");
+  hz.addColorStop(0.14, "rgba(255,255,255,1)");
+  hz.addColorStop(0.86, "rgba(255,255,255,1)");
+  hz.addColorStop(1, "rgba(255,255,255,0)");
+  cg.fillStyle = hz;
+  cg.fillRect(0, 0, pw, ph);
+  const vt = cg.createLinearGradient(0, 0, 0, ph);
+  vt.addColorStop(0, "rgba(255,255,255,0)");
+  vt.addColorStop(0.1, "rgba(255,255,255,1)");
+  vt.addColorStop(0.73, "rgba(255,255,255,1)");
+  vt.addColorStop(1, "rgba(255,255,255,0)");
+  cg.fillStyle = vt;
+  cg.fillRect(0, 0, pw, ph);
+  cg.globalCompositeOperation = "source-over";
+  poolLevelPatch = c;
+  return c;
+}
+
 /** State visuals this scene can show as a plate crop, in a stable order. */
 function activeStates(scene: string, visuals: string[]): string[] {
   const states = PLATES[scene]?.states;
@@ -1569,6 +1654,8 @@ export function resetFrameCaches() {
   maskB = undefined;
   blank(lens ?? null);
   lens = undefined;
+  blank(poolLevelPatch ?? null);
+  poolLevelPatch = undefined;
 }
 
 /**

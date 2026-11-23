@@ -20,13 +20,18 @@ if (built.status !== 0) {
   console.error(built.stderr || built.stdout);
   process.exit(1);
 }
-const jobs = [
-  ["pool-bag", "pool", "toolBag", 1.2],
-  ["yard-van-far", "yard", "van:0.15", 1.2],
-  ["yard-van-near", "yard", "van:0.9", 1.2],
-  ["tunnel-drip", "tunnel", "condensate", 1.4],
-  ["drywell-puddle", "drywell", "puddle", 1.4],
-];
+const jobs = process.argv.length > 3
+  ? Array.from({ length: Math.floor((process.argv.length - 3) / 4) }, (_, i) => {
+      const n = 3 + i * 4;
+      return [process.argv[n], process.argv[n + 1], process.argv[n + 2], Number(process.argv[n + 3])];
+    })
+  : [
+      ["pool-bag", "pool", "toolBag", 1.2],
+      ["yard-van-far", "yard", "van:0.15", 1.2],
+      ["yard-van-near", "yard", "van:0.9", 1.2],
+      ["tunnel-drip", "tunnel", "condensate", 1.4],
+      ["drywell-puddle", "drywell", "puddle", 1.4],
+    ];
 const PAGE = `<!doctype html><canvas id=c width=1920 height=540></canvas><script src="/cam.js"></script><script>
 window.go = async (jobs) => {
   await CAM.loadPlates();
