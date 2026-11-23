@@ -515,14 +515,29 @@ export function newNight(site: SiteKind, night: number, seed = night * 7919 + si
     oddities.push({ def, start, end: start + 25 + Math.round(r() * 35) });
   }
   if (night === 1) {
-    const silent = events.find((e) => e.def.id === "lhra-door" || e.def.id === "pool-fme");
-    if (silent) silent.start = 70;
-    else {
-      const def = watch.events.find((e) => e.id === "lhra-door") ?? watch.events.find((e) => e.id === "pool-fme");
-      if (def) {
-        events.pop();
-        events.push({ def: { ...def, escalate: Math.round(def.escalate * cfg.escalateScale) }, start: 70, caughtAt: null, early: false, doneAt: null });
-      }
+    // One silent door, one oddity on another camera, one event that can flash.
+    const place = (id: string, start: number): ActiveEvent | null => {
+      const def = watch.events.find((e) => e.id === id);
+      if (!def) return null;
+      return { def: { ...def, escalate: Math.round(def.escalate * cfg.escalateScale) }, start, caughtAt: null, early: false, doneAt: null };
+    };
+    const silent = place("lhra-door", 70) ?? place("pool-fme", 70);
+    const flash = place("feed-pump", 150);
+    const thirdSrc = events.find((e) => e.def.id !== "lhra-door" && e.def.id !== "pool-fme" && e.def.id !== "feed-pump" && Object.keys(e.def.effect).length > 0);
+    const third = thirdSrc
+      ? { ...thirdSrc, def: { ...thirdSrc.def }, start: 200 + (use % 70) }
+      : place("yard-arc", 200 + (use % 70));
+    if (silent && flash && third) {
+      events.length = 0;
+      events.push(silent, flash, third);
+    }
+    const gull = watch.oddities.find((o) => o.visual === "gull");
+    if (gull) {
+      const rest = oddities.find((o) => o.def.visual !== "gull");
+      const other = rest?.def ?? watch.oddities.find((o) => o.visual !== "gull");
+      oddities.length = 0;
+      oddities.push({ def: gull, start: 45, end: 110 });
+      if (other) oddities.push({ def: other, start: 190, end: 240 });
     }
   }
   if (night === 4) {

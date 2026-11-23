@@ -27,7 +27,9 @@ import {
   clock,
   fatigueOf,
   gameMinutes,
+  liveOn,
   newNight,
+  oddityOn,
   radio,
   readings,
   relieve,
@@ -39,6 +41,7 @@ import {
   type Category,
   type Night,
 } from "./nightwatch/model";
+import { nightCoachLine } from "./nightwatch/nightCoach";
 import { applyCarry, carryover } from "./nightwatch/carryover";
 import { nightsDone } from "./nightwatch/progress";
 import { elenaLine, oddityNotes, openerLine, recordNight, turnoverRows } from "./nightwatch/turnover";
@@ -277,6 +280,22 @@ function NightShift({ s, nightNo: asked, onLeave, replay = false }: { s: GameSta
     seenAlarm.current = alarmKey;
   }, [alarmKey]);
   const radioLines = radio(n);
+  const coach = nightCoachLine({
+    night: n.night,
+    minute: n.minute,
+    tablet: n.tablet,
+    camera: n.camera,
+    falseReports: n.falseReports,
+    oddityHere: oddityOn(n, n.camera) !== null,
+    liveHere: liveOn(n, n.camera) !== null,
+    events: n.events.map((e) => ({
+      id: e.def.id,
+      camera: e.def.camera,
+      start: e.start,
+      open: e.caughtAt === null && e.doneAt === null,
+      flashing: e.caughtAt === null && e.doneAt === null && n.minute >= e.start && Object.keys(e.def.effect).some((id) => lit.has(id)),
+    })),
+  });
   useEffect(() => {
     if (seenRadio.current && radioLines.length > seenRadio.current) startAmbience()?.squelch();
     seenRadio.current = radioLines.length;
@@ -404,6 +423,11 @@ function NightShift({ s, nightNo: asked, onLeave, replay = false }: { s: GameSta
                   {CATEGORY_LABEL[c]}
                 </Btn>
               ))}
+            </div>
+          ) : null}
+          {coach ? (
+            <div data-testid="nw-coach" style={{ ...MONO, marginTop: 6, fontSize: 12, lineHeight: 1.4, color: PAL.cream }}>
+              {coach}
             </div>
           ) : null}
           <div data-testid="nw-radio" style={{ ...MONO, marginTop: 6, fontSize: 11, lineHeight: 1.5, color: PAL.goldL, opacity: 0.9 }}>
