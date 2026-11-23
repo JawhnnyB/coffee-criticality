@@ -1,0 +1,3 @@
+Frame 30 btn-primary. Frame auto btn-ghost.
+Text large btn-primary. Text small btn-ghost.
+Page errors: 0.

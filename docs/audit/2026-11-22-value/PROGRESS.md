@@ -35,6 +35,7 @@ Brief: `docs/grok/value-100.md`. One step, one commit. Real-input proof in this 
 - Step 19 done · Menu, settings, pause, and the controls card read one chrome file. Lines stay under two phone rows. Scene text was not moved. Proof in step-19/.
 - Step 20 done · The menu shows version 0.20, not in the save. Known issues sits beside How to play. Proof in step-20/.
 - Step 1a done · A clash swaps the two keys. Down on E leaves Use on S. Reset keys restores the defaults. Nobody is None. Proof in step-1a/.
+- Step 1b done · Frame rate uses the same filled button as text size. Proof in step-1b/.
 
 
 

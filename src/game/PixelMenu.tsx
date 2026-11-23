@@ -212,15 +212,29 @@ export function PixelMenu({
           <div className="cc-sheet" style={{ maxHeight: "92vh", overflowY: "auto" }}>
             <h2 className="cc-title">SETTINGS</h2>
             <p style={{ fontFamily: "\"CCPixel3x5\", monospace", fontSize: 16, margin: "10px 0 0", color: "#f3e6d0" }}>{UI.frameRate}</p>
-            <button type="button" className="cc-btn" data-testid="fps-auto" aria-pressed={fps === "auto"} onClick={() => { setFrameChoice("auto"); setFps("auto"); }}>
-              {fps === "auto" ? "Auto · on" : "Auto"}
-            </button>
-            <button type="button" className="cc-btn" data-testid="fps-60" aria-pressed={fps === "60"} onClick={() => { setFrameChoice("60"); setFps("60"); }}>
-              {fps === "60" ? "60 · on" : "60"}
-            </button>
-            <button type="button" className="cc-btn" data-testid="fps-30" aria-pressed={fps === "30"} onClick={() => { setFrameChoice("30"); setFps("30"); }}>
-              {fps === "30" ? "30 · on" : "30"}
-            </button>
+            <div className="grid grid-cols-3 gap-2">
+              {(
+                [
+                  ["auto", "Auto"],
+                  ["60", "60"],
+                  ["30", "30"],
+                ] as const
+              ).map(([id, label]) => (
+                <button
+                  key={id}
+                  type="button"
+                  className={fps === id ? "btn-primary" : "btn-ghost"}
+                  data-testid={`fps-${id}`}
+                  aria-pressed={fps === id}
+                  onClick={() => {
+                    setFrameChoice(id);
+                    setFps(id);
+                  }}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
             <SettingsFields />
             <div style={{ display: "flex", gap: 8 }}>
               <button type="button" className="cc-btn" style={{ flex: 1, width: "auto" }} onClick={onHow}>
