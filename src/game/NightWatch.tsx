@@ -13,6 +13,7 @@ import { siteKind } from "./plantLoops";
 import { CAM_H, CAM_PX, CAM_W, lookOf, paintCamera, resetFrameCaches } from "./nightwatch/cameras";
 import { loadPlates, releasePlates } from "./nightwatch/plates";
 import { startAmbience, stopAmbience } from "./nightwatch/ambience";
+import { prefersReducedMotion } from "./reducedMotion";
 import {
   CATEGORY_LABEL,
   COFFEE,
@@ -119,7 +120,7 @@ function NightShift({ s, nightNo: asked, onLeave, replay = false }: { s: GameSta
   useEffect(() => {
     void loadPlates();
     startAmbience();
-    calm.current = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    calm.current = prefersReducedMotion();
     const api = window.__controlsTest;
     if (api) api.setNightSpeed = (n: number) => {
       speed.current = n;

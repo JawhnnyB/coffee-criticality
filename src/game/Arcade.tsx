@@ -4,6 +4,7 @@ import { TUNE, type CabLevel } from "./cabLevels";
 import { cabContext, cabFont } from "./cabCanvas";
 import { type ReactNode, useEffect, useRef, useState } from "react";
 import { playHuntHit, playHuntMiss } from "./audio";
+import { shakeOn } from "./frameRate";
 import { hostOwnsKey } from "./keyGate";
 
 export type CabId = "catch" | "fish" | "plot" | "horde" | "delay" | "golf" | "rods" | "pebble" | "bowl" | "phys" | "load";
@@ -692,7 +693,7 @@ export function Arcade({
       }
 
       ctx.save();
-      if (shake > 0) ctx.translate((Math.random() - 0.5) * 8, (Math.random() - 0.5) * 6);
+      if (shake > 0 && shakeOn()) ctx.translate((Math.random() - 0.5) * 8, (Math.random() - 0.5) * 6);
       ctx.fillStyle = "#2a1c14";
       ctx.fillRect(0, 0, CW, CH);
       ctx.fillStyle = "#1a1814";

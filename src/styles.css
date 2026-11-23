@@ -128,6 +128,34 @@
       transition-duration: 0.01ms !important;
     }
   }
+
+  html[data-text="small"] {
+    font-size: 14px;
+    --text-body: 14px;
+    --text-small: 12px;
+    --text-title: 24px;
+    --text-title-sm: 16px;
+  }
+
+  html[data-text="normal"] {
+    font-size: 16px;
+  }
+
+  html[data-text="large"] {
+    font-size: 19px;
+    --text-body: 19px;
+    --text-small: 16px;
+    --text-title: 36px;
+    --text-title-sm: 24px;
+  }
+
+  html[data-motion="reduce"] *,
+  html[data-motion="reduce"] *::before,
+  html[data-motion="reduce"] *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 .font-display {

@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { PAL } from "./palette";
+import { usePrefersReducedMotion } from "./reducedMotion";
 import { CAM_H, CAM_W, COL, camScale, drawCamScene } from "./camDraw";
 import { DEFAULT_PLANT, plantTitle, type PlantDesign } from "./plant";
 import { computeKeff } from "./nuclearLab";
@@ -50,8 +51,9 @@ export function CoreCamApp({ s }: { s: GameState }) {
   const ref = useRef<HTMLCanvasElement>(null);
   const wrap = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(2);
-  const live = useRef({ plant, run: s.run, reduced: s.desktop.reducedMotion });
-  live.current = { plant, run: s.run, reduced: s.desktop.reducedMotion };
+  const quietMotion = usePrefersReducedMotion();
+  const live = useRef({ plant, run: s.run, reduced: s.desktop.reducedMotion || quietMotion });
+  live.current = { plant, run: s.run, reduced: s.desktop.reducedMotion || quietMotion };
 
   // Integer scale, centred by the flex wrapper. Resize only changes the scale, never the grid.
   useEffect(() => {

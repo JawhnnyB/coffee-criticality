@@ -57,3 +57,105 @@ export function setFrameChoice(v: FrameChoice) {
   mem = v;
   writeStore({ ...readStore(), frameRate: v });
 }
+
+export type TextSize = "small" | "normal" | "large";
+
+export interface Mix {
+  master: number;
+  music: number;
+  sound: number;
+  ambience: number;
+}
+
+const TEXT: TextSize[] = ["small", "normal", "large"];
+
+function unit(v: unknown, fallback: number) {
+  const n = typeof v === "number" ? v : Number(v);
+  if (!Number.isFinite(n)) return fallback;
+  return Math.max(0, Math.min(1, n));
+}
+
+function textOf(v: unknown): TextSize {
+  return v === "small" || v === "large" || v === "normal" ? v : "normal";
+}
+
+let cached: { mix: Mix; text: TextSize; reduced: boolean; shake: boolean } | null = null;
+
+function current() {
+  if (cached) return cached;
+  const s = readStore();
+  cached = {
+    mix: {
+      master: unit(s.master, 1),
+      music: unit(s.music, 1),
+      sound: unit(s.sound, 1),
+      ambience: unit(s.ambience, 1),
+    },
+    text: textOf(s.text),
+    reduced: s.reducedMotion === true,
+    shake: s.shake !== false,
+  };
+  return cached;
+}
+
+function patch(extra: Store) {
+  writeStore({ ...readStore(), ...extra });
+  cached = null;
+}
+
+/** Volumes are 0 to 1. Text size, less motion, and screen shake are saved with the frame rate. */
+export function mixLevels(): Mix {
+  return current().mix;
+}
+
+export function textSize(): TextSize {
+  return current().text;
+}
+
+export function reducedMotionOn(): boolean {
+  return current().reduced;
+}
+
+/** Screen shake is on unless the player turned it off. */
+export function shakeOn(): boolean {
+  return current().shake;
+}
+
+export function setMixLevel(key: keyof Mix, value: number) {
+  patch({ [key]: unit(value, 1) });
+}
+
+export function setTextSize(v: TextSize) {
+  const next = textOf(v);
+  patch({ text: next });
+  applyText(next);
+}
+
+export function setReducedMotion(on: boolean) {
+  patch({ reducedMotion: on });
+  applyMotion(on);
+}
+
+export function setShakeOn(on: boolean) {
+  patch({ shake: on });
+}
+
+function applyText(v: TextSize) {
+  if (typeof document === "undefined") return;
+  document.documentElement.dataset.text = v;
+}
+
+function applyMotion(on: boolean) {
+  if (typeof document === "undefined") return;
+  if (on) document.documentElement.dataset.motion = "reduce";
+  else delete document.documentElement.dataset.motion;
+  if (typeof window !== "undefined") window.dispatchEvent(new Event("cc-settings"));
+}
+
+/** Paint the saved text size and motion onto the page. Call once at startup. */
+export function bootSettings() {
+  applyText(textSize());
+  applyMotion(reducedMotionOn());
+}
+
+export { TEXT };

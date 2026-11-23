@@ -1,9 +1,9 @@
 /**
  * Night Watch sound: what the camera microphones and the room pick up. A 60 Hz transformer hum with its
  * harmonic, an HVAC rush (filtered noise), and a burst of static on every feed change. Routed through the
- * game's playback bus, so the master mute silences it.
+ * ambience bus, under the master, so mute and the ambience slider both reach it.
  */
-import { playbackBus } from "../audio";
+import { ambienceBus } from "../audio";
 
 interface Running {
   stop: () => void;
@@ -29,7 +29,7 @@ export function startAmbience(): Running | null {
   let c: AudioContext;
   let dest: GainNode;
   try {
-    ({ c, dest } = playbackBus());
+    ({ c, dest } = ambienceBus());
   } catch {
     return null;
   }

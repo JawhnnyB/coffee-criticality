@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { playVoice } from "./audio";
 import { setRevealing, subscribeSkip } from "./chatter";
+import { prefersReducedMotion } from "./reducedMotion";
 
 declare global {
   interface Window {
@@ -52,7 +53,7 @@ export function Chatter({ text, voice, className }: { text: string; voice: strin
       };
     }
 
-    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const reduce = prefersReducedMotion();
     const finish = (quiet: boolean) => {
       if (!alive()) return;
       window.clearTimeout(timer);

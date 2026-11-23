@@ -4,6 +4,7 @@ import { cabContext, cabFont } from "./cabCanvas";
 import { useEffect, useRef, useState } from "react";
 import { Bezel } from "./Arcade";
 import { playHuntHit, playHuntMiss } from "./audio";
+import { shakeOn } from "./frameRate";
 import { hostOwnsKey } from "./keyGate";
 
 const W = 320;
@@ -126,7 +127,7 @@ export function MaintGame({
       }
 
       ctx.save();
-      if (shake > 0) ctx.translate((Math.random() - 0.5) * 6, (Math.random() - 0.5) * 4);
+      if (shake > 0 && shakeOn()) ctx.translate((Math.random() - 0.5) * 6, (Math.random() - 0.5) * 4);
       ctx.fillStyle = "#2a2218";
       ctx.fillRect(0, 0, W, H);
       ctx.fillStyle = "#1a1814";

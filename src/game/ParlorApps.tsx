@@ -69,7 +69,11 @@ export function BootLog({ reduced, onDone }: { reduced: boolean; onDone: () => v
   };
 
   useEffect(() => {
-    if (reduced) return;
+    if (reduced) {
+      setShown(BOOT_LINES.length);
+      finish();
+      return;
+    }
     const t = window.setInterval(() => {
       setShown((n) => {
         if (n >= BOOT_LINES.length) {

@@ -1,5 +1,6 @@
 /** Pillar F — the plant has a voice. Web Audio only. No sample library. */
 import { hallDistance, hallTone, type HallTone } from "./siteAudio";
+import { mixLevels } from "./frameRate";
 import type { SiteKind } from "./plantLoops";
 
 export type BedKind = "cafe" | "plant" | "menu" | "lot";
@@ -19,6 +20,7 @@ let master: GainNode | null = null;
 let music: GainNode | null = null;
 let sfx: GainNode | null = null;
 let tracks: GainNode | null = null;
+let ambience: GainNode | null = null;
 let musicHold = false;
 let lastMode = "play";
 let lastDuck = 1;
@@ -67,13 +69,17 @@ function ac() {
   music = ctx.createGain();
   sfx = ctx.createGain();
   tracks = ctx.createGain();
-  master.gain.value = muted ? 0 : MASTER;
-  music.gain.value = 1;
-  sfx.gain.value = 1;
-  tracks.gain.value = TRACKS_GAIN;
+  const mix = mixLevels();
+  master.gain.value = muted ? 0 : MASTER * mix.master;
+  music.gain.value = mix.music;
+  sfx.gain.value = mix.sound;
+  tracks.gain.value = TRACKS_GAIN * mix.music;
+  ambience = ctx.createGain();
+  ambience.gain.value = mix.ambience;
   music.connect(master);
   sfx.connect(master);
   tracks.connect(master);
+  ambience.connect(master);
   master.connect(ctx.destination);
   return ctx;
 }
@@ -94,15 +100,30 @@ function noiseBuf() {
   return buf;
 }
 
+function masterTarget() {
+  return muted ? 0 : MASTER * mixLevels().master;
+}
+
 export function isMuted() {
   return muted;
+}
+
+/** Re-read the volume sliders. Safe before the audio context exists. */
+export function refreshMix() {
+  if (!ctx || !master || !music || !sfx || !tracks || !ambience) return;
+  const m = mixLevels();
+  master.gain.setTargetAtTime(masterTarget(), ctx.currentTime, 0.03);
+  music.gain.setTargetAtTime(lastDuck * m.music, ctx.currentTime, 0.03);
+  sfx.gain.setTargetAtTime(m.sound, ctx.currentTime, 0.03);
+  tracks.gain.setTargetAtTime(TRACKS_GAIN * m.music, ctx.currentTime, 0.03);
+  ambience.gain.setTargetAtTime(m.ambience, ctx.currentTime, 0.03);
 }
 
 export function setMuted(v: boolean) {
   muted = v;
   const { c, master: m } = bus();
   m.gain.cancelScheduledValues(c.currentTime);
-  m.gain.setTargetAtTime(v ? 0 : MASTER, c.currentTime, 0.04);
+  m.gain.setTargetAtTime(masterTarget(), c.currentTime, 0.04);
   try {
     localStorage.setItem("cc.mute", v ? "1" : "0");
   } catch {
@@ -294,13 +315,19 @@ function duckTo(mode: string) {
   if (Math.abs(next - lastDuck) < 0.01) return;
   lastDuck = next;
   m.gain.cancelScheduledValues(c.currentTime);
-  m.gain.setTargetAtTime(next, c.currentTime, 0.07);
+  m.gain.setTargetAtTime(next * mixLevels().music, c.currentTime, 0.07);
 }
 
 /** The Music app's output bus. Tracks connect here, not to the bed. */
 export function playbackBus(): { c: AudioContext; dest: GainNode } {
   const b = bus();
   return { c: b.c, dest: tracks! };
+}
+
+/** Room tone and the hall hum. The ambience slider is this bus. Mute is still the master. */
+export function ambienceBus(): { c: AudioContext; dest: GainNode } {
+  ac();
+  return { c: ctx!, dest: ambience! };
 }
 
 /** On while a Music track plays. Ducks the existing bed to a low level and holds it there. */
@@ -470,7 +497,8 @@ export function syncWorld(w: {
 }
 
 function applyHall(tone: HallTone, dt: number) {
-  const { c, music: dest } = bus();
+  const c = ac();
+  const dest = ambience!;
   if (!hallHum || !hallHumGain) {
     const o = c.createOscillator();
     const g = c.createGain();

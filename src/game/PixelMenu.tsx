@@ -3,7 +3,8 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { integerCover, integerScale } from "./artScale";
 import { isMuted, setMuted, unlockAudio } from "./audio";
-import { frameChoice, setFrameChoice, type FrameChoice } from "./frameRate";
+import { frameChoice, setFrameChoice, bootSettings, type FrameChoice } from "./frameRate";
+import { SettingsFields } from "./SettingsFields";
 import { hostOwnsKey } from "./keyGate";
 
 /** Native layout from tools/artkit/menu.py. Do not redraw it. */
@@ -62,6 +63,7 @@ export function PixelMenu({
   const chipsRef = useRef<HTMLImageElement | null>(null);
 
   useEffect(() => {
+    bootSettings();
     const load = (src: string) => {
       const im = new Image();
       im.src = src;
@@ -195,7 +197,7 @@ export function PixelMenu({
       </div>
       {sheet ? (
         <div className="absolute inset-0 z-10 flex items-center justify-center" style={{ background: "rgba(22,17,13,0.72)" }}>
-          <div className="cc-sheet">
+          <div className="cc-sheet" style={{ maxHeight: "92vh", overflowY: "auto" }}>
             <h2 className="cc-title">SETTINGS</h2>
             <p style={{ fontFamily: "\"CCPixel3x5\", monospace", fontSize: 16, margin: "10px 0 0", color: "#f3e6d0" }}>Frame rate</p>
             <button type="button" className="cc-btn" data-testid="fps-auto" aria-pressed={fps === "auto"} onClick={() => { setFrameChoice("auto"); setFps("auto"); }}>
@@ -207,6 +209,7 @@ export function PixelMenu({
             <button type="button" className="cc-btn" data-testid="fps-30" aria-pressed={fps === "30"} onClick={() => { setFrameChoice("30"); setFps("30"); }}>
               {fps === "30" ? "30 · on" : "30"}
             </button>
+            <SettingsFields />
             <button type="button" className="cc-btn" onClick={onHow}>
               HOW TO PLAY
             </button>

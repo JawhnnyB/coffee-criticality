@@ -46,8 +46,8 @@ import { Chatter } from "./ChatterLine";
 import { heartCount } from "./pixel";
 import { drawWorld, glyphWidth, paintGlyphs, preloadRoomArt } from "./render";
 import { DEFAULT_PLANT, plantTitle, thermalState, type PlantDesign } from "./plant";
-import { systemReducedMotion } from "./reducedMotion";
-import { frameChoice, setFrameChoice, type FrameChoice } from "./frameRate";
+import { usePrefersReducedMotion } from "./reducedMotion";
+import { bootSettings, frameChoice, setFrameChoice, type FrameChoice } from "./frameRate";
 import { hasSave, hydrateSave, peekSave, wipeSave, writeSave } from "./save";
 import { setNextNightSeed } from "./nightwatch/model";
 import { computeKeff } from "./nuclearLab";
@@ -61,6 +61,7 @@ import { MAP_HUD, ROOM_BLURB, roomLinks } from "./site";
 import { TeachMeta, TeachPriya, TYPE_THUMB } from "./TeachFrame";
 import { ART } from "./artFlags";
 import { PixelMenu, PixelRead } from "./PixelMenu";
+import { SettingsFields } from "./SettingsFields";
 import { CastFace, PixelBadge, PixelBeat, PixelBrief } from "./IntroScreens";
 import {
   abortOverlay,
@@ -283,6 +284,7 @@ export function GameApp() {
   const [look, setLook] = useState<PlayerLook>(DEFAULT_PLAYER_LOOK);
   const [, bump] = useState(0);
   const refresh = () => bump((n) => n + 1);
+  const quietMotion = usePrefersReducedMotion();
 
   const applyMode = (next: Mode) => {
     if (next === "reactor") ensureRun(stateRef.current);
@@ -292,6 +294,7 @@ export function GameApp() {
   };
 
   useEffect(() => {
+    bootSettings();
     setReady(true);
     preloadRoomArt();
     setTouch(window.matchMedia("(pointer: coarse)").matches);
@@ -1379,7 +1382,7 @@ export function GameApp() {
 
         {mode === "splash" && !booted && (
           <BootLog
-            reduced={s.desktop.reducedMotion || systemReducedMotion()}
+            reduced={s.desktop.reducedMotion || quietMotion}
             onDone={() => setBooted(true)}
           />
         )}
@@ -2937,6 +2940,7 @@ function PauseStage({
               Save shift
             </button>
             <MuteToggle />
+            <SettingsFields />
             <FrameRateRow />
             <button type="button" className="btn-ghost" onClick={onAcademy}>
               Academy

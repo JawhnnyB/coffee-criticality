@@ -4,6 +4,7 @@ import { createContext, useContext, useEffect, useRef, useState, type CSSPropert
 import { monitorAlarm } from "./nightwatch/monitor";
 import { PAL } from "./palette";
 import { isMuted, setMuted } from "./audio";
+import { usePrefersReducedMotion } from "./reducedMotion";
 import {
   APPS,
   CABINET_FOUND_FLAG,
@@ -101,6 +102,7 @@ export function Desktop(props: DesktopProps) {
   const [startOpen, setStartOpen] = useState(false);
   const [phoneApp, setPhoneApp] = useState<AppId | null>(null);
   const [muteTick, setMuteTick] = useState(0);
+  const quietMotion = usePrefersReducedMotion();
 
   const d = s.desktop;
   const phone = size.w > 0 && size.w < PHONE_BREAKPOINT;
@@ -301,7 +303,7 @@ export function Desktop(props: DesktopProps) {
     >
       <style>{`@keyframes deskalarm { 0%,49% { background: ${PAL.bad}; } 50%,100% { background: ${PAL.ink}; } }`}</style>
       <LakeScene season={season} testId="wallpaper" site={siteKind(props.s.plant)} power={sitePower(props.s.run)} />
-      <ParticleLayer kind={info.particle} active={shown && !d.reducedMotion} />
+      <ParticleLayer kind={info.particle} active={shown && !d.reducedMotion && !quietMotion} />
 
       {phone ? (
         <PhoneHome

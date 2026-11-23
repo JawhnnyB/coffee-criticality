@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { CUTAWAY_H, CUTAWAY_W, paintCutaway, type LiveRun } from "./cutawayPaint";
+import { prefersReducedMotion } from "./reducedMotion";
 import { sitePower, type CutawayKind } from "./plantLoops";
 
 export { sitePower };
@@ -66,12 +67,7 @@ export function PlantCutaway({
     size();
     const ro = new ResizeObserver(size);
     ro.observe(host);
-    let still = false;
-    try {
-      still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    } catch {
-      still = false;
-    }
+    let still = prefersReducedMotion();
     let raf = 0;
     let last = -1;
     const start = performance.now();

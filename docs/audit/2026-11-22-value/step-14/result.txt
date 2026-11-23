@@ -1,0 +1,5 @@
+Menu. Store {"frameRate":"30","master":0.4,"music":0,"sound":0.6,"ambience":0.25,"text":"large","reducedMotion":true,"shake":false}. Text large. Motion reduce.
+Pause. Master 0.4. Music 0. Sound 0.6. Ambience 0.25. Text large. Motion reduce. Shake Screen shake off.
+New week. Store {"frameRate":"30","master":0.4,"music":0,"sound":0.6,"ambience":0.25,"text":"large","reducedMotion":true,"shake":false}.
+Reload. Store {"frameRate":"30","master":0.4,"music":0,"sound":0.6,"ambience":0.25,"text":"large","reducedMotion":true,"shake":false}. Text large. Motion reduce.
+Page errors: 0.

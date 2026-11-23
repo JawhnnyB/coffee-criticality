@@ -11,6 +11,7 @@ import { readFace } from "./siteFace";
 import { worldZoom } from "./artScale";
 import { SEASON_INFO, seasonOrDefault } from "./parlorOS";
 import { npcsHere, type GameState } from "./sim";
+import { shakeOn } from "./frameRate";
 
 const artCache = new Map<string, HTMLImageElement>();
 let camX = 0;
@@ -86,8 +87,9 @@ export function drawWorld(
   if (!g) return;
   pix(g);
 
-  const shakeX = s.shake > 0 ? Math.round(Math.sin(now * 48) * 2 * s.shake) : 0;
-  const shakeY = s.shake > 0 ? Math.round(Math.cos(now * 41) * 2 * s.shake) : 0;
+  const allowShake = shakeOn() && s.shake > 0;
+  const shakeX = allowShake ? Math.round(Math.sin(now * 48) * 2 * s.shake) : 0;
+  const shakeY = allowShake ? Math.round(Math.cos(now * 41) * 2 * s.shake) : 0;
   let targetX = s.x;
   let targetY = s.y - 6;
   if (room.w > bw) targetX = Math.max(bw / 2, Math.min(room.w - bw / 2, s.x));
