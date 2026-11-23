@@ -1,0 +1,10 @@
+residue-night and nightwatch: 24 pass, 0 fail.
+Open residue adds no events.
+Valve hid: event at 100, escalate under 50, radio says the weep is on the floor again.
+Valve caught: holding, and the repack is still dry.
+Tag hid: missing tag plus the IN SERVICE sticker at 110, escalate 28. Feed pump still pinned at 150 when maintenance was skipped.
+Tag caught: no extra event. Radio says the tag is still on pump B.
+Dose hid: start still 45 minutes earlier, escalate lower, dosimeter radio kept.
+Dose caught: the dosimeter agrees. No cut.
+Log hid: curt, one less pot, never zero.
+Log caught: Elena reads the line, and says she kept it.

@@ -51,6 +51,7 @@ Brief: `docs/grok/value-100.md`. One step, one commit. Real-input proof in this 
 - Step 42 done · The turnover shows the seed that dealt the night. Proof in step-42/.
 - Step 43 done · Endless starts at night 5 from the dawn lot. The high score is not in the week save. Proof in step-43/.
 - Step 44 done · Daily night uses one UTC seed and a local board. No Steam board. Proof in step-44/.
+- Step 45 done · One more night consequence for each residue. Open still adds nothing. Proof in step-45/.
 
 
 
