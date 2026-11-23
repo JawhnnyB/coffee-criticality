@@ -6,6 +6,8 @@ import { isMuted, setMuted, unlockAudio } from "./audio";
 import { frameChoice, setFrameChoice, bootSettings, type FrameChoice } from "./frameRate";
 import { SettingsFields } from "./SettingsFields";
 import { UI } from "./uiStrings";
+import { GAME_VERSION } from "./version";
+import { KnownIssues } from "./KnownIssues";
 import { hostOwnsKey } from "./keyGate";
 
 /** Native layout from tools/artkit/menu.py. Do not redraw it. */
@@ -58,6 +60,7 @@ export function PixelMenu({
   const [sel, setSel] = useState(0);
   const [mute, setMute] = useState(isMuted());
   const [sheet, setSheet] = useState(false);
+  const [issues, setIssues] = useState(false);
   const [fps, setFps] = useState<FrameChoice>("auto");
   const sceneRef = useRef<HTMLImageElement | null>(null);
   const partsRef = useRef<HTMLImageElement | null>(null);
@@ -125,6 +128,10 @@ export function PixelMenu({
       if (!hostOwnsKey("menu", e.code)) return;
       const tag = (e.target as HTMLElement | null)?.tagName;
       if (tag === "INPUT" || tag === "TEXTAREA") return;
+      if (issues) {
+        if (e.code === "Escape") setIssues(false);
+        return;
+      }
       if (sheet) {
         if (e.code === "Escape") setSheet(false);
         return;
@@ -196,6 +203,9 @@ export function PixelMenu({
         <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-small)", color: "#f3e6d0", margin: 0 }}>
           {UI.teaching}
         </p>
+        <p data-testid="game-version" style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-small)", color: "#f3e6d0", margin: 0 }}>
+          {GAME_VERSION}
+        </p>
       </div>
       {sheet ? (
         <div className="absolute inset-0 z-10 flex items-center justify-center" style={{ background: "rgba(22,17,13,0.72)" }}>
@@ -212,9 +222,14 @@ export function PixelMenu({
               {fps === "30" ? "30 · on" : "30"}
             </button>
             <SettingsFields />
-            <button type="button" className="cc-btn" onClick={onHow}>
-              HOW TO PLAY
-            </button>
+            <div style={{ display: "flex", gap: 8 }}>
+              <button type="button" className="cc-btn" style={{ flex: 1, width: "auto" }} onClick={onHow}>
+                HOW TO PLAY
+              </button>
+              <button type="button" className="cc-btn" style={{ flex: 1, width: "auto" }} data-testid="known-issues" onClick={() => setIssues(true)}>
+                {UI.knownIssues}
+              </button>
+            </div>
             <button type="button" className="cc-btn" onClick={onCredits}>
               CREDITS
             </button>
@@ -224,6 +239,7 @@ export function PixelMenu({
           </div>
         </div>
       ) : null}
+      {issues ? <KnownIssues onClose={() => setIssues(false)} /> : null}
     </div>
   );
 }

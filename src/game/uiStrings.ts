@@ -27,6 +27,7 @@ export const UI = {
   ambience: "Ambience",
   frameRate: "Frame rate",
   howTitle: "How to play",
+  knownIssues: "Known issues",
   keys: "Keys",
 } as const;
 

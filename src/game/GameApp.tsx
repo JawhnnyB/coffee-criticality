@@ -67,6 +67,8 @@ import { PixelMenu, PixelRead } from "./PixelMenu";
 import { SettingsFields } from "./SettingsFields";
 import { ControlsCard } from "./ControlsCard";
 import { UI } from "./uiStrings";
+import { GAME_VERSION } from "./version";
+import { KnownIssues } from "./KnownIssues";
 import { CastFace, PixelBadge, PixelBeat, PixelBrief } from "./IntroScreens";
 import {
   abortOverlay,
@@ -291,6 +293,7 @@ export function GameApp() {
   const [, bump] = useState(0);
   const refresh = () => bump((n) => n + 1);
   const [hold, setHold] = useState(false);
+  const [issues, setIssues] = useState(false);
   const quietMotion = usePrefersReducedMotion();
 
   const applyMode = (next: Mode) => {
@@ -1523,6 +1526,7 @@ export function GameApp() {
             <p className="mt-2 max-w-md text-sm leading-relaxed text-muted">
               Design Unit 1 with Priya. Then walk {SITE} for a week. Catch errors. Do not hide them.
             </p>
+            <p className="mt-2 text-xs text-subtle" data-testid="game-version">{GAME_VERSION}</p>
             <div className="mt-6 flex w-full max-w-xs flex-col gap-2">
               {saved ? (
                 <>
@@ -1565,9 +1569,14 @@ export function GameApp() {
               >
                 New shift
               </button>
-              <button type="button" className="btn-ghost" onClick={() => goMenu("how")} onPointerDown={() => goMenu("how")}>
-                {UI.howTitle}
-              </button>
+              <div className="flex gap-2">
+                <button type="button" className="btn-ghost flex-1" onClick={() => goMenu("how")} onPointerDown={() => goMenu("how")}>
+                  {UI.howTitle}
+                </button>
+                <button type="button" className="btn-ghost flex-1" data-testid="known-issues" onClick={() => setIssues(true)}>
+                  {UI.knownIssues}
+                </button>
+              </div>
               <button type="button" className="btn-ghost" onClick={() => goMenu("credits")} onPointerDown={() => goMenu("credits")}>
                 Thesis / credits
               </button>
@@ -1575,6 +1584,8 @@ export function GameApp() {
             </div>
           </Panel>
         )}
+
+        {issues && !ART.menu ? <KnownIssues onClose={() => setIssues(false)} /> : null}
 
         {mode === "how" && ART.menu && (
           <PixelRead title="HOW TO PLAY" onBack={() => goMenu("menu")}>

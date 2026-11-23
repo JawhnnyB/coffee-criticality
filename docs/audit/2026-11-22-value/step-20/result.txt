@@ -1,0 +1,5 @@
+Version 0.20.
+Beside how-to true. How x 443. Issues x 644.
+Panel has delay rods true. Panel has generated true.
+Storage has version false.
+Page errors: 0.
