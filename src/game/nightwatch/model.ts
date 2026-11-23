@@ -21,11 +21,13 @@ import type { SiteKind } from "../plantLoops";
 import { nightPace, type NightPace } from "../frameRate";
 
 /**
- * Night grade. Start at 100. Clamp 0–100.
- * Early catch +6. Late catch +2. Miss −18. Finding −10 more. False report −8.
- * A trip is F, whatever the arithmetic.
- * A ≥ 95, B ≥ 85, C ≥ 72, D ≥ 60, else F.
- * Worked check: two late catches and one silent miss that is a finding = 100 + 4 − 28 = 76, a C.
+ * Night grade. Start at 100.
+ * Early catch +6. Late catch +2. Miss -18. Finding -10 more. False report -8.
+ * Catch bonuses stop at 100 before false reports come off, so one false report
+ * on an otherwise clean night is 92, a B, not an A.
+ * A trip or a relief is F, whatever the arithmetic.
+ * A >= 95, B >= 85, C >= 72, D >= 60, else F.
+ * Worked check: two late catches and one silent miss that is a finding = 76, a C.
  * Three early catches stay at 100, an A.
  */
 export const GRADE_POINTS = { early: 6, late: 2, miss: -18, finding: -10, falseReport: -8 } as const;
@@ -504,6 +506,30 @@ export function setNextNightSeed(seed: number | null) {
 }
 
 /** Lay out the night: events and oddities, spread so nothing starts in the first 15 or last 30 minutes. */
+function isSilent(def: EventDef): boolean {
+  return Object.keys(def.effect).length === 0;
+}
+
+/** One camera-only event per night. The rest move a gauge, so a flashing board can be caught. */
+function capSilents(events: ActiveEvent[], watch: SiteWatch, scale: number) {
+  const at = events.map((e, i) => (isSilent(e.def) ? i : -1)).filter((i) => i >= 0);
+  if (at.length <= 1) return;
+  const finale = events.findIndex((e) => e.finale && isSilent(e.def));
+  const keep = finale >= 0 ? finale : at[0];
+  const used = new Set(events.map((e) => e.def.id));
+  const loud = watch.events.filter((d) => !isSilent(d) && !used.has(d.id));
+  const any = watch.events.filter((d) => !isSilent(d));
+  let n = 0;
+  for (const i of at) {
+    if (i === keep) continue;
+    const def = loud[n] ?? any[n % Math.max(1, any.length)];
+    n += 1;
+    if (!def) continue;
+    const prev = events[i];
+    events[i] = { def: { ...def, escalate: Math.round(def.escalate * scale) }, start: prev.start, caughtAt: null, early: false, doneAt: null };
+  }
+}
+
 export function newNight(site: SiteKind, night: number, seed = night * 7919 + site.length): Night {
   const use = pendingSeed ?? seed;
   pendingSeed = null;
@@ -570,6 +596,7 @@ export function newNight(site: SiteKind, night: number, seed = night * 7919 + si
       }
     }
   }
+  capSilents(events, watch, scale);
   return {
     site,
     night,
@@ -803,6 +830,8 @@ export function grade(n: Night): { points: number; letter: GradeLetter } {
       if (e.def.consequence === "finding") points += GRADE_POINTS.finding;
     }
   }
+  // Bonuses stop at 100. A false report still comes off after that.
+  if (points > 100) points = 100;
   points += n.falseReports * GRADE_POINTS.falseReport;
   points = Math.max(0, Math.min(100, points));
   return { points, letter: gradeLetter(points) };

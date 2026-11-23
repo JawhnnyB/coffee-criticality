@@ -1,0 +1,9 @@
+Careful policy: report a camera only when that event's own gauge is out, follow Jordan on night 1, one false report on the oddity, none later.
+Catch bonuses stop at 100 before the false report comes off.
+
+pwr night 1 seed 1: 92 B false 1
+pwr night 4 seed 1: 82 C silent 1 false 0
+pwr night 1 seed 3: 92 B
+pwr night 4 seed 3: 82 C
+Same 92 B and 82 C on bwr, pebble, and msr, seeds 1, 3, and 7.
+Worked check stays 76 C. Three early catches stay 100 A.
