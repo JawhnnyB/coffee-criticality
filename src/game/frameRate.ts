@@ -140,6 +140,26 @@ export function setShakeOn(on: boolean) {
   patch({ shake: on });
 }
 
+export type NightPace = "relaxed" | "standard" | "nuke";
+
+function paceOf(v: unknown): NightPace {
+  return v === "relaxed" || v === "nuke" || v === "standard" ? v : "standard";
+}
+
+let paceMem: NightPace | null = null;
+
+/** Night pace lives in cc.settings, with the other picture and sound choices. */
+export function nightPace(): NightPace {
+  if (paceMem) return paceMem;
+  paceMem = paceOf(readStore().nightPace);
+  return paceMem;
+}
+
+export function setNightPace(v: NightPace) {
+  paceMem = paceOf(v);
+  patch({ nightPace: paceMem });
+}
+
 function applyText(v: TextSize) {
   if (typeof document === "undefined") return;
   document.documentElement.dataset.text = v;

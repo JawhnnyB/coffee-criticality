@@ -18,6 +18,7 @@
  */
 import { thermalState } from "../plant";
 import type { SiteKind } from "../plantLoops";
+import { nightPace, type NightPace } from "../frameRate";
 
 /**
  * Night grade. Start at 100. Clamp 0–100.
@@ -330,6 +331,13 @@ export const NIGHTS = [
   { events: 6, oddities: 4, escalateScale: 0.85, brews: 1 },
 ];
 
+/** Applied when the night is dealt. Relaxed stretches the events and adds a pot. Nuke does the opposite. */
+export function paceMods(pace: NightPace = nightPace()): { esc: number; brews: number; drain: number } {
+  if (pace === "relaxed") return { esc: 1.35, brews: 1, drain: 0.7 };
+  if (pace === "nuke") return { esc: 0.72, brews: -1, drain: 1.4 };
+  return { esc: 1, brews: 0, drain: 1 };
+}
+
 export const NIGHT_MINUTES = 360;
 /** Real seconds for one game minute at 1×. A night is about seven and a half minutes. */
 export const SECONDS_PER_MINUTE = 1.25;
@@ -398,6 +406,8 @@ export interface Night {
   streakCam: string;
   /** A replay does not move trust or grade flags. */
   replay: boolean;
+  /** Coffee drain against the standard night. Set when the night is dealt. */
+  drain: number;
   /** Extra radio lines from the day week, spoken at a minute. */
   carriedRadio: { at: number; text: string }[];
   /** Elena's turnover is the short set when the day log was hidden. */
@@ -499,6 +509,8 @@ export function newNight(site: SiteKind, night: number, seed = night * 7919 + si
   pendingSeed = null;
   const watch = siteWatch(site);
   const cfg = NIGHTS[Math.max(0, Math.min(NIGHTS.length - 1, night - 1))];
+  const pace = paceMods();
+  const scale = cfg.escalateScale * pace.esc;
   const r = rng(use);
   const pool = watch.events.slice();
   const events: ActiveEvent[] = [];
@@ -506,7 +518,7 @@ export function newNight(site: SiteKind, night: number, seed = night * 7919 + si
   for (let k = 0; k < cfg.events && pool.length; k++) {
     const def = pool.splice(Math.floor(r() * pool.length), 1)[0];
     const start = Math.round(15 + (span * (k + r() * 0.8)) / cfg.events);
-    events.push({ def: { ...def, escalate: Math.round(def.escalate * cfg.escalateScale) }, start, caughtAt: null, early: false, doneAt: null });
+    events.push({ def: { ...def, escalate: Math.round(def.escalate * scale) }, start, caughtAt: null, early: false, doneAt: null });
   }
   const oddities: ActiveOddity[] = [];
   for (let k = 0; k < cfg.oddities; k++) {
@@ -519,7 +531,7 @@ export function newNight(site: SiteKind, night: number, seed = night * 7919 + si
     const place = (id: string, start: number): ActiveEvent | null => {
       const def = watch.events.find((e) => e.id === id);
       if (!def) return null;
-      return { def: { ...def, escalate: Math.round(def.escalate * cfg.escalateScale) }, start, caughtAt: null, early: false, doneAt: null };
+      return { def: { ...def, escalate: Math.round(def.escalate * scale) }, start, caughtAt: null, early: false, doneAt: null };
     };
     const silent = place("lhra-door", 70) ?? place("pool-fme", 70);
     const flash = place("feed-pump", 150);
@@ -548,7 +560,7 @@ export function newNight(site: SiteKind, night: number, seed = night * 7919 + si
         const def = watch.events.find((e) => e.id === id);
         const idx = events.findIndex((e) => !want.includes(e.def.id));
         if (def && idx >= 0) {
-          events[idx] = { def: { ...def, escalate: Math.round(def.escalate * cfg.escalateScale) }, start: 270, caughtAt: null, early: false, doneAt: null, finale: true };
+          events[idx] = { def: { ...def, escalate: Math.round(def.escalate * scale) }, start: 270, caughtAt: null, early: false, doneAt: null, finale: true };
           hit = events[idx];
         }
       }
@@ -564,7 +576,7 @@ export function newNight(site: SiteKind, night: number, seed = night * 7919 + si
     watch,
     minute: 0,
     coffee: COFFEE.max,
-    brewsLeft: cfg.brews,
+    brewsLeft: Math.max(1, cfg.brews + pace.brews),
     brewing: 0,
     tablet: false,
     camera: watch.cameras[0].id,
@@ -578,6 +590,7 @@ export function newNight(site: SiteKind, night: number, seed = night * 7919 + si
     streak: 0,
     streakCam: watch.cameras[0].id,
     replay: false,
+    drain: pace.drain,
     carriedRadio: [],
     curt: false,
     voice: "plain",
@@ -695,7 +708,7 @@ export function tick(n: Night, dt: number): void {
     n.tablet = false;
     if (n.brewing === 0) n.coffee = COFFEE.max;
   } else {
-    n.coffee = Math.max(0, n.coffee - (n.tablet ? COFFEE.tablet : COFFEE.desk) * dt);
+    n.coffee = Math.max(0, n.coffee - (n.tablet ? COFFEE.tablet : COFFEE.desk) * (n.drain || 1) * dt);
     if (n.coffee === 0) n.tablet = false;
   }
   if (n.tablet) {

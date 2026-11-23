@@ -44,6 +44,7 @@ Brief: `docs/grok/value-100.md`. One step, one commit. Real-input proof in this 
 - Step 25 done · Desktop weeks live in the OS app-data folder, with three older copies. The browser still uses localStorage. Proof in step-25/. The Tauri window was not opened here.
 - Step 36 done · Day 1 teaches one control at a time, and the line goes away when it is done. Proof in step-36/.
 - Step 37 done · Night 1 is a silent door, a gull, and one flashing camera. One line at a time. Proof in step-37/.
+- Step 38 done · Night pace is Relaxed, Standard, or Nuke. It is a setting, not part of the week. Proof in step-38/.
 
 
 

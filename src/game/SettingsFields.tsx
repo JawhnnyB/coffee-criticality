@@ -7,14 +7,17 @@ import { UI } from "./uiStrings";
 import { applyWindow, isDesktop, readWindow, type WindowMode } from "./windowMode";
 import {
   mixLevels,
+  nightPace,
   reducedMotionOn,
   setMixLevel,
+  setNightPace,
   setReducedMotion,
   setShakeOn,
   setTextSize,
   shakeOn,
   textSize,
   type Mix,
+  type NightPace,
   type TextSize,
 } from "./frameRate";
 
@@ -31,6 +34,12 @@ const SIZES: { id: TextSize; label: string }[] = [
   { id: "large", label: UI.large },
 ];
 
+const PACES: { id: NightPace; label: string }[] = [
+  { id: "relaxed", label: UI.paceRelaxed },
+  { id: "standard", label: UI.paceStandard },
+  { id: "nuke", label: UI.paceNuke },
+];
+
 const WINDOWS: { id: WindowMode; label: string }[] = [
   { id: "windowed", label: UI.windowed },
   { id: "fullscreen", label: UI.fullscreen },
@@ -41,6 +50,7 @@ const WINDOWS: { id: WindowMode; label: string }[] = [
 export function SettingsFields() {
   const [mix, setMix] = useState<Mix>(() => mixLevels());
   const [text, setText] = useState<TextSize>(() => textSize());
+  const [pace, setPace] = useState<NightPace>(() => nightPace());
   const [motion, setMotion] = useState(() => reducedMotionOn());
   const [shake, setShake] = useState(() => shakeOn());
   const [bound, setBound] = useState(() => binds());
@@ -105,6 +115,25 @@ export function SettingsFields() {
           </button>
         ))}
       </div>
+      <p className="font-mono text-[10px] tracking-widest text-subtle">{UI.nightPace}</p>
+      <div className="grid grid-cols-3 gap-2">
+        {PACES.map((row) => (
+          <button
+            key={row.id}
+            type="button"
+            className={pace === row.id ? "btn-primary" : "btn-ghost"}
+            data-testid={`pace-${row.id}`}
+            aria-pressed={pace === row.id}
+            onClick={() => {
+              setNightPace(row.id);
+              setPace(row.id);
+            }}
+          >
+            {row.label}
+          </button>
+        ))}
+      </div>
+      <p className="text-[11px] text-subtle">{UI.paceNote}</p>
       <button
         type="button"
         className="btn-ghost"

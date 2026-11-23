@@ -1,0 +1,6 @@
+Standard before the click: btn-primary
+Nuke before the click: btn-ghost
+Nuke after the click: btn-primary
+Standard after the click: btn-ghost
+Saved: {"nightPace":"nuke"}
+Page errors 0.
