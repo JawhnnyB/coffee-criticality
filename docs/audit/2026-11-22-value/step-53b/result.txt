@@ -1,0 +1,31 @@
+errors 0
+dawn-paper-1280 1280x720
+dawn-paper text 1280: The plant paper Nights A B A C.
+discharge-1280 1280x720
+discharge 1280: Discharge the least reactive, most-burned fuel. Fresh fuel goes where the shuffle puts it.
+puzzle-mid-1280 1280x720
+puzzle-solved-1280 1280x720
+puzzle 1280: Moves 1. Par 3. Limit 5.
+photo-off-cam1-1280 1280x720
+photo-on-cam1-1280 1280x720
+photo-off-cam2-1280 1280x720
+photo-on-cam2-1280 1280x720
+photo-off-cam3-1280 1280x720
+photo-on-cam3-1280 1280x720
+replay-1280 1280x720
+replay 1280: core
+dawn-paper-390 390x844
+dawn-paper text 390: The plant paper Nights A B A C.
+discharge-390 390x844
+discharge 390: Discharge the least reactive, most-burned fuel. Fresh fuel goes where the shuffle puts it.
+puzzle-mid-390 390x844
+puzzle-solved-390 390x844
+puzzle 390: Moves 1. Par 3. Limit 5.
+photo-off-cam1-390 390x844
+photo-on-cam1-390 390x844
+photo-off-cam2-390 390x844
+photo-on-cam2-390 390x844
+photo-off-cam3-390 390x844
+photo-on-cam3-390 390x844
+replay-390 390x844
+replay 390: core

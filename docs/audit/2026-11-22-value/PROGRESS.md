@@ -71,6 +71,8 @@ Brief: `docs/grok/value-100.md`. One step, one commit. Real-input proof in this 
 - Step 53 done · The turnover replays the night's gaze log at 10×. An empty log stays empty. Stopped here. Step 54 was not started.
 - Step 47b done · Discharge left Fuel Shuffle. The outage scores 64 picks against the Cycle 2 from-map: 64 of the 65 1.6% assemblies, F14 stayed. The holes take fresh fuel before the shuffle. Proof in step-47b/.
 - Step 49b done · Each loading puzzle takes 3 to 5 swaps. Search says none of them fall in one or two. Par is the minimum. The limit is two past par. Proof in step-49b/.
+- Step 53b done · Dawn paper, discharge, a puzzle mid-solve and solved, photo on and off for three cameras, and the replay, at 1280 and 390. Page errors 0. Proof in step-53b/.
+
 
 
 
