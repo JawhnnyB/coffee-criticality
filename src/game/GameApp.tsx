@@ -1262,7 +1262,12 @@ export function GameApp() {
           <FuelShuffle
             plant={s.plant ?? DEFAULT_PLANT}
             practice={s.returnMode === "academy" || s.day < 5 || !!s.flags.cabPractice}
-            onDone={(fq, map) => {
+            onDone={(fq, map, discharge) => {
+              const official = s.day >= 5 && s.returnMode !== "academy" && !s.flags.cabPractice;
+              if (official && discharge) {
+                s.flags["outage:discharged"] = true;
+                if (discharge.points === 100) s.flags["outage:discharge:match"] = true;
+              }
               finishShuffle(s, fq, map);
               applyMode(s.mode);
               playBlip("ok");

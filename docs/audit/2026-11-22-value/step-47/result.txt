@@ -1,0 +1,11 @@
+Step 47. Discharge, then the existing shuffle.
+
+The teaching pattern discharges fresh fuel on the rim of the start map. That set is 6 cells: 2, 4, 17, 18, 23, 35.
+Score is overlap. Extras dilute it. The pattern itself scores 100. One correct cell scores 17. All 36 cells score 17.
+The map is not edited. shuffleModel.ts was not edited. The pass rule is the same.
+
+An official day-5 shuffle stores outage:discharged, and outage:discharge:match when the score is 100.
+Practice does not.
+
+Proof: node --test scripts/discharge.test.mjs scripts/shuffle-model.test.mjs
+6 pass, 0 fail.
