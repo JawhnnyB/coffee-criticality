@@ -58,3 +58,4 @@ Brief: `docs/grok/value-100.md`. One step, one commit. Real-input proof in this 
 
 
 - Step 45a done · Every event picture is the fault that camera would show. A shared picture stays only where the board tiles differ. The list is in step-45a/events.md.
+- Step 45b done · Night 2 says the board tells you what kind. The turnover names the tile. A shared picture must have different tiles. Proof: picture-tiles.test.mjs, 27 pass, 0 fail.

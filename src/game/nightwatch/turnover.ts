@@ -1,7 +1,7 @@
 /**
  * Elena's 06:00 turnover. Five lines in her voice, and five curt ones when the day log was hidden.
  */
-import { clock, grade, looksAfter, type GradeLetter, type Night } from "./model";
+import { clock, grade, looksAfter, type EventDef, type GradeLetter, type Night } from "./model";
 
 export const ELENA: Record<GradeLetter, string> = {
   A: "You caught them before the board did. That is the job.",
@@ -60,6 +60,27 @@ export interface TurnRow {
   stillMinute: number;
   looks: number;
   camIndex: number;
+  /** Set when this picture can be two reports. Names the tile that splits them. */
+  tile: string | null;
+}
+
+export function boardTile(n: Night, def: EventDef): string | null {
+  const pool = new Map<string, EventDef>();
+  for (const e of n.watch.events) pool.set(e.id, e);
+  for (const e of n.events) pool.set(e.def.id, e.def);
+  const mine = new Set(Object.keys(def.effect));
+  const diff = new Set<string>();
+  let shared = false;
+  for (const other of pool.values()) {
+    if (other.id === def.id || other.camera !== def.camera || other.visual !== def.visual) continue;
+    shared = true;
+    const theirs = new Set(Object.keys(other.effect));
+    for (const k of mine) if (!theirs.has(k)) diff.add(k);
+    for (const k of theirs) if (!mine.has(k)) diff.add(k);
+  }
+  if (!shared || diff.size === 0) return null;
+  const labels = [...diff].map((id) => n.watch.metrics.find((m) => m.id === id)?.label ?? id);
+  return `The board: ${labels.join(", ")}.`;
 }
 
 export function turnoverRows(n: Night): TurnRow[] {
@@ -79,6 +100,7 @@ export function turnoverRows(n: Night): TurnRow[] {
         stillMinute: e.start,
         looks: looksAfter(n, e.def.camera, e.start),
         camIndex: idx,
+        tile: boardTile(n, e.def),
       };
     });
 }

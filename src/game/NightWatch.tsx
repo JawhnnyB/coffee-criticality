@@ -321,7 +321,15 @@ function NightShift({ s, nightNo: asked, onLeave, onStay, replay = false, endles
       start: e.start,
       open: e.caughtAt === null && e.doneAt === null,
       flashing: e.caughtAt === null && e.doneAt === null && n.minute >= e.start && Object.keys(e.def.effect).some((id) => lit.has(id)),
+      visual: e.def.visual,
+      tiles: Object.keys(e.def.effect),
     })),
+    catalog: [
+      ...n.watch.events.map((e) => ({ id: e.id, camera: e.camera, visual: e.visual, tiles: Object.keys(e.effect) })),
+      ...n.events
+        .filter((e) => !n.watch.events.some((w) => w.id === e.def.id))
+        .map((e) => ({ id: e.def.id, camera: e.def.camera, visual: e.def.visual, tiles: Object.keys(e.def.effect) })),
+    ],
   });
   useEffect(() => {
     if (seenRadio.current && radioLines.length > seenRadio.current) startAmbience()?.squelch();
@@ -562,6 +570,7 @@ function Summary({ n, nightNo, onLeave, onStay, endless, best }: { n: Night; nig
                 {row.time} · CAM{String(row.camIndex + 1).padStart(2, "0")} {row.camera} · {row.title} · {row.how}
                 {row.fromDays ? " · from days" : ""}
               </div>
+              {row.tile ? <div data-testid="nw-board-tile">{row.tile}</div> : null}
               {row.missed ? (
                 <div>
                   <Still n={n} camera={n.watch.cameras[row.camIndex]?.id ?? "aux"} minute={row.stillMinute} />
