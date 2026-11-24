@@ -81,6 +81,8 @@ Brief: `docs/grok/value-100.md`. One step, one commit. Real-input proof in this 
 - Step 60a done · The bowl payout in sim.ts is +2 again. The extra +2 for Jordan and for Mabel is outside that file, once per cabinet per day. A quiet week ends Jordan +12 (tier 1) before and +14 (tier 2) after. Proof in step-60a/.
 - Step 49c done · The ten puzzles are 36-cell flux goals: Fq under a line, rim under 50%, peak lower than the start. Search says no one-swap or two-swap map meets them. A three-swap line does. The board does not show it. Proof in step-49c/.
 - Step 60b done · Nights 2 and 3 at 1×, one pot, seed 1. The R10 sweeper is relieved, F and F, on three false reports. Night 3 still had the pot. The careful player stays A or C, so the pot stays. Proof in step-60b/.
+- Step 54b done · Day shift at 1280 and 390 shows the corner monitor. The outage map is on the paper, and the notes sit beside it on a desktop and under it on a phone. Proof in step-54b/.
+
 
 
 

@@ -42,6 +42,9 @@ import { CYCLE1_TUTORIAL, cycle1Batches, cycle1FuelCount } from "./outage/cycle1
 
 const FIELD: CSSProperties = { fontFamily: "var(--font-body)", fontSize: "var(--text-body)", color: PAL.ink, lineHeight: 1.5 };
 const SMALL: CSSProperties = { fontSize: "var(--text-small)", color: PAL.ink, opacity: 0.85 };
+/** Map and notes sit side by side. On a phone the notes wrap under the map instead of covering it. */
+const SPLIT: CSSProperties = { display: "flex", flexWrap: "wrap", gap: 16, alignItems: "flex-start", marginTop: 8 };
+const SIDE: CSSProperties = { flex: "1 1 260px", minWidth: 0, maxWidth: "100%" };
 const STORE = "cc.outage.v1";
 
 function Btn({ on, primary, disabled, onClick, testId, children }: { on?: boolean; primary?: boolean; disabled?: boolean; onClick: () => void; testId?: string; children: ReactNode }) {
@@ -195,16 +198,13 @@ function DischargePick({ eoc, onConfirm }: { eoc: Core; onConfirm: (ids: number[
     });
   };
   return (
-    <div data-testid="outage-discharge" style={{ marginTop: 8 }}>
-      <p style={SMALL}>
-        Selected {sel.length} of {DISCHARGE_COUNT}. Dark grey is 1.6%. The number is burnup, in GWd/t, once it is past 10.
-      </p>
+    <div data-testid="outage-discharge" style={SPLIT}>
       <div
-        style={{ display: "grid", gridTemplateColumns: "repeat(15, minmax(0, 1fr))", gap: 1, maxWidth: 480, background: PAL.ink, padding: 4, border: `2px solid ${PAL.steel}` }}
+        style={{ display: "grid", gridTemplateColumns: "repeat(15, minmax(0, 1fr))", gap: 1, width: "min(100%, 420px)", background: PAL.cream, padding: 4, border: `2px solid ${PAL.steel}` }}
         data-testid="outage-discharge-grid"
       >
         {eoc.map((a, i) => {
-          if (!a) return <div key={i} style={{ aspectRatio: "1", background: "transparent" }} />;
+          if (!a) return <div key={i} style={{ aspectRatio: "1" }} />;
           const marked = on.has(i);
           return (
             <button
@@ -231,10 +231,21 @@ function DischargePick({ eoc, onConfirm }: { eoc: Core; onConfirm: (ids: number[
           );
         })}
       </div>
-      <div style={{ marginTop: 8 }}>
-        <Btn primary disabled={sel.length !== DISCHARGE_COUNT} onClick={() => onConfirm(sel)} testId="outage-discharge-confirm">
-          {sel.length === DISCHARGE_COUNT ? "Discharge these 64" : `Choose ${DISCHARGE_COUNT - sel.length} more`}
-        </Btn>
+      <div style={SIDE}>
+        <p style={SMALL}>
+          Cycle 1 ran 327 effective full-power days. {DISCHARGE_FACT}
+        </p>
+        <p style={SMALL} data-testid="outage-rule">
+          {DISCHARGE_RULE}
+        </p>
+        <p style={SMALL}>
+          Selected {sel.length} of {DISCHARGE_COUNT}. Dark grey is 1.6%. The number is burnup, in GWd/t, once it is past 10.
+        </p>
+        <div style={{ marginTop: 8 }}>
+          <Btn primary disabled={sel.length !== DISCHARGE_COUNT} onClick={() => onConfirm(sel)} testId="outage-discharge-confirm">
+            {sel.length === DISCHARGE_COUNT ? "Discharge these 64" : `Choose ${DISCHARGE_COUNT - sel.length} more`}
+          </Btn>
+        </div>
       </div>
     </div>
   );
@@ -295,7 +306,7 @@ export function OutageApp({ s }: { s: GameState }) {
           ))}
         </ul>
         <div
-          style={{ display: "grid", gridTemplateColumns: "repeat(8, 38px)", gap: 2, padding: 6, background: PAL.ink, border: `2px solid ${PAL.steel}`, width: "fit-content" }}
+          style={{ display: "grid", gridTemplateColumns: "repeat(8, 38px)", gap: 2, padding: 6, background: PAL.cream, border: `2px solid ${PAL.steel}`, width: "fit-content" }}
           data-testid="outage-tutorial-grid"
         >
           {QUARTER_ROWS.flat().map((i, k) => {
@@ -402,21 +413,6 @@ export function OutageApp({ s }: { s: GameState }) {
   return (
     <div className="app-pad" style={FIELD} data-testid="app-outage">
       <p style={{ margin: 0, fontSize: "var(--text-body)" }}>Refuelling Outage · Cycle {cycle}</p>
-      <p style={SMALL}>
-        {cycle === 2
-          ? `Cycle 1 ran 327 effective full-power days. ${DISCHARGE_FACT}`
-          : `Your Cycle ${cycle - 1} is done. The most burned fuel came out and fresh fuel went in. Load it again.`}
-      </p>
-      {cycle === 2 ? (
-        <p style={SMALL} data-testid="outage-rule">
-          {DISCHARGE_RULE}
-        </p>
-      ) : null}
-      {cycle === 2 && saved.discharged ? (
-        <p style={SMALL} data-testid="outage-discharge-score">
-          Your discharge matches {dischargeScore(saved.discharged)} of 64. The vacated positions are fresh fuel. Move fuel a quarter-core at a time: tap one position, then another, and the four rotated copies swap together.
-        </p>
-      ) : null}
 
       {discharging && eoc1 ? (
         <DischargePick
@@ -430,14 +426,14 @@ export function OutageApp({ s }: { s: GameState }) {
           }}
         />
       ) : (
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 12, alignItems: "flex-start", marginTop: 8 }}>
+      <div style={SPLIT}>
         <div>
           <div style={{ display: "flex", gap: 6, marginBottom: 4 }}>
             <Btn on={view === "fuel"} onClick={() => setView("fuel")} testId="outage-view-fuel">Fuel</Btn>
             <Btn on={view === "power"} onClick={() => setView("power")} disabled={!power} testId="outage-view-power">Power</Btn>
           </div>
           <div
-            style={{ display: "grid", gridTemplateColumns: "repeat(8, 38px)", gap: 2, padding: 6, background: PAL.ink, border: `2px solid ${PAL.steel}`, width: "fit-content" }}
+            style={{ display: "grid", gridTemplateColumns: "repeat(8, 38px)", gap: 2, padding: 6, background: PAL.cream, border: `2px solid ${PAL.steel}`, width: "fit-content" }}
             data-testid="outage-grid"
           >
             {QUARTER_ROWS.flat().map((i, k) => {
@@ -474,12 +470,27 @@ export function OutageApp({ s }: { s: GameState }) {
           </p>
         </div>
 
-        <div style={{ minWidth: 220, flex: 1 }}>
-          <Btn primary onClick={run} disabled={busy} testId="outage-run">{busy ? "Running the cycle…" : `Run Cycle ${cycle}`}</Btn>
-          {cycle === 2 && !saved.draft ? <p style={SMALL}>This is the plant's own Cycle 2 loading. Run it as it is, or move fuel first.</p> : null}
-          {cycle === 2 && saved.draft ? (
-            <span style={{ marginLeft: 6 }}><Btn onClick={() => update({ draft: null })} testId="outage-reset">Back to the plant's pattern</Btn></span>
+        <div style={SIDE}>
+          <p style={SMALL}>
+            {cycle === 2
+              ? `Cycle 1 ran 327 effective full-power days. ${DISCHARGE_FACT}`
+              : `Your Cycle ${cycle - 1} is done. The most burned fuel came out and fresh fuel went in. Load it again.`}
+          </p>
+          {cycle === 2 ? (
+            <p style={SMALL} data-testid="outage-rule">
+              {DISCHARGE_RULE}
+            </p>
           ) : null}
+          {cycle === 2 && saved.discharged ? (
+            <p style={SMALL} data-testid="outage-discharge-score">
+              Your discharge matches {dischargeScore(saved.discharged)} of 64. The vacated positions are fresh fuel. Move fuel a quarter-core at a time: tap one position, then another, and the four rotated copies swap together.
+            </p>
+          ) : null}
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center" }}>
+            <Btn primary onClick={run} disabled={busy} testId="outage-run">{busy ? "Running the cycle…" : `Run Cycle ${cycle}`}</Btn>
+            {cycle === 2 && saved.draft ? <Btn onClick={() => update({ draft: null })} testId="outage-reset">Back to the plant's pattern</Btn> : null}
+          </div>
+          {cycle === 2 && !saved.draft ? <p style={SMALL}>This is the plant's own Cycle 2 loading. Run it as it is, or move fuel first.</p> : null}
           {result ? (
             <div style={{ marginTop: 8 }} data-testid="outage-result">
               <p style={{ margin: 0 }}>
