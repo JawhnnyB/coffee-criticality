@@ -12,6 +12,7 @@
 import { NPCS, type Line, type NpcId } from "./content";
 import { SCENES, type Scene } from "./socialScenes";
 import { A_ROTATION_NPC, A_ROTATION_SCENE, readCrew, takeARotationScene } from "./nightwatch/crewUnlock";
+import { dueMoment, knownMoments, markMoment, type MomentState } from "./crewMoments";
 
 export type Tier = 0 | 1 | 2 | 3;
 
@@ -75,13 +76,28 @@ export function addScene(s: TalkState, firstMeeting: boolean): Scene | null {
   if (extra) {
     s.dialogue.push(...extra.lines.map((l) => ({ ...l, choices: l.choices?.map((c) => ({ ...c })) })));
   }
+  // A crew moment (crewMoments.ts) only when nothing else played, so a conversation never runs long.
+  if (!scene && !extra && hasRecord(s)) {
+    const m = dueMoment(s, s.talkNpc);
+    if (m) {
+      s.dialogue.push(...m.lines.map((l) => ({ ...l, choices: l.choices?.map((c) => ({ ...c })) })));
+      markMoment(s.flags, m.id);
+      return { tier: 1, title: m.title, known: m.known, lines: m.lines };
+    }
+  }
   return scene ?? extra;
+}
+
+function hasRecord(s: TalkState): s is TalkState & MomentState {
+  const r = s as Partial<MomentState>;
+  return !!r.residue && typeof r.hides === "number" && typeof r.catches === "number" && typeof r.maintDone === "boolean";
 }
 
 /** What the player knows about someone: their note, then the title of each scene they have heard. */
 export function knownAbout(s: { flags: Record<string, boolean> }, npc: NpcId): string[] {
   const lines = [NPCS[npc].note, ...SCENES[npc].filter((sc) => s.flags[seenKey(npc, sc.tier)]).map((sc) => sc.known)];
   if (npc === A_ROTATION_NPC && readCrew().seen) lines.push(A_ROTATION_SCENE.known);
+  lines.push(...knownMoments(s.flags, npc));
   return lines;
 }
 
