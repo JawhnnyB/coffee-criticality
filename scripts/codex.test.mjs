@@ -9,7 +9,7 @@ import test from "node:test";
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const dir = mkdtempSync(join(tmpdir(), "cc-codex-"));
 const entry = join(dir, "entry.ts");
-writeFileSync(entry, `export { CODEX } from ${JSON.stringify(join(root, "src/game/codex.ts"))};\n`);
+writeFileSync(entry, `export { CODEX, codexUnlocked, noteCodexCatch } from ${JSON.stringify(join(root, "src/game/codex.ts"))};\n`);
 const out = join(dir, "codex.mjs");
 const built = spawnSync(process.env.ESBUILD ?? "npx", [...(process.env.ESBUILD ? [] : ["esbuild"]), entry, "--bundle", "--platform=node", "--format=esm", `--outfile=${out}`], {
   encoding: "utf8",
@@ -30,4 +30,47 @@ test("the codex is thirty short drafts, and none of them is a procedure", () => 
   for (const id of ["cherenkov", "freeze-valve", "beavrs", "rounds", "turnover", "relief-valve"]) {
     assert.ok(ids.has(id), id);
   }
+});
+
+const blank = { flags: {}, valve: "open", tag: "open", dose: "open", plant: "", shuffleDone: false };
+
+test("a steam leak opens the relief-valve note, and a fresh week does not", () => {
+  assert.equal(W.codexUnlocked("relief-valve", blank), false);
+  assert.equal(W.codexUnlocked("teaching-model", blank), true);
+  assert.equal(W.codexUnlocked("cherenkov", blank), false);
+  const day = { ...blank, valve: "caught" };
+  assert.equal(W.codexUnlocked("relief-valve", day), true);
+  assert.equal(W.codexUnlocked("pressurizer", day), true);
+  const flags = {};
+  W.noteCodexCatch(flags, "porv", ["leak"]);
+  assert.equal(W.codexUnlocked("relief-valve", { ...blank, flags }), true);
+  assert.equal(flags["codex:leak"], true);
+  const full = {
+    flags: {
+      "codex:pool": true,
+      "codex:freeze": true,
+      outageOpen: true,
+      "rot:nights": true,
+      "night:1:grade:C": true,
+      built: true,
+      "codex:bwr": true,
+      "codex:pebble": true,
+      "codex:msr": true,
+      "codex:porv": true,
+      "codex:leak": true,
+      "outage:c2:done": true,
+      "outage:discharged": true,
+      "cab:rods:d1": true,
+      "cab:delay:d1": true,
+      "cab:load:d1": true,
+      "codex:rad": true,
+      reported: true,
+    },
+    valve: "caught",
+    tag: "caught",
+    dose: "caught",
+    plant: "pwr",
+    shuffleDone: true,
+  };
+  for (const e of W.CODEX) assert.equal(W.codexUnlocked(e.id, full), true, e.id);
 });

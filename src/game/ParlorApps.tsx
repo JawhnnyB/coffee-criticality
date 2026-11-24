@@ -306,7 +306,7 @@ export function AppBody({ app, ctx }: { app: AppDef; ctx: AppCtx }) {
   if (app.id === "coremap") return <CoreMapApp s={ctx.s} onResults={ctx.onResults} />;
   if (app.id === "news") return <NewsApp s={ctx.s} />;
   if (app.id === "radiation") return <RadiationApp ctx={ctx} />;
-  if (app.id === "nrc") return <NrcApp />;
+  if (app.id === "nrc") return <NrcApp s={ctx.s} />;
   if (app.kind === "placeholder") return <PlaceholderApp app={app} />;
   return null;
 }
@@ -335,6 +335,7 @@ const REGION_SLOTS = Array.from({ length: 9 }, (_, i) => `Region slot ${i + 1}`)
 
 export function RadiationApp({ ctx }: { ctx: AppCtx }) {
   const alara = ACADEMY.findIndex((p) => p.title === "ALARA with eyes open");
+  if (!ctx.s.flags["codex:rad"]) ctx.s.flags["codex:rad"] = true;
   return (
     <div className="app-pad" style={{ ...FIELD, color: PAL.ink }} data-testid="app-radiation">
       <p style={{ fontFamily: "var(--font-title)", fontSize: "var(--text-title-sm)", margin: 0 }}>Radiation</p>
@@ -371,10 +372,18 @@ export function RadiationApp({ ctx }: { ctx: AppCtx }) {
   );
 }
 
-export function NrcApp() {
+export function NrcApp({ s }: { s: GameState }) {
   const [q, setQ] = useState("");
   const rows = filterNrc(NRC_ROWS, q);
   const needle = q.trim();
+  const play = {
+    flags: s.flags,
+    valve: s.residue.valve,
+    tag: s.residue.tag,
+    dose: s.residue.dose,
+    plant: s.plant?.type ?? "",
+    shuffleDone: s.shuffleDone,
+  };
   return (
     <div className="app-pad" style={{ ...FIELD, color: PAL.ink }} data-testid="app-nrc">
       <p style={{ fontFamily: "var(--font-title)", fontSize: "var(--text-title-sm)", margin: 0 }}>NRC Regulations</p>
@@ -409,7 +418,7 @@ export function NrcApp() {
           No match. Titles are not in this build.
         </p>
       ) : null}
-      <CodexPanel />
+      <CodexPanel play={play} />
     </div>
   );
 }

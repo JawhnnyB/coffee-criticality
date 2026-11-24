@@ -1,6 +1,5 @@
 /**
  * "How real is this?" Draft notes for the owner. Not regulations, and not a procedure.
- * Step 63 decides which ones a play has opened. This file only holds the words.
  */
 export interface CodexEntry {
   id: string;
@@ -21,7 +20,7 @@ export const CODEX: CodexEntry[] = [
   { id: "relief-valve", title: "Relief valve", opens: "Catch the steam leak, on the day or on the night board.", body: "A relief valve that weeps can drop pressure. The day hiss and the night pressurizer event are that kind of story. The words to say, and the valve to touch, are not in this game." },
   { id: "primary-pressure", title: "Primary pressure", opens: "Design a plant.", body: "The PWR board sits near 15.5 MPa, about 2250 psia, so the water stays liquid. That matches the public band. It is not one unit's setpoint." },
   { id: "steam-pressure", title: "Steam pressure", opens: "Design a plant.", body: "The steam-generator gauge sits near 6.9 MPa, about 1000 psi. A public 4-loop example uses that steam pressure. The alarm band around it is the game's." },
-  { id: "bwr-pressure", title: "A boiling core", opens: "Design a plant, or stand a BWR night.", body: "A BWR boils in the vessel, near 7 MPa on this board and 7.2 MPa in the builder. Those two numbers are not the same. Both are classroom rounding, not a dome pressure to use." },
+  { id: "bwr-pressure", title: "A boiling core", opens: "Design a BWR, or stand that night.", body: "A BWR boils in the vessel, near 7 MPa on this board and 7.2 MPa in the builder. Those two numbers are not the same. Both are classroom rounding, not a dome pressure to use." },
   { id: "pebble-helium", title: "Helium and pebbles", opens: "Design a pebble plant, or stand that night.", body: "Published HTR-PM tables use about 7 MPa helium and an outlet near 750 °C. The night board follows that. The builder still says 6.0 MPa. Neither is an NRC plant." },
   { id: "cover-gas", title: "Cover gas", opens: "Design a salt plant, or stand that night.", body: "An ORNL drain note uses 5 psig of helium to move salt. The night gauge says 5 psig. The freeze-plug temperature on that board was not found in the notes that were opened." },
   { id: "pool-depth", title: "Pool depth", opens: "Look at the fuel pool camera.", body: "DOE describes a typical spent-fuel pool as at least 40 feet deep. The night gauge reads 7 metres. That gauge is not a pool depth." },
@@ -29,8 +28,8 @@ export const CODEX: CodexEntry[] = [
   { id: "sump", title: "Sump", opens: "File a leak on a night.", body: "Water that does not belong on a floor shows up in a sump. The centimetres on the board are a teaching scale, not an instrument reading." },
   { id: "false-report", title: "A wrong report", opens: "Take a night watch.", body: "Calling a flicker a leak is how the night fails you. Three wrong reports and Elena takes the chair. That count is a rule of the game." },
   { id: "coffee", title: "Coffee", opens: "Take a night watch.", body: "The pot is the game's stand-in for attention. A real watch does not run on six cups and a tablet. Brewing here only keeps the cameras up." },
-  { id: "peaking", title: "The peak", opens: "Finish a fuel shuffle or a loading puzzle.", body: "Fq is the hottest assembly divided by the average. The puzzle line is chosen so the search has a shape. It is not a technical specification." },
-  { id: "rim", title: "Rim share", opens: "Finish a fuel shuffle or a loading puzzle.", body: "The rim share is how much of the power sits on the outside of this 36-cell map. Holding it under a half is a rule of the puzzle, not of a core." },
+  { id: "peaking", title: "The peak", opens: "Finish a fuel shuffle.", body: "Fq is the hottest assembly divided by the average. The puzzle line is chosen so the search has a shape. It is not a technical specification." },
+  { id: "rim", title: "Rim share", opens: "Finish a fuel shuffle.", body: "The rim share is how much of the power sits on the outside of this 36-cell map. Holding it under a half is a rule of the puzzle, not of a core." },
   { id: "boron", title: "Boron letdown", opens: "Run a cycle in the outage.", body: "A real PWR lets boron fall as the fuel burns, so the core stays critical. The curve in the outage is this simulator beside the plant's measured points. It is not a prediction to operate on." },
   { id: "discharge", title: "What leaves the core", opens: "Choose a discharge in the outage.", body: "BEAVRS cycle 1 loaded 1.6 percent fuel with no absorbers in a known pattern. The game asks you to pick the once-burned assemblies of that batch. The score is overlap with that pattern." },
   { id: "rods", title: "Control rods", opens: "Play a rod cabinet.", body: "A rod is absorber you can move. In goes down, out goes up, for a thermal water core. Banks, steps, and cooldowns in the cabinet are a toy of that idea." },
@@ -43,3 +42,101 @@ export const CODEX: CodexEntry[] = [
   { id: "grades", title: "The letter", opens: "Finish a night.", body: "A, B, C, D, and F are how this game talks about a watch. A plant does not grade a night that way. A trip or a relief is an F here because the story ends." },
   { id: "four-plants", title: "Four plants", opens: "Design a plant.", body: "PWR, BWR, pebble, and salt are four pictures of heat leaving. The same desk and the same night fit all four, which a real site would not. Comparison only." },
 ];
+
+export interface CodexPlay {
+  flags: Record<string, boolean>;
+  valve: string;
+  tag: string;
+  dose: string;
+  plant: string;
+  shuffleDone: boolean;
+}
+
+function nightGrade(flags: Record<string, boolean>): boolean {
+  for (let n = 1; n <= 4; n++) for (const letter of ["A", "B", "C", "D", "F"]) if (flags[`night:${n}:grade:${letter}`]) return true;
+  return false;
+}
+
+function played(flags: Record<string, boolean>, id: string): boolean {
+  const prefix = `cab:${id}:`;
+  return Object.keys(flags).some((k) => k.startsWith(prefix));
+}
+
+/** True once play has earned this note. A fresh week opens only the teaching-model line. */
+export function codexUnlocked(id: string, p: CodexPlay): boolean {
+  const f = p.flags;
+  switch (id) {
+    case "teaching-model":
+      return true;
+    case "cherenkov":
+    case "pool-depth":
+      return !!f["codex:pool"];
+    case "freeze-valve":
+      return !!f["codex:freeze"];
+    case "beavrs":
+      return !!f.outageOpen || !!f["outage:discharged"];
+    case "rounds":
+    case "coffee":
+    case "false-report":
+      return !!f["rot:nights"] || nightGrade(f);
+    case "turnover":
+    case "grades":
+      return nightGrade(f);
+    case "relief-valve":
+      return p.valve === "caught" || !!f["codex:porv"];
+    case "primary-pressure":
+    case "steam-pressure":
+    case "four-plants":
+      return !!f.built;
+    case "bwr-pressure":
+      return p.plant === "bwr" || !!f["codex:bwr"];
+    case "pebble-helium":
+      return p.plant === "pebble" || !!f["codex:pebble"];
+    case "cover-gas":
+      return p.plant === "msr" || !!f["codex:msr"];
+    case "pressurizer":
+      return p.valve === "caught" || !!f["codex:pzr"] || !!f["codex:porv"];
+    case "sump":
+      return !!f["codex:leak"];
+    case "peaking":
+    case "rim":
+      return p.shuffleDone;
+    case "boron":
+      return !!f["outage:c2:done"];
+    case "discharge":
+      return !!f["outage:discharged"];
+    case "rods":
+      return played(f, "rods");
+    case "delayed":
+      return played(f, "delay") || !!f.delayBuried || !!f.delayPrompt;
+    case "xenon":
+      return played(f, "load");
+    case "alara":
+      return p.dose === "caught" || !!f["codex:rad"];
+    case "lockout":
+      return p.tag === "caught";
+    case "culture":
+      return !!f.reported || !!f.hid;
+    case "hours":
+      return !!f["rot:nights"];
+    default:
+      return false;
+  }
+}
+
+/** A camera look. The flag stays on the save the night already writes. */
+export function noteCodexCamera(flags: Record<string, boolean>, scene: string, site: string) {
+  if (scene === "pool") flags["codex:pool"] = true;
+  if (scene === "freeze") flags["codex:freeze"] = true;
+  if (scene === "pressurizer") flags["codex:pzr"] = true;
+  if (site === "bwr") flags["codex:bwr"] = true;
+  if (site === "pebble") flags["codex:pebble"] = true;
+  if (site === "msr") flags["codex:msr"] = true;
+}
+
+/** A logged night report. A pressurizer relief opens the same note as the day steam leak. */
+export function noteCodexCatch(flags: Record<string, boolean>, eventId: string, accept: readonly string[]) {
+  if (eventId === "porv" || eventId === "spray-by") flags["codex:porv"] = true;
+  if (eventId === "freeze-air") flags["codex:freeze"] = true;
+  if (accept.includes("leak")) flags["codex:leak"] = true;
+}

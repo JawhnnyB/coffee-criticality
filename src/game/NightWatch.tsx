@@ -49,6 +49,7 @@ import { paperLines, writePaper } from "./nightwatch/paper";
 import { gazeReplay } from "./nightwatch/gazeReplay";
 import { readDaily, recordDaily } from "./nightwatch/daily";
 import { nightsDone } from "./nightwatch/progress";
+import { noteCodexCamera, noteCodexCatch } from "./codex";
 import { elenaLine, oddityNotes, openerLine, recordNight, turnoverRows } from "./nightwatch/turnover";
 
 const SITE_LABEL = { pwr: "PWR", bwr: "BWR", pebble: "Pebble bed", msr: "Salt" } as const;
@@ -193,6 +194,8 @@ function NightShift({ s, nightNo: asked, onLeave, onStay, replay = false, endles
       startAmbience()?.static();
     }
     n.camera = id;
+    const scene = n.watch.cameras.find((c) => c.id === id)?.scene ?? "";
+    noteCodexCamera(s.flags, scene, site);
     setReporting(false);
     rerender();
   };
@@ -210,6 +213,7 @@ function NightShift({ s, nightNo: asked, onLeave, onStay, replay = false, endles
     const r = report(n, c);
     setReporting(false);
     if (r.ok) {
+      if (r.event) noteCodexCatch(s.flags, r.event.def.id, r.event.def.accept);
       say(r.early ? "Logged before the board knew. The crew is on it." : "Logged. The crew is on it.");
       markJuice("catch");
     } else if (r.reason === "logged") say("Already logged. The crew is on it.");
