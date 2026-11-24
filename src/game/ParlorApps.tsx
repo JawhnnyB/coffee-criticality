@@ -12,6 +12,7 @@ import { PlantMonitorApp } from "./PlantMonitorApp";
 import { NewsApp } from "./NewsApp";
 import { ACADEMY } from "./content";
 import { NRC_ROWS, filterNrc } from "./nrcIndex";
+import { CodexPanel } from "./CodexPanel";
 import type { PlantDesign } from "./plant";
 import type { DesktopSave, GameState, ResultsSave } from "./sim";
 import {
@@ -408,6 +409,7 @@ export function NrcApp() {
           No match. Titles are not in this build.
         </p>
       ) : null}
+      <CodexPanel />
     </div>
   );
 }
