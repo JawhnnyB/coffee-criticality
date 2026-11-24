@@ -68,6 +68,8 @@ Brief: `docs/grok/value-100.md`. One step, one commit. Real-input proof in this 
 - Step 49 done · Ten loading puzzles. Each target peak is the model's best one-swap Fq. Met is stored outside the week save.
 - Step 51 done · Dawn prints a plant paper from the week's choices. It is stored in cc.paper, not the week save. Step 50 was not started.
 - Step 52 done · Photo mode on the night feed turns off breathing, grain, the rolling bar, and the vignette. The scene is not redrawn.
+- Step 53 done · The turnover replays the night's gaze log at 10×. An empty log stays empty. Stopped here. Step 54 was not started.
+
 
 
 

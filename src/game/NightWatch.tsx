@@ -46,6 +46,7 @@ import { applyCarry, carryover } from "./nightwatch/carryover";
 import { noteEndless, readEndless } from "./nightwatch/endless";
 import { dawnCrewLine, noteARotation, readCrew } from "./nightwatch/crewUnlock";
 import { paperLines, writePaper } from "./nightwatch/paper";
+import { gazeReplay } from "./nightwatch/gazeReplay";
 import { readDaily, recordDaily } from "./nightwatch/daily";
 import { nightsDone } from "./nightwatch/progress";
 import { elenaLine, oddityNotes, openerLine, recordNight, turnoverRows } from "./nightwatch/turnover";
@@ -612,10 +613,49 @@ function Summary({ n, nightNo, onLeave, onStay, endless, best }: { n: Night; nig
             Stay
           </button>
         ) : null}
+        <GazeReplay n={n} />
         <button type="button" className="paper-btn-primary" style={{ minHeight: 44, marginTop: 12, width: "100%", flex: "0 0 auto" }} data-testid="nw-summary-leave" onClick={onLeave}>
           {n.over?.why === "dawn" && (g.letter === "A" || g.letter === "B" || g.letter === "C") ? "Sleep" : "Back"}
         </button>
       </div>
+    </div>
+  );
+}
+
+function GazeReplay({ n }: { n: Night }) {
+  const frames = gazeReplay(n.gaze);
+  const [i, setI] = useState(-1);
+  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => {
+    return () => {
+      if (timer.current) clearTimeout(timer.current);
+    };
+  }, []);
+  if (frames.length === 0) return null;
+  const play = () => {
+    if (timer.current) clearTimeout(timer.current);
+    let k = 0;
+    const step = () => {
+      setI(k);
+      const hold = frames[k].holdMs;
+      k += 1;
+      if (k < frames.length) timer.current = setTimeout(step, hold);
+      else timer.current = setTimeout(() => setI(-1), hold);
+    };
+    step();
+  };
+  const frame = i >= 0 ? frames[i] : null;
+  return (
+    <div style={{ marginTop: 8, flex: "0 0 auto" }}>
+      <button type="button" className="paper-btn" style={{ minHeight: 44, width: "100%" }} data-testid="nw-replay" onClick={play}>
+        Replay at 10×
+      </button>
+      {frame ? (
+        <div data-testid="nw-replay-cam" style={{ marginTop: 6, fontSize: 13 }}>
+          {frame.camera}
+          <Still n={n} camera={frame.camera} minute={frame.from} />
+        </div>
+      ) : null}
     </div>
   );
 }

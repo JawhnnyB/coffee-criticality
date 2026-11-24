@@ -1,0 +1,9 @@
+Step 53. The turnover replays n.gaze at 10×.
+
+A 10 game-minute look holds 1250 ms, because a game minute is 1.25 s and the replay divides by 10.
+An empty gaze log draws no button and invents no looks.
+The still uses the look's start minute.
+
+Proof: node --test scripts/gaze-replay.test.mjs
+1 pass, 0 fail.
+esbuild parsed NightWatch.tsx.
