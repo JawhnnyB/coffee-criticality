@@ -12,7 +12,7 @@ const entry = join(dir, "entry.ts");
 writeFileSync(
   entry,
   [
-    `export { loadingPuzzles, applySwaps, gradePuzzle, notePuzzleMet, readPuzzleMet, PUZZLE_LINES, PUZZLE_ENRICH } from ${JSON.stringify(join(root, "src/game/loadingPuzzles.ts"))};`,
+    `export { loadingPuzzles, applySwaps, gradePuzzle, notePuzzleMet, readPuzzleMet, PUZZLE_LINES, PUZZLE_ENRICH } from ${JSON.stringify(join(root, "src/game/puzzleBoards.ts"))};`,
     `export { fluxOf } from ${JSON.stringify(join(root, "src/game/shuffleModel.ts"))};`,
   ].join("\n"),
 );

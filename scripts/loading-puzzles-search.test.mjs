@@ -15,7 +15,7 @@ const dir = mkdtempSync(join(tmpdir(), "puzzles-"));
 const entry = join(dir, "entry.ts");
 writeFileSync(
   entry,
-  `export * from ${JSON.stringify(join(root, "src/game/loadingPuzzles.ts"))};\n` +
+  `export * from ${JSON.stringify(join(root, "src/game/puzzleBoards.ts"))};\n` +
     `export { fluxOf } from ${JSON.stringify(join(root, "src/game/shuffleModel.ts"))};\n`,
 );
 const out = join(dir, "bundle.cjs");

@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { fluxOf, type Burn } from "./shuffleModel";
-import { gradePuzzle, loadingPuzzles, notePuzzleMet, PUZZLE_ENRICH, PUZZLE_LINES, readPuzzleMet, type Puzzle } from "./loadingPuzzles";
+import { gradePuzzle, loadingPuzzles, notePuzzleMet, PUZZLE_ENRICH, PUZZLE_LINES, readPuzzleMet, type Puzzle } from "./puzzleBoards";
 import { juiceClass, prefersReducedMotion } from "./reducedMotion";
 
 function heat(v: number, max: number) {
