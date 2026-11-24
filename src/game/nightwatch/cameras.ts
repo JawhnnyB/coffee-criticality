@@ -12,6 +12,7 @@
  */
 
 import { PLATES, SIGNS_BAKED, plateFor, roverSheet, stateFor } from "./plates";
+import { cameraPass } from "./cameraPass";
 
 export const CAM_W = 480;
 export const CAM_H = 270;
@@ -1856,7 +1857,7 @@ export function resetFrameCaches() {
  * The static picture (photo or code base, state crops, plus the colour grade) is cached. A frame draws
  * that, then the live layer, then grain, the rolling bar and one cached scanline-and-vignette overlay.
  */
-export function paintCamera(g: G, scene: string, visuals: string[], t: number, opts: { switching?: number; tripped?: boolean; fatigue?: number; calm?: boolean } = {}) {
+export function paintCamera(g: G, scene: string, visuals: string[], t: number, opts: { switching?: number; tripped?: boolean; fatigue?: number; calm?: boolean; photo?: boolean } = {}) {
   const sc = S[scene] ?? S.corridor;
   const name = S[scene] ? scene : "corridor";
   const v = parseVis(visuals);
@@ -1877,37 +1878,46 @@ export function paintCamera(g: G, scene: string, visuals: string[], t: number, o
     g.fillStyle = `rgba(200,20,10,${0.14 + 0.06 * Math.sin(t * 2)})`;
     g.fillRect(0, 0, W, H);
   }
-  // Exposure breathing, the auto-gain hunting in the dark.
-  g.fillStyle = `rgba(0,0,0,${0.06 + 0.05 * Math.sin(t * 0.7)})`;
-  g.fillRect(0, 0, W, H);
+  const pass = cameraPass(opts);
   const frames = noiseFrames();
   const tick = Math.floor(t * 24);
-  if (frames) {
-    g.globalAlpha = sc.look === "ir" ? 0.16 : 0.11;
-    g.globalCompositeOperation = "overlay";
-    g.save();
-    g.translate((tick * 37) % 7, 0);
-    g.drawImage(frames[tick % frames.length] as CanvasImageSource, 0, 0, W, H);
-    g.restore();
-    g.globalCompositeOperation = "source-over";
-    g.globalAlpha = 1;
-  } else {
-    for (let k = 0; k < 300; k++) {
-      g.fillStyle = hash(k, tick) > 0.5 ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.08)";
-      g.fillRect(hash(k, tick + 1) * W, hash(tick + 2, k) * H, 1, 1);
+  if (pass.breathe) {
+    // Exposure breathing, the auto-gain hunting in the dark.
+    g.fillStyle = `rgba(0,0,0,${0.06 + 0.05 * Math.sin(t * 0.7)})`;
+    g.fillRect(0, 0, W, H);
+  }
+  if (pass.grain) {
+    if (frames) {
+      g.globalAlpha = sc.look === "ir" ? 0.16 : 0.11;
+      g.globalCompositeOperation = "overlay";
+      g.save();
+      g.translate((tick * 37) % 7, 0);
+      g.drawImage(frames[tick % frames.length] as CanvasImageSource, 0, 0, W, H);
+      g.restore();
+      g.globalCompositeOperation = "source-over";
+      g.globalAlpha = 1;
+    } else {
+      for (let k = 0; k < 300; k++) {
+        g.fillStyle = hash(k, tick) > 0.5 ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.08)";
+        g.fillRect(hash(k, tick + 1) * W, hash(tick + 2, k) * H, 1, 1);
+      }
     }
   }
-  const motion = opts.calm ? 0.3 : 1;
-  const bar = ((t * 22) % (H + 60)) - 30;
-  g.fillStyle = lin(g, 0, bar - 20, 0, bar + 20, [[0, "rgba(255,255,255,0)"], [0.5, `rgba(255,255,255,${0.035 * motion})`], [1, "rgba(255,255,255,0)"]]);
-  g.fillRect(0, bar - 20, W, 40);
-  const shade = lensOverlay();
-  if (shade) g.drawImage(shade as CanvasImageSource, 0, 0, W, H);
-  else {
-    g.fillStyle = "rgba(0,0,0,0.07)";
-    for (let y = 0; y < H; y += 2) g.fillRect(0, y, W, 1);
-    g.fillStyle = rad(g, W / 2, H / 2, W * 0.62, [[0.55, "rgba(0,0,0,0)"], [1, "rgba(0,0,0,0.75)"]]);
-    g.fillRect(0, 0, W, H);
+  if (pass.bar) {
+    const motion = opts.calm ? 0.3 : 1;
+    const bar = ((t * 22) % (H + 60)) - 30;
+    g.fillStyle = lin(g, 0, bar - 20, 0, bar + 20, [[0, "rgba(255,255,255,0)"], [0.5, `rgba(255,255,255,${0.035 * motion})`], [1, "rgba(255,255,255,0)"]]);
+    g.fillRect(0, bar - 20, W, 40);
+  }
+  if (pass.vignette) {
+    const shade = lensOverlay();
+    if (shade) g.drawImage(shade as CanvasImageSource, 0, 0, W, H);
+    else {
+      g.fillStyle = "rgba(0,0,0,0.07)";
+      for (let y = 0; y < H; y += 2) g.fillRect(0, y, W, 1);
+      g.fillStyle = rad(g, W / 2, H / 2, W * 0.62, [[0.55, "rgba(0,0,0,0)"], [1, "rgba(0,0,0,0.75)"]]);
+      g.fillRect(0, 0, W, H);
+    }
   }
   if (!opts.calm && opts.fatigue && opts.fatigue > 0) {
     g.globalAlpha = 0.15 * Math.min(1, opts.fatigue);

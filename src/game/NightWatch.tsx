@@ -167,6 +167,8 @@ function NightShift({ s, nightNo: asked, onLeave, onStay, replay = false, endles
   }, []);
   const rewarded = useRef(false);
   const calm = useRef(false);
+  const photo = useRef(false);
+  const [photoOn, setPhotoOn] = useState(false);
   const speed = useRef(1);
   const seenAlarm = useRef("");
   const seenRadio = useRef(0);
@@ -232,6 +234,7 @@ function NightShift({ s, nightNo: asked, onLeave, onStay, replay = false, endles
           tripped: n.over?.why === "trip",
           fatigue: calm.current ? 0 : fatigueOf(n),
           calm: calm.current,
+          photo: photo.current,
         });
       }
       acc += dt;
@@ -253,7 +256,7 @@ function NightShift({ s, nightNo: asked, onLeave, onStay, replay = false, endles
     if (!c || !n.tablet || switching <= 0) return;
     const cam = n.watch.cameras.find((x) => x.id === n.camera)!;
     c.setTransform(CAM_PX, 0, 0, CAM_PX, 0, 0);
-    paintCamera(c, cam.scene, visualsOn(n, cam.id), performance.now() / 1000, { switching: calm.current ? switching * 0.3 : switching, tripped: n.over?.why === "trip", calm: calm.current });
+    paintCamera(c, cam.scene, visualsOn(n, cam.id), performance.now() / 1000, { switching: calm.current ? switching * 0.3 : switching, tripped: n.over?.why === "trip", calm: calm.current, photo: photo.current });
   });
 
   useEffect(() => {
@@ -451,6 +454,16 @@ function NightShift({ s, nightNo: asked, onLeave, onStay, replay = false, endles
           <div style={{ display: "flex", gap: 6, marginTop: 6, flexWrap: "wrap" }}>
             <Btn onClick={() => setReporting((v) => !v)} disabled={!n.tablet || !!n.over} danger={reporting} testId="nw-report">
               Report what's on CAM {n.watch.cameras.indexOf(cam) + 1} (R)
+            </Btn>
+            <Btn
+              testId="nw-photo"
+              on={photoOn}
+              onClick={() => {
+                photo.current = !photo.current;
+                setPhotoOn(photo.current);
+              }}
+            >
+              {photoOn ? "Photo on" : "Photo"}
             </Btn>
           </div>
           {reporting ? (

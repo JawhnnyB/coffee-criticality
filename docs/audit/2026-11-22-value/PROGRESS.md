@@ -67,6 +67,8 @@ Brief: `docs/grok/value-100.md`. One step, one commit. Real-input proof in this 
 - Step 48 done · Cycle 1 opens as a worked example. The grid and the counts are the benchmark map already in the build. No new figures.
 - Step 49 done · Ten loading puzzles. Each target peak is the model's best one-swap Fq. Met is stored outside the week save.
 - Step 51 done · Dawn prints a plant paper from the week's choices. It is stored in cc.paper, not the week save. Step 50 was not started.
+- Step 52 done · Photo mode on the night feed turns off breathing, grain, the rolling bar, and the vignette. The scene is not redrawn.
+
 
 
 

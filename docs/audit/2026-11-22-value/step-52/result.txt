@@ -1,0 +1,9 @@
+Step 52. Photo mode turns the camera pass off.
+
+Off: breathing, grain, rolling bar, vignette.
+On: none of those four. The scene, a trip, and a feed change still draw.
+The button is on the night feed. The missed still was not changed.
+
+Proof: node --test scripts/camera-pass.test.mjs
+1 pass, 0 fail.
+esbuild parsed cameras.ts.
