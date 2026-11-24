@@ -1,0 +1,31 @@
+runs 20
+night1 B 20/20
+night4 C 20/20
+cup hit empty 0/20
+alarm minutes unseen 0/20
+culture >= 28 20/20
+culture held (>=42) 20/20
+mabel and jordan tier 2 20/20
+culture min 100 max 100
+night4 coffee min 0
+#1 pwr seed 1 nights BAAC coffee 97.8/0/0/0 empty 0 missed 0 pots 2/1/1/1 culture 100 elena +26 (t3) mabel +15 (t2) jordan +14 (t2)
+#2 bwr seed 1 nights BAAC coffee 97.8/0/0/0 empty 0 missed 0 pots 2/1/1/1 culture 100 elena +27 (t3) mabel +16 (t2) jordan +15 (t2)
+#3 pebble seed 1 nights BAAC coffee 97.8/0/0/0 empty 0 missed 0 pots 2/1/1/1 culture 100 elena +28 (t3) mabel +17 (t2) jordan +16 (t2)
+#4 msr seed 1 nights BAAC coffee 97.8/0/0/0 empty 0 missed 0 pots 2/1/1/1 culture 100 elena +26 (t3) mabel +15 (t2) jordan +14 (t2)
+#5 pwr seed 2 nights BAAC coffee 97.8/0/0/0 empty 0 missed 0 pots 2/1/1/1 culture 100 elena +27 (t3) mabel +16 (t2) jordan +15 (t2)
+#6 bwr seed 2 nights BAAC coffee 97.8/0/0/0 empty 0 missed 0 pots 2/1/1/1 culture 100 elena +28 (t3) mabel +17 (t2) jordan +16 (t2)
+#7 pebble seed 2 nights BAAC coffee 97.8/0/0/0 empty 0 missed 0 pots 2/1/1/1 culture 100 elena +26 (t3) mabel +15 (t2) jordan +14 (t2)
+#8 msr seed 2 nights BAAC coffee 97.8/0/0/0 empty 0 missed 0 pots 2/1/1/1 culture 100 elena +27 (t3) mabel +16 (t2) jordan +15 (t2)
+#9 pwr seed 3 nights BCCC coffee 97.8/0/0/0 empty 0 missed 0 pots 2/1/1/1 culture 100 elena +24 (t3) mabel +17 (t2) jordan +16 (t2)
+#10 bwr seed 3 nights BCCC coffee 97.8/0/0/0 empty 0 missed 0 pots 2/1/1/1 culture 100 elena +22 (t2) mabel +15 (t2) jordan +14 (t2)
+#11 pebble seed 3 nights BCCC coffee 97.8/0/0/0 empty 0 missed 0 pots 2/1/1/1 culture 100 elena +23 (t2) mabel +16 (t2) jordan +15 (t2)
+#12 msr seed 3 nights BCCC coffee 97.8/0/0/0 empty 0 missed 0 pots 2/1/1/1 culture 100 elena +24 (t3) mabel +17 (t2) jordan +16 (t2)
+#13 pwr seed 4 nights BCCC coffee 97.8/0/0/0 empty 0 missed 0 pots 2/1/1/1 culture 100 elena +22 (t2) mabel +15 (t2) jordan +14 (t2)
+#14 bwr seed 4 nights BCCC coffee 97.8/0/0/0 empty 0 missed 0 pots 2/1/1/1 culture 100 elena +23 (t2) mabel +16 (t2) jordan +15 (t2)
+#15 pebble seed 4 nights BCCC coffee 97.8/0/0/0 empty 0 missed 0 pots 2/1/1/1 culture 100 elena +24 (t3) mabel +17 (t2) jordan +16 (t2)
+#16 msr seed 4 nights BCCC coffee 97.8/0/0/0 empty 0 missed 0 pots 2/1/1/1 culture 100 elena +22 (t2) mabel +15 (t2) jordan +14 (t2)
+#17 pwr seed 5 nights BAAC coffee 97.8/0/0/0 empty 0 missed 0 pots 2/1/1/1 culture 100 elena +27 (t3) mabel +16 (t2) jordan +15 (t2)
+#18 bwr seed 5 nights BAAC coffee 97.8/0/0/0 empty 0 missed 0 pots 2/1/1/1 culture 100 elena +28 (t3) mabel +17 (t2) jordan +16 (t2)
+#19 pebble seed 5 nights BAAC coffee 97.8/0/0/0 empty 0 missed 0 pots 2/1/1/1 culture 100 elena +26 (t3) mabel +15 (t2) jordan +14 (t2)
+#20 msr seed 5 nights BAAC coffee 97.8/0/0/0 empty 0 missed 0 pots 2/1/1/1 culture 100 elena +27 (t3) mabel +16 (t2) jordan +15 (t2)
+required-only culture 68 (no cabinets, no extra talks)

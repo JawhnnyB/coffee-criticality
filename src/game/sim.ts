@@ -1467,7 +1467,7 @@ export function finishLeisure(s: GameState, score: number) {
   if (chargedHome(back)) addMinutes(s, 6);
   if (score >= 3 && !delayRun && !physRun && !loadRun) payOnce(4);
   // Hosts pay trust for a good score: Jordan bowls, Mabel golfs. Scores are higher-is-better.
-  if (score >= 3 && from === "bowl") bumpTrust(s, "jordan", 2);
+  if (score >= 3 && from === "bowl") bumpTrust(s, "jordan", 4);
   if (score >= 3 && from === "golf") bumpTrust(s, "mabel", 2);
   refreshObjective(s);
 }

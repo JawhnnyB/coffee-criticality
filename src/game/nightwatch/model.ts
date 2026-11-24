@@ -360,8 +360,8 @@ export function siteWatch(site: SiteKind): SiteWatch {
 /** Night 1 to 4. Night 1 teaches. Night 4 is the finale. Later nights are the endless watch. */
 export const NIGHTS = [
   { events: 3, oddities: 2, escalateScale: 1.3, brews: 3 },
-  { events: 4, oddities: 3, escalateScale: 1.1, brews: 2 },
-  { events: 5, oddities: 4, escalateScale: 1.0, brews: 2 },
+  { events: 4, oddities: 3, escalateScale: 1.1, brews: 1 },
+  { events: 5, oddities: 4, escalateScale: 1.0, brews: 1 },
   { events: 6, oddities: 4, escalateScale: 0.85, brews: 1 },
 ];
 

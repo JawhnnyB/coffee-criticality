@@ -92,7 +92,7 @@ test("a good bowl round pays Jordan trust and culture once", () => {
   const c0 = s.culture;
   const t0 = s.trust.jordan;
   S.finishLeisure(s, 4);
-  assert.equal(s.trust.jordan, t0 + 2, "host trust for a good round");
+  assert.equal(s.trust.jordan, t0 + 4, "host trust for a good round");
   assert.equal(s.culture, c0 + 4);
   s.mode = "bowl";
   S.finishLeisure(s, 4);
