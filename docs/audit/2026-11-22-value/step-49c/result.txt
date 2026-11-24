@@ -1,0 +1,5 @@
+loading-puzzles.test.mjs: 1 pass, 0 fail, 4.3s
+ten puzzles, 36 cells, fluxOf at 4.5%
+each fqMax is under the start Fq
+each witness is 3 swaps and meets Fq and rim
+best Fq within 2 swaps is not under the line

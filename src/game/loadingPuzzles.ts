@@ -1,36 +1,55 @@
 /**
- * Ten loading puzzles. Each target is a permutation of eight assemblies.
- * Par is the fewest swaps that reach it. The move limit is two past par.
- * Search (minSwaps) is what checks the par. No target is a one-swap or two-swap peak.
+ * Ten loading puzzles on the shuffle's 36-cell flux model.
+ * A goal is Fq under X and rim share under Y. X is just below every map
+ * one or two swaps away, and a stored three-swap line meets it.
+ * The board never shows that line.
  */
+import { fluxOf, type Burn } from "./shuffleModel";
+
 const KEY = "cc.puzzles";
+
+export const PUZZLE_ENRICH = 4.5;
 
 export const PUZZLE_LINES = {
   met: "Met.",
-  over: "Not the target.",
+  over: "Not under the line.",
   out: "Out of moves.",
-  note: "Each target takes three to five swaps. Par is the fewest. The limit is two past par.",
+  note: "Lower the peak. Keep the rim under 50%. Three swaps is the shortest.",
 } as const;
 
 export interface Puzzle {
   id: number;
   title: string;
-  start: string[];
-  target: string[];
-  /** Fewest swaps. Checked by search. */
+  start: Burn[];
+  /** Meet the goal with Fq strictly under this. */
+  fqMax: number;
+  /** And rim share strictly under this. */
+  rimMax: number;
   par: number;
   limit: number;
-  /** One shortest path, used by the test. The board does not show it. */
+  /** One three-swap line that meets the goal. Not shown on the board. */
   swaps: [number, number][];
 }
 
-const NAMES = ["A", "B", "C", "D", "E", "F", "G", "H"];
+const SPECS: { start: string; fqMax: number; swaps: [number, number][] }[] = [
+  { start: "120201202011211200011010220102222110", fqMax: 1.46, swaps: [[16, 25], [21, 33], [26, 29]] },
+  { start: "122202202011111200011010220102220110", fqMax: 1.486, swaps: [[0, 26], [5, 21], [17, 31]] },
+  { start: "120001102012211200011012220112222100", fqMax: 1.479, swaps: [[6, 21], [9, 22], [11, 16]] },
+  { start: "100201202012211000011210212100222112", fqMax: 1.448, swaps: [[10, 21], [0, 16], [15, 25]] },
+  { start: "121201200100211200012020220101222111", fqMax: 1.493, swaps: [[5, 8], [21, 34], [9, 16]] },
+  { start: "120221211011010200111020220112222000", fqMax: 1.477, swaps: [[4, 17], [11, 14], [21, 29]] },
+  { start: "120201202011201201011010210202222110", fqMax: 1.476, swaps: [[1, 7], [10, 16], [0, 21]] },
+  { start: "220101212001211200011011220102222010", fqMax: 1.474, swaps: [[3, 31], [16, 31], [21, 34]] },
+  { start: "120221002021211100011210020102122210", fqMax: 1.449, swaps: [[15, 33], [25, 26], [16, 34]] },
+  { start: "120101202012011002011012200102122122", fqMax: 1.483, swaps: [[25, 29], [21, 24], [15, 34]] },
+];
 
-/** Reactivity used only to print a peak. Not the pass rule. */
-const WEIGHT: Record<string, number> = { A: 1.34, B: 1.22, C: 1.12, D: 1.02, E: 0.92, F: 0.82, G: 0.72, H: 0.6 };
+function burns(s: string): Burn[] {
+  return Array.from(s, (c) => Number(c) as Burn);
+}
 
-function apply(start: readonly string[], swaps: readonly [number, number][]): string[] {
-  const a = start.slice();
+export function applySwaps(start: readonly Burn[], swaps: readonly [number, number][]): Burn[] {
+  const a = start.slice() as Burn[];
   for (const [i, j] of swaps) {
     const t = a[i];
     a[i] = a[j];
@@ -39,82 +58,35 @@ function apply(start: readonly string[], swaps: readonly [number, number][]): st
   return a;
 }
 
-const SPECS: { id: number; title: string; swaps: [number, number][] }[] = [
-  { id: 1, title: "Rim batch", swaps: [[0, 3], [0, 2], [0, 1]] },
-  { id: 2, title: "Centre shift", swaps: [[0, 4], [0, 3], [0, 2], [0, 1]] },
-  { id: 3, title: "Checker row", swaps: [[0, 5], [0, 4], [0, 3], [0, 2], [0, 1]] },
-  { id: 4, title: "Three pairs", swaps: [[0, 1], [2, 3], [4, 5]] },
-  { id: 5, title: "Split batch", swaps: [[0, 2], [0, 1], [3, 6], [3, 5], [3, 4]] },
-  { id: 6, title: "Inner ring", swaps: [[2, 5], [2, 4], [2, 3]] },
-  { id: 7, title: "Edge and pair", swaps: [[0, 3], [0, 2], [0, 1], [4, 5]] },
-  { id: 8, title: "Odd seats", swaps: [[1, 7], [1, 5], [1, 3]] },
-  { id: 9, title: "Long move", swaps: [[0, 4], [0, 3], [0, 2], [0, 1], [5, 6]] },
-  { id: 10, title: "Two groups", swaps: [[0, 3], [0, 2], [0, 1], [4, 6], [4, 5]] },
-];
-
 export function loadingPuzzles(): Puzzle[] {
-  return SPECS.map((s) => ({
-    id: s.id,
-    title: s.title,
-    start: NAMES.slice(),
-    target: apply(NAMES, s.swaps),
+  return SPECS.map((s, n) => ({
+    id: n + 1,
+    title: `Fq under ${s.fqMax.toFixed(3)}`,
+    start: burns(s.start),
+    fqMax: s.fqMax,
+    rimMax: 0.5,
     par: s.swaps.length,
     limit: s.swaps.length + 2,
     swaps: s.swaps.map((pair) => [pair[0], pair[1]] as [number, number]),
   }));
 }
 
-/** Assembly peak of this row. A classroom proxy, not a core calculation. */
-export function peakOf(layout: readonly string[]): number {
-  let max = 0;
-  let sum = 0;
-  layout.forEach((id, i) => {
-    const r = Math.abs(i - (layout.length - 1) / 2) / (layout.length / 2);
-    const p = (WEIGHT[id] ?? 1) * (1.12 - 0.35 * r);
-    sum += p;
-    if (p > max) max = p;
-  });
-  return sum === 0 ? 0 : max / (sum / layout.length);
+export function meets(puzzle: Puzzle, grid: readonly Burn[]): boolean {
+  const f = fluxOf(grid, PUZZLE_ENRICH);
+  return f.fq < puzzle.fqMax && f.rim < puzzle.rimMax;
 }
 
-/** Fewest swaps of any two seats. -1 if the search gives up past `cap`. */
-export function minSwaps(start: readonly string[], goal: readonly string[], cap = 6): number {
-  const g = goal.join("");
-  const s0 = start.join("");
-  if (s0 === g) return 0;
-  const n = start.length;
-  const seen = new Set<string>([s0]);
-  let layer = [start.slice()];
-  for (let dist = 1; dist <= cap; dist++) {
-    const next: string[][] = [];
-    for (const cur of layer) {
-      for (let i = 0; i < n; i++) {
-        for (let j = i + 1; j < n; j++) {
-          const copy = cur.slice();
-          const t = copy[i];
-          copy[i] = copy[j];
-          copy[j] = t;
-          const key = copy.join("");
-          if (seen.has(key)) continue;
-          if (key === g) return dist;
-          seen.add(key);
-          next.push(copy);
-        }
-      }
-    }
-    layer = next;
-    if (!layer.length) return -1;
-  }
-  return -1;
-}
-
-export function gradePuzzle(puzzle: Puzzle, grid: readonly string[], moves: number): { met: boolean; grade: "A" | "B" | "C" | "F"; peak: number } {
-  const same = grid.length === puzzle.target.length && grid.every((v, i) => v === puzzle.target[i]);
-  const peak = peakOf(grid);
-  if (!same || moves > puzzle.limit) return { met: false, grade: "F", peak };
-  if (moves <= puzzle.par) return { met: true, grade: "A", peak };
-  if (moves === puzzle.par + 1) return { met: true, grade: "B", peak };
-  return { met: true, grade: "C", peak };
+export function gradePuzzle(
+  puzzle: Puzzle,
+  grid: readonly Burn[],
+  moves: number,
+): { met: boolean; grade: "A" | "B" | "C" | "F"; fq: number; rim: number } {
+  const f = fluxOf(grid, PUZZLE_ENRICH);
+  const under = f.fq < puzzle.fqMax && f.rim < puzzle.rimMax;
+  if (!under || moves > puzzle.limit) return { met: false, grade: "F", fq: f.fq, rim: f.rim };
+  if (moves <= puzzle.par) return { met: true, grade: "A", fq: f.fq, rim: f.rim };
+  if (moves === puzzle.par + 1) return { met: true, grade: "B", fq: f.fq, rim: f.rim };
+  return { met: true, grade: "C", fq: f.fq, rim: f.rim };
 }
 
 export function readPuzzleMet(): number[] {

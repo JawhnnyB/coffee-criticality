@@ -9,7 +9,13 @@ import test from "node:test";
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const dir = mkdtempSync(join(tmpdir(), "cc-pz-"));
 const entry = join(dir, "entry.ts");
-writeFileSync(entry, `export { loadingPuzzles, minSwaps, gradePuzzle, notePuzzleMet, readPuzzleMet, PUZZLE_LINES, peakOf } from ${JSON.stringify(join(root, "src/game/loadingPuzzles.ts"))};\n`);
+writeFileSync(
+  entry,
+  [
+    `export { loadingPuzzles, applySwaps, gradePuzzle, notePuzzleMet, readPuzzleMet, PUZZLE_LINES, PUZZLE_ENRICH } from ${JSON.stringify(join(root, "src/game/loadingPuzzles.ts"))};`,
+    `export { fluxOf } from ${JSON.stringify(join(root, "src/game/shuffleModel.ts"))};`,
+  ].join("\n"),
+);
 const out = join(dir, "pz.mjs");
 const built = spawnSync(process.env.ESBUILD ?? "npx", [...(process.env.ESBUILD ? [] : ["esbuild"]), entry, "--bundle", "--platform=node", "--format=esm", `--outfile=${out}`], {
   encoding: "utf8",
@@ -24,35 +30,78 @@ globalThis.localStorage = {
 };
 const M = await import(out);
 
-function apply(start, swaps) {
-  const a = start.slice();
-  for (const [i, j] of swaps) {
-    const t = a[i];
-    a[i] = a[j];
-    a[j] = t;
-  }
-  return a;
+function pairs(g) {
+  const idx = [[], [], []];
+  for (let i = 0; i < 36; i++) idx[g[i]].push(i);
+  const list = [];
+  for (let a = 0; a < 3; a++)
+    for (let b = a + 1; b < 3; b++)
+      for (const i of idx[a]) for (const j of idx[b]) list.push([i, j]);
+  return list;
 }
 
-test("each puzzle takes 3 to 5 swaps, and search finds no 1-swap or 2-swap answer", () => {
+/** Lowest Fq within `depth` swaps that also keeps rim share under the goal. */
+function bestFq(start, depth, rimMax) {
+  const root = start.join("");
+  const seen = new Set([root]);
+  let layer = [root];
+  let best = Infinity;
+  for (let d = 1; d <= depth; d++) {
+    const next = [];
+    for (const key of layer) {
+      const g = Array.from(key, Number);
+      for (const [i, j] of pairs(g)) {
+        const a = g[i];
+        const b = g[j];
+        g[i] = b;
+        g[j] = a;
+        const k = g.join("");
+        g[i] = a;
+        g[j] = b;
+        if (seen.has(k)) continue;
+        seen.add(k);
+        next.push(k);
+      }
+    }
+    for (const key of next) {
+      const f = M.fluxOf(Array.from(key, Number), M.PUZZLE_ENRICH);
+      if (f.rim < rimMax && f.fq < best) best = f.fq;
+    }
+    layer = next;
+  }
+  return best;
+}
+
+test("each puzzle is a lower peak that takes three swaps, and search finds no one-swap or two-swap answer", () => {
   const list = M.loadingPuzzles();
   assert.equal(list.length, 10);
   const ids = new Set();
+  const starts = new Set();
   for (const p of list) {
     assert.equal(ids.has(p.id), false);
     ids.add(p.id);
-    assert.ok(p.par >= 3 && p.par <= 5, `${p.id} par ${p.par}`);
-    assert.equal(p.limit, p.par + 2);
-    assert.equal(p.swaps.length, p.par);
-    assert.deepEqual(apply(p.start, p.swaps), p.target);
-    const found = M.minSwaps(p.start, p.target, 5);
-    assert.equal(found, p.par, `${p.id} search ${found} wanted ${p.par}`);
-    assert.equal(M.minSwaps(p.start, p.target, 2), -1, `${p.id} is reachable in 1 or 2`);
+    assert.equal(starts.has(p.start.join("")), false);
+    starts.add(p.start.join(""));
+    assert.equal(p.start.length, 36);
+    assert.equal(p.start.filter((v) => v === 0).length, 12);
+    assert.equal(p.start.filter((v) => v === 1).length, 12);
+    assert.equal(p.start.filter((v) => v === 2).length, 12);
+    assert.equal(p.par, 3);
+    assert.equal(p.limit, 5);
+    assert.equal(p.swaps.length, 3);
+    assert.equal(p.rimMax, 0.5);
+    const from = M.fluxOf(p.start, M.PUZZLE_ENRICH);
+    assert.ok(p.fqMax < from.fq, `${p.id} target does not improve the peak`);
+    const solved = M.applySwaps(p.start, p.swaps);
+    const got = M.fluxOf(solved, M.PUZZLE_ENRICH);
+    assert.ok(got.fq < p.fqMax && got.rim < p.rimMax, `${p.id} witness misses`);
+    assert.ok(got.fq < from.fq, `${p.id} witness is not a lower peak`);
+    const short = bestFq(p.start, 2, p.rimMax);
+    assert.ok(short >= p.fqMax, `${p.id} a 1- or 2-swap map reaches ${short} under ${p.fqMax}`);
     assert.equal(M.gradePuzzle(p, p.start, 0).met, false);
-    assert.equal(M.gradePuzzle(p, p.target, p.par).grade, "A");
-    assert.equal(M.gradePuzzle(p, p.target, p.limit).met, true);
-    assert.equal(M.gradePuzzle(p, p.target, p.limit + 1).met, false);
-    assert.ok(M.peakOf(p.target) > 1);
+    assert.equal(M.gradePuzzle(p, solved, 3).grade, "A");
+    assert.equal(M.gradePuzzle(p, solved, 5).grade, "C");
+    assert.equal(M.gradePuzzle(p, solved, 6).met, false);
   }
   for (const line of Object.values(M.PUZZLE_LINES)) {
     assert.ok(line.length <= 92, line);

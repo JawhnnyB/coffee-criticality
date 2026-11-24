@@ -79,6 +79,7 @@ Brief: `docs/grok/value-100.md`. One step, one commit. Real-input proof in this 
 - Step 58 done · Catch, rods, pebble, fish, golf, bowl, horde, and plot show Level 3 on the glass. Delay, load, and phys are not on the ladder. Proof in step-58/.
 - Step 60 done · Nights 2 and 3 have one pot, so the cup runs out. A good bowl pays Jordan enough trust to reach tier 2. Culture was already on the scale. Night 1 stays a B and night 4 stays a C. Proof in step-60/.
 - Step 60a done · The bowl payout in sim.ts is +2 again. The extra +2 for Jordan and for Mabel is outside that file, once per cabinet per day. A quiet week ends Jordan +12 (tier 1) before and +14 (tier 2) after. Proof in step-60a/.
+- Step 49c done · The ten puzzles are 36-cell flux goals: Fq under a line, rim under 50%, peak lower than the start. Search says no one-swap or two-swap map meets them. A three-swap line does. The board does not show it. Proof in step-49c/.
 
 
 - Step 58 done · Eight cabinets show Level 3 on the bezel, at 1280 and 390. Delay, load, and phys stay unlevelled. Proof in step-58/.
