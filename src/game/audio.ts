@@ -56,6 +56,30 @@ let hallHiss: AudioBufferSourceNode | null = null;
 let hallHissFilter: BiquadFilterNode | null = null;
 let hallHissGain: GainNode | null = null;
 let hallTickAcc = 0;
+let paAcc = 0;
+let officeGain: GainNode | null = null;
+let coffeeGain: GainNode | null = null;
+
+/** Which day layers a room should hear. Office, the machine, and a distant page. */
+export function dayLayers(room: string, mode: string): { office: boolean; coffee: boolean; pa: boolean } {
+  const live = mode === "play" || mode === "dialogue" || mode === "incident";
+  return {
+    office: live && (room === "control" || room === "engineering"),
+    coffee: live && (room === "cafe" || room === "breakroom"),
+    pa: live && room !== "gate",
+  };
+}
+
+/** Seconds between distant pages. */
+export const PA_GAP = 22;
+
+/** Advance the page timer. A page fires once, then the wait starts over. Off resets it. */
+export function stepPa(acc: number, dt: number, on: boolean): { acc: number; fire: boolean } {
+  if (!on || dt <= 0) return { acc: on ? acc : 0, fire: false };
+  const next = acc + dt;
+  if (next < PA_GAP) return { acc: next, fire: false };
+  return { acc: 0, fire: true };
+}
 
 function ac() {
   if (ctx) return ctx;
@@ -494,6 +518,123 @@ export function syncWorld(w: {
   }
   const tone = hallTone(w.site ?? "pwr", w.power ?? 0, !!w.scram, hallDistance(w.room), w.soundOn !== false && !muted);
   applyHall(tone, w.dt);
+  const layers = dayLayers(w.room, w.mode);
+  setOffice(layers.office);
+  setCoffee(layers.coffee);
+  const page = stepPa(paAcc, w.dt, layers.pa);
+  paAcc = page.acc;
+  if (page.fire) playPa();
+}
+
+function layerGain(node: GainNode | null, on: boolean, level: number) {
+  if (!node || !ctx) return;
+  node.gain.setTargetAtTime(on && !muted ? level : 0.0001, ctx.currentTime, 0.2);
+}
+
+function setOffice(on: boolean) {
+  const c = ac();
+  const dest = ambience!;
+  if (!officeGain) {
+    const g = c.createGain();
+    g.gain.value = 0.0001;
+    const hum = c.createOscillator();
+    hum.type = "sine";
+    hum.frequency.value = 120;
+    const hg = c.createGain();
+    hg.gain.value = 0.55;
+    const src = c.createBufferSource();
+    src.buffer = noiseBuf();
+    src.loop = true;
+    const lp = c.createBiquadFilter();
+    lp.type = "lowpass";
+    lp.frequency.value = 180;
+    const ng = c.createGain();
+    ng.gain.value = 0.22;
+    hum.connect(hg);
+    hg.connect(g);
+    src.connect(lp);
+    lp.connect(ng);
+    ng.connect(g);
+    g.connect(dest);
+    hum.start();
+    src.start();
+    officeGain = g;
+  }
+  layerGain(officeGain, on, 0.02);
+}
+
+function setCoffee(on: boolean) {
+  const c = ac();
+  const dest = ambience!;
+  if (!coffeeGain) {
+    const g = c.createGain();
+    g.gain.value = 0.0001;
+    const src = c.createBufferSource();
+    src.buffer = noiseBuf();
+    src.loop = true;
+    const bp = c.createBiquadFilter();
+    bp.type = "bandpass";
+    bp.frequency.value = 420;
+    bp.Q.value = 0.8;
+    const lfo = c.createOscillator();
+    const lfoG = c.createGain();
+    lfo.frequency.value = 3.2;
+    lfoG.gain.value = 0.35;
+    const base = c.createGain();
+    base.gain.value = 0.55;
+    lfo.connect(lfoG);
+    lfoG.connect(base.gain);
+    src.connect(bp);
+    bp.connect(base);
+    base.connect(g);
+    g.connect(dest);
+    src.start();
+    lfo.start();
+    coffeeGain = g;
+  }
+  layerGain(coffeeGain, on, 0.016);
+}
+
+/** A distant page: two tones, then three formant bursts. No sample. */
+function playPa() {
+  const c = ac();
+  const dest = ambience!;
+  const t0 = c.currentTime + 0.02;
+  const beep = (freq: number, at: number) => {
+    const o = c.createOscillator();
+    const g = c.createGain();
+    o.type = "sine";
+    o.frequency.value = freq;
+    g.gain.setValueAtTime(0.0001, at);
+    g.gain.exponentialRampToValueAtTime(0.03, at + 0.02);
+    g.gain.exponentialRampToValueAtTime(0.0001, at + 0.18);
+    o.connect(g);
+    g.connect(dest);
+    o.start(at);
+    o.stop(at + 0.2);
+  };
+  beep(880, t0);
+  beep(660, t0 + 0.22);
+  const burst = (freq: number, at: number) => {
+    const src = c.createBufferSource();
+    src.buffer = noiseBuf();
+    const bp = c.createBiquadFilter();
+    bp.type = "bandpass";
+    bp.frequency.value = freq;
+    bp.Q.value = 6;
+    const g = c.createGain();
+    g.gain.setValueAtTime(0.0001, at);
+    g.gain.exponentialRampToValueAtTime(0.02, at + 0.03);
+    g.gain.exponentialRampToValueAtTime(0.0001, at + 0.28);
+    src.connect(bp);
+    bp.connect(g);
+    g.connect(dest);
+    src.start(at);
+    src.stop(at + 0.3);
+  };
+  burst(700, t0 + 0.5);
+  burst(1100, t0 + 0.82);
+  burst(520, t0 + 1.1);
 }
 
 function applyHall(tone: HallTone, dt: number) {
