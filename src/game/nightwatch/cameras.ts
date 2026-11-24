@@ -389,6 +389,21 @@ function beacon(g: G, x: number, y: number, t: number, color: [number, number, n
   g.globalCompositeOperation = "source-over";
 }
 
+function localGauge(g: G, x: number, y: number, frac: number) {
+  const f = Math.max(0, Math.min(1, frac));
+  g.fillStyle = "#14181c";
+  g.fillRect(x, y, 34, 20);
+  g.strokeStyle = "#e6e1d4";
+  g.lineWidth = 1;
+  g.strokeRect(x + 0.5, y + 0.5, 33, 19);
+  g.strokeStyle = "#e23b2b";
+  g.lineWidth = 2;
+  g.beginPath();
+  g.moveTo(x + 6, y + 15);
+  g.lineTo(x + 6 + f * 22, y + 5);
+  g.stroke();
+}
+
 /** A person on rounds: hard hat, coveralls, a torch sweeping. p: 0..1 across the frame. */
 function rover(g: G, p: number, t: number, floorY: number, s = 1) {
   const x = -30 + p * (W + 60);
@@ -608,6 +623,14 @@ const S: Record<string, Scene> = {
         grateSheen(g, 240, 252, 72, t, v.at("puddle") ?? 1);
         plume(g, 248, 168, t, 0.45);
       }
+      // Oil under the coupling is amber, not the water sheen. The sump is a local sight glass.
+      if (v.has("oilSheen")) {
+        g.fillStyle = "rgba(180,110,28,0.62)";
+        g.beginPath();
+        g.ellipse(268, 246, 26, 7, 0, 0, Math.PI * 2);
+        g.fill();
+      }
+      if (v.has("sumpHigh")) localGauge(g, 28, 198, 0.9);
     },
   },
   pressurizer: {
@@ -627,6 +650,11 @@ const S: Record<string, Scene> = {
     },
     live(g, t, v) {
       if (v.has("steamWisp")) plume(g, 400, 62, t, 1.1);
+      if (v.has("sprayLeak")) plume(g, 330, 40, t, 0.65);
+      if (v.has("heaterGlow")) {
+        g.fillStyle = "rgba(255,120,40,0.9)";
+        for (const x of [198, 228, 258]) g.fillRect(x, 78, 10, 16);
+      }
     },
   },
   msiv: {
@@ -645,6 +673,13 @@ const S: Record<string, Scene> = {
       g.fillStyle = hi ? `rgba(230,40,30,${0.6 + 0.4 * Math.sin(t * 6)})` : "rgba(60,200,90,0.85)";
       g.fillRect(364, 96, 64, 4);
       if (hi) beacon(g, 440, 40, t);
+      if (v.has("packingWeep")) {
+        g.fillStyle = "rgba(206,214,220,0.9)";
+        g.fillRect(236, 164, 2, 16);
+        g.beginPath();
+        g.ellipse(237, 184, 8, 3, 0, 0, Math.PI * 2);
+        g.fill();
+      }
     },
   },
   drywell: {
@@ -660,6 +695,7 @@ const S: Record<string, Scene> = {
         puddle(g, W / 2, H - 12, 100, t, v.at("puddle") ?? 1);
         plume(g, W / 2 - 20, H - 60, t, 0.7);
       }
+      if (v.has("sightLow")) localGauge(g, 36, 148, 0.12);
     },
   },
   torus: {
@@ -686,6 +722,7 @@ const S: Record<string, Scene> = {
           g.fill();
         }
       }
+      if (v.has("tempNeedle")) localGauge(g, 16, 36, 0.84);
     },
   },
   tunnel: {
@@ -700,6 +737,8 @@ const S: Record<string, Scene> = {
     },
     live(g, t, v) {
       if (v.has("beacon")) beacon(g, W / 2, 70, t);
+      if (v.has("sideBeacon")) beacon(g, 72, 46, t);
+      if (v.has("flowNeedle")) localGauge(g, 400, 36, 0.18);
       if (v.has("condensate")) {
         const grow = v.at("condensate") ?? 0.7;
         // Threads off the steam lines. One pixel wide, long enough to see, not a painted oval.
@@ -763,6 +802,11 @@ const S: Record<string, Scene> = {
         g.fill();
         g.globalCompositeOperation = "source-over";
       }
+      if (v.has("ductHot")) {
+        g.fillStyle = "rgba(255,110,30,0.85)";
+        g.fillRect(168, 92, 16, 40);
+      }
+      if (v.has("cavityBeacon")) beacon(g, 42, 58, t);
     },
   },
   blower: {
@@ -791,6 +835,10 @@ const S: Record<string, Scene> = {
       }
       if (v.has("steamWisp")) plume(g, 340, 150, t, 1);
       if (v.has("shake")) beacon(g, 135, 96, t, [240, 190, 40]);
+      if (v.has("motorHot")) {
+        g.fillStyle = "rgba(210,140,40,0.88)";
+        g.fillRect(96, 128, 48, 22);
+      }
     },
   },
   discharge: {
@@ -810,6 +858,14 @@ const S: Record<string, Scene> = {
       g.fillStyle = jam ? `rgba(230,40,30,${0.6 + 0.4 * Math.sin(t * 6)})` : "rgba(60,200,90,0.85)";
       g.fillRect(89, 128, 15, 6);
       if (jam) beacon(g, 91, 108, t);
+      if (v.has("bridge")) {
+        g.fillStyle = "#1a1c1e";
+        for (let k = 0; k < 5; k++) g.fillRect(250 + k * 14, 184, 8, 14);
+      }
+      if (v.has("dust")) {
+        g.fillStyle = "rgba(30,30,30,0.95)";
+        for (let k = 0; k < 16; k++) g.fillRect(248 + (k % 8) * 10, 182 + ((k / 8) | 0) * 6, 2, 2);
+      }
     },
   },
   cell: {
@@ -854,6 +910,14 @@ const S: Record<string, Scene> = {
         g.fill();
         g.restore();
       }
+      if (v.has("traceDark")) {
+        g.fillStyle = "rgba(18,12,8,0.95)";
+        for (let x = 100; x <= 168; x += 6) g.fillRect(x, 158, 3, 2);
+      }
+      if (v.has("cellBand")) {
+        g.fillStyle = "rgba(12,8,4,0.88)";
+        g.fillRect(74, 116, 332, 14);
+      }
     },
   },
   freeze: {
@@ -873,7 +937,7 @@ const S: Record<string, Scene> = {
           g.fillRect(203 + hash(k, 1) * 64, 116 + hash(k, 2) * 52, 2, 2);
         }
       // Cooling-air fan.
-      const a = v.has("frostGone") ? 0.3 : t * 14;
+      const a = v.has("fanStop") ? 0.4 : v.has("frostGone") ? 0.3 : t * 14;
       g.strokeStyle = "#cfd5d8";
       g.lineWidth = 3;
       for (let k = 0; k < 3; k++) {
@@ -883,6 +947,11 @@ const S: Record<string, Scene> = {
         g.stroke();
       }
       if (v.has("frostGone")) beacon(g, 235, 96, t, [240, 190, 40]);
+      if (v.has("fanStop")) {
+        g.fillStyle = "rgba(226,59,43,0.92)";
+        g.fillRect(366, 126, 38, 16);
+      }
+      if (v.has("plugGauge")) localGauge(g, 28, 168, 0.86);
     },
   },
   offgas: {
@@ -895,6 +964,10 @@ const S: Record<string, Scene> = {
     },
     live(g, t, v) {
       if (v.has("beacon")) beacon(g, 440, 110, t);
+      if (v.has("linePlug")) {
+        g.fillStyle = "rgba(245,245,240,0.95)";
+        g.fillRect(148, 50, 30, 16);
+      }
     },
   },
   turbine: {
@@ -926,6 +999,12 @@ const S: Record<string, Scene> = {
         g.strokeRect(392, 150, 44, 22);
         g.fillStyle = "#e8c21a";
         g.fillRect(410, 142, 3, 10);
+      }
+      if (v.has("stickerOn")) {
+        g.fillStyle = "#e8c21a";
+        g.fillRect(392, 150, 40, 18);
+        g.fillStyle = "#1a1a18";
+        g.fillRect(396, 157, 32, 3);
       }
     },
   },
@@ -961,6 +1040,13 @@ const S: Record<string, Scene> = {
         g.fill();
       }
       if (v.has("puddle")) puddle(g, 200, H - 26, 80, t, v.at("puddle") ?? 1);
+      if (v.has("flangeWeep")) {
+        g.fillStyle = "rgba(190,200,210,0.9)";
+        g.fillRect(146, 118, 2, 16);
+        g.beginPath();
+        g.ellipse(147, 138, 7, 3, 0, 0, Math.PI * 2);
+        g.fill();
+      }
     },
   },
   pool: {

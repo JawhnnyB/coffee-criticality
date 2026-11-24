@@ -37,7 +37,7 @@ const valve = (scale: number): EventDef => ({
   develop: 18,
   escalate: Math.round(50 / 1.3 * scale),
   consequence: "finding",
-  visual: "puddle",
+  visual: "flangeWeep",
   log: "Valve 14 packing weeping on the aux header. Packing nuts tightened on the night shift.",
 });
 
@@ -63,7 +63,7 @@ const tagSticker: EventDef = {
   develop: 1,
   escalate: 28,
   consequence: "finding",
-  visual: "missingTag",
+  visual: "stickerOn",
   log: "IN SERVICE sticker still on feed pump B. Peeled off, and the tag checked.",
 };
 

@@ -57,3 +57,4 @@ Brief: `docs/grok/value-100.md`. One step, one commit. Real-input proof in this 
 
 
 
+- Step 45a done · Every event picture is the fault that camera would show. A shared picture stays only where the board tiles differ. The list is in step-45a/events.md.
