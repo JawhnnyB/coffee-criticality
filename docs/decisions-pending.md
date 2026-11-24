@@ -143,3 +143,7 @@ The owner asked for a progressing social environment, progressing mini games, an
 
 - Ten short scenes that play only when the week's record says something happened (Valve 14 reported or hidden, the tag, the dose, the log, catches, hides, maintenance done), plus Jordan introducing himself as the night rover on day 5.
 - Every line is in `docs/crew-moments-draft.md`. Not approved yet. They count as AI-drafted dialogue for the Steam disclosure unless the owner rewrites them.
+
+## Night grade: should an A need an early catch? (23 November 2026)
+
+- A careful player who only answers alarms can get an A on a night with no silent event (night 3, 1×: five late catches, score capped at 100). Options: leave it; cap a night with no early catch at B; or start the score at 90 so early catches are needed to reach A. Claude's suggestion: cap at B, since catching things before the board is the game's whole idea.
