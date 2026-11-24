@@ -4,12 +4,27 @@
  */
 import type { NpcId, Line } from "../content";
 import type { Scene } from "../socialScenes";
-
-const KEY = "cc.crew";
+import { profileGet, profileSet } from "../profile";
 
 export interface CrewUnlock {
   unlocked: boolean;
   seen: boolean;
+}
+
+const EMPTY: CrewUnlock = { unlocked: false, seen: false };
+
+function write(next: CrewUnlock): CrewUnlock {
+  profileSet("crew", next);
+  return next;
+}
+
+export function readCrew(): CrewUnlock {
+  try {
+    const o = (profileGet("crew") ?? {}) as { unlocked?: unknown; seen?: unknown };
+    return { unlocked: o.unlocked === true, seen: o.seen === true };
+  } catch {
+    return { ...EMPTY };
+  }
 }
 
 export const A_ROTATION_NPC: NpcId = "elena";
@@ -35,26 +50,6 @@ export const A_ROTATION_SCENE: Scene = {
 
 export const DAWN_CREW_LINE = "Four A's. Elena has a word next week.";
 
-const EMPTY: CrewUnlock = { unlocked: false, seen: false };
-
-function write(next: CrewUnlock): CrewUnlock {
-  try {
-    localStorage.setItem(KEY, JSON.stringify(next));
-  } catch {
-    /* private mode */
-  }
-  return next;
-}
-
-export function readCrew(): CrewUnlock {
-  try {
-    const o = JSON.parse(localStorage.getItem(KEY) || "{}") as { unlocked?: unknown; seen?: unknown };
-    return { unlocked: o.unlocked === true, seen: o.seen === true };
-  } catch {
-    return { ...EMPTY };
-  }
-}
-
 /** Unlock once. A later week does not play the scene again, and a B does not unlock it. */
 export function noteARotation(letters: readonly string[]): CrewUnlock {
   const cur = readCrew();
@@ -71,7 +66,7 @@ export function dawnCrewLine(letters: readonly string[], seen: boolean): string 
 }
 
 /**
- * Append-once scene for Elena. Marks seen in cc.crew, not in the week flags.
+ * Append-once scene for Elena. Marks seen in the profile, not in the week flags.
  * Returns null for anyone else, and null after the first talk that takes it.
  */
 export function takeARotationScene(npc: string): Scene | null {

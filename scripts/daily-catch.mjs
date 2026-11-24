@@ -37,6 +37,13 @@ await page.goto(`${base}?v=daily-catch`, { waitUntil: "domcontentloaded" });
 await page.waitForFunction(() => window.__controlsTest);
 await page.evaluate(() => {
   localStorage.removeItem("cc.daily");
+  try {
+    const o = JSON.parse(localStorage.getItem("cc.profile") || "{}");
+    delete o.daily;
+    localStorage.setItem("cc.profile", JSON.stringify(o));
+  } catch {
+    localStorage.removeItem("cc.profile");
+  }
   window.__controlsTest.bootPlay();
   window.__controlsTest.openDesk();
 });
@@ -112,7 +119,15 @@ const stat = await page.locator("[data-testid='nw-summary'] p").evaluateAll((els
 await page.getByTestId("nw-summary-leave").click();
 await page.getByTestId("daily-board").waitFor();
 const board = (await page.getByTestId("daily-board").innerText()).replace(/\n/g, " ");
-const saved = await page.evaluate(() => ({ daily: localStorage.getItem("cc.daily") || "", week: localStorage.getItem("cc.save.v2") || "" }));
+const saved = await page.evaluate(() => {
+  let daily = "";
+  try {
+    daily = JSON.stringify(JSON.parse(localStorage.getItem("cc.profile") || "{}").daily || {});
+  } catch {
+    daily = "";
+  }
+  return { daily, week: localStorage.getItem("cc.save.v2") || "" };
+});
 await browser.close();
 const lines = [
   `App. ${listed}`,

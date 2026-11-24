@@ -57,7 +57,8 @@ test("four A's unlock one Elena scene, once, outside the week save", () => {
   assert.equal(W.noteARotation(["A", "A", "A", "A"]).unlocked, true);
   assert.equal(W.readCrew().seen, false);
   assert.equal(store.has("cc.save.v2"), false);
-  assert.equal(store.has("cc.crew"), true);
+  assert.equal(store.has("cc.profile"), true);
+  assert.equal(store.has("cc.crew"), false);
   assert.equal(W.dawnCrewLine(["A", "A", "A", "A"], false), W.DAWN_CREW_LINE);
   assert.equal(W.dawnCrewLine(["A", "A", "A", "B"], false), null);
 
@@ -86,9 +87,9 @@ test("four A's unlock one Elena scene, once, outside the week save", () => {
   assert.equal(again?.title, "Two sets of eyes");
   assert.equal(s.dialogue.some((l) => l.text.startsWith("Four quiet nights")), false);
 
-  const kept = store.get("cc.crew");
+  const kept = store.get("cc.profile");
   store.delete("cc.save.v2");
-  assert.equal(store.get("cc.crew"), kept);
+  assert.equal(store.get("cc.profile"), kept);
   assert.equal(W.noteARotation(["A", "A", "A", "A"]).seen, true);
 });
 

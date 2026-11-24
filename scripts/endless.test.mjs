@@ -40,5 +40,6 @@ test("endless nights get harder, and the high score stays out of the week save",
   assert.equal(W.noteEndless(2, 90).points, 90);
   assert.equal(W.readEndless().nights, 3);
   assert.equal(store.has("cc.save.v2"), false);
-  assert.ok(store.has("cc.endless"));
+  assert.ok(store.has("cc.profile"));
+  assert.equal(store.has("cc.endless"), false);
 });

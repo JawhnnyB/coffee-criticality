@@ -7,8 +7,12 @@
 export const LIVE_SAVE = "cc.save.v2";
 export const OLD_SAVE = "cc.save.v1";
 export const CORRUPT_SAVE = "cc.save.v2.corrupt";
+/** Crew, paper, endless, and the daily board. Not rotated with the week file. */
+export const PROFILE_SAVE = "cc.profile";
 /** Newest backup first. Three are kept. */
 export const SAVE_BACKUPS = ["cc.save.v2.1", "cc.save.v2.2", "cc.save.v2.3"] as const;
+/** Copied beside the week file. The week file rotates. These do not. */
+export const DESK_PLAIN = [OLD_SAVE, CORRUPT_SAVE, PROFILE_SAVE] as const;
 
 export type SaveFiles = Map<string, string>;
 

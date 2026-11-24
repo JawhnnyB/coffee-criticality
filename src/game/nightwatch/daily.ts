@@ -1,7 +1,7 @@
 /**
- * One shared night per UTC day. Scores stay on this machine. No Steam board.
+ * One shared night per UTC day. Scores stay on this machine, in the profile. No Steam board.
  */
-const KEY = "cc.daily";
+import { profileGet, profileSet } from "../profile";
 
 export interface DailyRow {
   points: number;
@@ -34,7 +34,7 @@ export function readDaily(d = new Date()): DailyBoard {
   const day = utcDay(d);
   const seed = dailySeed(d);
   try {
-    const o = JSON.parse(localStorage.getItem(KEY) || "{}") as { day?: unknown; rows?: unknown };
+    const o = (profileGet("daily") ?? {}) as { day?: unknown; rows?: unknown };
     if (o.day === day && Array.isArray(o.rows)) {
       const rows = o.rows
         .filter((row): row is DailyRow => !!row && typeof row === "object" && typeof (row as DailyRow).points === "number")
@@ -51,10 +51,6 @@ export function recordDaily(points: number, letter: string, d = new Date()): Dai
   const cur = readDaily(d);
   const rows = [...cur.rows, { points, letter, at: Date.now() }].sort((a, b) => b.points - a.points || a.at - b.at).slice(0, 10);
   const next = { day: cur.day, seed: cur.seed, rows };
-  try {
-    localStorage.setItem(KEY, JSON.stringify(next));
-  } catch {
-    /* private mode */
-  }
+  profileSet("daily", next);
   return next;
 }

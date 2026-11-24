@@ -55,5 +55,6 @@ test("the paper is the week's choices, short, and not the week save", () => {
   P.writePaper(full);
   assert.deepEqual(P.readPaper(), full);
   assert.equal(store.has("cc.save.v2"), false);
-  assert.equal(store.has("cc.paper"), true);
+  assert.equal(store.has("cc.profile"), true);
+  assert.equal(store.has("cc.paper"), false);
 });

@@ -1,10 +1,9 @@
 /**
  * End-of-rotation paper. Headlines are the week's flags, not a city and not a licence.
- * Stored beside the week save so a new week can wipe cc.save.v2 and leave the sheet.
+ * Stored in the profile so a new week can wipe cc.save.v2 and leave the sheet.
  */
 import type { ResidueHow } from "../content";
-
-const KEY = "cc.paper";
+import { profileGet, profileSet } from "../profile";
 
 export interface PaperInput {
   grades: readonly string[];
@@ -42,16 +41,12 @@ export function paperLines(p: PaperInput): string[] {
 }
 
 export function writePaper(lines: readonly string[]): void {
-  try {
-    localStorage.setItem(KEY, JSON.stringify({ lines }));
-  } catch {
-    /* private mode */
-  }
+  profileSet("paper", { lines });
 }
 
 export function readPaper(): string[] {
   try {
-    const o = JSON.parse(localStorage.getItem(KEY) || "{}") as { lines?: unknown };
+    const o = (profileGet("paper") ?? {}) as { lines?: unknown };
     if (!Array.isArray(o.lines)) return [];
     return o.lines.filter((l) => typeof l === "string");
   } catch {

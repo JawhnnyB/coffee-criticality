@@ -39,5 +39,6 @@ test("one UTC day is one seed, and the board is local", () => {
   assert.equal(board.rows[0].letter, "B");
   assert.equal(W.readDaily(next).rows.length, 0);
   assert.equal(store.has("cc.save.v2"), false);
-  assert.ok(store.has("cc.daily"));
+  assert.ok(store.has("cc.profile"));
+  assert.equal(store.has("cc.daily"), false);
 });
