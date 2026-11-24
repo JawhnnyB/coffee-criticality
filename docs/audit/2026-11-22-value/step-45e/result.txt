@@ -1,0 +1,9 @@
+App. Seed 35190161
+Plan. sg-packing@18:leak, rcp-oil@84:leak, sump-rise@145:leak, rcp-seal@222:leak
+Turnover. GRADE A. 06:00 turnover.
+Stat. Caught 4 (0 early) · missed 0 · false reports 0
+Board. 100 A
+Saved. {"day":"2026-11-24","seed":35190161,"rows":[{"points":100,"letter":"A","at":1795479756675}]}
+Week save unchanged.
+Week save has no night:2.
+Page errors 0.
