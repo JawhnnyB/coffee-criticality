@@ -589,7 +589,7 @@ function Summary({ n, nightNo, onLeave, onStay, endless, best }: { n: Night; nig
             Best: {best ?? 0} nights.
           </p>
         ) : null}
-        <p style={{ margin: "8px 0 0", fontSize: 14 }}>{elenaLine(g.letter, n.curt, n.over?.why)}</p>
+        <p style={{ margin: "8px 0 0", fontSize: 14 }}>{elenaLine(g.letter, n.curt, n.over?.why, sc.early)}</p>
         <p style={{ margin: "8px 0 0", fontSize: 12, color: "#6a4a32" }}>
           Caught {sc.caught} ({sc.early} early) · missed {sc.missed} · false reports {sc.falseReports}
         </p>

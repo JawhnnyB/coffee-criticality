@@ -30,9 +30,13 @@ export function openerLine(night: number, again: boolean): string {
   return again ? `Night ${night}, again. Elena wants it stood properly.` : "18:00 turnover. Quiet board. At midnight the watch desk is yours.";
 }
 
-export function elenaLine(letter: GradeLetter, curt: boolean, why?: string): string {
+/** An A where every catch came after the alarm: true, but not the line about beating the board. */
+export const ELENA_A_LATE = "Everything caught, every one after the alarm. Next time, find one before the board does.";
+
+export function elenaLine(letter: GradeLetter, curt: boolean, why?: string, early?: number): string {
   if (why === "relieved") return curt ? ELENA_RELIEVED_CURT : ELENA_RELIEVED;
   if (letter === "C" && why != null && why !== "dawn") return curt ? "You did not reach six." : "Six is the end of the night. This one ended early.";
+  if (letter === "A" && !curt && early === 0) return ELENA_A_LATE;
   return (curt ? ELENA_CURT : ELENA)[letter];
 }
 
@@ -80,7 +84,7 @@ export function boardTile(n: Night, def: EventDef): string | null {
   }
   if (!shared || diff.size === 0) return null;
   const labels = [...diff].map((id) => n.watch.metrics.find((m) => m.id === id)?.label ?? id);
-  return `The board: ${labels.join(", ")}.`;
+  return `What tells it apart on the board: ${labels.join(", ")}.`;
 }
 
 export function turnoverRows(n: Night): TurnRow[] {

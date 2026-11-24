@@ -102,7 +102,7 @@ test("night 2 says the board tells you what kind, and the turnover names that ti
   n.minute = 360;
   const row = W.turnoverRows(n).find((r) => r.title.includes("tube") || r.title.includes("Steam generator"));
   assert.ok(row);
-  assert.equal(row.tile, "The board: Pressurizer level.");
+  assert.equal(row.tile, "What tells it apart on the board: Pressurizer level.");
   assert.equal(row.tile.includes("!"), false);
   assert.ok(row.tile.length <= 78);
   const pump = watch.events.find((e) => e.id === "feed-pump");

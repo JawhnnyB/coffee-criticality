@@ -285,6 +285,8 @@ test("being relieved is an F, an open event is a miss, and the C line is only at
   assert.equal(W.elenaLine("C", false, "dawn"), "You made six. The ones you missed were already on a camera.");
   assert.equal(W.elenaLine("C", false).includes("You made six"), true);
   assert.equal(W.elenaLine("C", false, "relieved").includes("You made six"), false);
+  assert.equal(W.elenaLine("A", false, "dawn", 0).includes("before the board did"), false, "an all-late A does not claim early catches");
+  assert.equal(W.elenaLine("A", false, "dawn", 2).includes("before the board did"), true);
   assert.equal(W.elenaLine("F", false, "relieved").includes("!"), false);
   assert.equal(W.elenaLine("F", true, "relieved"), "Relieved. The night is not done.");
 });
