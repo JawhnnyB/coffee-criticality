@@ -1,0 +1,6 @@
+R10 sweeper, seed 1, 1× clock. Model careful grades, same letter bands: night 1 is 92 B, night 4 is 82 C.
+
+Night 1 sweeper: F. Clock 01:07. Early 0. Missed 0. False reports 3. Wall time 84 s.
+Night 4 sweeper: F. Clock 01:55. Early 0. Missed 1. False reports 3. Wall time 144 s.
+
+Three false reports relieve the watch, so the grade is F before dawn. The sweeper files a picture change when no tile is red, and it guesses a category. The careful model reports only when that event's own reading is in alarm, and it files one false report on purpose on night 1. The letters are not the same policy.

@@ -6,7 +6,9 @@ import { mkdirSync, writeFileSync } from "node:fs";
 import { chromium } from "../node_modules/playwright/index.mjs";
 
 const base = process.argv[2] ?? "http://127.0.0.1:8092/";
-const outDir = new URL("../docs/audit/2026-11-21-rotation/", import.meta.url);
+const speed = Number(process.env.NIGHT_SPEED || 8);
+const limitMs = Number(process.env.NIGHT_MS || 180000);
+const outDir = new URL(process.env.NIGHT_OUT || "../docs/audit/2026-11-21-rotation/", import.meta.url);
 const rows = [];
 const browser = await chromium.launch({
   args: ["--disable-background-timer-throttling", "--disable-renderer-backgrounding", "--disable-backgrounding-occluded-windows"],
@@ -41,7 +43,7 @@ async function play(policy, seed, nightNo) {
   await z(400);
   await page.locator("[data-testid='start-night']").click();
   await page.waitForFunction(() => typeof window.__controlsTest.setNightSpeed === "function");
-  await T("setNightSpeed", 8);
+  await T("setNightSpeed", speed);
   const cams = await page.locator("[data-testid^='nw-cam-']").evaluateAll((els) => els.map((e) => e.getAttribute("data-testid").slice(7)));
   const thumb = () =>
     page.evaluate(() => {
@@ -91,7 +93,7 @@ async function play(policy, seed, nightNo) {
     }
   };
   const t0 = Date.now();
-  while (Date.now() - t0 < 180000) {
+  while (Date.now() - t0 < limitMs) {
     try {
     if (await page.locator("[data-testid='nw-summary']").count()) break;
     const coffee = await page.locator("[data-testid='nw-coffee']").innerText();
@@ -198,7 +200,7 @@ const falseAvg = rows.reduce((s, r) => s + r.falses, 0) / rows.length;
 const lines = [
   "# Bot table",
   "",
-  "8× clock. Labelled setup opens one night. The rest is clicks.",
+  `${speed}× clock. Labelled setup opens one night. The rest is clicks.`,
   "",
   "| Policy | Seed | Night | Grade | Early | Missed | False |",
   "| --- | ---: | ---: | --- | ---: | ---: | ---: |",
