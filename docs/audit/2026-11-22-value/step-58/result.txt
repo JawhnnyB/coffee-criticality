@@ -1,0 +1,17 @@
+errors 0
+catch 1280 Level 3
+rods 1280 Level 3
+pebble 1280 Level 3
+fish 1280 Level 3
+golf 1280 Level 3
+bowl 1280 Level 3
+horde 1280 Level 3
+plot 1280 Level 3
+catch 390 Level 3
+rods 390 Level 3
+pebble 390 Level 3
+fish 390 Level 3
+golf 390 Level 3
+bowl 390 Level 3
+horde 390 Level 3
+plot 390 Level 3

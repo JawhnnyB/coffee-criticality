@@ -856,6 +856,22 @@
 .cabinet-screen :where(p, h2, h3, li) {
   color: #e8d8b8;
 }
+/* The desktop window hides the marquee. The level still has to be on the screen. */
+.cab-level {
+  position: absolute;
+  z-index: 3;
+  top: 8px;
+  right: 10px;
+  margin: 0;
+  padding: 3px 8px;
+  background: #c4783a;
+  color: #1a1410;
+  font-family: var(--font-tag);
+  font-size: var(--text-tag-sm);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  line-height: 1.2;
+}
 /* cabCanvas.ts sets the size: the drawing's own shape, never a stretch. */
 .cabinet-screen canvas {
   flex: none;

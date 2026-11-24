@@ -2,7 +2,7 @@
 
 import { TUNE, type CabLevel } from "./cabLevels";
 import { cabContext, cabFont } from "./cabCanvas";
-import { type ReactNode, useEffect, useRef, useState } from "react";
+import { type ReactNode, useContext, useEffect, useRef, useState, createContext } from "react";
 import { playHuntHit, playHuntMiss } from "./audio";
 import { shakeOn } from "./frameRate";
 import { actHeld } from "./binds";
@@ -33,7 +33,15 @@ const WALLS: { id: CabWall; title: string; line: string }[] = [
   { id: "after", title: "AFTER-SHIFT", line: "South wall. Not the thesis." },
 ];
 
+const ShownLevel = createContext<number | null>(null);
+
+/** Puts the cabinet's level on every bezel inside, including the end card. */
+export function CabLevelFrame({ level, children }: { level: number; children: ReactNode }) {
+  return <ShownLevel.Provider value={level}>{children}</ShownLevel.Provider>;
+}
+
 export function Bezel({ children }: { children: ReactNode }) {
+  const level = useContext(ShownLevel);
   return (
     <div className="cab-shell absolute inset-0 z-30 flex items-stretch justify-center bg-[#2a1c14]/80 p-2 sm:p-4">
       <div className="cabinet w-full max-w-6xl">
@@ -41,7 +49,14 @@ export function Bezel({ children }: { children: ReactNode }) {
           <span>Mabel’s parlor</span>
           <span>CRT · teaching only</span>
         </div>
-        <div className="cabinet-screen">{children}</div>
+        <div className="cabinet-screen">
+          {children}
+          {level ? (
+            <span data-testid="cab-level" className="cab-level">
+              Level {level}
+            </span>
+          ) : null}
+        </div>
         <div className="cabinet-deck" aria-hidden>
           <span />
         </div>

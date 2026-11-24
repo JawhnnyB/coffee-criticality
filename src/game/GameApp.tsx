@@ -25,7 +25,7 @@ import {
   type Period,
   type RoomId,
 } from "./content";
-import { Arcade, ArcadeHall } from "./Arcade";
+import { Arcade, ArcadeHall, CabLevelFrame } from "./Arcade";
 import { ReactorTrainer } from "./ReactorTrainer";
 import { ReactorBuilder } from "./ReactorBuilder";
 import { FuelShuffle } from "./FuelShuffle";
@@ -1043,6 +1043,7 @@ export function GameApp() {
         )}
 
         {mode === "fish" && (
+          <CabLevelFrame level={cabLevel(s.flags, "fish")}>
           <FishGame
             level={cabLevel(s.flags, "fish")}
             onDone={(score) => {
@@ -1058,8 +1059,10 @@ export function GameApp() {
               refresh();
             }}
           />
+          </CabLevelFrame>
         )}
         {mode === "plot" && (
+          <CabLevelFrame level={cabLevel(s.flags, "plot")}>
           <PlotGame
             level={cabLevel(s.flags, "plot")}
             onDone={(score) => {
@@ -1075,9 +1078,11 @@ export function GameApp() {
               refresh();
             }}
           />
+          </CabLevelFrame>
         )}
 
         {mode === "horde" && (
+          <CabLevelFrame level={cabLevel(s.flags, "horde")}>
           <HordeGame
             level={cabLevel(s.flags, "horde")}
             onDone={(score) => {
@@ -1093,6 +1098,7 @@ export function GameApp() {
               refresh();
             }}
           />
+          </CabLevelFrame>
         )}
         {mode === "delay" && (
           <DelayGame
@@ -1110,6 +1116,7 @@ export function GameApp() {
           />
         )}
         {mode === "golf" && (
+          <CabLevelFrame level={cabLevel(s.flags, "golf")}>
           <GolfGame
             level={cabLevel(s.flags, "golf")}
             onDone={(score) => {
@@ -1125,8 +1132,10 @@ export function GameApp() {
               refresh();
             }}
           />
+          </CabLevelFrame>
         )}
         {mode === "rods" && (
+          <CabLevelFrame level={cabLevel(s.flags, "rods")}>
           <RodsGame
             level={cabLevel(s.flags, "rods")}
             onDone={(score) => {
@@ -1142,8 +1151,10 @@ export function GameApp() {
               refresh();
             }}
           />
+          </CabLevelFrame>
         )}
         {mode === "pebble" && (
+          <CabLevelFrame level={cabLevel(s.flags, "pebble")}>
           <PebbleGame
             level={cabLevel(s.flags, "pebble")}
             onDone={(score) => {
@@ -1159,8 +1170,10 @@ export function GameApp() {
               refresh();
             }}
           />
+          </CabLevelFrame>
         )}
         {mode === "bowl" && (
+          <CabLevelFrame level={cabLevel(s.flags, "bowl")}>
           <BowlGame
             level={cabLevel(s.flags, "bowl")}
             onDone={(score) => {
@@ -1176,6 +1189,7 @@ export function GameApp() {
               refresh();
             }}
           />
+          </CabLevelFrame>
         )}
         {mode === "phys" && (
           <PhysicsGame
@@ -1213,6 +1227,7 @@ export function GameApp() {
         )}
 
         {mode === "arcade" && (
+          <CabLevelFrame level={cabLevel(s.flags, "catch")}>
           <Arcade
             day={s.day}
             fromEod={s.returnMode === "eod"}
@@ -1230,6 +1245,7 @@ export function GameApp() {
               refresh();
             }}
           />
+          </CabLevelFrame>
         )}
 
         {mode === "reactor" && (
