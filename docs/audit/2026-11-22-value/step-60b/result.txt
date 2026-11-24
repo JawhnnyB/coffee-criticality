@@ -1,0 +1,28 @@
+model worse than C: false
+model pwr night 2 seed 1: 100 A coffee 0 empty 0 missed 0 left 0 false 0 dawn
+model pwr night 3 seed 1: 100 A coffee 0 empty 0 missed 0 left 0 false 0 dawn
+model pwr night 2 seed 3: 78 C coffee 0 empty 0 missed 0 left 0 false 0 dawn
+model pwr night 3 seed 3: 80 C coffee 0 empty 0 missed 0 left 0 false 0 dawn
+model pwr night 2 seed 7: 100 A coffee 0 empty 0 missed 0 left 0 false 0 dawn
+model pwr night 3 seed 7: 100 A coffee 0 empty 0 missed 0 left 0 false 0 dawn
+model bwr night 2 seed 1: 100 A coffee 0 empty 0 missed 0 left 0 false 0 dawn
+model bwr night 3 seed 1: 100 A coffee 0 empty 0 missed 0 left 0 false 0 dawn
+model bwr night 2 seed 3: 78 C coffee 0 empty 0 missed 0 left 0 false 0 dawn
+model bwr night 3 seed 3: 80 C coffee 0 empty 0 missed 0 left 0 false 0 dawn
+model bwr night 2 seed 7: 100 A coffee 0 empty 0 missed 0 left 0 false 0 dawn
+model bwr night 3 seed 7: 100 A coffee 0 empty 0 missed 0 left 0 false 0 dawn
+model pebble night 2 seed 1: 100 A coffee 0 empty 0 missed 0 left 0 false 0 dawn
+model pebble night 3 seed 1: 100 A coffee 0 empty 0 missed 0 left 0 false 0 dawn
+model pebble night 2 seed 3: 78 C coffee 0 empty 0 missed 0 left 0 false 0 dawn
+model pebble night 3 seed 3: 80 C coffee 0 empty 0 missed 0 left 0 false 0 dawn
+model pebble night 2 seed 7: 100 A coffee 0 empty 0 missed 0 left 0 false 0 dawn
+model pebble night 3 seed 7: 100 A coffee 0 empty 0 missed 0 left 0 false 0 dawn
+model msr night 2 seed 1: 100 A coffee 0 empty 0 missed 0 left 0 false 0 dawn
+model msr night 3 seed 1: 100 A coffee 0 empty 0 missed 0 left 0 false 0 dawn
+model msr night 2 seed 3: 78 C coffee 0 empty 0 missed 0 left 0 false 0 dawn
+model msr night 3 seed 3: 80 C coffee 0 empty 0 missed 0 left 0 false 0 dawn
+model msr night 2 seed 7: 100 A coffee 0 empty 0 missed 0 left 0 false 0 dawn
+model msr night 3 seed 7: 100 A coffee 0 empty 0 missed 0 left 0 false 0 dawn
+browser night 2 {"grade":"Grade F","stat":"Caught 3 (0 early) · missed 1 · false reports 3","head":"02:37. Elena takes the chair.","reason":"relieved. 02:37. Elena takes the chair. Caught 3 (0 early) · missed 1 · false reports 3","pots":"☕ 1 pot left","footer":"% FUEL POOL LEVEL 7.01 m GAMMA, AUX BUILDING ×1.0 normal 7 real min until 06:00.","coffeeEnd":"☕ 0 pots left","seedLine":"Seed 1","ms":197287}
+night 2 was not a pass, so the proof set night:2:done to reach night 3
+browser night 3 {"grade":"Grade F","stat":"Caught 2 (0 early) · missed 1 · false reports 3","head":"02:12. Elena takes the chair.","reason":"relieved. 02:12. Elena takes the chair. Caught 2 (0 early) · missed 1 · false reports 3","pots":"☕ 1 pot left","footer":"% FUEL POOL LEVEL 7.01 m GAMMA, AUX BUILDING ×1.0 normal 7 real min until 06:00.","coffeeEnd":"☕ 1 pot left","seedLine":"Seed 1","ms":164897}
