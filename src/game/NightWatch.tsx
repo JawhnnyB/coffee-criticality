@@ -44,6 +44,7 @@ import {
 import { nightCoachLine } from "./nightwatch/nightCoach";
 import { applyCarry, carryover } from "./nightwatch/carryover";
 import { noteEndless, readEndless } from "./nightwatch/endless";
+import { dawnCrewLine, noteARotation, readCrew } from "./nightwatch/crewUnlock";
 import { readDaily, recordDaily } from "./nightwatch/daily";
 import { nightsDone } from "./nightwatch/progress";
 import { elenaLine, oddityNotes, openerLine, recordNight, turnoverRows } from "./nightwatch/turnover";
@@ -640,6 +641,14 @@ export function NightRotation({ s, onNewWeek, onMenu }: { s: GameState; onNewWee
   const avg = grades.length ? grades.reduce((sum, letter) => sum + { A: 4, B: 3, C: 2, D: 1, F: 0 }[letter as "A"], 0) / grades.length : 2;
   const dawnLine = avg >= 3.2 ? "The lot is pale. Elena nods once and keeps walking." : avg >= 2 ? "Dawn on the lot. The log is what it is." : "The lot is empty. A night like that has to be stood again.";
   const last = (bestLetter(s.flags, 4) || "C") as "A";
+  const letters = [1, 2, 3, 4].map((k) => bestLetter(s.flags, k));
+  const [crewHeard, setCrewHeard] = useState(true);
+  useEffect(() => {
+    if (phase !== "dawn") return;
+    const heard = readCrew().seen;
+    noteARotation(letters);
+    setCrewHeard(heard);
+  }, [phase, letters.join("")]);
   if (endless > 0) {
     return (
       <NightShift
@@ -712,6 +721,11 @@ export function NightRotation({ s, onNewWeek, onMenu }: { s: GameState; onNewWee
           <h2 className="font-display mt-2 text-3xl">The lot at dawn</h2>
           <p className="mt-3 text-sm leading-relaxed">{dawnLine}</p>
           <p className="mt-2 text-sm leading-relaxed">Elena: {elenaLine(last, !!s.flags["log:curt"] || s.residue.log === "hid")}</p>
+          {dawnCrewLine(letters, crewHeard) ? (
+            <p className="mt-2 text-sm leading-relaxed" data-testid="dawn-crew">
+              {dawnCrewLine(letters, crewHeard)}
+            </p>
+          ) : null}
           <div className="mt-5 flex flex-col gap-2">
             <button type="button" className="paper-btn-primary" style={{ minHeight: 44 }} data-testid="dawn-new-week" onClick={onNewWeek}>
               New week

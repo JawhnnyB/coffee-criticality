@@ -1,0 +1,11 @@
+Step 46. An A on all four nights unlocks one Elena scene for a later day.
+
+Store: cc.crew. Not cc.save.v2. A new week wipes the week save and leaves this key.
+
+Scene: "The quiet nights." Plays once, on a talk with Elena that is not the first meeting.
+A B in the four nights does not unlock it. Hearing it does not set social:elena:1.
+
+Proof: node --test scripts/crew-unlock.test.mjs scripts/social.test.mjs
+8 pass, 0 fail.
+
+Dawn line, only while the scene is still unheard: "Four A's. Elena has a word next week."

@@ -62,3 +62,5 @@ Brief: `docs/grok/value-100.md`. One step, one commit. Real-input proof in this 
 - Step 45c done · Each day-1 and night-1 teaching line, at 1280×720 and 390×844. Shots in step-45c/. Page errors 0.
 - Step 45d done · R10 sweeper at 1×, seed 1. Night 1 is F at 01:07 (3 false reports). Night 4 is F at 01:55 (1 miss, 3 false reports). The careful model is 92 B and 82 C. Notes in step-45d/result.txt.
 - Step 45e done · Daily night filed catches. The board stored that grade. The week save did not gain night:2. Proof in step-45e/.
+- Step 46 done · Four A's unlock one Elena scene for a later day. It lives in cc.crew, not the week save, and it plays once.
+

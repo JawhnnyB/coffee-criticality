@@ -11,6 +11,7 @@
  */
 import { NPCS, type Line, type NpcId } from "./content";
 import { SCENES, type Scene } from "./socialScenes";
+import { A_ROTATION_NPC, A_ROTATION_SCENE, readCrew, takeARotationScene } from "./nightwatch/crewUnlock";
 
 export type Tier = 0 | 1 | 2 | 3;
 
@@ -66,15 +67,22 @@ export interface TalkState {
 export function addScene(s: TalkState, firstMeeting: boolean): Scene | null {
   if (s.mode !== "dialogue" || !s.talkNpc || s.flags.endingWalk || s.ended || firstMeeting) return null;
   const scene = dueScene(s, s.talkNpc);
-  if (!scene) return null;
-  s.dialogue.push(...scene.lines.map((l) => ({ ...l, choices: l.choices?.map((c) => ({ ...c })) })));
-  s.flags[seenKey(s.talkNpc, scene.tier)] = true;
-  return scene;
+  if (scene) {
+    s.dialogue.push(...scene.lines.map((l) => ({ ...l, choices: l.choices?.map((c) => ({ ...c })) })));
+    s.flags[seenKey(s.talkNpc, scene.tier)] = true;
+  }
+  const extra = takeARotationScene(s.talkNpc);
+  if (extra) {
+    s.dialogue.push(...extra.lines.map((l) => ({ ...l, choices: l.choices?.map((c) => ({ ...c })) })));
+  }
+  return scene ?? extra;
 }
 
 /** What the player knows about someone: their note, then the title of each scene they have heard. */
 export function knownAbout(s: { flags: Record<string, boolean> }, npc: NpcId): string[] {
-  return [NPCS[npc].note, ...SCENES[npc].filter((sc) => s.flags[seenKey(npc, sc.tier)]).map((sc) => sc.known)];
+  const lines = [NPCS[npc].note, ...SCENES[npc].filter((sc) => s.flags[seenKey(npc, sc.tier)]).map((sc) => sc.known)];
+  if (npc === A_ROTATION_NPC && readCrew().seen) lines.push(A_ROTATION_SCENE.known);
+  return lines;
 }
 
 /** A plain hint toward the next scene. */
