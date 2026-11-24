@@ -37,6 +37,7 @@ import { CORE, FIT_REPORT, PRESET_FIT } from "./outage/calibration";
 import { freshTypes, parseLatticeSet, type LatticeSet } from "./outage/lattice";
 import { presetSet } from "./outage/preset";
 import { PRESET_EOC1 } from "./outage/eoc1";
+import { CYCLE1_TUTORIAL, cycle1Batches, cycle1FuelCount } from "./outage/cycle1Lesson";
 
 const FIELD: CSSProperties = { fontFamily: "var(--font-body)", fontSize: "var(--text-body)", color: PAL.ink, lineHeight: 1.5 };
 const SMALL: CSSProperties = { fontSize: "var(--text-small)", color: PAL.ink, opacity: 0.85 };
@@ -77,6 +78,8 @@ interface Saved {
   /** The core being loaded now, and its cycle number. */
   draft: Core | null;
   draftCycle: number;
+  /** The Cycle 1 worked example has been closed. */
+  tutorialSeen?: boolean;
 }
 
 function readSaved(): Saved {
@@ -197,9 +200,75 @@ export function OutageApp({ s }: { s: GameState }) {
   const plantLoaded = useMemo(() => (eoc1 ? beavrsCycle2(endCycle(eoc1)) : null), [eoc1]);
   const [plantRun, setPlantRun] = useState<CycleResult | null>(null);
   useEffect(() => setPlantRun(null), [plantLoaded]);
+  const cycle1 = useMemo(() => beavrsCycle1(), []);
+  const batches = useMemo(() => cycle1Batches(), []);
 
   // Clear a stale result when the loading changes.
   useEffect(() => setResult(null), [saved.draft, set]);
+
+  const update = (patch: Partial<Saved>) => {
+    const next = { ...saved, ...patch };
+    setSaved(next);
+    writeSaved(next);
+  };
+
+  if (!saved.tutorialSeen && !saved.draft && saved.history.length === 0) {
+    return (
+      <div className="app-pad" style={FIELD} data-testid="outage-tutorial">
+        <p style={{ margin: 0 }}>Refuelling Outage · Cycle 1</p>
+        {CYCLE1_TUTORIAL.slice(0, 3).map((line) => (
+          <p key={line} style={SMALL}>
+            {line}
+          </p>
+        ))}
+        <p style={SMALL} data-testid="outage-tutorial-count">
+          {cycle1FuelCount()} assemblies on the map.
+        </p>
+        <ul style={{ ...SMALL, margin: "4px 0", paddingLeft: 18 }}>
+          {batches.map((b) => (
+            <li key={`${b.e}/${b.ba}`}>
+              {b.e}% · {b.ba} rods · {b.n}
+            </li>
+          ))}
+        </ul>
+        <div
+          style={{ display: "grid", gridTemplateColumns: "repeat(8, 38px)", gap: 2, padding: 6, background: PAL.ink, border: `2px solid ${PAL.steel}`, width: "fit-content" }}
+          data-testid="outage-tutorial-grid"
+        >
+          {QUARTER_ROWS.flat().map((i, k) => {
+            if (i === null) return <div key={`x${k}`} style={{ width: 38, height: 30 }} />;
+            const a = cycle1[i];
+            return (
+              <div
+                key={i}
+                data-testid={`tutorial-cell-${posName(i)}`}
+                style={{
+                  width: 38,
+                  height: 30,
+                  background: cellColor(a),
+                  color: PAL.ink,
+                  border: `1px solid ${PAL.outline}`,
+                  fontSize: 10,
+                  fontFamily: "var(--font-mono, monospace)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                {cellText(a)}
+              </div>
+            );
+          })}
+        </div>
+        <p style={{ ...SMALL, marginTop: 4 }}>{CYCLE1_TUTORIAL[3]}</p>
+        <div style={{ marginTop: 8 }}>
+          <Btn primary onClick={() => update({ tutorialSeen: true })} testId="outage-tutorial-done">
+            On to Cycle 2
+          </Btn>
+        </div>
+      </div>
+    );
+  }
 
   if (!plantLoaded) {
     return (
@@ -212,12 +281,6 @@ export function OutageApp({ s }: { s: GameState }) {
   const plant = { loaded: plantLoaded };
   const draft: Core = saved.draft ?? plant.loaded;
   const cycle = saved.draftCycle;
-
-  const update = (patch: Partial<Saved>) => {
-    const next = { ...saved, ...patch };
-    setSaved(next);
-    writeSaved(next);
-  };
 
   const choose = (i: number) => {
     if (busy) return;

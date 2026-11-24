@@ -1,0 +1,21 @@
+Step 48. Cycle 1 is a worked example before Cycle 2.
+
+The grid and the batch counts are beavrsCycle1(), the benchmark map already in this build. The screen adds no figures.
+193 assemblies. Batches, enrichment / absorber rods / count:
+1.6 / 0 / 65
+3.1 / 0 / 32
+2.4 / 16 / 32
+2.4 / 12 / 28
+3.1 / 6 / 12
+3.1 / 16 / 8
+3.1 / 20 / 8
+3.1 / 15 / 4
+2.4 / 0 / 4
+
+The Cycle 2 sentence already on the outage says 64 of the oldest 1.6% came out. This map has 65 assemblies at 1.6% with no rods. That sentence was not changed.
+
+Proof: node --test scripts/cycle1-lesson.test.mjs
+1 pass, 0 fail.
+
+Unverified: this pass did not re-open the cited BEAVRS PDF. The counts are the file the build already ships.
+Owner decision: whether the older "64" sentence should be reconciled with the 65.

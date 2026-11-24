@@ -64,5 +64,7 @@ Brief: `docs/grok/value-100.md`. One step, one commit. Real-input proof in this 
 - Step 45e done · Daily night filed catches. The board stored that grade. The week save did not gain night:2. Proof in step-45e/.
 - Step 46 done · Four A's unlock one Elena scene for a later day. It lives in cc.crew, not the week save, and it plays once.
 - Step 47 done · The outage asks for a discharge before the shuffle. The score is overlap with fresh fuel on the rim. The pass rule is unchanged.
+- Step 48 done · Cycle 1 opens as a worked example. The grid and the counts are the benchmark map already in the build. No new figures.
+
 
 
