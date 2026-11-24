@@ -1,5 +1,5 @@
 # Step 58
 
-Each levelled cabinet shows Level 3 on the bezel. The flag is set, then the cabinet opens. Delay, load, and phys stay unlevelled.
+The eight levelled cabinets show Level 3 on the screen: catch, rods, pebble, fish, golf, bowl, horde, plot. Delay, load, and phys stay unlevelled. The desktop window hides the marquee, so the level is a chip on the glass.
 
-Eight cabinets, at 1280×720 and 390×844. Page errors 0.
+Shots at 1280 and 390. Page errors 0. Proof: `node scripts/step-58-proof.mjs`.

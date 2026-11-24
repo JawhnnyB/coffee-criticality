@@ -76,6 +76,8 @@ Brief: `docs/grok/value-100.md`. One step, one commit. Real-input proof in this 
 - Step 54 done · The plant monitor sits in the corner on a day shift. It reads the live board and it leaves when nights start. Proof in step-54/.
 - Step 55 done · Days add an office hum, the coffee machine, and a distant page. WebAudio only. Proof in step-55/.
 - Step 57 done · Catches and brews flash. Grades pop. Reduced motion gets neither. Step 56 was not started. Proof in step-57/.
+- Step 58 done · Catch, rods, pebble, fish, golf, bowl, horde, and plot show Level 3 on the glass. Delay, load, and phys are not on the ladder. Proof in step-58/.
+
 - Step 58 done · Eight cabinets show Level 3 on the bezel, at 1280 and 390. Delay, load, and phys stay unlevelled. Proof in step-58/.
 
 
