@@ -1,0 +1,8 @@
+Step 51. The dawn card prints a plant paper from the week's choices.
+
+Nights, hides, residue, the shuffle, the discharge score, and how the week ended. At most six lines. No exclamation marks. No city.
+The sheet is also written to cc.paper, so a new week can wipe cc.save.v2 and leave it.
+Step 50 was not started.
+
+Proof: node --test scripts/paper.test.mjs
+1 pass, 0 fail.

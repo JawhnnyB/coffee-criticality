@@ -45,6 +45,7 @@ import { nightCoachLine } from "./nightwatch/nightCoach";
 import { applyCarry, carryover } from "./nightwatch/carryover";
 import { noteEndless, readEndless } from "./nightwatch/endless";
 import { dawnCrewLine, noteARotation, readCrew } from "./nightwatch/crewUnlock";
+import { paperLines, writePaper } from "./nightwatch/paper";
 import { readDaily, recordDaily } from "./nightwatch/daily";
 import { nightsDone } from "./nightwatch/progress";
 import { elenaLine, oddityNotes, openerLine, recordNight, turnoverRows } from "./nightwatch/turnover";
@@ -642,13 +643,26 @@ export function NightRotation({ s, onNewWeek, onMenu }: { s: GameState; onNewWee
   const dawnLine = avg >= 3.2 ? "The lot is pale. Elena nods once and keeps walking." : avg >= 2 ? "Dawn on the lot. The log is what it is." : "The lot is empty. A night like that has to be stood again.";
   const last = (bestLetter(s.flags, 4) || "C") as "A";
   const letters = [1, 2, 3, 4].map((k) => bestLetter(s.flags, k));
+  const paper = paperLines({
+    grades: letters,
+    hides: s.hides,
+    ended: s.ended,
+    shuffleDone: s.shuffleDone,
+    discharged: !!s.flags["outage:discharged"],
+    dischargeMatch: !!s.flags["outage:discharge:match"],
+    valve: s.residue.valve,
+    tag: s.residue.tag,
+    dose: s.residue.dose,
+    log: s.residue.log,
+  });
   const [crewHeard, setCrewHeard] = useState(true);
   useEffect(() => {
     if (phase !== "dawn") return;
     const heard = readCrew().seen;
     noteARotation(letters);
+    writePaper(paper);
     setCrewHeard(heard);
-  }, [phase, letters.join("")]);
+  }, [phase, letters.join(""), paper.join("|")]);
   if (endless > 0) {
     return (
       <NightShift
@@ -726,6 +740,14 @@ export function NightRotation({ s, onNewWeek, onMenu }: { s: GameState; onNewWee
               {dawnCrewLine(letters, crewHeard)}
             </p>
           ) : null}
+          <div className="mt-3" data-testid="dawn-paper">
+            <p className="font-mono text-[10px] tracking-widest text-[#6a4a32]">The plant paper</p>
+            {paper.map((line) => (
+              <p key={line} className="mt-1 text-sm leading-relaxed">
+                {line}
+              </p>
+            ))}
+          </div>
           <div className="mt-5 flex flex-col gap-2">
             <button type="button" className="paper-btn-primary" style={{ minHeight: 44 }} data-testid="dawn-new-week" onClick={onNewWeek}>
               New week
