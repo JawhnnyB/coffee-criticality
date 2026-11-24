@@ -43,6 +43,7 @@ import { binds } from "./binds";
 import { setShiftHeld, shiftHeld } from "./hold";
 import { applyPad, arrowNav, dirOf, emptyPad, isKeyMode, isPadEcho, moveFocus, readPad } from "./screenNav";
 import { BootLog, SetupScreen } from "./ParlorApps";
+import { CornerMonitor } from "./PlantMonitorApp";
 import { isMuted, playBed, playBlip, setMuted, unlockAudio, syncWorld, getAudioProbe, bedForRoom } from "./audio";
 import { isRevealing, requestSkip } from "./chatter";
 import { Chatter } from "./ChatterLine";
@@ -1448,6 +1449,8 @@ export function GameApp() {
         />
 
         {!ready && <div className="absolute inset-0 z-50 bg-bg" />}
+
+        {mode === "play" && !s.flags["rot:nights"] ? <CornerMonitor s={s} calm={!!s.desktop.reducedMotion || quietMotion} /> : null}
 
         {mode === "play" && (
           <Hud

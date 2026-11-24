@@ -73,6 +73,7 @@ Brief: `docs/grok/value-100.md`. One step, one commit. Real-input proof in this 
 - Step 49b done · Each loading puzzle takes 3 to 5 swaps. Search says none of them fall in one or two. Par is the minimum. The limit is two past par. Proof in step-49b/.
 - Step 53b done · Dawn paper, discharge, a puzzle mid-solve and solved, photo on and off for three cameras, and the replay, at 1280 and 390. Page errors 0. Proof in step-53b/.
 - Step 53c done · Crew, the paper, endless, and the daily board are one profile. The desktop bridge copies it and does not rotate it. A reload keeps all four. Proof in step-53c/.
+- Step 54 done · The plant monitor sits in the corner on a day shift. It reads the live board and it leaves when nights start. Proof in step-54/.
 
 
 

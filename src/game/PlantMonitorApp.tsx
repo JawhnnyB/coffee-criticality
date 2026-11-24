@@ -70,3 +70,22 @@ export function PlantMonitorApp({ s }: { s: GameState }) {
     </div>
   );
 }
+
+/** The same board, small, in the corner of a day shift. It does not take clicks. */
+export function CornerMonitor({ s, calm }: { s: GameState; calm?: boolean }) {
+  const st = monitorState(siteKind(s.plant), s.run, s.minutes);
+  const alarm = st.alarms.length > 0;
+  return (
+    <aside
+      data-testid="corner-monitor"
+      className="pointer-events-none absolute left-2 top-2 z-20"
+      style={{ ...MONO, width: 148, padding: "4px 6px", background: "rgba(22,17,13,0.9)", color: PAL.goldL, border: `2px solid ${PAL.copperD}`, lineHeight: 1.35, fontSize: 10 }}
+    >
+      <style>{`@keyframes pmflash { 0%,49% { background: ${PAL.bad}; color: ${PAL.ink} } 50%,100% { background: ${PAL.copperD}; color: ${PAL.goldL} } }`}</style>
+      <div style={{ color: PAL.cream }}>MONITOR · {st.shift.toUpperCase()}</div>
+      <div data-testid="corner-monitor-state" style={{ animation: alarm && !calm ? "pmflash 0.8s infinite" : undefined }}>
+        {alarm ? `${st.alarms.length} ALARM` : "ALL NORMAL"} · {Math.round(st.power)}%
+      </div>
+    </aside>
+  );
+}
