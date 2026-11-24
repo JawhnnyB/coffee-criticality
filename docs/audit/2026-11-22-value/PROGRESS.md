@@ -69,6 +69,8 @@ Brief: `docs/grok/value-100.md`. One step, one commit. Real-input proof in this 
 - Step 51 done · Dawn prints a plant paper from the week's choices. It is stored in cc.paper, not the week save. Step 50 was not started.
 - Step 52 done · Photo mode on the night feed turns off breathing, grain, the rolling bar, and the vignette. The scene is not redrawn.
 - Step 53 done · The turnover replays the night's gaze log at 10×. An empty log stays empty. Stopped here. Step 54 was not started.
+- Step 47b done · Discharge left Fuel Shuffle. The outage scores 64 picks against the Cycle 2 from-map: 64 of the 65 1.6% assemblies, F14 stayed. The holes take fresh fuel before the shuffle. Proof in step-47b/.
+
 
 
 

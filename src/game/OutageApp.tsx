@@ -33,6 +33,7 @@ import {
   type Core,
   type CycleResult,
 } from "./outage/core";
+import { afterDischarge, DISCHARGE_COUNT, DISCHARGE_FACT, DISCHARGE_RULE, dischargeScore } from "./outage/discharge";
 import { CORE, FIT_REPORT, PRESET_FIT } from "./outage/calibration";
 import { freshTypes, parseLatticeSet, type LatticeSet } from "./outage/lattice";
 import { presetSet } from "./outage/preset";
@@ -80,16 +81,22 @@ interface Saved {
   draftCycle: number;
   /** The Cycle 1 worked example has been closed. */
   tutorialSeen?: boolean;
+  /** Cycle 2 only: the 64 assemblies the player chose to discharge. Null until they confirm. */
+  discharged: number[] | null;
 }
 
 function readSaved(): Saved {
   try {
     const raw = localStorage.getItem(STORE);
-    if (raw) return JSON.parse(raw) as Saved;
+    if (raw) {
+      const v = JSON.parse(raw) as Saved;
+      if (!("discharged" in v)) v.discharged = null;
+      return v;
+    }
   } catch {
     // Private mode or a broken entry: start clean.
   }
-  return { custom: null, useCustom: false, history: [], draft: null, draftCycle: 2 };
+  return { custom: null, useCustom: false, history: [], draft: null, draftCycle: 2, discharged: null };
 }
 
 function writeSaved(v: Saved) {
@@ -174,6 +181,62 @@ function Letdown({ runs }: { runs: { label: string; color: string; result: Cycle
         </text>
       ))}
     </svg>
+  );
+}
+
+function DischargePick({ eoc, onConfirm }: { eoc: Core; onConfirm: (ids: number[]) => void }) {
+  const [sel, setSel] = useState<number[]>([]);
+  const on = new Set(sel);
+  const toggle = (i: number) => {
+    setSel((cur) => {
+      if (cur.includes(i)) return cur.filter((x) => x !== i);
+      if (cur.length >= DISCHARGE_COUNT) return cur;
+      return [...cur, i];
+    });
+  };
+  return (
+    <div data-testid="outage-discharge" style={{ marginTop: 8 }}>
+      <p style={SMALL}>
+        Selected {sel.length} of {DISCHARGE_COUNT}. Dark grey is 1.6%. The number is burnup, in GWd/t, once it is past 10.
+      </p>
+      <div
+        style={{ display: "grid", gridTemplateColumns: "repeat(15, minmax(0, 1fr))", gap: 1, maxWidth: 480, background: PAL.ink, padding: 4, border: `2px solid ${PAL.steel}` }}
+        data-testid="outage-discharge-grid"
+      >
+        {eoc.map((a, i) => {
+          if (!a) return <div key={i} style={{ aspectRatio: "1", background: "transparent" }} />;
+          const marked = on.has(i);
+          return (
+            <button
+              key={i}
+              type="button"
+              onClick={() => toggle(i)}
+              data-testid={`outage-out-${posName(i)}`}
+              aria-pressed={marked}
+              aria-label={`${posName(i)} ${a.e}% ${a.burnup.toFixed(1)} GWd per tonne${marked ? ", discharging" : ""}`}
+              style={{
+                aspectRatio: "1",
+                minWidth: 0,
+                padding: 0,
+                fontSize: 8,
+                fontFamily: "var(--font-mono, monospace)",
+                background: marked ? PAL.copper : a.e <= 1.6 ? PAL.steelD : a.e <= 2.4 ? PAL.steel : PAL.gold,
+                color: marked || a.e <= 2.4 ? PAL.cream : PAL.ink,
+                border: marked ? `1px solid ${PAL.white}` : `1px solid ${PAL.outline}`,
+                cursor: "pointer",
+              }}
+            >
+              {marked ? "·" : a.burnup >= 10 ? a.burnup.toFixed(0) : a.e.toFixed(1)}
+            </button>
+          );
+        })}
+      </div>
+      <div style={{ marginTop: 8 }}>
+        <Btn primary disabled={sel.length !== DISCHARGE_COUNT} onClick={() => onConfirm(sel)} testId="outage-discharge-confirm">
+          {sel.length === DISCHARGE_COUNT ? "Discharge these 64" : `Choose ${DISCHARGE_COUNT - sel.length} more`}
+        </Btn>
+      </div>
+    </div>
   );
 }
 
@@ -334,16 +397,39 @@ export function OutageApp({ s }: { s: GameState }) {
   const reference = cycle === 2 ? plantRun : null;
   const prev = saved.history.length ? saved.history[saved.history.length - 1] : null;
   const types = freshTypes(set);
+  const discharging = cycle === 2 && !saved.discharged;
 
   return (
     <div className="app-pad" style={FIELD} data-testid="app-outage">
       <p style={{ margin: 0, fontSize: "var(--text-body)" }}>Refuelling Outage · Cycle {cycle}</p>
       <p style={SMALL}>
         {cycle === 2
-          ? "Cycle 1 ran 327 effective full-power days. 64 fresh assemblies are on the floor; all 64 of the oldest 1.6% fuel came out. Move fuel a quarter-core at a time: tap one position, then another, and the four rotated copies swap together."
+          ? `Cycle 1 ran 327 effective full-power days. ${DISCHARGE_FACT}`
           : `Your Cycle ${cycle - 1} is done. The most burned fuel came out and fresh fuel went in. Load it again.`}
       </p>
+      {cycle === 2 ? (
+        <p style={SMALL} data-testid="outage-rule">
+          {DISCHARGE_RULE}
+        </p>
+      ) : null}
+      {cycle === 2 && saved.discharged ? (
+        <p style={SMALL} data-testid="outage-discharge-score">
+          Your discharge matches {dischargeScore(saved.discharged)} of 64. The vacated positions are fresh fuel. Move fuel a quarter-core at a time: tap one position, then another, and the four rotated copies swap together.
+        </p>
+      ) : null}
 
+      {discharging && eoc1 ? (
+        <DischargePick
+          eoc={eoc1}
+          onConfirm={(ids) => {
+            s.flags["outage:discharged"] = true;
+            if (dischargeScore(ids) === DISCHARGE_COUNT) s.flags["outage:discharge:match"] = true;
+            else delete s.flags["outage:discharge:match"];
+            update({ discharged: ids, draft: afterDischarge(eoc1, ids) });
+            setPick(null);
+          }}
+        />
+      ) : (
       <div style={{ display: "flex", flexWrap: "wrap", gap: 12, alignItems: "flex-start", marginTop: 8 }}>
         <div>
           <div style={{ display: "flex", gap: 6, marginBottom: 4 }}>
@@ -441,6 +527,7 @@ export function OutageApp({ s }: { s: GameState }) {
           ) : null}
         </div>
       </div>
+      )}
 
       <details style={{ marginTop: 12 }}>
         <summary style={{ cursor: "pointer" }}>Data: {set === PRESET ? "BEAVRS preset" : set.name}</summary>
