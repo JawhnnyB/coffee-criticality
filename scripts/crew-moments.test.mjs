@@ -53,13 +53,15 @@ test("ten moments, unique ids and choice ids, every speaker is the person", () =
     const name = M.NPCS[m.npc].name;
     for (const l of m.lines) {
       assert.ok(name.includes(l.speaker), `${m.id}: ${l.speaker} is not ${name}`);
-      assert.ok(l.text.length <= 140, `${m.id}: line over 140 characters`);
+      assert.ok(l.text.length <= 125, `${m.id}: line over 125 characters (keep it phone-sized)`);
       for (const c of l.choices ?? []) {
         assert.ok(!choiceIds.has(c.id), `duplicate choice id ${c.id}`);
+        assert.ok(c.label.length <= 90 && c.reply.length <= 150, `${c.id}: choice or reply too long for a phone`);
         choiceIds.add(c.id);
       }
     }
     assert.ok(m.lines.at(-1).choices?.length >= 2, `${m.id} ends with a choice`);
+    assert.ok(m.lines.length >= 4, `${m.id} is a conversation, not a one-liner`);
   }
 });
 
