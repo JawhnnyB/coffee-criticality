@@ -85,6 +85,8 @@ Brief: `docs/grok/value-100.md`. One step, one commit. Real-input proof in this 
 - Step 61 done · Reactor lines are listed in docs/facts.md against public NRC and DOE pages. The pool gauge and the builder's pebble pressure do not match those pages. Proof in step-61/.
 - Step 62 done · The NRC window has a draft codex, "How real is this?", thirty short notes. Proof in step-62/.
 - Step 63 done · Codex notes stay locked until play opens them. The day steam leak and the night relief both open the relief-valve note. Proof in step-63/.
+- Step 64 done · Watchstander notes are optional, off by default, and marked as a draft. Proof in step-64/.
+
 
 
 
