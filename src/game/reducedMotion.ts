@@ -26,3 +26,8 @@ export function usePrefersReducedMotion(): boolean {
   }, []);
   return on;
 }
+
+/** Screen juice. Empty when motion should stay still. */
+export function juiceClass(reduced: boolean): string {
+  return reduced ? "" : "cc-juice";
+}

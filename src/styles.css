@@ -648,6 +648,41 @@
   opacity: 0.92;
 }
 
+.cc-juice {
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  animation: cc-juice 0.42s ease-out;
+}
+.cc-juice[data-juice="catch"] {
+  box-shadow: inset 0 0 0 6px rgba(196, 120, 58, 0.9);
+}
+.cc-juice[data-juice="brew"] {
+  box-shadow: inset 0 0 90px rgba(231, 194, 122, 0.55);
+}
+.cc-juice[data-juice="grade"] {
+  position: static;
+  box-shadow: none;
+  animation: cc-grade 0.45s ease-out;
+}
+@keyframes cc-juice {
+  0% { opacity: 0.2; }
+  35% { opacity: 1; }
+  100% { opacity: 0; }
+}
+@keyframes cc-grade {
+  0% { transform: scale(0.92); }
+  55% { transform: scale(1.08); }
+  100% { transform: scale(1); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cc-juice {
+    animation: none;
+    box-shadow: none;
+  }
+}
+
 /* Teaching desk — builder + Academy share this grid. 12 col / 16px gutter. */
 .teach-grid {
   display: grid;

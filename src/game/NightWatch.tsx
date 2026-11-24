@@ -13,7 +13,7 @@ import { siteKind } from "./plantLoops";
 import { CAM_H, CAM_PX, CAM_W, lookOf, paintCamera, resetFrameCaches } from "./nightwatch/cameras";
 import { loadPlates, releasePlates } from "./nightwatch/plates";
 import { startAmbience, stopAmbience } from "./nightwatch/ambience";
-import { prefersReducedMotion } from "./reducedMotion";
+import { juiceClass, prefersReducedMotion } from "./reducedMotion";
 import { binds } from "./binds";
 import { shiftHeld } from "./hold";
 import {
@@ -170,6 +170,12 @@ function NightShift({ s, nightNo: asked, onLeave, onStay, replay = false, endles
   const calm = useRef(false);
   const photo = useRef(false);
   const [photoOn, setPhotoOn] = useState(false);
+  const [juice, setJuice] = useState("");
+  const markJuice = (kind: string) => {
+    if (prefersReducedMotion()) return;
+    setJuice(kind);
+    window.setTimeout(() => setJuice((cur) => (cur === kind ? "" : cur)), 450);
+  };
   const speed = useRef(1);
   const seenAlarm = useRef("");
   const seenRadio = useRef(0);
@@ -197,13 +203,16 @@ function NightShift({ s, nightNo: asked, onLeave, onStay, replay = false, endles
   };
   const doBrew = () => {
     if (!brew(n)) say(n.brewsLeft <= 0 ? "The pot is empty. No more tonight." : "Already brewing.");
+    else markJuice("brew");
     rerender();
   };
   const file = (c: Category) => {
     const r = report(n, c);
     setReporting(false);
-    if (r.ok) say(r.early ? "Logged before the board knew. The crew is on it." : "Logged. The crew is on it.");
-    else if (r.reason === "logged") say("Already logged. The crew is on it.");
+    if (r.ok) {
+      say(r.early ? "Logged before the board knew. The crew is on it." : "Logged. The crew is on it.");
+      markJuice("catch");
+    } else if (r.reason === "logged") say("Already logged. The crew is on it.");
     else say(r.reason === "wrong-kind" ? "That is not what is wrong there. Logged as a false report." : "Nothing safety-related on this camera. Logged as a false report.");
     rerender();
   };
@@ -348,6 +357,7 @@ function NightShift({ s, nightNo: asked, onLeave, onStay, replay = false, endles
       data-testid="nightwatch-shift"
       style={{ position: "fixed", inset: 0, zIndex: 60, background: PAL.ink, color: PAL.goldL, display: "flex", flexDirection: "column", ...MONO, overflow: "auto" }}
     >
+      {juice ? <div className="cc-juice" data-testid="nw-juice" data-juice={juice} /> : null}
       <style>{`@keyframes nwflash { 0%,49% { background: ${PAL.bad}; color: ${PAL.ink} } 50%,100% { background: ${PAL.copperD}; color: ${PAL.goldL} } }`}</style>
       <div style={{ display: "flex", flexDirection: "column", gap: 8, padding: "6px 10px", borderBottom: `2px solid ${PAL.copperD}` }}>
         <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 8 }}>
@@ -568,7 +578,7 @@ function Summary({ n, nightNo, onLeave, onStay, endless, best }: { n: Night; nig
     <div data-testid="nw-summary" style={{ position: "fixed", inset: 0, zIndex: 80, display: "flex", padding: 12, background: "rgba(22,17,13,0.55)" }}>
       <div className="paper" style={{ display: "flex", flexDirection: "column", flex: 1, maxWidth: 560, margin: "0 auto", minHeight: 0, width: "100%", padding: 16, fontFamily: "var(--font-body)", color: "#16110d", lineHeight: 1.45 }}>
         <p className="font-mono text-[10px] tracking-widest text-[#6a4a32]" style={{ margin: 0 }}>{head}</p>
-        <h2 className="font-display text-3xl" style={{ margin: "8px 0 0" }} data-testid="nw-grade">Grade {g.letter}</h2>
+        <h2 className={"font-display text-3xl " + juiceClass(prefersReducedMotion())} style={{ margin: "8px 0 0" }} data-testid="nw-grade" data-juice="grade">Grade {g.letter}</h2>
         <p data-testid="nw-seed" style={{ margin: "4px 0 0", fontSize: 12, color: "#6a4a32" }}>Seed {n.seed}</p>
         {endless ? (
           <p data-testid="endless-best" style={{ margin: "4px 0 0", fontSize: 12 }}>

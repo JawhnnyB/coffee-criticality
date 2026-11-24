@@ -20,3 +20,8 @@ test("server render has no window, so reduced motion is false and does not throw
   assert.equal(typeof globalThis.window, "undefined");
   assert.equal(M.systemReducedMotion(), false);
 });
+
+test("juice is a class, and reduced motion turns it off", () => {
+  assert.equal(M.juiceClass(false), "cc-juice");
+  assert.equal(M.juiceClass(true), "");
+});

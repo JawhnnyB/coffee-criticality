@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { gradePuzzle, loadingPuzzles, notePuzzleMet, peakOf, PUZZLE_LINES, readPuzzleMet, type Puzzle } from "./loadingPuzzles";
+import { juiceClass, prefersReducedMotion } from "./reducedMotion";
 
 export function LoadingPuzzles({ onClose }: { enrich?: number; onClose: () => void }) {
   const puzzles = useMemo(() => loadingPuzzles(), []);
@@ -80,7 +81,7 @@ export function LoadingPuzzles({ onClose }: { enrich?: number; onClose: () => vo
               ))}
             </div>
             <p className="mt-2 font-mono text-[10px] text-[#6a4a32]">Target {open.target.join(" ")}</p>
-            <p className="mt-3 text-sm" data-testid="puzzle-verdict">
+            <p className={"mt-3 text-sm " + (solved ? juiceClass(prefersReducedMotion()) : "")} data-juice={solved ? "grade" : undefined} data-testid="puzzle-verdict">
               {verdict}
             </p>
             <div className="mt-4 flex flex-wrap gap-2">
