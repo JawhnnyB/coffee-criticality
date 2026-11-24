@@ -111,6 +111,7 @@ import {
   unstick,
   openTalk,
   openStill,
+  bumpTrust,
   update,
   type Actions,
   type GameState,
@@ -121,6 +122,7 @@ import type { AcademyTier, Choice, Line, NpcId, RoleId } from "./content";
 import { coachLine } from "./dayCoach";
 import { addScene, knownAbout, nextHint, tierOf, TIER_NAME, type Tier } from "./social";
 import { cabLevel, LADDERS, recordCab } from "./cabLevels";
+import { hostDayTrust } from "./hostTrust";
 
 const GAME_CODES = new Set([
   "KeyW",
@@ -2326,6 +2328,8 @@ function noteCab(s: GameState, id: string, score: number) {
   if (!ladder) return;
   const host = ladder.host;
   const out = recordCab(s.flags, id, cabLevel(s.flags, id), score, host ? { trust: s.trust[host], start: NPCS[host].startTrust } : undefined);
+  const extra = hostDayTrust(s.flags, id, s.day, score);
+  if (extra) bumpTrust(s, extra.npc, extra.trust);
   const name = id === "catch" ? "CATCH.CAB" : `${id.toUpperCase()}.CAB`;
   if (out.unlocked) pushMsg(s, `${name} level ${out.unlocked}: ${ladder.what[out.unlocked - 1]}.`);
   else if (out.waitsOn) pushMsg(s, `${name} level 3 is cleared. ${shortName(out.waitsOn)} sets it up once they trust you.`);

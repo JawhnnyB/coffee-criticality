@@ -1,0 +1,10 @@
+quiet week, one talk a day, one golf, one bowl. Gain since morning.
+day | mabel before | jordan before | mabel after | jordan after
+1   | +12 | +8 | +14 | +10
+2   | +13 | +10 | +15 | +12
+3   | +14 | +11 | +16 | +13
+4   | +15 | +12 | +17 | +14
+end before mabel +15 t2 jordan +12 t1
+end after  mabel +17 t2 jordan +14 t2
+jordan tier 2 across 20 talk-patterns: before 6/20 after 20/20
+same-day replay: frozen pays again, extra is not paid. jordan 30 -> 34 -> 36
