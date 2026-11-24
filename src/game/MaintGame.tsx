@@ -227,7 +227,7 @@ export function MaintGame({
         <h2 className="font-display mt-2 text-2xl text-good">{end.ok ? "The pump stays quiet" : "The orange walked"}</h2>
         <p className="mt-3 font-mono text-sm leading-relaxed text-good/80">
           {end.ok
-            ? "Tommy: That's a lockout. Finish the sentence. Teaching only."
+            ? "Tommy: That's a lockout, done right. Thank you. It's a teaching model, but the habit is real."
             : "Look again. IN SERVICE does not hang here."}
         </p>
         <button type="button" className="btn-primary mt-5" onClick={() => onDone(end.ok ? 1 : 0)}>

@@ -33,7 +33,7 @@ test("each residue key has one more night consequence, and open adds none", () =
   assert.equal(W.carryover(open, 1).cut, null);
 
   const hidValve = W.carryover({ ...open, residue: { ...open.residue, valve: "hid" } }, 1);
-  assert.ok(hidValve.radios.some((r) => r.text.includes("floor again")));
+  assert.ok(hidValve.radios.some((r) => r.text.includes("back on the floor")));
   const n1 = W.newNight("pwr", 1, 4);
   W.applyCarry(n1, hidValve);
   const weep = n1.events.find((e) => e.def.id === "valve-14");

@@ -32,7 +32,7 @@ export const WEEK: DayDef[] = [
     name: "Day 1 · First floor",
     kicker: "06:52  ·  Morning brief  ·  Holt",
     title: "Unit 1 is holding. You are not a hero today.",
-    holt: "Holt: You designed the core. Now walk it. Catch. I fund reviews, not mythology.",
+    holt: "Holt: You signed the core on paper. Today, go and meet it. If something's wrong, bring me the time and place.",
     items: [
       "Sit with Mabel. The cup is already poured.",
       "You have seen their faces. Stand where they work.",
@@ -53,7 +53,7 @@ export const WEEK: DayDef[] = [
     name: "Day 2 · Tags",
     kicker: "06:50  ·  Morning brief  ·  Holt",
     title: "LOTOTO is a sentence. Finish it.",
-    holt: "Holt: Yesterday was a valve. Today is a tag. Tommy's board. Academy is still not optional.",
+    holt: "Holt: Tommy has a lockout on pump 2A today. Watch how he does it. And please, one Academy module.",
     items: [
       "Maintenance wing — hang the lockout right. Teaching model only.",
       "Finish at least one Academy module you skipped.",
@@ -72,7 +72,7 @@ export const WEEK: DayDef[] = [
     name: "Day 3 · Dose and ego",
     kicker: "06:48  ·  Morning brief  ·  Holt",
     title: "The sticker is a liar or a prayer. Decide which.",
-    holt: "Holt: Area dose. Marcus will want it to be 'a print error.' Volume. Not a duel.",
+    holt: "Holt: A dose sticker in Maintenance reads high. Marcus will hope it's a typo. Be kind. Say the number anyway.",
     items: [
       "Look at the dose sticker in Maintenance. 40 mSv/h is not a paperwork thing.",
       "Marcus is in Engineering. Data, not vibes — but still catch.",
@@ -91,7 +91,7 @@ export const WEEK: DayDef[] = [
     name: "Day 4 · Volume",
     kicker: "06:51  ·  Morning brief  ·  Holt",
     title: "One catch is a rumor. Three is a budget line.",
-    holt: "Holt: The log has no initials this morning. I need volume before the outage. Walk. Look. Close with me.",
+    holt: "Holt: A log in Control has no initials. I need to know who stood those hours. Close the day with me.",
     items: [
       "Unsigned shift log in Control. Catch it.",
       "Afternoon check-in with Holt.",
@@ -110,7 +110,7 @@ export const WEEK: DayDef[] = [
     name: "Day 5 · Shuffle",
     kicker: "06:40  ·  Morning brief  ·  Holt",
     title: "Outage week. You program the core.",
-    holt: "Holt: Fuel shuffle on the reactor hall desk. Flux has to live in your hands. Teaching model — not a license.",
+    holt: "Holt: Outage week. You program the fuel shuffle today. Teaching model, not a license. Take your time.",
     items: [
       "Reactor hall — program the fuel shuffle. Watch the flux map.",
       "Priya will not sign a peak she cannot explain.",
@@ -215,18 +215,18 @@ export function eodNpcLine(args: {
   ended: "a" | "c" | null;
   flags: Record<string, boolean>;
 }): string {
-  if (args.hides >= 3) return "Mabel: Three hides is a week I will not pretend was honest.";
+  if (args.hides >= 3) return "Mabel: Three things hidden this week. I won't pretend it was honest. But I'll pour you a cup tomorrow.";
   if (args.ended === "a") {
-    if (args.flags.elenaSecondEyes) return "Elena: I'll back a catch. You stood where I could see you.";
-    if (args.flags.holtVolume) return "Holt: Volume. That's a review I can fund.";
-    if (args.flags.tommySentence) return "Tommy: You finished the sentence. Boring on purpose. That's respect.";
-    if (args.flags.priyaPeak) return "Priya: You said the line. Teaching model — not a license.";
-    return "Mabel: You sat. You looked. That's the job.";
+    if (args.flags.elenaSecondEyes) return "Elena: You called me over before you were sure. Thank you. That's how we got here.";
+    if (args.flags.holtVolume) return "Holt: Times and places, all week. That's a review I can actually fund. Thank you.";
+    if (args.flags.tommySentence) return "Tommy: You did the lockout start to finish. Boring, on purpose. That's respect, and I noticed.";
+    if (args.flags.priyaPeak) return "Priya: You walked the peak, not just the screen. Teaching model, not a license, and you treated it that way.";
+    return "Mabel: You sat, you looked, and you said it. That's the whole job, love.";
   }
-  if (args.flags.delayPrompt) return "Mabel: $1 is a cliff. The parlor does not pretend it isn't.";
-  if (args.flags.catchMiss) return "Mabel: You left a lie on the glass. The week remembers.";
-  if (args.flags.hid) return "Jordan: You hid. I want distance. That was the deal.";
-  return "Holt: Skill without a safe floor is unfinished power.";
+  if (args.flags.delayPrompt) return "Mabel: In the parlor, a dollar now feels like a cliff. That's the trick of it. Real weeks do the same to us.";
+  if (args.flags.catchMiss) return "Mabel: Something got left on the glass this week. The week remembers, and so do I. Come and talk to me.";
+  if (args.flags.hid) return "Jordan: Something got hidden, and I can't stand next to it. It's not personal. I'm sorry.";
+  return "Holt: You're skilled. That was never the question. The question is whether the floor is safe enough to use it.";
 }
 
 export function shoreLine(ended: "a" | "c" | null, residue: Residue, shuffleDone: boolean, elenaSecondEyes: boolean) {

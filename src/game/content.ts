@@ -197,86 +197,87 @@ export const ROLES: { id: RoleId; title: string; line: string }[] = [
 
 /** Day-2, once, in Mabel's mouth. The menu keeps ROLES.line. She does not recite the poster. */
 export function roleMouth(role: RoleId): string {
-  if (role === "promoted") return "The title is new. The hiss is not. I am listening for the catch.";
-  if (role === "military") return "The catch is the order here. Not the rank.";
-  if (role === "veteran") return "You have seen a hide. I am watching whether you do it again.";
-  return "New site. I'll know you by what you say out loud.";
+  if (role === "promoted") return "Newly promoted, aren't you? You still look at things. Don't stop when the title settles in.";
+  if (role === "military") return "You were in the service. I can tell by how you stand. Here, nobody outranks whoever saw it first.";
+  if (role === "veteran") return "You've worked somewhere people hid things. You've got the look. You're safe to say it here, love.";
+  return "New site for you. Every plant has odd habits. Ask us why we do things. We should have to answer.";
 }
 
+/** Voices and histories: docs/characters.md. */
 export const NPCS: Record<NpcId, NpcDef> = {
   mabel: {
     id: "mabel",
     name: "Dr. Mabel Quinn",
     role: "Cafe / retired floor",
     startTrust: 40,
-    note: "Retired floor manager. Grandma warmth, doctorate steel.",
+    note: "Ran the floor for twenty years. Retired, couldn't stay away. Pours your cup before you ask.",
     portrait: { src: "/art/ui/portraits/portrait-mabel-smile.png", pos: "center" },
-    meet: "Sit. The kettle is the last board I still touch.",
+    meet: "Sit down, love. I poured before you came in. I always pour one extra.",
   },
   holt: {
     id: "holt",
     name: "Mr. Reginald Holt",
     role: "Director",
     startTrust: 28,
-    note: "Funds reviews, not mythology. Volume, not a speech.",
+    note: "Runs the site. Wants times and places, not adjectives. Knows people are scared to tell him things, and hates it.",
     portrait: { src: "/art/ui/portraits/portrait-holt-smile.png", pos: "center" },
-    meet: "You designed the core. Now walk it. Catch. I fund reviews, not mythology.",
+    meet: "You signed the core. Now go and meet it, and bring me what you see.",
   },
   elena: {
     id: "elena",
     name: "Elena Voss",
     role: "Shift supervisor",
     startTrust: 32,
-    note: "Two sets of eyes. The van was here before dawn.",
+    note: "Day shift supervisor. First in every morning. Her daughter's seat stays in the van. Nobody is alone with a problem on her floor.",
     portrait: { src: "/art/ui/portraits/portrait-elena-smile.png", pos: "center" },
-    meet: "I will back a catch if you stand where I can see you.",
+    meet: "If you find something, come and get me. I'd rather see it with you.",
   },
   tommy: {
     id: "tommy",
     name: "Tommy Reyes",
     role: "Maintenance",
     startTrust: 34,
-    note: "LOTOTO is a sentence. Finish it.",
+    note: "Maintenance, twenty-eight years. Talks to pumps. Wants his crew home with all ten fingers.",
     portrait: { src: "/art/ui/portraits/portrait-tommy-smile.png", pos: "center" },
-    meet: "Isolate. Lock. Tag. Try. IN SERVICE does not hang on a dead pump.",
+    meet: "Before you touch anything in my shop, say the four words out loud.",
   },
   marcus: {
     id: "marcus",
     name: "Marcus Hale",
     role: "Senior engineer",
     startTrust: 22,
-    note: "Youngest senior once. Hates being wrong in public.",
+    note: "Youngest senior engineer the site has had. Brilliant, prickly, and harder on himself than anyone.",
     portrait: { src: "/art/ui/portraits/portrait-marcus-smile.png", pos: "center" },
-    meet: "I was the youngest senior on this floor. Don't take that as a compliment.",
+    meet: "Yes, I'm young for a senior. Everyone mentions it, so I mention it first.",
   },
   priya: {
     id: "priya",
     name: "Dr. Priya Sharma",
     role: "Reactor engineering",
     startTrust: 36,
-    note: "A peak on a screen is a rumor until you stand next to the tank.",
+    note: "Reactor engineering. Walks everything she signs. Gets visibly excited about neutrons.",
     portrait: { src: "/art/ui/portraits/portrait-priya-smile.png", pos: "center" },
-    meet: "Teaching model — not a license. Heat has to leave.",
+    meet: "I don't sign anything I haven't walked. Will you walk it with me?",
   },
   jordan: {
     id: "jordan",
     name: "Jordan Peck",
     role: "Floor tech",
     startTrust: 30,
-    note: "Notices who shares a win. Wants distance from a hide.",
+    note: "Floor tech, bowling captain, finder of the good coffee. Keeps his distance from anything left unsaid.",
     portrait: { src: "/art/ui/portraits/portrait-jordan-smile.png", pos: "center" },
-    meet: "I want distance. That was the deal. Share a catch if you have one.",
+    meet: "When you catch something, say it out here, where people can hear.",
   },
 };
 
 export const NPC_INTRO: Record<NpcId, { who: string; meet: string; beat: string }> = {
-  mabel: { who: "She poured before you spoke. Chalk only moves for a catch.", meet: NPCS.mabel.meet, beat: "Cup, then chalk." },
-  holt: { who: "He funds the line. He will not fund the introduction.", meet: NPCS.holt.meet, beat: "Ink already spent." },
-  elena: { who: "She places boots. The van door has been open since before dawn.", meet: NPCS.elena.meet, beat: "The van counts too." },
-  tommy: { who: "He talks to flanges. People get the short version.", meet: NPCS.tommy.meet, beat: "Dead flange." },
-  marcus: { who: "Youngest senior once. He still won't turn for a soft number.", meet: NPCS.marcus.meet, beat: "The ugly number." },
-  priya: { who: "A peak is a rumor until her shoes are next to the tank.", meet: NPCS.priya.meet, beat: "Feet, then the peak." },
-  jordan: { who: "He remembers who said the win where the door could hear it.", meet: NPCS.jordan.meet, beat: "The door keeps score." },
+  mabel: { who: "She poured your cup before you reached the counter.", meet: NPCS.mabel.meet, beat: "Pours before you ask." },
+  holt: { who: "He stands up when you come in. Someone once told him he didn't.", meet: NPCS.holt.meet, beat: "Times and places, please." },
+  elena: { who: "She's been here since five. The child seat is still in her van.", meet: NPCS.elena.meet, beat: "Two sets of eyes." },
+  tommy: { who: "He's talking to the pump when you walk in, and finishes the sentence first.", meet: NPCS.tommy.meet, beat: "The four words." },
+  marcus: { who: "He's halfway through a calculation and holds up one hand.", meet: NPCS.marcus.meet, beat: "The ugly number first." },
+  priya: { who: "Her boots are scuffed. Her desk is spotless.", meet: NPCS.priya.meet, beat: "Walks what she signs." },
+  jordan: { who: "He waves at you like he's known you for years.", meet: NPCS.jordan.meet, beat: "Where the door can hear." },
 };
 
 function slot(room: RoomId, x: number, y: number): NpcSlot {
@@ -344,13 +345,13 @@ export const INTRO: IntroBeat[] = [
     scene: "/art/intro/scene-core.png",
     portrait: "/art/ui/portraits/portrait-priya-talk.png",
     kicker: "The core  ·  Priya",
-    title: "You signed a core. Now it has to live.",
-    body: "Teaching model — not a license. Heat still has to leave.",
+    title: "You signed a core. Now meet it.",
+    body: "Teaching model, not a license. Heat still has to leave.",
     exchanges: [
-      { you: true, line: "I signed Unit 1 on the sheet. I have not stood at the tank.", focus: "42% 78%", zoom: 1.14, lean: -2 },
-      { line: "“I don't sign a peak I can't walk. You already signed this one, so we walk it.”", focus: "22% 68%", zoom: 1.22, lean: 0 },
-      { you: true, line: "Then walk me to the rail. I want the heat, not the plot.", focus: "74% 28%", zoom: 1.08, lean: 3 },
-      { line: "“The stack looks dark from here. Stand next to it and feel how much heat still has to leave.”", focus: "50% 62%", zoom: 1.16, lean: 1 },
+      { you: true, line: "I signed Unit 1's core on paper. I've never stood next to it.", focus: "42% 78%", zoom: 1.14, lean: -2 },
+      { line: "“Honestly, most designers haven't. That isn't a criticism. It's why I asked you down here.”", focus: "22% 68%", zoom: 1.22, lean: 0 },
+      { you: true, line: "Then show me. I want to feel it, not just read it.", focus: "74% 28%", zoom: 1.08, lean: 3 },
+      { line: "“It looks still from here. It's making heat for a whole city, and every bit of it has to leave.”", focus: "50% 62%", zoom: 1.16, lean: 1 },
     ],
   },
   {
@@ -358,13 +359,13 @@ export const INTRO: IntroBeat[] = [
     portrait: "/art/ui/portraits/portrait-mabel-talk.png",
     kicker: "The cafe  ·  Mabel",
     title: "The kettle is still on from the night shift.",
-    body: "Retired floor manager. The cafe is the last board she touches.",
+    body: "Retired floor manager. She couldn't stay home, so she makes the coffee.",
     exchanges: [
-      { line: "“Sit. The two-to-ten left that chair warm. I'm Mabel. I ran this floor for twenty years.”", focus: "36% 48%", zoom: 1.06, lean: 0 },
-      { you: true, line: "You're not on the board. Why is the kettle still yours?", focus: "58% 72%", zoom: 1.1, lean: 1 },
-      { line: "“Somebody has to pour before anyone asks for anything. It gives people a minute before they have to say something true.”", focus: "48% 40%", zoom: 1.2, lean: 2, prop: "cup" },
-      { you: true, line: "Then I'll sit. Tell me who wouldn't.", focus: "22% 55%", zoom: 1.08, lean: -1 },
-      { line: "“The ones with a catch in their pocket. They stand by the door and wait for someone else to say it first.”", focus: "18% 32%", zoom: 1.12, lean: -2 },
+      { line: "“Sit down, love. The night shift left that chair warm. I'm Mabel. I ran this floor for twenty years.”", focus: "36% 48%", zoom: 1.06, lean: 0 },
+      { you: true, line: "You're retired. Why are you still making the coffee?", focus: "58% 72%", zoom: 1.1, lean: 1 },
+      { line: "“Somebody should pour before anyone asks for anything. It gives people a minute to work up to the truth.”", focus: "48% 40%", zoom: 1.2, lean: 2, prop: "cup" },
+      { you: true, line: "Then I'll sit. Who doesn't?", focus: "22% 55%", zoom: 1.08, lean: -1 },
+      { line: "“The ones carrying something. They hover by the door and wait for someone else to say it first.”", focus: "18% 32%", zoom: 1.12, lean: -2 },
     ],
   },
   {
@@ -372,27 +373,27 @@ export const INTRO: IntroBeat[] = [
     portrait: "/art/ui/portraits/portrait-elena-talk.png",
     kicker: "The lot  ·  Elena",
     title: "Child seat first.",
-    body: "Shift supervisor. The van was cold. The seat was not empty.",
+    body: "Shift supervisor. First in every morning. The seat in the van is her daughter's.",
     exchanges: [
-      { line: "“Two sets of eyes, or it isn't a catch. The van's been open since before dawn.”", focus: "32% 64%", zoom: 1.1, lean: 2 },
-      { you: true, line: "The child seat is still in the back. You didn't take it out.", focus: "70% 58%", zoom: 1.16, lean: -1 },
-      { line: "“No. Some mornings, leaving one thing where it is, is the whole job.”", focus: "46% 46%", zoom: 1.24, lean: -3 },
-      { you: true, line: "You came from home. Then the gate.", focus: "78% 34%", zoom: 1.06, lean: 0 },
-      { line: "“Child seat first, then here. Stand where I can see your hands, and we'll get along.”", focus: "28% 70%", zoom: 1.12, lean: 1 },
+      { line: "“Morning. You're early. Good. I like two sets of eyes on the floor before the sun's up.”", focus: "32% 64%", zoom: 1.1, lean: 2 },
+      { you: true, line: "There's a child seat in the back of your van.", focus: "70% 58%", zoom: 1.16, lean: -1 },
+      { line: "“My daughter's. I drop her at my sister's at five. I leave the seat in. It reminds me who I work for.”", focus: "46% 46%", zoom: 1.24, lean: -3 },
+      { you: true, line: "So that's why you're here before everyone else.", focus: "78% 34%", zoom: 1.06, lean: 0 },
+      { line: "“Partly. Mostly it's because handovers are where things slip. If you see anything, come and get me.”", focus: "28% 70%", zoom: 1.12, lean: 1 },
     ],
   },
   {
     scene: "/art/intro/scene-wing.png",
     portrait: "/art/ui/portraits/portrait-tommy-talk.png",
     kicker: "The wing  ·  Tommy",
-    title: "Finish the sentence.",
-    body: "Maintenance. Pump two. The tag is the rest of the sentence.",
+    title: "The four words.",
+    body: "Maintenance, twenty-eight years. Pump two is dead on purpose this week.",
     exchanges: [
-      { line: "“Pump two. Say LOTOTO out loud before you touch anything.”", focus: "72% 42%", zoom: 1.16, lean: 1, prop: "lock" },
-      { you: true, line: "Lock. Tag. Try. The IN SERVICE card is still on the flange.", focus: "28% 50%", zoom: 1.08, lean: -1 },
-      { line: "“Then pump two still thinks your hands are on it. Finish the sentence and it stops thinking that.”", focus: "64% 58%", zoom: 1.22, lean: -1 },
-      { you: true, line: "I won't touch it until that sentence is finished.", focus: "18% 48%", zoom: 1.05, lean: 0 },
-      { line: "“Good. Boring is how I keep my hands. Most people hate boring until it saves them.”", focus: "80% 36%", zoom: 1.1, lean: 2 },
+      { line: "“Hold up, that's pump two. Before you touch anything in my shop, say the four words out loud.”", focus: "72% 42%", zoom: 1.16, lean: 1, prop: "lock" },
+      { you: true, line: "Isolate. Lock. Tag. Try. And there's an IN SERVICE card on the flange.", focus: "28% 50%", zoom: 1.08, lean: -1 },
+      { line: "“Yeah. On a pump that's supposed to be dead. Somebody believes that card, it's their hands in there.”", focus: "64% 58%", zoom: 1.22, lean: -1 },
+      { you: true, line: "Then I won't touch it until it's right.", focus: "18% 48%", zoom: 1.05, lean: 0 },
+      { line: "“Thank you. Boring is how I've kept all ten fingers. People hate boring until the day it saves them.”", focus: "80% 36%", zoom: 1.1, lean: 2 },
     ],
   },
   {
@@ -400,27 +401,27 @@ export const INTRO: IntroBeat[] = [
     portrait: "/art/ui/portraits/portrait-marcus-talk.png",
     kicker: "The bench  ·  Marcus",
     title: "Two instruments.",
-    body: "Senior engineer. Youngest on this floor, once. He was wrong out loud, and he remembers it.",
+    body: "Senior engineer, the youngest the site has had. Harder on himself than anyone.",
     exchanges: [
-      { line: "“Left gauge. I trust the one under my hand more than the one on the wall.”", focus: "36% 38%", zoom: 1.14, lean: 0 },
-      { you: true, line: "The one on the wall doesn't agree with it.", focus: "62% 42%", zoom: 1.08, lean: -1 },
-      { line: "“I was the youngest senior on this floor. I was wrong out loud once, and it took a year to stop flinching.”", focus: "72% 68%", zoom: 1.18, lean: 2, prop: "pencil" },
-      { you: true, line: "So I say the number before I defend it.", focus: "40% 30%", zoom: 1.08, lean: -2 },
-      { line: "“Don't take that as a compliment. If the two gauges argue, don't pick the polite one.”", focus: "24% 55%", zoom: 1.12, lean: 1 },
+      { line: "“Two gauges, and they disagree. I trust the one under my hand more than the one on the wall.”", focus: "36% 38%", zoom: 1.14, lean: 0 },
+      { you: true, line: "The wall gauge reads lower.", focus: "62% 42%", zoom: 1.08, lean: -1 },
+      { line: "“It does. Once, I defended a number before I'd said it out loud. It went badly. Very publicly.”", focus: "72% 68%", zoom: 1.18, lean: 2, prop: "pencil" },
+      { you: true, line: "So say the number first, then defend it.", focus: "40% 30%", zoom: 1.08, lean: -2 },
+      { line: "“Exactly that. Sorry, I'm lecturing. When two gauges argue, don't pick the polite one.”", focus: "24% 55%", zoom: 1.12, lean: 1 },
     ],
   },
   {
     scene: "/art/intro/scene-break.png",
     portrait: "/art/ui/portraits/portrait-jordan-talk.png",
     kicker: "The break  ·  Jordan",
-    title: "Three tiles off the hide.",
-    body: "Floor tech. He remembers who kept the catch.",
+    title: "Where the door can hear.",
+    body: "Floor tech and bowling captain. He remembers who says it out loud.",
     exchanges: [
-      { line: "“Say the catch out here. One in your pocket doesn't count for anything.”", focus: "58% 42%", zoom: 1.1, lean: 3 },
-      { you: true, line: "Three tiles off the hide. Is that still where we say it?", focus: "16% 40%", zoom: 1.12, lean: -2 },
-      { line: "“Same place as always. I remember who said the win out loud. Not who shouted loudest.”", focus: "40% 62%", zoom: 1.14, lean: 1 },
-      { you: true, line: "If I hide it, you won't sit next to me.", focus: "84% 38%", zoom: 1.06, lean: 1 },
-      { line: "“I'll sit by you. I won't sit by a hide. Bowl after shift, once the catch is already said.”", focus: "22% 48%", zoom: 1.08, lean: -1 },
+      { line: "“Hey, new face! Quick thing. When you catch something, say it out here. In your pocket, it helps nobody.”", focus: "58% 42%", zoom: 1.1, lean: 3 },
+      { you: true, line: "Here? In the break room?", focus: "16% 40%", zoom: 1.12, lean: -2 },
+      { line: "“Break room, board, anywhere people can hear. I remember who says it out loud. Not who's loudest.”", focus: "40% 62%", zoom: 1.14, lean: 1 },
+      { you: true, line: "And if I keep one quiet?", focus: "84% 38%", zoom: 1.06, lean: 1 },
+      { line: "“Then I'll still like you. I just won't sit next to it. Bowling after shift, though. Everyone's invited.”", focus: "22% 48%", zoom: 1.08, lean: -1 },
     ],
   },
   {
@@ -428,13 +429,13 @@ export const INTRO: IntroBeat[] = [
     portrait: "/art/ui/portraits/portrait-holt-talk.png",
     kicker: "The board  ·  Holt",
     title: "Unit 1 is holding. You are not a hero today.",
-    body: "Director. He funds the review. He doesn't fund speeches.",
+    body: "Director. He wants a time, a place and what you saw.",
     exchanges: [
-      { line: "“Unit 1 is already lit. You don't have to tell me it's holding.”", focus: "34% 72%", zoom: 1.1, lean: 0 },
+      { line: "“You're the core designer. Unit 1 is holding. I won't make a speech about it, and please don't.”", focus: "34% 72%", zoom: 1.1, lean: 0 },
       { you: true, line: "I'm not here to be the hero of the board.", focus: "64% 70%", zoom: 1.16, lean: -2 },
-      { line: "“Good. Speeches cost me a review. A catch I can fund.”", focus: "48% 40%", zoom: 1.2, lean: 1 },
-      { you: true, line: "I'll stand next to the line before I ask you to read it.", focus: "82% 28%", zoom: 1.06, lean: 1 },
-      { line: "“Then I'll read the line you stood next to. Not the one you performed for me.”", focus: "30% 55%", zoom: 1.1, lean: -1 },
+      { line: "“Good. I can't fund a hero. I can fund a catch. Bring me the time, the place, and what you saw.”", focus: "48% 40%", zoom: 1.2, lean: 1 },
+      { you: true, line: "I'll stand next to the line before I bring it to you.", focus: "82% 28%", zoom: 1.06, lean: 1 },
+      { line: "“Then I'll read it twice. Thank you. Most people bring me the version they think I want.”", focus: "30% 55%", zoom: 1.1, lean: -1 },
     ],
   },
   {
@@ -455,9 +456,9 @@ export const INTRO: IntroBeat[] = [
 export const INCIDENT = {
   title: "Valve 14 is talking",
   body: "Board A and the paper log do not agree. The hiss is not a personality. Report, peer-check, or hide. Teaching model — not a license.",
-  report: "Elena: Logged. Two sets of eyes. That's a catch.",
-  peer: "Elena: I'll back it. You stood where I could see you.",
-  hide: "Jordan: You hid. I want distance. That was the deal.",
+  report: "Elena: Thank you for writing that up. I'll walk it down with you.",
+  peer: "Elena: Thanks for calling me over. Two of us saw it, so it's real.",
+  hide: "Jordan: I saw that didn't get written down. I can't stand next to that. I'm sorry.",
 };
 
 export function clockLabel(minutes: number) {
@@ -491,13 +492,13 @@ export function trustState(n: number) {
 }
 
 export function relationLine(id: NpcId, flags: Record<string, boolean>, trust: number) {
-  if (id === "mabel" && flags.mabelTalked) return "She kept the cafe so the floor had a place to tell the truth.";
-  if (id === "holt") return trust > 40 ? "He will fund a review if the volume is honest." : "He is waiting for a catch, not a speech.";
-  if (id === "elena") return flags.elenaSecondEyes ? "She will back a catch she can see." : "Two sets of eyes. Stand where she can see you.";
-  if (id === "tommy") return "LOTOTO is a sentence. Finish it.";
-  if (id === "marcus") return "Do not make him wrong in public unless the sticker is a liar.";
-  if (id === "priya") return "Heat has to leave. Teaching only.";
-  if (id === "jordan") return flags.hid ? "He wants distance from a hide." : "He notices who shares a win.";
+  if (id === "mabel" && flags.mabelTalked) return "She keeps the café so people have somewhere to say the hard thing.";
+  if (id === "holt") return trust > 40 ? "He's started telling you things before he has to." : "He's waiting to see whether you bring him times and places.";
+  if (id === "elena") return flags.elenaSecondEyes ? "She'll back any catch she saw with you." : "She'd rather see a problem with you than hear about it later.";
+  if (id === "tommy") return "He'll teach you anything in the shop, once you've said the four words.";
+  if (id === "marcus") return "Hardest on himself. Bring him the ugly number gently, but bring it.";
+  if (id === "priya") return "She won't sign what she hasn't walked. She'd love you to walk it with her.";
+  if (id === "jordan") return flags.hid ? "He's keeping a polite distance. It's about what went unsaid." : "He remembers who says things out loud, and he says thank you.";
   return trustState(trust);
 }
 
@@ -515,66 +516,66 @@ export function floorTies(residue: Residue, flags: Record<string, boolean>): { p
     "jordan",
     "Elena · Jordan",
     hid
-      ? "Jordan took the far side. Elena is still counting hands."
+      ? "Jordan's gone quiet this week. Elena keeps checking on him."
       : residue.valve === "caught"
-        ? "Elena saw the hands. Jordan will take the same row."
-        : "Elena wants the hands. Jordan wants it said at the door.",
+        ? "Elena told Jordan you called her over on Valve 14. He was pleased."
+        : "Elena gave Jordan this job when nobody else would. He'd walk through a wall for her.",
   );
   push(
     "mabel",
     "jordan",
     "Mabel · Jordan",
-    hid ? "Mabel watched the chair. Jordan left it." : "Mabel keeps the chalk. Jordan keeps the row.",
+    hid ? "Jordan skipped his coffee at Mabel's. She noticed." : "Mabel saves Jordan the last pastry. He pretends not to know.",
   );
   push(
     "holt",
     "elena",
     "Holt · Elena",
     residue.valve === "hid"
-      ? "Elena is on the van. Holt will not fund what she did not see."
+      ? "Elena's uneasy about Valve 14. Holt can tell, and can't help until someone says it."
       : residue.valve === "caught"
-        ? "Elena saw the hands. Holt can read that line."
-        : "Elena has not called it. Holt has nothing to buy.",
+        ? "Holt asked Elena how you did on Valve 14. She told him. It was good."
+        : "Holt asks Elena's opinion before anyone else's. Neither of them mentions it.",
   );
   push(
     "mabel",
     "elena",
     "Mabel · Elena",
     residue.valve === "caught"
-      ? "Elena left the van. Mabel can chalk the hands."
+      ? "Mabel trained Elena. Elena told her about Valve 14, and Mabel chalked it."
       : residue.valve === "hid"
-        ? "Elena stayed on the van. Mabel watched you not sit."
-        : "Elena counts hands. Mabel waits for one said out loud.",
+        ? "Mabel trained Elena. They've both noticed you avoiding the café."
+        : "Mabel trained Elena. They still argue about how strong the coffee should be.",
   );
   push(
     "tommy",
     "marcus",
     "Tommy · Marcus",
     residue.tag === "hid" || residue.dose === "hid"
-      ? "A lie is still on the wall. They will not dress it."
+      ? "Something wrong is still hanging on the wall. Both of them know it. Neither will dress it up."
       : residue.tag === "caught" && residue.dose === "caught"
-        ? "Tag down. Forty said. They will both turn."
-        : "Tommy wants the sentence. Marcus wants the number.",
+        ? "Marcus went down to the shop to say thanks. Tommy didn't know what to do with his hands."
+        : "Tommy once sent back a work package Marcus signed. They've been careful with each other since.",
   );
   push(
     "priya",
     "marcus",
     "Priya · Marcus",
     residue.dose === "hid"
-      ? "The sticker still says 40. Priya will not sign past it."
+      ? "The sticker still says 40. Priya won't sign past it, and Marcus knows she's right."
       : residue.dose === "caught"
-        ? "Marcus said forty. Priya still wants the rail."
-        : "Marcus has not turned. Priya has not walked it.",
+        ? "Priya told Marcus the sticker catch was a good one. He went quiet, then said thanks."
+        : "Priya and Marcus started the same year. She's the only one who can tease him.",
   );
   push(
     "priya",
     "holt",
     "Priya · Holt",
     hid
-      ? "Priya will not sign. Holt will not fund the blank."
+      ? "Priya won't sign a week with a gap in it. Holt won't ask her to."
       : residue.log === "caught"
-        ? "Holt will read the line. Priya still walks it."
-        : "Holt wants a line. Priya wants feet on the metal.",
+        ? "Holt read your signed log out to Priya. She's walking it anyway. He expected that."
+        : "Priya keeps asking Holt for walkdown hours. He keeps saying yes, slowly.",
   );
   return ties;
 }
@@ -588,10 +589,21 @@ export interface WeekVoice {
 
 const QUIET_WEEK: WeekVoice = { catches: 0, hides: 0, reports: 0, trust: 0 };
 
+/** One line per day of the week: index 0 is day 1, the last entry covers day 5 and later. */
 function spin(day: number, lines: readonly string[]) {
-  return lines[(Math.max(1, day) - 1) % lines.length] ?? lines[0];
+  return lines[Math.min(Math.max(1, day), lines.length) - 1] ?? lines[0];
 }
 
+/** "1 thing" / "3 things". */
+function things(n: number, one = "thing", many = `${one}s`) {
+  return `${n} ${n === 1 ? one : many}`;
+}
+
+/**
+ * Everyday conversations. Who these people are, how they talk and what each has been through: docs/characters.md.
+ * Each person sounds like nobody else. Thanks and apologies say what for. Mistakes are told once, in the
+ * place docs/characters.md lists. Choice ids, flags and trust values are unchanged from the earlier text.
+ */
 export function talkLines(
   npc: NpcId,
   flags: Record<string, boolean>,
@@ -610,373 +622,474 @@ export function talkLines(
   if (npc === "mabel") {
     if (!first) {
       const caughtWeek = residue.valve === "caught" || residue.tag === "caught" || residue.dose === "caught" || residue.log === "caught";
-      const lines: Line[] = [
-        {
-          speaker: "Mabel",
-          text: hid
-            ? "You left a lie on the glass. I watched you not sit with it."
-            : day >= 3 && caughtWeek
-              ? "You sat with the last one. The kettle is still on."
-              : spin(day, [
-                  "The chair remembers who used the cup as courage.",
-                  "Kettle's on. The chair is empty.",
-                  "North wall still wants the catch out loud.",
-                ]),
-          mood: hid ? "sharp" : "warm",
-        },
-      ];
+      const lines: Line[] = hid
+        ? [
+            { speaker: "Mabel", text: "Sit down a minute. Something got left unsaid this week, didn't it? People stop looking at the wall.", mood: "soft" },
+            { speaker: "Mabel", text: "I'm not cross. I kept one to myself once, and it sat in me for years. Go and say it while it's small.", mood: "soft" },
+          ]
+        : [
+            {
+              speaker: "Mabel",
+              text:
+                day >= 3 && caughtWeek
+                  ? "You said one out loud this week. I put a mark up for it. North wall, third row. Go and look."
+                  : spin(day, [
+                      "Back already? Good. The ones who come back for a second cup usually turn out fine.",
+                      "Tommy's been in. He's in a mood, so be nice to him. His pump's playing up.",
+                      "You look like you slept badly. Most of us did, our first week. Sit.",
+                      "Reggie came in and asked how you were getting on. Don't tell him I call him Reggie.",
+                      "Last day of the week. I always liked Fridays on the floor. Tired people are more honest.",
+                    ]),
+              mood: "warm",
+            },
+          ];
       if (day === 2 && role && !flags.roleHeard) {
         lines.push({ speaker: "Mabel", text: roleMouth(role), mood: "even" });
       } else if (!hid) {
         lines.push({
           speaker: "Mabel",
-          text: "What do you need?",
+          text: "Now. What can I get you?",
           mood: "soft",
           choices: [
-            { id: "mabel-sit", label: "Just the coffee.", reply: "On the house. The night shift already paid for the heat.", trust: 2, culture: 1 },
-            { id: "mabel-catch", label: "Who wouldn't sit today?", reply: "The ones with a catch in their pocket. North wall is Unit 1. I'll chalk it if you say it out loud.", flag: "arcade" },
-            { id: "mabel-load", label: "The load on the north wall.", reply: "You see the pulse. One rod, or one catch. The load is the opponent. I keep the score.", flag: "arcade" },
+            { id: "mabel-sit", label: "Just the coffee, thanks.", reply: "Coming up. Night shift left it strong, so add milk or regret it.", trust: 2, culture: 1 },
+            { id: "mabel-catch", label: "Who hasn't sat down today?", reply: "Whoever's carrying something they haven't said. They hover by the door. Say it out loud and I'll chalk it.", flag: "arcade" },
+            { id: "mabel-load", label: "What's the score on the north wall?", reply: "Every mark's a catch somebody said out loud. Nobody's beaten the night shift yet. I don't let anyone cheat.", flag: "arcade" },
           ],
         });
       }
       return lines;
     }
     return [
-      { speaker: "Mabel", text: "Cup's poured. Sit before the name.", mood: "warm" },
-      { speaker: "Mabel", text: "Dr. Mabel Quinn. I ran this floor — the kettle is what's left of the board.", mood: "soft" },
-      { speaker: "Mabel", text: "Say one catch out loud today. I chalk what gets said — a pocket does not.", mood: "even" },
+      { speaker: "Mabel", text: "There you are. We only had a minute before. Sit, sit. I always pour one extra.", mood: "warm" },
+      { speaker: "Mabel", text: "Mabel Quinn. I ran this floor for twenty years, retired, and couldn't stay home. So now I make the coffee.", mood: "soft" },
+      { speaker: "Mabel", text: "See the chalk on the north wall? Every mark is a time someone caught a problem and said it out loud.", mood: "even" },
+      { speaker: "Mabel", text: "I started that wall because of one I kept quiet about. I'll tell you sometime, if you keep coming back.", mood: "soft" },
       {
         speaker: "Mabel",
-        text: "Coffee, or the chalk?",
+        text: "Now. What can I get you?",
         mood: "warm",
         choices: [
-          { id: "mabel-sit", label: "Just the coffee.", reply: "On the house. Don't use it as courage.", trust: 2, culture: 1 },
-          { id: "mabel-catch", label: "Who won't sit?", reply: "The ones carrying a catch in their pocket. I'll chalk it if you say it.", trust: 1, flag: "arcade" },
-          { id: "mabel-load", label: "I'll say one out loud.", reply: "Then the chalk moves. North wall is Unit 1.", trust: 2, flag: "arcade" },
+          { id: "mabel-sit", label: "Just the coffee, thanks.", reply: "On the house. The night shift paid for it with their sleep.", trust: 2, culture: 1 },
+          { id: "mabel-catch", label: "Who doesn't sit down here?", reply: "The ones carrying something. They stand by the door. Say it out loud and I'll chalk it for you.", trust: 1, flag: "arcade" },
+          { id: "mabel-load", label: "I'd like to earn a mark on that wall.", reply: "Don't try to earn it. Just say what you see, even if it's small. The marks take care of themselves.", trust: 2, flag: "arcade" },
         ],
       },
-      { speaker: "Mabel", text: "Chalk's for this room. Pockets don't get a mark.", mood: "even" },
+      { speaker: "Mabel", text: "And come back tomorrow. I like to see who comes back.", mood: "warm" },
     ];
   }
   if (npc === "holt") {
     if (!first) {
-      if (residue.log === "hid") return [{ speaker: "Holt", text: "Your initials are on a blank. I will not fund that.", mood: "sharp" }];
+      if (residue.log === "hid") {
+        return [
+          { speaker: "Holt", text: "Your initials are on a log line for hours you didn't stand. I'd like to hear why from you first.", mood: "sharp" },
+          { speaker: "Holt", text: "I'm not going to shout. I've sat on your side of this desk. Come and see me before the day's out.", mood: "even" },
+        ];
+      }
       if (residue.log === "caught") {
-        const lines: Line[] = [{ speaker: "Holt", text: "I will read the line. My hand stays off it.", mood: "even" }];
-        if (culture >= 28) lines.push({ speaker: "Holt", text: "Honest catches. That is a review I can fund.", mood: "even" });
+        const lines: Line[] = [
+          { speaker: "Holt", text: "You wouldn't sign that blank log. It held up a turnover by twenty minutes. Thank you for those twenty minutes.", mood: "even" },
+        ];
+        if (culture >= 28) lines.push({ speaker: "Holt", text: "People are starting to say things out loud on this floor. I can see it in the reports. That isn't nothing.", mood: "warm" });
         return lines;
       }
       return [
         {
           speaker: "Holt",
           text: spin(day, [
-            `Day ${day}. Stand next to a line I can fund.`,
-            "The log is still blank. So is the check.",
-            "Volume. Not a speech. I am still waiting.",
+            "How is the floor treating you? Specifics, please. 'Fine' doesn't tell me anything.",
+            "Tommy has a lockout on 2A today. He'll teach you more about this site in ten minutes than I can in a week.",
+            "Corporate wants a slide about our 'safety culture'. I'd rather have one honest page than twenty slides.",
+            "There's a log in Control with a blank where a name should be. I'd like to know whose hours those were.",
+            "Outage week. Everyone's tired, and tired people round numbers. Please don't round numbers.",
           ]),
-          mood: "sharp",
+          mood: "even",
         },
         {
           speaker: "Holt",
           text: spin(day, [
-            "A blank does not get a signature from me.",
-            "I fund the line. Not the story around it.",
-            `Day ${day}. Still no line.`,
+            "I mean that kindly, by the way. I'm told it doesn't always sound kind.",
+            "Listen to him. I do, though he'd never believe it.",
+            "If you see something today, that page is where it goes.",
+            "Not to punish anyone. A blank is the one thing I can't investigate.",
+            "When the week's done, come and tell me what I got wrong. I mean that.",
           ]),
-          mood: "even",
+          mood: day === 1 ? "soft" : "even",
         },
       ];
     }
     return [
-      { speaker: "Holt", text: "Skip the hello. The org chart already spent the ink.", mood: "sharp" },
-      { speaker: "Holt", text: "Reginald Holt. I direct the site, and I buy the line, not the person.", mood: "even" },
-      { speaker: "Holt", text: "Stand next to a number today. That is the only thing I can fund.", mood: "sharp" },
+      { speaker: "Holt", text: "Ah. The core designer. I've been meaning to find you. I'm bad at hellos, so I'll skip it.", mood: "even" },
+      { speaker: "Holt", text: "Reginald Holt. I run the site. People tell me what they think I want to hear. It makes me expensive to talk to.", mood: "even" },
+      { speaker: "Holt", text: "So, a favour on day one. If you see something wrong, bring me the time, the place, and what you saw.", mood: "even" },
       {
         speaker: "Holt",
-        text: "Well?",
+        text: "Not how you feel about it. Can you do that?",
         mood: "sharp",
         choices: [
-          { id: "holt-line", label: "Here's the line.", reply: "Then I will read it. Not the speech around it.", trust: 2 },
-          { id: "holt-review", label: "I need a review.", reply: "Bring the volume. Then we talk about the check.", trust: 1 },
-          { id: "holt-later", label: "Not today.", reply: "Then the log stays blank. I do not fund a blank.", flag: "holtDeferred" },
+          { id: "holt-line", label: "Yes. Times and places.", reply: "Thank you. You'd be surprised how rare that is.", trust: 2 },
+          { id: "holt-review", label: "What if I'm not sure yet?", reply: "Then tell me you're not sure. That's information too, and I'd rather have it early.", trust: 1 },
+          { id: "holt-later", label: "I'd like to settle in first.", reply: "Fair. But the plant won't wait for you to settle in. Neither will the first thing you find.", flag: "holtDeferred" },
         ],
       },
-      { speaker: "Holt", text: "Leave the speech in the hall.", mood: "even" },
+      { speaker: "Holt", text: "Mabel will tell you I'm a cold man. She's known me since I was twenty-four. She's half right.", mood: "wry" },
     ];
   }
   if (npc === "elena") {
     if (!first) {
-      if (residue.valve === "hid") return [{ speaker: "Elena", text: "I'm still looking at the van.", mood: "even" }];
+      if (residue.valve === "hid") {
+        return [
+          { speaker: "Elena", text: "Hey. How did your first day go? Really go.", mood: "even" },
+          { speaker: "Elena", text: "If something didn't get written down, I'd rather hear it from you than find it. I've been there.", mood: "soft" },
+        ];
+      }
       if (residue.valve === "caught" || flags.elenaSecondEyes) {
-        const lines: Line[] = [{ speaker: "Elena", text: "I saw your hands. I'll back that catch.", mood: "soft" }];
-        if (day >= 2) lines.push({ speaker: "Elena", text: "I am not looking at the van anymore.", mood: "soft" });
+        const lines: Line[] = [
+          { speaker: "Elena", text: "Thank you for calling me over on that valve. You asked before you were sure. That's exactly the right time.", mood: "soft" },
+        ];
+        if (day >= 2) lines.push({ speaker: "Elena", text: "I told my sister about it last night. I never talk about work at home. So you know.", mood: "warm" });
         return lines;
       }
       return [
         {
           speaker: "Elena",
           text: spin(day, [
-            "Stand where I can see your hands.",
-            "The van hasn't moved. Neither have I.",
-            "Eyes on you. That's the job today.",
+            "How are you holding up? First days are long. Have you eaten anything?",
+            "Tommy's got a lockout on 2A today. If he asks you to check his tags, take it as a compliment.",
+            "Long night. My daughter had a fever. She's fine. I'm running on Mabel's coffee.",
+            "Somebody left the night log unsigned. I'm not pointing fingers. I'm just tired of blanks.",
+            "Last day before the outage. Everybody's rushing. That's when I slow down on purpose.",
           ]),
-          mood: "even",
+          mood: day === 3 ? "tired" : "even",
         },
         {
           speaker: "Elena",
-          text: spin(day, ["Not the pocket. The hands.", "Door's open. I stayed.", "I count the hands. Not the stories."]),
-          mood: "even",
+          text: spin(day, [
+            "There's soup in the break room fridge. Nobody's going to claim it.",
+            "He doesn't ask many people.",
+            "So if I miss something today, tell me. Today especially.",
+            "If you see one, don't fill it in for them. Bring it to me.",
+            "Walk with me later if you like. Rushing is easier to spot from two angles.",
+          ]),
+          mood: "soft",
         },
       ];
     }
     return [
-      { speaker: "Elena", text: "Boots on the paint. I don't do doorways.", mood: "even" },
-      { speaker: "Elena", text: "Elena Voss. I put people where they can be seen. That's the whole job.", mood: "even" },
-      { speaker: "Elena", text: "That van's been open since before dawn. Cupholder's cold. Somebody sat there and left.", mood: "soft" },
+      { speaker: "Elena", text: "Mind the paint line, the forklift doesn't. We only said hello in the lot. I'm Elena, I run days.", mood: "even" },
+      { speaker: "Elena", text: "My job is mostly putting people where someone else can see them. Nobody should be alone with a problem here.", mood: "even" },
+      { speaker: "Elena", text: "You noticed the seat in my van. You're the first new person who's said anything.", mood: "soft" },
       {
         speaker: "Elena",
-        text: "Look at it.",
+        text: "Go on, then. Ask.",
         mood: "even",
         choices: [
-          { id: "elena-seat", label: "The child seat.", reply: "Good. Eyes before opinions.", trust: 2 },
-          { id: "elena-whose", label: "Whose van is it?", reply: "Mine. Next question, you'll like it less.", trust: 1 },
-          { id: "elena-reactor", label: "I'm here for the reactor.", reply: "Everybody is. Today the van is the reactor.", flag: "elenaReactor" },
+          { id: "elena-seat", label: "Everyone here has someone waiting at home.", reply: "Yes. That's the whole reason for two sets of eyes. Everybody here is somebody's ride home.", trust: 2 },
+          { id: "elena-whose", label: "How old is she?", reply: "Six. She thinks I drive the reactor. I've stopped correcting her.", trust: 1 },
+          { id: "elena-reactor", label: "I should get to the reactor.", reply: "Go on. But the reactor's the easy part. It's the people around it who need watching.", flag: "elenaReactor" },
         ],
       },
-      { speaker: "Elena", text: "Both hands where the van can see them. Then it's a catch.", mood: "even" },
+      { speaker: "Elena", text: "If you find something today, come and get me. I'd rather check it with you than hear about it later.", mood: "even" },
     ];
   }
   if (npc === "tommy") {
     if (!first) {
       if (residue.tag === "caught") {
-        const lines: Line[] = [{ speaker: "Tommy", text: "The tag is down. Pump two can stay quiet.", mood: "even" }];
-        if (day >= 3) lines.push({ speaker: "Tommy", text: "You can ask for the wrench.", mood: "even" });
+        const lines: Line[] = [
+          { speaker: "Tommy", text: "That IN SERVICE card's in my drawer now. Thank you. If someone had believed it, it'd be my guy's hands in there.", mood: "warm" },
+        ];
+        if (day >= 3) lines.push({ speaker: "Tommy", text: "Anything you want to learn in this shop, ask. My tools are your tools. I mean that.", mood: "warm" });
         return lines;
       }
-      if (residue.tag === "hid") return [{ speaker: "Tommy", text: "IN SERVICE is still on the flange.", mood: "sharp" }];
+      if (residue.tag === "hid") {
+        return [
+          { speaker: "Tommy", text: "That card's still hanging on 2A. I know it was on your list.", mood: "sharp" },
+          { speaker: "Tommy", text: "I'm not going to chew you out. I just can't send my people near that pump till it's right. Help me fix it?", mood: "even" },
+        ];
+      }
       if (day === 2) {
         return [
-          { speaker: "Tommy", text: "Pump 2A. The hunt is on the board.", mood: "sharp" },
-          { speaker: "Tommy", text: "The tag is still the sentence.", mood: "even" },
+          { speaker: "Tommy", text: "2A today. There's an IN SERVICE card on a dead pump. Find it before somebody believes it.", mood: "sharp" },
+          { speaker: "Tommy", text: "Sorry. Short with you again. You find it, you call me, and we pull it together.", mood: "even" },
         ];
       }
       return [
         {
           speaker: "Tommy",
           text: spin(day, [
-            "Finish the sentence before you ask me for a wrench.",
-            "The tag's still where you left it.",
-            "Pump two doesn't care what day it is. Neither do I.",
+            "Morning, boss. Keep coming down here and people'll think you like it.",
+            "Morning, boss.",
+            "Marcus came down and actually asked me a question. I nearly dropped my coffee.",
+            "Knees are bad today. Rain coming. Twenty-eight years on concrete does that.",
+            "Outage week. Lots of new hands in my shop who don't know my pumps.",
           ]),
-          mood: "even",
+          mood: day === 4 ? "tired" : "wry",
         },
         {
           speaker: "Tommy",
-          text: spin(day, ["Isolate. Lock. Tag. Try.", "IN SERVICE is not a sentence.", "Wrench stays on the hook."]),
+          text: spin(day, [
+            "Don't worry. I won't tell anyone you're an engineer.",
+            "Say the four words for me. Isolate. Lock. Tag. Try.",
+            "Don't tell him I said so. He's all right, underneath.",
+            "Do me a favour. Wear the good boots. Not those.",
+            "Keep an eye out for me, would you? I can't be everywhere.",
+          ]),
           mood: "even",
         },
       ];
     }
     return [
-      { speaker: "Tommy", text: "Pump two's dressed for a shift it isn't working.", mood: "even" },
-      { speaker: "Tommy", text: "Tommy Reyes, maintenance. I finish the sentence the pump can't.", mood: "sharp" },
-      { speaker: "Tommy", text: "IN SERVICE is zip-tied to a dead flange. Take the lie off before you ask for a wrench.", mood: "sharp" },
+      { speaker: "Tommy", text: "Hey, careful, she bites. Pump 2A. She's dead on purpose this week, and I want her to stay that way.", mood: "even" },
+      { speaker: "Tommy", text: "Tommy Reyes, maintenance. Twenty-eight years of turning wrenches and filling in the forms nobody reads.", mood: "wry" },
+      { speaker: "Tommy", text: "Somebody hung an IN SERVICE card on her. On a pump that's locked out. That's how people get hurt.", mood: "sharp" },
       {
         speaker: "Tommy",
-        text: "Four words. Or don't.",
+        text: "Before you touch anything in my shop, I need four words. You know them?",
         mood: "even",
         choices: [
-          { id: "tommy-four", label: "Isolate. Lock. Tag. Try.", reply: "Four words. Now the wrench can come off the hook.", trust: 2 },
-          { id: "tommy-where", label: "Where's the tag?", reply: "On the board. It does not walk itself over.", trust: 1 },
-          { id: "tommy-leave", label: "I'll leave it.", reply: "Then the pump keeps your hands. That's the deal.", flag: "tommyLeft" },
+          { id: "tommy-four", label: "Isolate. Lock. Tag. Try.", reply: "There it is. You'd be amazed how many stop at tag. The try is the one that saves you.", trust: 2 },
+          { id: "tommy-where", label: "Where's the wrong card?", reply: "On the board, by 2A. Go and see it yourself. You'll remember it better than if I tell you.", trust: 1 },
+          { id: "tommy-leave", label: "I'll stay out of your way.", reply: "Appreciate it. But out of the way isn't the same as safe. Come back when you want to learn it.", flag: "tommyLeft" },
         ],
       },
-      { speaker: "Tommy", text: "I'm not your audience. The flange is.", mood: "even" },
+      { speaker: "Tommy", text: "Sorry if I'm short. I'm not mad at you. I'm mad at the card.", mood: "soft" },
     ];
   }
   if (npc === "marcus") {
     if (!first) {
       if (residue.dose === "caught") {
-        const lines: Line[] = [{ speaker: "Marcus", text: "You said forty out loud. That is the number.", mood: "tired" }];
-        lines.push({
-          speaker: "Marcus",
-          text: day >= 4 ? "I will turn around for the next one." : "I turned. That was the number, not me.",
-          mood: "tired",
-        });
-        return lines;
+        return [
+          { speaker: "Marcus", text: "You said forty out loud on that sticker. In front of people. Before anyone could call it a typo.", mood: "even" },
+          {
+            speaker: "Marcus",
+            text:
+              day >= 4
+                ? "I wanted it to be a typo because it came off my survey sheet. Thank you for not letting me hide behind that."
+                : "I was annoyed with you for about an hour. Then I wasn't. Thank you.",
+            mood: "soft",
+          },
+        ];
       }
-      if (residue.dose === "hid") return [{ speaker: "Marcus", text: "The sticker still says 40. I am not turning around.", mood: "sharp" }];
+      if (residue.dose === "hid") {
+        return [
+          { speaker: "Marcus", text: "That sticker still says forty. Whatever's stuck over it, the area doesn't read labels.", mood: "sharp" },
+          { speaker: "Marcus", text: "And honestly? I was relieved when nobody said anything. That's the part that scares me.", mood: "soft" },
+        ];
+      }
       return [
         {
           speaker: "Marcus",
           text: spin(day, [
-            "Say the number before you defend it.",
-            "The sticker is still 40. The mouth isn't.",
-            "Left gauge. Under the hand. Not the wall.",
+            "You again. That's a compliment, by the way. People usually avoid my bench.",
+            "Tommy's got a bad tag on 2A, on a job I signed off. I'm going down to look at it myself.",
+            "There's a sticker in Maintenance reading forty. The others say point oh four. I'd love it to be a typo.",
+            "Sorry about yesterday, if I was short with you. I get prickly when a number might be mine.",
+            "Outage week. A hundred numbers, and every one matters. I'm checking mine twice and asking someone for a third.",
           ]),
           mood: "even",
         },
         {
           speaker: "Marcus",
-          text: spin(day, ["The number. Then the defense.", "I have not turned.", "Out loud. Then we can argue."]),
-          mood: "tired",
+          text: spin(day, [
+            "I'm told I'm a lot before lunch.",
+            "Not because I have to. Because I should have the first time.",
+            "Wanting something to be a typo is how you stop looking. I know. I know.",
+            "It's not an excuse. I'm working on it.",
+            "That last part's new. You can take some of the credit.",
+          ]),
+          mood: day === 3 ? "tired" : "soft",
         },
       ];
     }
     return [
-      { speaker: "Marcus", text: "Stay on that side of the bench. I'm not turning for a name.", mood: "tired" },
-      { speaker: "Marcus", text: "Marcus Hale, senior engineer. The room kept the day I was wrong.", mood: "sharp" },
-      { speaker: "Marcus", text: "Say the number before you defend it. The wall gauge is the crowd.", mood: "even" },
+      { speaker: "Marcus", text: "Hi. Sorry, one second. I'm mid-calculation, and if I stop now I lose the whole thing.", mood: "tired" },
+      { speaker: "Marcus", text: "Okay. Marcus Hale, senior engineer. Yes, I'm young for it. Everyone mentions it, so I mention it first.", mood: "wry" },
+      { speaker: "Marcus", text: "Two gauges on this bench. The one under my hand says forty. The one on the wall says thirty-eight.", mood: "even" },
       {
         speaker: "Marcus",
-        text: "Well. The number.",
-        mood: "tired",
+        text: "Quick test. Which number do you tell the board?",
+        mood: "even",
         choices: [
-          { id: "marcus-forty", label: "Forty.", reply: "Out loud. That's the number. I can turn for that.", trust: 2 },
-          { id: "marcus-which", label: "Which gauge?", reply: "The one under the hand. Not the one on the wall.", trust: 1 },
-          { id: "marcus-sheet", label: "I'll check the sheet.", reply: "The sheet is the crowd. Come back with a mouth.", flag: "marcusSheet" },
+          { id: "marcus-forty", label: "Forty. Then we find out why they disagree.", reply: "Good. Say the number out loud before you defend it. It took me years to learn that order.", trust: 2 },
+          { id: "marcus-which", label: "Which one was calibrated last?", reply: "The one under my hand. Good question. Most people pick the one that makes them look right.", trust: 1 },
+          { id: "marcus-sheet", label: "I'd check the data sheet first.", reply: "The sheet tells you what it should say. The gauge tells you what it does say. Think about that one.", flag: "marcusSheet" },
         ],
       },
-      { speaker: "Marcus", text: "Don't dress the next one up.", mood: "even" },
+      { speaker: "Marcus", text: "Sorry. I test people. It's a bad habit from being tested a lot.", mood: "soft" },
     ];
   }
   if (npc === "priya") {
     if (!first) {
-      if (anyHid(residue)) return [{ speaker: "Priya", text: "I will not sign. The rail is empty.", mood: "sharp" }];
+      if (anyHid(residue)) {
+        return [
+          { speaker: "Priya", text: "Something this week didn't get written down. I can't sign a week with a hole in it, even a small one.", mood: "sharp" },
+          { speaker: "Priya", text: "I'm not judging you. I've ignored a reading myself. I just can't put my name under it.", mood: "soft" },
+        ];
+      }
       if (day >= 5) {
-        const lines: Line[] = [{ speaker: "Priya", text: "I will walk that peak to the rail.", mood: "soft" }];
-        if (flags.shuffle) lines.push({ speaker: "Priya", text: "You stood next to the tank. So will I.", mood: "soft" });
+        const lines: Line[] = [{ speaker: "Priya", text: "I walked your peak to the rail this morning. Your numbers held. I wanted to tell you in person.", mood: "warm" }];
+        if (flags.shuffle) lines.push({ speaker: "Priya", text: "And you stood at the tank yourself. That's the part that'll make you good at this.", mood: "warm" });
         return lines;
       }
-      if (flags.physMcHeld) return [{ speaker: "Priya", text: "You ran analog MC. k ± σ. The bank is the clock. OpenMC stays a letter, and I still will not sign a peak I have not walked.", mood: "soft" }];
-      if (flags.physPlayed) return [{ speaker: "Priya", text: "You watched the pin. Leakage is the last two doors. Teaching analog — not a license.", mood: "even" }];
+      if (flags.physMcHeld) {
+        return [
+          { speaker: "Priya", text: "You ran the Monte Carlo bench. k with its sigma, the bank as a clock. That's real physics. Nicely done.", mood: "warm" },
+          { speaker: "Priya", text: "It's still a teaching model, and OpenMC is only a letter on the page here. I won't sign a peak I haven't walked.", mood: "even" },
+        ];
+      }
+      if (flags.physPlayed) {
+        return [
+          { speaker: "Priya", text: "You watched a neutron leave on the bench. Leakage is just the last two doors it can walk out of.", mood: "warm" },
+          { speaker: "Priya", text: "Teaching analog, not a license. I still get a little thrill every time, though.", mood: "wry" },
+        ];
+      }
       return [
         {
           speaker: "Priya",
           text: spin(day, [
-            "The sheet is still a rumor until you stand next to the tank.",
-            "I have not walked it. I will not sign it.",
-            "Screen peak. Floor empty. I am still here.",
+            "How's day one? Overwhelming is normal. I cried in a stairwell on mine. Don't tell Marcus.",
+            "Tommy's got a pump locked out. Go and watch him. It's like watching someone play an instrument.",
+            "Marcus is in a mood about a sticker. Be patient with him. He's harder on himself than anyone else could be.",
+            "I'm prepping the outage loading. Sixty-four new assemblies. I've redone the map three times.",
           ]),
           mood: "even",
         },
-        { speaker: "Priya", text: "Stand next to it. Then talk.", mood: "even" },
+        {
+          speaker: "Priya",
+          text: spin(day, [
+            "Come and find me at the tank. Everything's easier to understand standing next to it.",
+            "Physics is my job. That's his. Both matter.",
+            "And if the sticker's real, it's real. Say so.",
+            "Come and look at it later. Fresh eyes catch the things mine have stopped seeing.",
+          ]),
+          mood: "soft",
+        },
       ];
     }
     return [
-      { speaker: "Priya", text: "No handshake. A schematic doesn't have a pulse.", mood: "soft" },
-      { speaker: "Priya", text: "Priya Sharma, reactor engineering. I walk what I sign.", mood: "even" },
-      { speaker: "Priya", text: "You signed from a chair. Stand at the tank today — heat leaves through the metal.", mood: "soft" },
+      { speaker: "Priya", text: "You're the designer. I've read your loading sheet four times. It's good. Can I be honest about one thing?", mood: "warm" },
+      { speaker: "Priya", text: "I'm Priya, reactor engineering. I don't sign anything I haven't walked. My shoes have more miles than my car.", mood: "wry" },
+      { speaker: "Priya", text: "Your sheet was signed at a desk. That's normal. But heat doesn't read sheets. It leaves through real metal.", mood: "even" },
       {
         speaker: "Priya",
-        text: "Teaching model. Not a license.",
-        mood: "even",
+        text: "So, will you walk it with me?",
+        mood: "soft",
         choices: [
-          { id: "priya-walk", label: "I'll walk it.", reply: "Then I will meet you at the rail.", trust: 2, flag: "priyaWalk" },
-          { id: "priya-sheet", label: "The sheet is enough.", reply: "A sheet is a rumor. I will not sign it.", flag: "priyaSheet" },
-          { id: "priya-peak", label: "Show me the peak.", reply: "After your feet. Not before.", trust: 1 },
+          { id: "priya-walk", label: "Yes. Show me the real thing.", reply: "Wonderful. Meet me at the rail. Proper boots, the floor's warm.", trust: 2, flag: "priyaWalk" },
+          { id: "priya-sheet", label: "The sheet should be enough.", reply: "It usually is. 'Usually' is the word that worries me. I won't sign until we've walked it.", flag: "priyaSheet" },
+          { id: "priya-peak", label: "Show me the power peak first.", reply: "After we walk. I promise the peak makes more sense once you've stood next to it.", trust: 1 },
         ],
       },
-      { speaker: "Priya", text: "Stand at the metal. Then we can use the word peak.", mood: "soft" },
+      { speaker: "Priya", text: "And so it's said: this is a teaching model, not a license. We learn from it. We don't trust it blindly.", mood: "even" },
     ];
   }
   if (!first) {
-    if (hid) return [{ speaker: "Jordan", text: "Distance.", mood: "even" }];
+    if (hid) {
+      return [
+        { speaker: "Jordan", text: "Hey.", mood: "even" },
+        { speaker: "Jordan", text: "Sorry. I'm keeping to myself a bit this week. It's not you, exactly. It's what didn't get said.", mood: "soft" },
+      ];
+    }
     if (flags.peered || flags.jordanCredit) {
-      const lines: Line[] = [{ speaker: "Jordan", text: "The catch was said. The chair is yours.", mood: "soft" }];
-      if (day >= 3 && !anyHid(residue)) lines.push({ speaker: "Jordan", text: "I'll sit the same row.", mood: "soft" });
+      const lines: Line[] = [{ speaker: "Jordan", text: "You said it out loud and put my name next to yours. You didn't have to. Thank you.", mood: "warm" }];
+      if (day >= 3 && !anyHid(residue)) lines.push({ speaker: "Jordan", text: "Saved you a seat at lunch. And a lane on Thursday. Don't make me regret the lane.", mood: "wry" });
       return lines;
     }
     return [
       {
         speaker: "Jordan",
-        text: spin(day, ["Say the catch out here.", "The door sees it. I do too.", "Pocket stays empty. Mouth doesn't."]),
-        mood: "even",
+        text: spin(day, [
+          "How's the first day? Survived Holt yet? He's not as scary as he looks. He's exactly as scary as he looks.",
+          "Elena gave me this job when nobody else would look at me. If she asks you for a check, do it properly.",
+          "Marcus snapped at me over a sticker this morning. Then he apologised. Twice. Weird day.",
+          "Somebody left a log unsigned last night. That sort of thing makes my stomach go funny. Old reasons.",
+          "Outage week. Everything's loud and everyone's tired. Perfect conditions for missing stuff.",
+        ]),
+        mood: day === 4 ? "soft" : "wry",
       },
       {
         speaker: "Jordan",
-        text: spin(day, ["Out here. Not later.", "Same row if you say it.", "I watch the door."]),
+        text: "Caught anything today?",
         mood: "even",
-        choices: [
-          { id: "jordan-say", label: "The catch is out here.", reply: "Then the chair is still in play.", trust: 1 },
-        ],
+        choices: [{ id: "jordan-say", label: "Yes, and I'll say it out loud.", reply: "Then say it where the room can hear. I'll back you.", trust: 1 }],
       },
     ];
   }
   return [
-    { speaker: "Jordan", text: "Door, then you. I like that order.", mood: "even" },
-    { speaker: "Jordan", text: "Jordan Peck, floor tech. I keep the row for a catch the door can hear.", mood: "soft" },
-    { speaker: "Jordan", text: "Say one out loud today. A win in a pocket does not get split.", mood: "even" },
+    { speaker: "Jordan", text: "Hey! You're the new one. Jordan. Floor tech, bowling captain, finder of the good coffee.", mood: "warm" },
+    { speaker: "Jordan", text: "Honest question, I ask everyone. When you find something wrong, do you say it out loud?", mood: "even" },
+    { speaker: "Jordan", text: "I came here from another plant. Somebody there kept quiet about a reading, and it landed on me. Long story.", mood: "soft" },
     {
       speaker: "Jordan",
-      text: "Your call.",
+      text: "So. Are you a say-it-out-loud person?",
       mood: "even",
       choices: [
-        { id: "jordan-out", label: "The catch is out here.", reply: "Then the chair is still in play.", trust: 2, flag: "jordanSaid" },
-        { id: "jordan-quiet", label: "Not in front of them.", reply: "Then I'm three tiles off. That was the deal.", flag: "jordanQuiet" },
-        { id: "jordan-later", label: "After the shift.", reply: "Bowl only if it is already said.", flag: "jordanLater" },
+        { id: "jordan-out", label: "Yes. Out loud, where people can hear.", reply: "Then we'll get along. Bowling's Thursdays. You're probably terrible. That's fine.", trust: 2, flag: "jordanSaid" },
+        { id: "jordan-quiet", label: "Depends who's listening.", reply: "Fair. Just know I keep a bit of distance from quiet. It's not personal. It's history.", flag: "jordanQuiet" },
+        { id: "jordan-later", label: "I'd want to be sure first.", reply: "Sure is good. Just don't be sure in your pocket for a week. Say it while it's small.", flag: "jordanLater" },
       ],
     },
-    { speaker: "Jordan", text: "Same row if you say it. Distance if you don't.", mood: "even" },
+    { speaker: "Jordan", text: "Anyway. Welcome. It's a good crew. Mostly.", mood: "wry" },
   ];
 }
 
+/** The Friday walk to the shore. One line each, from how the week went. */
 function endingLines(npc: NpcId, residue: Residue, ended: "a" | "c" | null, week: WeekVoice): Line[] {
   const held = ended === "a";
   const scraped = week.hides >= 2 || anyHid(residue);
+  const say = (speaker: string, text: string, mood: Line["mood"]): Line[] => [{ speaker, text, mood }];
   if (!held) {
     if (npc === "jordan") {
-      return [{ speaker: "Jordan", text: week.hides >= 3 ? "Three hides. Distance was the deal." : "Distance. The board stayed wrong.", mood: "even" }];
+      return say("Jordan", week.hides >= 3 ? "Three things went unsaid this week. I can't be the name next to that again. I'm sorry. I mean it." : "I wanted this week to go differently. I think you did too.", "soft");
     }
-    if (npc === "elena") return [{ speaker: "Elena", text: "The van. I'm looking at it.", mood: "even" }];
-    if (npc === "tommy") return [{ speaker: "Tommy", text: residue.tag === "hid" ? "IN SERVICE stayed up. I heard it all week." : "Pump two never got the sentence.", mood: "sharp" }];
-    if (npc === "marcus") return [{ speaker: "Marcus", text: residue.dose === "hid" ? "The sticker still says 40. So does the week." : "The number never got said.", mood: "tired" }];
-    if (npc === "holt") return [{ speaker: "Holt", text: week.hides >= 3 ? "Three hides. I will not fund a blank." : "I will not fund this week.", mood: "sharp" }];
-    if (npc === "priya") return [{ speaker: "Priya", text: "The rail stayed empty. So did my name.", mood: "sharp" }];
-    return [{ speaker: "Mabel", text: week.hides >= 3 ? "Three hides. I will not chalk this week." : "I will not pretend this week was honest.", mood: "sharp" }];
+    if (npc === "elena") return say("Elena", "I'll be straight, because I'd want you to be. This week didn't hold. Next week, call me early. Every time.", "even");
+    if (npc === "tommy") return say("Tommy", residue.tag === "hid" ? "That card stayed up all week. I walked past it every morning. Hurt every time." : "We never finished the lockout on 2A together. Next week we do it start to finish.", "sharp");
+    if (npc === "marcus") return say("Marcus", residue.dose === "hid" ? "The sticker still says forty. So does the part of my head I don't like. Let's both stop pretending." : "We never said the number out loud this week. That's on me as much as you.", "tired");
+    if (npc === "holt") return say("Holt", week.hides >= 3 ? "Three hides. I can't build a review on blanks. I'd like to try again next week. With you." : "This week didn't hold. Come and see me Monday. I'd rather understand it than grade it.", "even");
+    if (npc === "priya") return say("Priya", "I couldn't sign this week. That isn't a verdict on you. It's a promise I made a long time ago.", "soft");
+    return say("Mabel", week.hides >= 3 ? "Three hides. I'm not chalking this week. But the cup's poured on Monday. It always is." : "I won't pretend this week was honest. But I'll pour you a cup Monday, and we'll start again.", "soft");
   }
   if (npc === "elena") {
-    if (scraped) return [{ speaker: "Elena", text: `${week.hides} hides. I still watched the hands that stayed.`, mood: "even" }];
-    if (residue.valve === "caught" && week.trust >= 40) return [{ speaker: "Elena", text: "Every day, hands where I could see them.", mood: "soft" }];
-    if (residue.valve === "caught") return [{ speaker: "Elena", text: "I saw your hands on the valve. That was the catch.", mood: "soft" }];
-    if (week.catches > 0) return [{ speaker: "Elena", text: `${week.catches} catches. I watched the hands, not the van.`, mood: "even" }];
-    return [{ speaker: "Elena", text: "I stayed. The hands did too.", mood: "even" }];
+    if (scraped) return say("Elena", `We held, with ${things(week.hides)} left unsaid. I saw how hard you worked on the rest. Next week, all of it.`, "even");
+    if (residue.valve === "caught" && week.trust >= 40) return say("Elena", "Every day this week, you called me over before you were sure. Thank you. That's rarer than you'd think.", "warm");
+    if (residue.valve === "caught") return say("Elena", "You called me over on Valve 14 on your first day. I've thought about that all week. Thank you.", "soft");
+    if (week.catches > 0) return say("Elena", `You said ${things(week.catches, "catch", "catches")} out loud this week. I'm glad you're on my floor.`, "warm");
+    return say("Elena", "We got through it, quietly. Next week I'd like to hear more from you. I mean that kindly.", "even");
   }
   if (npc === "tommy") {
-    if (residue.tag === "hid") return [{ speaker: "Tommy", text: "IN SERVICE stayed up. I heard it all week.", mood: "sharp" }];
-    if (scraped) return [{ speaker: "Tommy", text: `${week.hides} hides. The wrench stayed on the hook.`, mood: "even" }];
-    if (residue.tag === "caught" && week.catches >= 4) return [{ speaker: "Tommy", text: `${week.catches} catches. Pump two stayed quiet.`, mood: "even" }];
-    if (residue.tag === "caught") return [{ speaker: "Tommy", text: "The tag is down. Pump two is quiet on purpose.", mood: "even" }];
-    return [{ speaker: "Tommy", text: week.catches > 0 ? `${week.catches} catches. Pump two still wants the sentence.` : "Pump two still wants the sentence.", mood: "even" }];
+    if (residue.tag === "hid") return say("Tommy", "We held, but that card stayed up all week. First thing Monday, we take it down together.", "sharp");
+    if (scraped) return say("Tommy", `We held. But I heard about ${things(week.hides)} secondhand. Next time, come tell me first.`, "even");
+    if (residue.tag === "caught" && week.catches >= 4) return say("Tommy", `${things(week.catches, "catch", "catches")}, and 2A stayed quiet all week. You made my crew's week easier. Thank you.`, "warm");
+    if (residue.tag === "caught") return say("Tommy", "That card's still in my drawer. I'm keeping it. Reminds me somebody new got it right.", "warm");
+    return say("Tommy", "Good week. Next week, come and hang a lockout with me. Start to finish.", "even");
   }
   if (npc === "marcus") {
-    if (residue.dose === "hid") return [{ speaker: "Marcus", text: "The sticker still says 40. So does the week.", mood: "tired" }];
-    if (scraped) return [{ speaker: "Marcus", text: `Forty got said. ${week.hides} hides did not.`, mood: "tired" }];
-    if (residue.dose === "caught" && week.catches >= 4) return [{ speaker: "Marcus", text: `${week.catches} numbers. Forty was the first.`, mood: "tired" }];
-    if (residue.dose === "caught") return [{ speaker: "Marcus", text: "You said forty out loud.", mood: "tired" }];
-    return [{ speaker: "Marcus", text: "The number is still waiting.", mood: "tired" }];
+    if (residue.dose === "hid") return say("Marcus", "We held. But the sticker still says forty, and I let it. I'm fixing it Monday. Will you come?", "tired");
+    if (scraped) return say("Marcus", `You said the number on the sticker. The ${things(week.hides, "quiet one", "quiet ones")} bother me more than I'd like.`, "tired");
+    if (residue.dose === "caught" && week.catches >= 4) return say("Marcus", `${things(week.catches, "number", "numbers")} said out loud this week. Forty was the first. I won't forget that one.`, "soft");
+    if (residue.dose === "caught") return say("Marcus", "You said forty out loud when I wanted it to be a typo. Thank you. I mean that.", "soft");
+    return say("Marcus", "Good week. I'm still waiting for you to tell me I'm wrong about something. It's coming.", "wry");
   }
   if (npc === "holt") {
-    if (residue.log === "hid") return [{ speaker: "Holt", text: "Your initials are on a blank. The week is too.", mood: "sharp" }];
-    if (scraped) return [{ speaker: "Holt", text: "I can fund the catches. Not the hides.", mood: "even" }];
-    if (week.reports > 0 && week.catches >= 4) return [{ speaker: "Holt", text: `${week.reports} signed. ${week.catches} I can fund.`, mood: "even" }];
-    if (residue.log === "caught") return [{ speaker: "Holt", text: "I will read the line. I will not fund a blank.", mood: "even" }];
-    return [{ speaker: "Holt", text: "No blank. Still not a speech.", mood: "even" }];
+    if (residue.log === "hid") return say("Holt", "Your initials are on a blank from this week. We held, but that's the line I'll be asked about.", "sharp");
+    if (scraped) return say("Holt", "I can fund what you caught. The hides I have to explain. I'd rather we had none to explain.", "even");
+    if (week.reports > 0 && week.catches >= 4) return say("Holt", `${week.reports} written up, ${things(week.catches, "catch", "catches")}. That's a review I can defend. Thank you.`, "warm");
+    if (residue.log === "caught") return say("Holt", "You wouldn't sign a blank. That's the line I'll read out at the review, with your name on it.", "warm");
+    return say("Holt", "A quiet week, and no blanks. I'll take it. Next week, bring me more times and places.", "even");
   }
   if (npc === "priya") {
-    if (scraped) return [{ speaker: "Priya", text: `${week.hides} hides. I will not sign the week.`, mood: "sharp" }];
-    if (week.catches >= 4) return [{ speaker: "Priya", text: `${week.catches} catches on the floor. I will walk the peak.`, mood: "soft" }];
-    return [{ speaker: "Priya", text: "I will walk that peak to the rail.", mood: "soft" }];
+    if (scraped) return say("Priya", `I can't sign this week, with ${things(week.hides)} unwritten. I'd like to sign the next one with you.`, "soft");
+    if (week.catches >= 4) return say("Priya", `${things(week.catches, "catch", "catches")}, all on the floor, not on a screen. I'll walk your peak to the rail and sign it.`, "warm");
+    return say("Priya", "I'll walk your peak to the rail. You've earned that walk. Thank you for coming down to the metal.", "soft");
   }
   if (npc === "jordan") {
-    if (scraped) return [{ speaker: "Jordan", text: `${week.hides} hides. I kept the distance on those.`, mood: "even" }];
-    if (week.catches >= 4) return [{ speaker: "Jordan", text: `${week.catches} catches. Same row.`, mood: "soft" }];
-    return [{ speaker: "Jordan", text: "The catch was said. I'll stand here.", mood: "soft" }];
+    if (scraped) return say("Jordan", `We held. There were ${things(week.hides)} I wasn't part of, and I kept my distance on those. Not on you.`, "even");
+    if (week.catches >= 4) return say("Jordan", `${things(week.catches, "catch", "catches")}, out loud, every one. Thursday. Lane two. You're coming.`, "warm");
+    return say("Jordan", "You said it out loud this week. That's all I ever ask of anyone. Thank you.", "soft");
   }
-  if (week.hides >= 2) return [{ speaker: "Mabel", text: `${week.hides} hides. I watched you not sit with those.`, mood: "sharp" }];
-  if (week.catches >= 4 && week.reports > 0) return [{ speaker: "Mabel", text: `${week.reports} signed. ${week.catches} said out loud. The kettle can rest.`, mood: "warm" }];
-  if (week.catches >= 4) return [{ speaker: "Mabel", text: `${week.catches} catches. The kettle can rest.`, mood: "warm" }];
-  return [{ speaker: "Mabel", text: "You sat with it. The kettle can rest.", mood: "warm" }];
+  if (week.hides >= 2) return say("Mabel", `There were ${week.hides} you didn't sit with. I saw. But you're here, and that counts.`, "soft");
+  if (week.catches >= 4 && week.reports > 0) return say("Mabel", `${week.catches} marks on my wall this week, and ${week.reports} written up properly. I'm proud of you. Sit.`, "warm");
+  if (week.catches >= 4) return say("Mabel", `${week.catches} marks on my wall this week. My kettle can finally rest.`, "warm");
+  return say("Mabel", "You sat with it all week. That's harder than it looks. Thank you, love.", "warm");
 }
 
 function still(src: string, title: string, body: string, extra: { video?: string; photo?: boolean; teaching?: boolean } = {}) {

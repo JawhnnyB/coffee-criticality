@@ -84,28 +84,28 @@ export function carryover(s: CarryInput, night: number): NightSeed {
     const line = s.weekLog?.slice().reverse().find((e) => e.text)?.text ?? "the day log";
     const short = line.length > 80 ? `${line.slice(0, 77)}...` : line;
     seed.radios.push({ at: 12, text: `00:12 Elena: From your day log. ${short}` });
-    seed.radios.push({ at: 28, text: "00:28 Elena: I kept the line you wrote." });
+    seed.radios.push({ at: 28, text: "00:28 Elena: I kept the line you wrote. Thank you for writing it straight." });
   }
   if (night === 1 && s.residue.valve === "hid") {
     seed.extras.push({ def: valve(1), start: 100 });
-    seed.radios.push({ at: 100, text: "01:40 Jordan: The weep is on the floor again." });
+    seed.radios.push({ at: 100, text: "01:40 Jordan: That weep's back on the floor by Valve 14. Can you get a camera on it?" });
   }
   if (night === 1 && s.residue.valve === "caught") {
-    seed.radios.push({ at: 20, text: "00:20 Jordan: Valve 14 repack is holding." });
-    seed.radios.push({ at: 130, text: "02:10 Jordan: The repack is still dry." });
+    seed.radios.push({ at: 20, text: "00:20 Jordan: Valve 14 repack is holding. Tommy did a nice job." });
+    seed.radios.push({ at: 130, text: "02:10 Jordan: Repack's still dry. That was your catch, right? Nice." });
   }
   if (night === 2 && s.residue.tag === "hid") {
     seed.extras.push({ def: missingTag, start: 95 });
     seed.extras.push({ def: tagSticker, start: 110 });
   }
-  if (night === 2 && s.residue.tag === "caught") seed.radios.push({ at: 40, text: "00:40 Jordan: The tag is still on pump B." });
+  if (night === 2 && s.residue.tag === "caught") seed.radios.push({ at: 40, text: "00:40 Jordan: Your tag's still on pump B. Nobody's touched it. Good." });
   if (night === 2 && !s.maintDone) seed.pin.push({ id: "feed-pump", start: 150 });
   if (night === 3 && s.residue.dose === "hid") {
     seed.earlier.push({ match: isRadiation, minutes: 45 });
     seed.cut = "radiation";
-    seed.radios.push({ at: 30, text: "00:30 Jordan: Dosimeter's been chirping near the aux stairs." });
+    seed.radios.push({ at: 30, text: "00:30 Jordan: Dosimeter's been chirping near the aux stairs. Is that sticker right? Kind of worried." });
   }
-  if (night === 3 && s.residue.dose === "caught") seed.radios.push({ at: 36, text: "00:36 Jordan: The dosimeter agrees with the board." });
+  if (night === 3 && s.residue.dose === "caught") seed.radios.push({ at: 36, text: "00:36 Jordan: Dosimeter agrees with the board. Glad somebody said something about that sticker." });
   if (night === 4 && s.shuffleDone) seed.radios.push({ at: 5, text: "00:05 Plant Monitor: First nights on the new core." });
   return seed;
 }

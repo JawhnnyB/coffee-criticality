@@ -29,26 +29,27 @@ export function readCrew(): CrewUnlock {
 
 export const A_ROTATION_NPC: NpcId = "elena";
 
-/** Drafted for step 46. One scene, short, no exclamation marks. */
+/** Drafted for step 46, rewritten 24 November 2026 in her voice (docs/characters.md). Short, no exclamation marks. */
 export const A_ROTATION_SCENE: Scene = {
   tier: 1,
   title: "The quiet nights",
-  known: "Elena said the four quiet nights were the watch.",
+  known: "Elena thanked you for four honest night logs. The quiet was you.",
   lines: [
-    { speaker: "Elena", text: "Four quiet nights. That was the watch, not the plant.", mood: "even" },
+    { speaker: "Elena", text: "Four nights, four A's. I read every log. I wanted to thank you properly.", mood: "warm" },
+    { speaker: "Elena", text: "Quiet nights aren't the plant being kind. That was you, watching.", mood: "soft" },
     {
       speaker: "Elena",
-      text: "Same standard next week.",
+      text: "Same standard next week?",
       mood: "even",
       choices: [
-        { id: "crew-a-rot-a", label: "Same standard.", reply: "Then we start at eighteen hundred.", trust: 2 },
-        { id: "crew-a-rot-b", label: "The plant helped.", reply: "The plant does what the log says it did.", trust: 1 },
+        { id: "crew-a-rot-a", label: "Same standard.", reply: "Then I'll see you at eighteen hundred. Thank you.", trust: 2 },
+        { id: "crew-a-rot-b", label: "The plant helped.", reply: "The plant does what the log says. Your log was honest.", trust: 1 },
       ],
     },
   ],
 };
 
-export const DAWN_CREW_LINE = "Four A's. Elena has a word next week.";
+export const DAWN_CREW_LINE = "Four A's. Elena wants a word next week. A good one.";
 
 /** Unlock once. A later week does not play the scene again, and a B does not unlock it. */
 export function noteARotation(letters: readonly string[]): CrewUnlock {

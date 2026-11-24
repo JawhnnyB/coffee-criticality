@@ -494,26 +494,26 @@ export function roundsFor(r: () => number): Round[] {
 
 /** Jordan, when the week ended well. */
 export const JORDAN_WARM = [
-  "Yard lights are on. I am starting at the turbine.",
-  "Aux corridor is quiet. Door latches look shut from here.",
-  "Pool deck is dry. I am walking the rail.",
-  "Containment entry is logged. Nobody else in the airlock.",
-  "Steam valve room is warm, nothing weeping.",
-  "Intake deck is clear. Screens are turning.",
-  "Switchyard is dark except the sodium lamp.",
-  "Back at the turbine. Call if a camera looks wrong.",
+  "Evening, control. Yard lights are on. Starting at the turbine.",
+  "Aux corridor's quiet. Door latches look shut from here.",
+  "Pool deck's dry. Walking the rail, slowly. Hi, camera.",
+  "Containment entry logged. Just me in the airlock. Spooky.",
+  "Steam valve room's warm. Nothing weeping. Good.",
+  "Intake's clear, screens turning. The fish are being weird again.",
+  "Switchyard's dark except the sodium lamp. I love that lamp.",
+  "Back at the turbine. Thanks for watching my back tonight.",
 ];
 
-/** Jordan, when the week ended badly. */
+/** Jordan, when the week ended badly: polite, short, and keeping his own log (docs/characters.md). */
 export const JORDAN_TERSE = [
-  "Rounds.",
-  "Turbine.",
-  "Aux.",
-  "Pool.",
-  "Core.",
-  "Steam line.",
-  "Intake.",
-  "Yard. Out.",
+  "Starting rounds.",
+  "Turbine. Fine.",
+  "Aux. Fine.",
+  "Pool. Fine.",
+  "Containment. Logged it myself.",
+  "Steam line. Nothing.",
+  "Intake. Nothing.",
+  "Yard. Done. Writing my own log tonight.",
 ];
 
 /** Radio traffic so far, oldest first: the rover calling in each space, the van at the gate. */

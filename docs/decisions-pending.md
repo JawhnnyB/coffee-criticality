@@ -147,3 +147,15 @@ The owner asked for a progressing social environment, progressing mini games, an
 ## Night grade: should an A need an early catch? (23 November 2026)
 
 - A careful player who only answers alarms can get an A on a night with no silent event (night 3, 1×: five late catches, score capped at 100). Options: leave it; cap a night with no early catch at B; or start the score at 90 so early catches are needed to reach A. Claude's suggestion: cap at B, since catching things before the board is the game's whole idea.
+
+## Crew dialogue rewrite (needs the owner)
+
+24 November 2026, Claude. The owner asked for the whole cast to read as people, not slogans: genuine thank-yous, genuine "I made a mistake", and what would have broken. Every line of crew dialogue outside the frozen `sim.ts` is rewritten from a character sheet.
+
+- Character sheet: `docs/characters.md` (history, wants, fears, mistake, voice, relationships; who tells which story, so none is told twice).
+- Every new line, generated from the code: `docs/crew-dialogue-draft.md`.
+- Unchanged: all 65 choice ids, trust and culture values and flags (script-checked, 0 differences); when lines play; what each scene teaches.
+- New test `scripts/dialogue-fit.test.mjs` walks 966 conversation states and checks every line fits a phone and is spoken by the right person.
+- Still in the old voice because `sim.ts` is frozen: Mabel's three-hides line and Tommy's lockout result line.
+
+Decision: approve as written, or mark lines to change. This also counts toward the Steam AI disclosure (AI-drafted dialogue), like the crew moments.

@@ -76,7 +76,7 @@ test("four A's unlock one Elena scene, once, outside the week save", () => {
   W.openTalk(s, "elena");
   const scene = W.addScene(s, false);
   assert.equal(scene.title, "The quiet nights");
-  assert.equal(s.dialogue.some((l) => l.text.startsWith("Four quiet nights")), true);
+  assert.equal(s.dialogue.some((l) => l.text === W.A_ROTATION_SCENE.lines[0].text), true);
   assert.equal(s.flags["social:elena:1"], undefined);
   assert.equal(W.readCrew().seen, true);
   assert.equal(W.dawnCrewLine(["A", "A", "A", "A"], true), null);
@@ -85,7 +85,7 @@ test("four A's unlock one Elena scene, once, outside the week save", () => {
   W.openTalk(s, "elena");
   const again = W.addScene(s, false);
   assert.equal(again?.title, "Two sets of eyes");
-  assert.equal(s.dialogue.some((l) => l.text.startsWith("Four quiet nights")), false);
+  assert.equal(s.dialogue.some((l) => l.text === W.A_ROTATION_SCENE.lines[0].text), false);
 
   const kept = store.get("cc.profile");
   store.delete("cc.save.v2");

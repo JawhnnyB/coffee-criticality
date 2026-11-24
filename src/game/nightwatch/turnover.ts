@@ -1,41 +1,42 @@
 /**
- * Elena's 06:00 turnover. Five lines in her voice, and five curt ones when the day log was hidden.
+ * Elena's 06:00 turnover. Five lines in her voice, and five cooler ones when the day log was hidden: she is still
+ * fair about the night, but she has not let the day log go. Voice: docs/characters.md.
  */
 import { clock, grade, looksAfter, type EventDef, type GradeLetter, type Night } from "./model";
 
 export const ELENA: Record<GradeLetter, string> = {
-  A: "You caught them before the board did. That is the job.",
-  B: "The log is clean enough. Keep walking the quiet cameras.",
-  C: "You made six. The ones you missed were already on a camera.",
-  D: "I am taking the chair. Stand this night again.",
-  F: "The plant does not get a second board. Stand the night again.",
+  A: "You caught them before the board did. Thank you. That's exactly why I asked for you.",
+  B: "A good night, and a clean log. Keep walking the quiet cameras. They're the ones that fool you.",
+  C: "You made six. The ones you missed were already on a camera. Let's look at them together.",
+  D: "I'm taking the chair. You're not in trouble. You're tired, and this one needs standing again.",
+  F: "The plant doesn't get a second board, and neither do we. Go home, sleep, and we'll stand it again.",
 };
 
 export const ELENA_CURT: Record<GradeLetter, string> = {
-  A: "Logged. The board agrees.",
-  B: "Acceptable. Do not get comfortable.",
-  C: "You reached six. The misses stand.",
-  D: "Not good enough. Again.",
-  F: "Relieved. The night is not done.",
+  A: "Good catches. Logged. We still need to talk about the day log.",
+  B: "Acceptable. I won't pretend I'm not still bothered about the day log.",
+  C: "You reached six. The misses stand. So does the day log.",
+  D: "Not good enough tonight. Stand it again. Then we'll talk.",
+  F: "I've relieved you. The night isn't done, and neither are we.",
 };
 
 export const TRUST_DELTA: Record<GradeLetter, number> = { A: 3, B: 2, C: 1, D: 0, F: -2 };
 
 const RANK: Record<GradeLetter, number> = { F: 0, D: 1, C: 2, B: 3, A: 4 };
 
-export const ELENA_RELIEVED = "I have the chair. This night does not count.";
-export const ELENA_RELIEVED_CURT = "Relieved. The night is not done.";
+export const ELENA_RELIEVED = "I've got the chair. This night won't count against you. Get some sleep.";
+export const ELENA_RELIEVED_CURT = "I've got the chair. The night isn't done.";
 
 export function openerLine(night: number, again: boolean): string {
   return again ? `Night ${night}, again. Elena wants it stood properly.` : "18:00 turnover. Quiet board. At midnight the watch desk is yours.";
 }
 
 /** An A where every catch came after the alarm: true, but not the line about beating the board. */
-export const ELENA_A_LATE = "Everything caught, every one after the alarm. Next time, find one before the board does.";
+export const ELENA_A_LATE = "Everything caught, but every one after the alarm. Next time, find one before the board does. You will.";
 
 export function elenaLine(letter: GradeLetter, curt: boolean, why?: string, early?: number): string {
   if (why === "relieved") return curt ? ELENA_RELIEVED_CURT : ELENA_RELIEVED;
-  if (letter === "C" && why != null && why !== "dawn") return curt ? "You did not reach six." : "Six is the end of the night. This one ended early.";
+  if (letter === "C" && why != null && why !== "dawn") return curt ? "You didn't make it to six." : "Six is the end of the night. This one ended early. We'll stand it again together.";
   if (letter === "A" && !curt && early === 0) return ELENA_A_LATE;
   return (curt ? ELENA_CURT : ELENA)[letter];
 }
