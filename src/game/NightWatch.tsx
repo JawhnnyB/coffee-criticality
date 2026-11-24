@@ -770,7 +770,7 @@ export function NightRotation({ s, onNewWeek, onMenu }: { s: GameState; onNewWee
           <h2 className="font-display mt-2 text-3xl">Three days off</h2>
           <p className="mt-3 text-sm leading-relaxed">Three days off. You sleep wrong for two of them.</p>
           <p className="mt-2 text-sm leading-relaxed">{weekLine}</p>
-          <p className="mt-3 text-[11px] text-[#6a4a32]">Fatigue rules: no more than 16 hours on in any 24, and at least 34 hours off in any 9 days.</p>
+          <p className="mt-3 text-[11px] text-[#6a4a32]">Teaching model only. The three days off are a story beat, not a work-hour rule. This game does not say how long a real watch may be.</p>
           <button
             type="button"
             className="paper-btn-primary mt-5 w-full"

@@ -29,7 +29,7 @@ Draft for the owner. Nothing here is an approved line, and nothing here is a pro
 | Pressurizer level 55%, power band 90–104%, sump, gamma "× normal" | Night board | Board conventions for the game. Not copied from a technical specification. |
 | Fq under 1.5 and rim share under 50% | Fuel shuffle | Teaching limits inside this model. Not a plant limit. |
 | Rounds, turnover, grades, coffee | Night watch | A real shift has a turnover and people walk the plant. The tablet, the pot, the letter grade, and the false-report count are the game. They are not an NRC procedure. |
-| "No more than 16 hours on in any 24" on the days-off card | Night rotation | This reads as a work-hour rule. It is called out for step 65. It is not kept as advice. |
+| Days off on the night rotation | Night rotation | The card used to state a 16-hour and 34-hour work rule. Step 65 took that sentence off. The card now says the days off are a story beat, not a work-hour rule. |
 
 ## Not checked digit by digit
 

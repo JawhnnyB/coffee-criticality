@@ -393,6 +393,7 @@ export function ReactorTrainer({
           <p className="font-mono tracking-widest text-warn">{call.title}</p>
           <p className="mt-1">{call.panel}</p>
           <p className="mt-1 text-muted">{call.hall}</p>
+          <p className="mt-2 text-muted" data-testid="event-teaching">Teaching model only. Not a step for a real plant.</p>
           <div className="mt-2 flex flex-col gap-2">
             <button
               type="button"

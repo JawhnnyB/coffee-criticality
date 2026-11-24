@@ -86,6 +86,7 @@ Brief: `docs/grok/value-100.md`. One step, one commit. Real-input proof in this 
 - Step 62 done · The NRC window has a draft codex, "How real is this?", thirty short notes. Proof in step-62/.
 - Step 63 done · Codex notes stay locked until play opens them. The day steam leak and the night relief both open the relief-valve note. Proof in step-63/.
 - Step 64 done · Watchstander notes are optional, off by default, and marked as a draft. Proof in step-64/.
+- Step 65 done · The days-off card, the plant-call buttons, and the period step no longer read as a procedure. Which answer holds did not change. Proof in step-65/.
 
 
 

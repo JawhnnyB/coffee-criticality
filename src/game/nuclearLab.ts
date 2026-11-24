@@ -402,11 +402,11 @@ export const TERM_LESSONS: Record<string, TermLesson> = {
     id: "period",
     title: "Reactor period — the slope, not the switch",
     plain:
-      "Period is the time for power to multiply by e if you left the reactivity alone. Think of it as the weather of the core: a gentle slope you can walk, or a cliff you do not live on. When delayed neutrons still matter (ρ < β), the period is long — seconds to minutes — because you are waiting on fragments to decay. When ρ reaches β, those delayed neutrons are no longer required and the period collapses to the prompt neutron lifetime, a fraction of a millisecond in a thermal lattice. The inhour equation is that sentence with more clothes on. This classroom k has no clock. We name the period so a jumping count rate is a Stop, not a vibe.",
+      "Period is the time for power to multiply by e if you left the reactivity alone. Think of it as the weather of the core: a gentle slope you can walk, or a cliff you do not live on. When delayed neutrons still matter (ρ < β), the period is long — seconds to minutes — because you are waiting on fragments to decay. When ρ reaches β, those delayed neutrons are no longer required and the period collapses to the prompt neutron lifetime, a fraction of a millisecond in a thermal lattice. The inhour equation is that sentence with more clothes on. This classroom k has no clock. A jumping count rate is a short period in the model, not a vibe, and not a step.",
     steps: [
       "A small positive ρ. Delayed neutrons still required. Power rises on a slope.",
       "T ≈ (β − ρ) / (λ̄ ρ). λ̄ is a lumped precursor decay (~0.1 /s classroom). Bigger ρ, shorter T.",
-      "Count rate jumping means T is shrinking. Stop. Think. Do not pull more rods to 'catch' it.",
+      "Count rate jumping means T is shrinking. In this classroom that is a short period, not a reason to add rods. Teaching model only.",
       "If ρ ≥ β the delayed fraction is spent. Prompt period T ≈ ℓ / ρ. ℓ ~ 10⁻⁴ s thermal. A cliff.",
       "Our k-ladder is steady-state. The floor is not. Priya names this so you do not treat k as a switch.",
     ],
@@ -535,9 +535,9 @@ export { generateOpenMCPython, downloadOpenMC } from "./openmcExport";
 export function verdictWords(kCore: number, kInf: number): string {
   const leak = kInf > 0 ? Math.max(0, 1 - kCore / kInf) : 0;
   const leakLine = ` The edge takes about ${Math.round(leak * 100)}% of the crowd.`;
-  if (kCore > 1.05) return `Runs away. k is ${kCore.toFixed(3)}, so the core would keep climbing. Do not sign.` + leakLine;
-  if (kCore > 1.005) return `Creeping up. k is ${kCore.toFixed(3)}, so the crowd grows. Pull a little rod or give back a little enrichment before you sign.` + leakLine;
+  if (kCore > 1.05) return `Runs away. k is ${kCore.toFixed(3)}, so the core would keep climbing. The desk does not sign this. Teaching model only.` + leakLine;
+  if (kCore > 1.005) return `Creeping up. k is ${kCore.toFixed(3)}, so the crowd grows. In this model a little less rod or a little less enrichment would hold it. Teaching model only.` + leakLine;
   if (kCore >= 0.995) return `Holds. k is ${kCore.toFixed(3)}, so the crowd stays the same and power can sit still.` + leakLine;
-  if (kCore >= 0.95) return `Creeping down. k is ${kCore.toFixed(3)}, so the crowd shrinks. Raise enrichment or pull rods.` + leakLine;
-  return `Dies out. k is ${kCore.toFixed(3)}, so there is nothing to hold. Do not sign.` + leakLine;
+  if (kCore >= 0.95) return `Creeping down. k is ${kCore.toFixed(3)}, so the crowd shrinks. In this model a little more enrichment or a little more rod would hold it. Teaching model only.` + leakLine;
+  return `Dies out. k is ${kCore.toFixed(3)}, so there is nothing to hold. The desk does not sign this. Teaching model only.` + leakLine;
 }
