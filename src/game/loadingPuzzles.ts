@@ -1,7 +1,8 @@
 /**
  * Ten loading puzzles on the shuffle's 36-cell flux model.
- * A goal is Fq under X and rim share under Y. X is just below every map
- * one or two swaps away, and a stored three-swap line meets it.
+ * A goal is Fq under X and rim share under Y. X sits halfway between the best map
+ * one or two swaps away and a stored three-swap line, so the three-decimal Fq on
+ * screen always agrees with the verdict.
  * The board never shows that line.
  */
 import { fluxOf, type Burn } from "./shuffleModel";
@@ -32,16 +33,16 @@ export interface Puzzle {
 }
 
 const SPECS: { start: string; fqMax: number; swaps: [number, number][] }[] = [
-  { start: "120201202011211200011010220102222110", fqMax: 1.46, swaps: [[16, 25], [21, 33], [26, 29]] },
-  { start: "122202202011111200011010220102220110", fqMax: 1.486, swaps: [[0, 26], [5, 21], [17, 31]] },
-  { start: "120001102012211200011012220112222100", fqMax: 1.479, swaps: [[6, 21], [9, 22], [11, 16]] },
-  { start: "100201202012211000011210212100222112", fqMax: 1.448, swaps: [[10, 21], [0, 16], [15, 25]] },
-  { start: "121201200100211200012020220101222111", fqMax: 1.493, swaps: [[5, 8], [21, 34], [9, 16]] },
-  { start: "120221211011010200111020220112222000", fqMax: 1.477, swaps: [[4, 17], [11, 14], [21, 29]] },
-  { start: "120201202011201201011010210202222110", fqMax: 1.476, swaps: [[1, 7], [10, 16], [0, 21]] },
-  { start: "220101212001211200011011220102222010", fqMax: 1.474, swaps: [[3, 31], [16, 31], [21, 34]] },
-  { start: "120221002021211100011210020102122210", fqMax: 1.449, swaps: [[15, 33], [25, 26], [16, 34]] },
-  { start: "120101202012011002011012200102122122", fqMax: 1.483, swaps: [[25, 29], [21, 24], [15, 34]] },
+  { start: "120201202011211200011010220102222110", fqMax: 1.456, swaps: [[16, 25], [21, 33], [26, 29]] },
+  { start: "122202202011111200011010220102220110", fqMax: 1.482, swaps: [[0, 26], [5, 21], [17, 31]] },
+  { start: "120001102012211200011012220112222100", fqMax: 1.476, swaps: [[6, 21], [9, 22], [11, 16]] },
+  { start: "100201202012211000011210212100222112", fqMax: 1.445, swaps: [[10, 21], [0, 16], [15, 25]] },
+  { start: "121201200100211200012020220101222111", fqMax: 1.491, swaps: [[5, 8], [21, 34], [9, 16]] },
+  { start: "120221211011010200111020220112222000", fqMax: 1.476, swaps: [[4, 17], [11, 14], [21, 29]] },
+  { start: "120201202011201201011010210202222110", fqMax: 1.473, swaps: [[1, 7], [10, 16], [0, 21]] },
+  { start: "220101212001211200011011220102222010", fqMax: 1.469, swaps: [[3, 31], [16, 31], [21, 34]] },
+  { start: "120221002021211100011210020102122210", fqMax: 1.445, swaps: [[15, 33], [25, 26], [16, 34]] },
+  { start: "120101202012011002011012200102122122", fqMax: 1.475, swaps: [[25, 29], [21, 24], [15, 34]] },
 ];
 
 function burns(s: string): Burn[] {
@@ -71,9 +72,14 @@ export function loadingPuzzles(): Puzzle[] {
   }));
 }
 
+/** Fq as the board prints it. The verdict uses the same number the player reads. */
+export function shownFq(fq: number): number {
+  return Math.round(fq * 1000) / 1000;
+}
+
 export function meets(puzzle: Puzzle, grid: readonly Burn[]): boolean {
   const f = fluxOf(grid, PUZZLE_ENRICH);
-  return f.fq < puzzle.fqMax && f.rim < puzzle.rimMax;
+  return shownFq(f.fq) < puzzle.fqMax && f.rim < puzzle.rimMax;
 }
 
 export function gradePuzzle(
@@ -82,7 +88,7 @@ export function gradePuzzle(
   moves: number,
 ): { met: boolean; grade: "A" | "B" | "C" | "F"; fq: number; rim: number } {
   const f = fluxOf(grid, PUZZLE_ENRICH);
-  const under = f.fq < puzzle.fqMax && f.rim < puzzle.rimMax;
+  const under = shownFq(f.fq) < puzzle.fqMax && f.rim < puzzle.rimMax;
   if (!under || moves > puzzle.limit) return { met: false, grade: "F", fq: f.fq, rim: f.rim };
   if (moves <= puzzle.par) return { met: true, grade: "A", fq: f.fq, rim: f.rim };
   if (moves === puzzle.par + 1) return { met: true, grade: "B", fq: f.fq, rim: f.rim };
