@@ -1,0 +1,23 @@
+day-walk-1280 1280x720 Walk. WASD or the arrows.
+day-mabel-1280 1280x720 E sits with Mabel.
+day-gate-1280 1280x720 Walk east to the gate.
+day-holt-1280 1280x720 E talks to Holt.
+day-peer-1280 1280x720 P looks closer at what is wrong.
+day-incident-1280 1280x720 R reports. H hides. P looks with you.
+night-tablet-1280 1280x720 Space opens the tablet.
+night-oddity-1280 1280x720 That is an oddity. Leave it.
+night-jordan-1280 1280x720 Jordan named a camera. Check it.
+night-flash-1280 1280x720 A flash is an alarm. Open that camera.
+night-report-1280 1280x720 Report the kind that fits.
+day-walk-390 390x844 Walk. WASD or the arrows.
+day-mabel-390 390x844 E sits with Mabel.
+day-gate-390 390x844 Walk east to the gate.
+day-holt-390 390x844 E talks to Holt.
+day-peer-390 390x844 P looks closer at what is wrong.
+day-incident-390 390x844 R reports. H hides. P looks with you.
+night-tablet-390 390x844 Space opens the tablet.
+night-oddity-390 390x844 That is an oddity. Leave it.
+night-jordan-390 390x844 Jordan named a camera. Check it.
+night-flash-390 390x844 A flash is an alarm. Open that camera.
+night-report-390 390x844 Report the kind that fits.
+Page errors 0.
