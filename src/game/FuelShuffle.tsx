@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import type { PlantDesign, ShuffleCell } from "./plant";
 import { type Burn, FQ_MAX, N, RIM_MAX, fluxOf, passes, startMap } from "./shuffleModel";
 import { scoreDischarge, type DischargeScore } from "./discharge";
+import { LoadingPuzzles } from "./LoadingPuzzles";
 
 /** rgba(), not "rgb(...)aa": an rgb() with a hex-alpha suffix is invalid CSS and drops the whole declaration. */
 function heat(v: number, max: number, alpha: number) {
@@ -31,6 +32,7 @@ export function FuelShuffle({
   const [phase, setPhase] = useState<"discharge" | "shuffle">("discharge");
   const [picked, setPicked] = useState<number[]>([]);
   const [kept, setKept] = useState<DischargeScore | null>(null);
+  const [challenges, setChallenges] = useState(false);
   const flux = useMemo(() => fluxOf(grid, plant.enrich), [grid, plant.enrich]);
   const ok = passes(flux, swaps);
   const discharge = useMemo(() => scoreDischarge(picked), [picked]);
@@ -56,6 +58,8 @@ export function FuelShuffle({
     setSel(null);
     setSwaps((n) => n + 1);
   };
+
+  if (challenges) return <LoadingPuzzles enrich={plant.enrich} onClose={() => setChallenges(false)} />;
 
   return (
     <div className="absolute inset-0 z-30 overflow-y-auto bg-[#1a1410]/85 px-3 pb-28 pt-16 sm:px-8">
@@ -125,6 +129,9 @@ export function FuelShuffle({
         <div className="mt-5 flex flex-wrap gap-2">
           <button type="button" className="btn-ghost" onClick={onAbort}>
             Leave desk
+          </button>
+          <button type="button" className="btn-ghost" data-testid="shuffle-challenges" onClick={() => setChallenges(true)}>
+            Challenges
           </button>
           {phase === "discharge" ? (
             <button

@@ -1,0 +1,17 @@
+Step 49. Ten loading puzzles. The target is the best one-swap peak from fluxOf, at 4.5% enrichment.
+
+1 1.6655
+2 1.5623
+3 1.5176
+4 1.5380
+5 1.5100
+6 1.6468
+7 1.4929
+8 1.4809
+9 1.6263
+10 1.4835
+
+A one-swap that reaches the target grades Met. The puzzle as dealt does not. Changing the fuel inventory does not. The list is cc.puzzles, not the week save. shuffleModel.ts was not edited.
+
+Proof: node --test scripts/loading-puzzles.test.mjs
+1 pass, 0 fail.

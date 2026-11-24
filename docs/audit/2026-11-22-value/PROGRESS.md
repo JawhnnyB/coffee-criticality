@@ -65,6 +65,8 @@ Brief: `docs/grok/value-100.md`. One step, one commit. Real-input proof in this 
 - Step 46 done · Four A's unlock one Elena scene for a later day. It lives in cc.crew, not the week save, and it plays once.
 - Step 47 done · The outage asks for a discharge before the shuffle. The score is overlap with fresh fuel on the rim. The pass rule is unchanged.
 - Step 48 done · Cycle 1 opens as a worked example. The grid and the counts are the benchmark map already in the build. No new figures.
+- Step 49 done · Ten loading puzzles. Each target peak is the model's best one-swap Fq. Met is stored outside the week save.
+
 
 
 
