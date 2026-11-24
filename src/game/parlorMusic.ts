@@ -137,9 +137,24 @@ export function eighthSeconds(bpm: number): number {
   return 60 / bpm / 2;
 }
 
+/** Things that redraw when the music starts, stops or changes track: the Music app and the taskbar's tray. */
+const listeners = new Set<() => void>();
+
+/** Hear about every start, stop and skip. Returns the unsubscribe function. */
+export function onMusic(fn: () => void): () => void {
+  listeners.add(fn);
+  return () => {
+    listeners.delete(fn);
+  };
+}
+
+function tell() {
+  for (const fn of listeners) fn();
+}
+
 /**
  * Plays one track in a loop on the shared audio context. Start only from a click (the Music app's
- * Play button), so no music runs before the player asks for it.
+ * Play button, or the taskbar's), so no music runs before the player asks for it.
  */
 export class TrackPlayer {
   private season: Season | null = null;
@@ -172,6 +187,7 @@ export class TrackPlayer {
     setMusicHold(true);
     this.timer = window.setInterval(() => this.pump(), 100);
     this.pump();
+    tell();
   }
 
   stop() {
@@ -186,6 +202,7 @@ export class TrackPlayer {
     }
     this.gain = null;
     setMusicHold(false);
+    tell();
   }
 
   /** The next season's track, in calendar order. */
@@ -233,4 +250,15 @@ export class TrackPlayer {
     o.start(when);
     o.stop(when + dur + 0.05);
   }
+}
+
+let shared: TrackPlayer | null = null;
+
+/**
+ * The one player the whole game shares. The Music app and the taskbar both drive it, so a track keeps
+ * playing after the Music window closes and while you walk the plant. It stops only when someone presses pause.
+ */
+export function musicPlayer(): TrackPlayer {
+  if (!shared) shared = new TrackPlayer();
+  return shared;
 }

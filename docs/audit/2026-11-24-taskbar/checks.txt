@@ -1,0 +1,32 @@
+PASS 1280 bar under the plant
+PASS 1280 bar sits on the bottom edge (686+34)
+PASS 1280 bar has no overflow (0px)
+PASS 1280 cameras open on the desk
+PASS 1280 plant tab on the desk taskbar
+PASS 1280 plant clock stopped while out (412.0508333333333 -> 412.0508333333333)
+PASS 1280 a feed enlarges
+PASS 1280 back into the plant
+PASS 1280 music plays from the bar
+PASS 1280 Music app shows the same track (Now playing: Fall leaves, long shadows)
+PASS 1280 closing the app keeps the music
+PASS 1280 plant data opens the monitor
+PASS 1280 Academy launches
+PASS 1280 back from the Academy (play)
+PASS 1280 Start opens the start menu
+PASS 1280 tabs wait during a talk
+PASS 1280 no page errors
+PASS 390 bar under the plant
+PASS 390 bar sits on the bottom edge (810+34)
+PASS 390 bar has no overflow (0px)
+PASS 390 cameras open on the desk
+PASS 390 plant tab on the desk taskbar
+PASS 390 plant clock stopped while out (412.0466666666666 -> 412.0466666666666)
+PASS 390 back into the plant
+PASS 390 music plays from the bar
+PASS 390 Music app shows the same track (Now playing: Fall leaves, long shadows)
+PASS 390 closing the app keeps the music
+PASS 390 plant data opens the monitor
+PASS 390 Academy launches
+PASS 390 back from the Academy (play)
+PASS 390 tabs wait during a talk
+PASS 390 no page errors

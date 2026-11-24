@@ -4,7 +4,8 @@ import { useEffect, useRef, useState, lazy, Suspense, type CSSProperties, type R
 import { PAL } from "./palette";
 import { ReactorBuilder } from "./ReactorBuilder";
 import { NuclearDesk } from "./NuclearDesk";
-import { TrackPlayer, TRACKS } from "./parlorMusic";
+import { TRACKS, musicPlayer, onMusic } from "./parlorMusic";
+import { BAR_OFF_FLAG } from "./barRules";
 import { setMuted, isMuted, unlockAudio } from "./audio";
 import { hostOwnsKey } from "./keyGate";
 import { CoreCamApp, CoreMapApp, ResultsApp } from "./ReactorApps";
@@ -550,6 +551,28 @@ function SettingsApp({ ctx }: { ctx: AppCtx }) {
         </Chip>
         <span style={FIELD}>Now {clockText(ctx.s.minutes, d.clock24)}</span>
       </Row>
+      <Row label="Taskbar in the plant" note="Cameras, plant data, the Academy and music under the plant, with your own clock beside the plant's. Hide it to stay inside the story.">
+        <Chip
+          on={!ctx.s.flags[BAR_OFF_FLAG]}
+          onClick={() => {
+            delete ctx.s.flags[BAR_OFF_FLAG];
+            ctx.onPatch({});
+          }}
+          testId="bar-show"
+        >
+          Show
+        </Chip>
+        <Chip
+          on={!!ctx.s.flags[BAR_OFF_FLAG]}
+          onClick={() => {
+            ctx.s.flags[BAR_OFF_FLAG] = true;
+            ctx.onPatch({});
+          }}
+          testId="bar-hide"
+        >
+          Hide
+        </Chip>
+      </Row>
       <Row label="Season" note={`Set at setup: ${SEASON_INFO[seasonOrDefault(setup.season)].label}. Region: ${REGION_PENDING}.`}>
         <span />
       </Row>
@@ -568,18 +591,22 @@ function SettingsApp({ ctx }: { ctx: AppCtx }) {
 }
 
 function MusicApp({ ctx }: { ctx: AppCtx }) {
-  const playerRef = useRef<TrackPlayer | null>(null);
-  if (!playerRef.current) playerRef.current = new TrackPlayer();
-  const player = playerRef.current;
-  const [now, setNow] = useState<Season | null>(null);
-  const [playing, setPlaying] = useState(false);
+  // The shared player: closing this window does not stop the music. Pause does.
+  const player = musicPlayer();
+  const [now, setNow] = useState<Season | null>(player.current);
+  const [playing, setPlaying] = useState(player.playing);
   const [vol, setVol] = useState(ctx.s.desktop.music);
   const setup = seasonOrDefault(ctx.s.setup.season);
   const shown = now ?? setup;
 
-  useEffect(() => {
-    return () => player.stop();
-  }, [player]);
+  useEffect(
+    () =>
+      onMusic(() => {
+        setNow(player.current);
+        setPlaying(player.playing);
+      }),
+    [player],
+  );
 
   useEffect(() => {
     player.setVolume(vol);
@@ -643,7 +670,7 @@ function MusicApp({ ctx }: { ctx: AppCtx }) {
         ))}
       </ol>
       <p style={{ ...FIELD, color: PAL.wood, marginTop: 10 }}>
-        Procedural, written in code. The existing bed ducks while a track plays.
+        Procedural, written in code. The existing bed ducks while a track plays. It keeps playing when you close this window and walk back into the plant; the taskbar has the same play and pause.
       </p>
     </div>
   );

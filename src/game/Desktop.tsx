@@ -78,6 +78,10 @@ export interface DesktopProps {
   onDesign: (plant: PlantDesign) => void;
   onResults: (patch: Partial<ResultsSave>) => void;
   onAcademy: (index: number) => void;
+  /** Opened from the plant's taskbar: bring this app forward (or open the start menu) once the desk is shown. n changes per click. */
+  openRequest?: { app: AppId | "start"; n: number } | null;
+  /** The plant's own tab on this taskbar, e.g. "Unit 1 · Day 2 · Tags". Clicking it goes back into the plant. */
+  plantTask?: string | null;
 }
 
 function useSize(ref: RefObject<HTMLDivElement | null>) {
@@ -95,7 +99,7 @@ function useSize(ref: RefObject<HTMLDivElement | null>) {
 }
 
 export function Desktop(props: DesktopProps) {
-  const { shown, s, simMode, simContent, onLaunchSim, onAbortSim, onLeave, onMenu, onStartShift, onSaveShift, onPatch, onDesign, onResults, onAcademy } = props;
+  const { shown, s, simMode, simContent, onLaunchSim, onAbortSim, onLeave, onMenu, onStartShift, onSaveShift, onPatch, onDesign, onResults, onAcademy, openRequest, plantTask } = props;
   const rootRef = useRef<HTMLDivElement>(null);
   const size = useSize(rootRef);
   const [wins, setWins] = useState<WinState[]>([]);
@@ -279,6 +283,20 @@ export function Desktop(props: DesktopProps) {
     openStatic(app);
   };
 
+  // A click on the plant's taskbar opened the desk for one app. Wait for the desk's size, then open it once.
+  const handledRequest = useRef(0);
+  useEffect(() => {
+    if (!shown || !openRequest || size.w <= 0 || handledRequest.current === openRequest.n) return;
+    handledRequest.current = openRequest.n;
+    if (openRequest.app === "start") {
+      if (!phone) setStartOpen(true);
+      return;
+    }
+    if (apps.some((a) => a.id === openRequest.app)) openApp(APPS[openRequest.app]);
+    // openApp and apps are rebuilt each render; the request number is what matters.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [shown, openRequest?.n, size.w]);
+
   const focused = focusedWin(wins);
   const simOpenOnPhone = phone && !!simMode;
 
@@ -398,6 +416,8 @@ export function Desktop(props: DesktopProps) {
           }}
           muteTick={muteTick}
           alarmApps={alarmApps}
+          plantTask={hasShift && !simMode ? plantTask ?? null : null}
+          onPlant={onLeave}
         />
       ) : null}
     </div>
@@ -619,6 +639,8 @@ function Taskbar({
   onSound,
   muteTick,
   alarmApps,
+  plantTask,
+  onPlant,
 }: {
   season: string;
   taskbar: string;
@@ -633,6 +655,9 @@ function Taskbar({
   muteTick: number;
   /** Apps whose tab flashes red (an alarm on the Plant Monitor). */
   alarmApps?: Set<string>;
+  /** The shift, minimized: its tab sits first, and clicking it goes back into the plant. */
+  plantTask?: string | null;
+  onPlant?: () => void;
 }) {
   void muteTick;
   return (
@@ -653,6 +678,18 @@ function Taskbar({
         {alarmApps?.size ? "▲ " : ""}Start
       </button>
       <div className="flex min-w-0 flex-1 items-center gap-1 overflow-hidden">
+        {plantTask ? (
+          <button
+            type="button"
+            onClick={onPlant}
+            className="truncate"
+            title="Back into the plant. Its clock starts again."
+            data-testid="task-plant"
+            style={{ maxWidth: 200, height: 26, padding: "0 8px", background: "transparent", color: PAL.goldL, border: `1px dashed ${PAL.goldL}`, fontFamily: "var(--font-body)", fontSize: "var(--text-small)", lineHeight: "1.2", cursor: "pointer" }}
+          >
+            {plantTask}
+          </button>
+        ) : null}
         {wins.map((w) => (
           <button
             key={w.id}

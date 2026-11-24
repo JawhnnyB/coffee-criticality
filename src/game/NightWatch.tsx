@@ -11,7 +11,9 @@ import { bumpTrust, pushMsg, type GameState } from "./sim";
 import { writeSave } from "./save";
 import { siteKind } from "./plantLoops";
 import { CAM_H, CAM_PX, CAM_W, lookOf, paintCamera, resetFrameCaches } from "./nightwatch/cameras";
-import { loadPlates, releasePlates } from "./nightwatch/plates";
+import { PLATES, loadPlates, releasePlates } from "./nightwatch/plates";
+import { siteWatch } from "./nightwatch/model";
+import { clockText } from "./parlorOS";
 import { startAmbience, stopAmbience } from "./nightwatch/ambience";
 import { juiceClass, prefersReducedMotion } from "./reducedMotion";
 import { binds } from "./binds";
@@ -106,7 +108,8 @@ export function NightWatchApp({ s }: { s: GameState }) {
   const done = open ? [1, 2, 3, 4].filter((k) => s.flags[`night:${k}:done`]) : [];
   return (
     <div className="app-pad" data-testid="app-nightwatch" style={{ fontFamily: "var(--font-body)", color: PAL.ink, lineHeight: 1.5 }}>
-      <p style={{ margin: 0 }}>{open ? `Replay nights · ${SITE_LABEL[site]} Unit 1` : `Night Watch · ${SITE_LABEL[site]} Unit 1`}</p>
+      <LiveFeeds s={s} />
+      <p style={{ margin: "14px 0 0" }}>{open ? `Replay nights · ${SITE_LABEL[site]} Unit 1` : `Night Watch · ${SITE_LABEL[site]} Unit 1`}</p>
       <p style={{ fontSize: "var(--text-small)" }}>{open ? "A replay does not change Elena's trust or the grade on the log." : "Your night rotation starts after this week."}</p>
       <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 8 }}>
         {open && done.length === 0 ? <p style={{ fontSize: "var(--text-small)" }}>No night is on the log yet.</p> : null}
@@ -126,6 +129,53 @@ export function NightWatchApp({ s }: { s: GameState }) {
         {board.rows.length === 0 ? <p style={{ margin: 0 }}>No score yet today.</p> : board.rows.map((row, i) => <p key={`${row.at}-${i}`} style={{ margin: 0 }}>{row.points} {row.letter}</p>)}
       </div>
     </div>
+  );
+}
+
+/**
+ * The site's cameras, watched from the desk while the plant runs: the photo plates, the plant's clock, REC.
+ * Read-only. Nothing here is a night or a catch; it is the view from outside, looking in. Click a feed to enlarge it.
+ */
+function LiveFeeds({ s }: { s: GameState }) {
+  const site = siteKind(s.plant);
+  const cams = siteWatch(site).cameras;
+  const [big, setBig] = useState<string | null>(null);
+  const stamp = clockText(s.minutes, s.desktop.clock24);
+  const shown = big ? cams.filter((c) => c.id === big) : cams;
+  return (
+    <section data-testid="live-feeds" aria-label="Live camera feeds">
+      <p style={{ margin: "0 0 6px" }}>
+        Live feeds · {SITE_LABEL[site]} Unit 1 <span style={{ fontSize: "var(--text-small)", color: PAL.wood }}>· {big ? "click to go back to all cameras" : "click a feed to enlarge it"}</span>
+      </p>
+      <div style={{ display: "grid", gridTemplateColumns: big ? "1fr" : "repeat(auto-fill, minmax(150px, 1fr))", gap: 6 }}>
+        {shown.map((c) => {
+          const n = cams.indexOf(c) + 1;
+          const file = PLATES[c.scene]?.file;
+          return (
+            <button
+              key={c.id}
+              type="button"
+              onClick={() => setBig(big ? null : c.id)}
+              data-testid={`feed-${c.id}`}
+              aria-label={`Camera ${n}, ${c.name}${big ? ", enlarged" : ""}`}
+              style={{ position: "relative", aspectRatio: "16 / 9", padding: 0, border: `2px solid ${PAL.outline}`, background: PAL.ink, cursor: "pointer", overflow: "hidden" }}
+            >
+              {file ? (
+                <img src={file} alt="" loading="lazy" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", filter: "saturate(0.7) contrast(1.05)" }} />
+              ) : (
+                <span style={{ position: "absolute", inset: 0, display: "grid", placeItems: "center", color: PAL.ash, fontFamily: "var(--font-mono, monospace)", fontSize: 11 }}>NO SIGNAL</span>
+              )}
+              <span aria-hidden style={{ position: "absolute", inset: 0, background: "repeating-linear-gradient(0deg, rgba(0,0,0,0.18) 0 1px, transparent 1px 3px)" }} />
+              <span style={{ position: "absolute", left: 4, right: 44, top: 3, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", textAlign: "left", color: PAL.cream, fontFamily: "var(--font-mono, monospace)", fontSize: 10, textShadow: `1px 1px 0 ${PAL.ink}` }}>
+                CAM {String(n).padStart(2, "0")} · {c.name.toUpperCase()}
+              </span>
+              <span style={{ position: "absolute", right: 4, top: 3, color: PAL.bad, fontFamily: "var(--font-mono, monospace)", fontSize: 10, textShadow: `1px 1px 0 ${PAL.ink}` }}>● REC</span>
+              <span style={{ position: "absolute", right: 4, bottom: 3, color: PAL.cream, fontFamily: "var(--font-mono, monospace)", fontSize: 10, textShadow: `1px 1px 0 ${PAL.ink}` }}>{stamp}</span>
+            </button>
+          );
+        })}
+      </div>
+    </section>
   );
 }
 

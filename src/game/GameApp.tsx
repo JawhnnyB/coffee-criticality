@@ -123,6 +123,9 @@ import { coachLine } from "./dayCoach";
 import { addScene, knownAbout, nextHint, tierOf, TIER_NAME, type Tier } from "./social";
 import { cabLevel, LADDERS, recordCab } from "./cabLevels";
 import { hostDayTrust } from "./hostTrust";
+import { ShiftBar } from "./ShiftBar";
+import { barShown } from "./barRules";
+import type { AppId } from "./parlorOS";
 
 const GAME_CODES = new Set([
   "KeyW",
@@ -290,6 +293,8 @@ export function GameApp() {
   const [ready, setReady] = useState(false);
   const [touch, setTouch] = useState(false);
   const [saved, setSaved] = useState(false);
+  /** The plant's taskbar asked the desktop to open one app (or the start menu). n changes per click. */
+  const [deskReq, setDeskReq] = useState<{ app: AppId | "start"; n: number } | null>(null);
   const [askWipe, setAskWipe] = useState(false);
   const [wipeNext, setWipeNext] = useState<WipeNext>("setup");
   const [booted, setBooted] = useState(false);
@@ -966,6 +971,23 @@ export function GameApp() {
   const playing = PLAY_MODES.includes(mode);
   const line = s.dialogue[s.dialogueI] as Line | undefined;
   const pendingChoices = line?.choices?.filter((c) => !s.flags[`choice:${c.id}`]) ?? [];
+
+  /**
+   * The plant's taskbar: step out of the plant onto the desktop, with one app in front (or the start menu, or
+   * nothing for a plain minimize). The same door as the desk in the plant, so sim.ts freezes the clock the same way.
+   */
+  const stepOut = (app: AppId | "start" | null) => {
+    if (s.mode !== "play") return;
+    keysRef.current.clear();
+    edgesRef.current.clear();
+    stickRef.current = { x: 0, y: 0, active: false };
+    unlockAudio();
+    playBlip("click");
+    openDesktop(s);
+    setDeskReq(app ? { app, n: Date.now() } : null);
+    applyMode("desktop");
+    refresh();
+  };
 
   const goMenu = (next: Mode) => {
     unlockAudio();
@@ -2022,12 +2044,24 @@ export function GameApp() {
         )}
       </div>
 
+      {!deskShown && s.role && barShown(mode, s.flags) ? (
+        <ShiftBar
+          s={s}
+          mode={mode}
+          onStart={() => stepOut("start")}
+          onMinimize={() => stepOut(null)}
+          onOpen={(app) => stepOut(app)}
+        />
+      ) : null}
+
       {deskShown ? (
         <Desktop
           shown
           s={s}
           simMode={deskHosted ? mode : null}
           simContent={deskHosted ? simOverlays : null}
+          openRequest={deskReq}
+          plantTask={`Unit 1 · ${dayDef(s.day).name}`}
           onLaunchSim={(app) => {
             if (!app.mode) return;
             launchFromDesk(s, app.mode as Mode);
