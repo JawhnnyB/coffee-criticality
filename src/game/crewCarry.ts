@@ -20,7 +20,7 @@ export const RETURNING_FLAG = "crew:returning";
 
 /**
  * Flags that belong to the relationship, not the week. Named ones: met, the choices you made with them, what they
- * gave you. Prefixes: trust scenes seen, crew moments had, and the outage's progress.
+ * gave you. Prefixes: trust scenes seen, crew moments had, the outage's progress, and the toys you gave them.
  * Week-only flags stay behind on purpose: elenaSecondEyes (Valve 14 this week), holtAfternoon, the end-of-day
  * flags, jordanCredit, anything about this week's catches and hides.
  */
@@ -48,7 +48,7 @@ export const CARRY_NAMED: readonly string[] = [
   "tommyLock",
   "tommyTry",
 ];
-export const CARRY_PREFIXES: readonly string[] = ["social:", "moment:", "outage:"];
+export const CARRY_PREFIXES: readonly string[] = ["social:", "moment:", "outage:", "gift:"];
 
 export interface CrewCarry {
   /** The week just finished: 1 after the first week. The next week is week + 1. */

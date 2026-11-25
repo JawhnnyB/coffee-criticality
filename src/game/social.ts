@@ -14,6 +14,9 @@ import { NPCS, type Line, type NpcId } from "./content";
 import { SCENES, type Scene } from "./socialScenes";
 import { A_ROTATION_NPC, A_ROTATION_SCENE, readCrew, takeARotationScene } from "./nightwatch/crewUnlock";
 import { dueMoment, knownMoments, markMoment, type MomentState } from "./crewMoments";
+import { dueFloorTalk, floorKey, floorLines, saysAbout, talkKey } from "./floorTalks";
+import { cultureOf, type Culture } from "./floorCulture";
+import { TOYS, giftDue, giftKey, giveToy, readJar, writeJar } from "./parlorPrizes";
 
 export type Tier = 0 | 1 | 2 | 3;
 
@@ -65,30 +68,69 @@ export interface TalkState {
 }
 
 /**
- * Called once each time a conversation opens. Appends the due scene, if any, and marks it seen.
- * Not during the ending walk, and not on the first meeting (that conversation belongs to the introduction).
+ * Called once each time a conversation opens. Counts the talk, then adds at most one thing, in this order:
+ * a toy you're giving them, Elena's four-A scene, what you walk in on (floorTalks.ts, the 2nd and 3rd talk),
+ * their due relationship scene, a crew moment. Not during the ending walk, and nothing on the first meeting (that's the introduction).
  */
 export function addScene(s: TalkState, firstMeeting: boolean): Scene | null {
-  if (s.mode !== "dialogue" || !s.talkNpc || s.flags.endingWalk || s.ended || firstMeeting) return null;
-  const scene = dueScene(s, s.talkNpc);
-  if (scene) {
-    s.dialogue.push(...scene.lines.map((l) => ({ ...l, choices: l.choices?.map((c) => ({ ...c })) })));
-    s.flags[seenKey(s.talkNpc, scene.tier)] = true;
+  // Not on the walk to the shore. (sim's finishDay sets s.ended at the end of every day, not only the last, so it
+  // can't be the test here: it used to silence every scene and moment from day 2 on.)
+  if (s.mode !== "dialogue" || !s.talkNpc || s.flags.endingWalk) return null;
+  const npc = s.talkNpc;
+  // Count this week's talks with them (floorTalks.ts opens the 2nd and 3rd).
+  let n = 1;
+  while (s.flags[talkKey(npc, n)]) n += 1;
+  s.flags[talkKey(npc, n)] = true;
+  if (firstMeeting) return null;
+  const copy = (lines: Line[]) => lines.map((l) => ({ ...l, choices: l.choices?.map((c) => ({ ...c })) }));
+
+  // A toy in your pocket for them (parlorPrizes.ts): you give it now, after they've said hello. Nothing else plays.
+  const jar = readJar();
+  const toy = giftDue(npc, s.flags, jar);
+  if (toy) {
+    s.dialogue.push(...copy(toy.scene));
+    writeJar(giveToy(toy, s.flags, jar));
+    s.trust[npc] = Math.min(100, (s.trust[npc] ?? 0) + 4);
+    return { tier: 1, title: toy.name, known: toy.known, lines: toy.scene };
   }
+
+  // Elena's four-A scene, earned in an earlier rotation: rare, and it doesn't wait.
   const extra = takeARotationScene(s.talkNpc);
   if (extra) {
-    s.dialogue.push(...extra.lines.map((l) => ({ ...l, choices: l.choices?.map((c) => ({ ...c })) })));
+    s.dialogue.push(...copy(extra.lines));
+    return extra;
+  }
+  // What you walk in on (floorTalks.ts): the 2nd and 3rd talk of the week open with two of the crew, in the floor's
+  // culture right now. The owner asked for exactly those talks, so the relationship scene waits for the next one.
+  const floor = dueFloorTalk(s.flags, npc, n);
+  if (floor) {
+    s.dialogue.unshift(...floorLines(floor, cultureNow(s)));
+    s.flags[floorKey(floor.id)] = true;
+    return { tier: 1, title: floor.title, known: floor.says.text, lines: [] };
+  }
+  const scene = dueScene(s, s.talkNpc);
+  if (scene) {
+    s.dialogue.push(...copy(scene.lines));
+    s.flags[seenKey(s.talkNpc, scene.tier)] = true;
+    return scene;
   }
   // A crew moment (crewMoments.ts) only when nothing else played, so a conversation never runs long.
-  if (!scene && !extra && hasRecord(s)) {
+  if (hasRecord(s)) {
     const m = dueMoment(s, s.talkNpc);
     if (m) {
-      s.dialogue.push(...m.lines.map((l) => ({ ...l, choices: l.choices?.map((c) => ({ ...c })) })));
+      s.dialogue.push(...copy(m.lines));
       markMoment(s.flags, m.id);
       return { tier: 1, title: m.title, known: m.known, lines: m.lines };
     }
   }
-  return scene ?? extra;
+  return null;
+}
+
+/** The floor's culture (floorCulture.ts) from the talk state, or guarded when the record isn't there. */
+export function cultureNow(s: TalkState): Culture {
+  const r = s as Partial<{ reports: number; catches: number; hides: number }>;
+  if (typeof r.reports !== "number" || typeof r.catches !== "number" || typeof r.hides !== "number") return "guarded";
+  return cultureOf({ flags: s.flags, reports: r.reports, catches: r.catches, hides: r.hides });
 }
 
 function hasRecord(s: TalkState): s is TalkState & MomentState {
@@ -101,6 +143,10 @@ export function knownAbout(s: { flags: Record<string, boolean> }, npc: NpcId): s
   const lines = [NPCS[npc].note, ...SCENES[npc].filter((sc) => s.flags[seenKey(npc, sc.tier)]).map((sc) => sc.known)];
   if (npc === A_ROTATION_NPC && readCrew().seen) lines.push(A_ROTATION_SCENE.known);
   lines.push(...knownMoments(s.flags, npc));
+  // How others talk about them (floorTalks.ts), and the toy you gave them (parlorPrizes.ts).
+  lines.push(...saysAbout(s.flags, npc));
+  const toy = TOYS.find((t) => t.npc === npc);
+  if (toy && s.flags[giftKey(npc)]) lines.push(toy.known);
   return lines;
 }
 

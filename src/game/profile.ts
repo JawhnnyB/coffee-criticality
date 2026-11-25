@@ -4,7 +4,7 @@
  */
 export const PROFILE_KEY = "cc.profile";
 
-export type ProfileSection = "crew" | "paper" | "endless" | "daily" | "carry";
+export type ProfileSection = "crew" | "paper" | "endless" | "daily" | "carry" | "tokens";
 
 const OLD: Record<ProfileSection, string> = {
   crew: "cc.crew",
@@ -12,6 +12,7 @@ const OLD: Record<ProfileSection, string> = {
   endless: "cc.endless",
   daily: "cc.daily",
   carry: "cc.carry",
+  tokens: "cc.tokens",
 };
 
 type Bag = Partial<Record<ProfileSection, unknown>>;

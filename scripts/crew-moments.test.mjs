@@ -87,9 +87,14 @@ test("each moment plays only on its own record and its day", () => {
   assert.equal(M.MOMENTS.find((x) => x.id === "elena-nights").when(week({ catches: 3, hides: 1 })), false, "a hide keeps Elena's nights talk back");
 });
 
+
+// Overheard exchanges (floorTalks.ts) take a talk of their own; these tests are about scenes and moments.
+const HEARD_FLOOR = Object.fromEntries(["mabel-holt", "mabel-jordan", "holt-elena", "holt-priya", "elena-jordan", "elena-tommy", "tommy-marcus", "tommy-mabel", "marcus-priya", "marcus-jordan", "priya-tommy", "priya-elena", "jordan-tommy", "jordan-holt"].map((id) => [`floor:${id}`, true]));
+
 test("a moment plays once, and never in the same conversation as a tier scene", () => {
   const s = week({ day: 5, residue: { valve: "caught", tag: "open", dose: "open", log: "open" } });
   s.talkNpc = "tommy";
+  Object.assign(s.flags, HEARD_FLOOR);
   // Tommy has no tier yet (trust at start), so the moment plays.
   const first = M.addScene(s, false);
   assert.equal(first?.title, "The repack");

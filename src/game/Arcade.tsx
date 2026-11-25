@@ -69,10 +69,13 @@ export function ArcadeHall({
   onPick,
   onAbort,
   fromEod = false,
+  children,
 }: {
   onPick: (id: CabId) => void;
   onAbort: () => void;
   fromEod?: boolean;
+  /** Under the cabinets: Mabel's prize shelf (PrizeShelf.tsx). */
+  children?: ReactNode;
 }) {
   return (
     <Bezel>
@@ -106,6 +109,7 @@ export function ArcadeHall({
           </div>
         ))}
       </div>
+      {children}
       <button type="button" className="btn-ghost mt-4" onClick={onAbort}>
         {fromEod ? "Back to clock-out" : "Back"}
       </button>

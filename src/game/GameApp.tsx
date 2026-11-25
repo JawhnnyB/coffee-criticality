@@ -124,6 +124,9 @@ import { addScene, knownAbout, nextHint, tierOf, TIER_NAME, type Tier } from "./
 import { cabLevel, LADDERS, recordCab } from "./cabLevels";
 import { hostDayTrust } from "./hostTrust";
 import { ShiftBar } from "./ShiftBar";
+import { PrizeShelf } from "./PrizeShelf";
+import { readJar, tokensForRun, writeJar } from "./parlorPrizes";
+import { CULTURE_INFO, cultureAxes, cultureOf } from "./floorCulture";
 import { RETURNING_FLAG, applyCrew, readCarry, snapshotCrew, writeCarry } from "./crewCarry";
 import { barShown } from "./barRules";
 import type { AppId } from "./parlorOS";
@@ -1108,7 +1111,9 @@ export function GameApp() {
               applyMode(s.mode);
               refresh();
             }}
-          />
+          >
+            <PrizeShelf flags={s.flags} onBought={() => playBlip("ok")} />
+          </ArcadeHall>
         )}
 
         {mode === "fish" && (
@@ -1818,10 +1823,10 @@ export function GameApp() {
         {mode === "dialogue" && line && (
           <DialogueStage
             line={line}
-            npc={s.talkNpc}
-            role={s.talkNpc ? NPCS[s.talkNpc].role : ""}
-            beat={s.talkNpc ? NPC_INTRO[s.talkNpc].beat : undefined}
-            who={s.talkNpc && s.dialogueI === 0 ? NPC_INTRO[s.talkNpc].who : undefined}
+            npc={speakerNpc(line.speaker) ?? s.talkNpc}
+            role={(speakerNpc(line.speaker) ?? s.talkNpc) ? NPCS[(speakerNpc(line.speaker) ?? s.talkNpc)!].role : ""}
+            beat={s.talkNpc && (speakerNpc(line.speaker) ?? s.talkNpc) === s.talkNpc ? NPC_INTRO[s.talkNpc].beat : undefined}
+            who={s.talkNpc && s.dialogueI === 0 && line.speaker ? NPC_INTRO[s.talkNpc].who : undefined}
             time={s.timeLabel}
             room={ROOMS[s.room].name}
             hearts={s.talkNpc ? heartCount(s.trust[s.talkNpc]) : 0}
@@ -1934,6 +1939,9 @@ export function GameApp() {
               {s.plant ? <p className="mt-2 font-mono text-xs text-[#3d5c44]">{plantTitle(s.plant)}</p> : null}
               <p className="mt-2 text-sm leading-relaxed text-[#6a4a32]">
                 {eodNpcLine({ hides: s.hides, ended: s.ended, flags: s.flags })}
+              </p>
+              <p className="mt-2 text-sm leading-relaxed text-[#3a2818]" data-testid="eod-culture">
+                The floor today: <strong>{CULTURE_INFO[cultureOf(s)].name}</strong>. {CULTURE_INFO[cultureOf(s)].line}
               </p>
               {s.weekLog.length > 0 ? (
                 <ul className="mt-3 space-y-1 text-left text-[12px] leading-relaxed text-[#3a2818]" data-testid="week-log">
@@ -2213,6 +2221,31 @@ function paperMood(mood?: Line["mood"]) {
   return "text-[#c4783a]";
 }
 
+/**
+ * The floor's culture (floorCulture.ts): which one, what it means, and which way your choices are pulling it.
+ */
+function FloorCultureCard({ s }: { s: GameState }) {
+  const c = cultureOf(s);
+  const { trust, candor } = cultureAxes(s);
+  const sign = (n: number) => (n > 0 ? `+${n}` : `${n}`);
+  return (
+    <div className="mt-3 border border-border bg-surface px-2 py-1.5 text-[11px]" data-testid="floor-culture" data-culture={c}>
+      <div className="font-mono tracking-wide text-fg">FLOOR CULTURE · {CULTURE_INFO[c].name.toUpperCase()}</div>
+      <div className="text-muted">{CULTURE_INFO[c].line}</div>
+      <div className="mt-0.5 text-subtle">
+        Trust {sign(trust)} · calling each other out {sign(candor)}. Backing people up builds trust; naming the problem builds calling out;
+        hiding costs both. Respect needs both.
+      </div>
+    </div>
+  );
+}
+
+/** Whose face goes with a line: an overheard exchange (floorTalks.ts) has more than one speaker. */
+function speakerNpc(speaker: string): NpcId | null {
+  const id = speaker.toLowerCase();
+  return id in NPCS ? (id as NpcId) : null;
+}
+
 function PixelPortrait({ npc }: { npc: NpcId }) {
   return <CastFace id={npc} zoom={4} live />;
 }
@@ -2419,10 +2452,18 @@ function noteCab(s: GameState, id: string, score: number) {
   const ladder = LADDERS[id];
   if (!ladder) return;
   const host = ladder.host;
+  const level = cabLevel(s.flags, id); // before this run can unlock the next one
   const out = recordCab(s.flags, id, cabLevel(s.flags, id), score, host ? { trust: s.trust[host], start: NPCS[host].startTrust } : undefined);
   const extra = hostDayTrust(s.flags, id, s.day, score);
   if (extra) bumpTrust(s, extra.npc, extra.trust);
   const name = id === "catch" ? "CATCH.CAB" : `${id.toUpperCase()}.CAB`;
+  // Parlor tokens (parlorPrizes.ts): a run pays 1, clearing the level's score pays 2, at most 3 a cabinet a day.
+  const paid = tokensForRun(s.flags, id, s.day, score, score >= ladder.clear[Math.min(level, 2) - 1]);
+  if (paid > 0) {
+    const jar = readJar();
+    writeJar({ ...jar, tokens: jar.tokens + paid });
+    pushMsg(s, `+${paid} token${paid === 1 ? "" : "s"} · ${jar.tokens + paid} in Mabel's jar.`);
+  }
   if (out.unlocked) pushMsg(s, `${name} level ${out.unlocked}: ${ladder.what[out.unlocked - 1]}.`);
   else if (out.waitsOn) pushMsg(s, `${name} level 3 is cleared. ${shortName(out.waitsOn)} sets it up once they trust you.`);
 }
@@ -3088,6 +3129,7 @@ function PauseStage({
         <div>
           <h2 className="font-display text-2xl">Relationships</h2>
           <p className="mt-1 text-xs text-subtle">Hearts are with you. The lines under the list are between them.</p>
+          <FloorCultureCard s={s} />
           <div className="mt-3 space-y-2">
             {(Object.keys(NPCS) as NpcId[]).map((id) => {
               const met = !!s.flags[`${id}Talked`];

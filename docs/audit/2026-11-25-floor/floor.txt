@@ -1,0 +1,34 @@
+PASS 1280 2nd talk opens with Tommy and Marcus (Maintenance · The four words. · Marcus is in the shop doorway with a work package. Tommy doesn't look up from the bench. · Marcus is in the shop doorway · Click)
+PASS 1280 the call-out choice is recorded
+PASS 1280 3rd talk: Tommy and Mabel, on a floor of respect (Maintenance · The four words. · Mabel walks into the shop with a cup before ten. Tommy doesn't smile. Not yet. · Mabel walks into the shop with · Click or Space)
+PASS 1280 crew page shows the floor culture
+PASS 1280 crew page: what others say about Marcus (New · Talk with them, take their side when it is right, and catch things where they can see it.
+· Tommy says Marcus writes packages from dra)
+PASS 1280 distrust: the sign-up sheet becomes surveillance (Floor tech · Where the door can hear. · Jordan is pinning the bowling sign-up sheet to the shop door. Tommy is watching him do it. · Jordan is pinning the bowli)
+PASS 1280 prize shelf in the arcade
+PASS 1280 12 tokens in the jar
+PASS 1280 Jordan's pin is on the shelf
+PASS 1280 Mabel's kettle waits on her cabinet
+PASS 1280 no toy for Holt, and Mabel says why
+PASS 1280 bought: in your pocket
+PASS 1280 tokens spent
+PASS 1280 Jordan gets his pin (Jordan · Floor tech · Where the door can hear. · He waves at you like he's known you for years. · Elena gave me this job when nobody else wo)
+PASS 1280 and keeps it
+PASS 1280 no page errors
+PASS 390 2nd talk opens with Tommy and Marcus (Maintenance · The four words. · Marcus is in the shop doorway with a work package. Tommy doesn't look up from the bench. · Marcus is in the shop doorway w · Cli)
+PASS 390 the call-out choice is recorded
+PASS 390 3rd talk: Tommy and Mabel, on a floor of respect (Maintenance · The four words. · Mabel walks into the shop with a cup before ten. Tommy doesn't smile. Not yet. · Mabel walks into the shop with · Click or Space)
+PASS 390 crew page shows the floor culture
+PASS 390 crew page: what others say about Marcus (New · Talk with them, take their side when it is right, and catch things where they can see it.
+· Tommy says Marcus writes packages from dra)
+PASS 390 distrust: the sign-up sheet becomes surveillance (Floor tech · Where the door can hear. · Jordan is pinning the bowling sign-up sheet to the shop door. Tommy is watching him do it. · Jordan is pinning the bowli)
+PASS 390 prize shelf in the arcade
+PASS 390 12 tokens in the jar
+PASS 390 Jordan's pin is on the shelf
+PASS 390 Mabel's kettle waits on her cabinet
+PASS 390 no toy for Holt, and Mabel says why
+PASS 390 bought: in your pocket
+PASS 390 tokens spent
+PASS 390 Jordan gets his pin (Jordan · Floor tech · Where the door can hear. · He waves at you like he's known you for years. · Elena gave me this job when nobody else wo)
+PASS 390 and keeps it
+PASS 390 no page errors

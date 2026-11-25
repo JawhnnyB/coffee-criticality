@@ -169,3 +169,12 @@ Decision: approve as written, or mark lines to change. This also counts toward t
 3. **The reloads are linked:** signing Friday's shuffle opens the outage, and the outage can lay the real core out by Friday's plan. Decision: the faithful translation busts the real core's limit (about 2.3 against 1.37). Kept as the lesson. Alternative: tune the translation so it lands near the limit.
 4. **Transitions:** the plant shrinks into its taskbar tab and grows back; cards and the desk ease in; reduced motion turns it off.
 5. **Narration rewritten** on the ending, end-of-day footer, shore and dawn. `sim.ts` lines and the title tagline unchanged.
+
+## The floor between them (needs the owner)
+
+25 November 2026, Claude. Every line: `docs/floor-talk-draft.md`. Checks: `docs/audit/2026-11-25-floor/`.
+
+- **Floor culture** from two numbers your choices move, trust and calling each other out: Guarded, Respect, Comfort, Distrust, Fear (`floorCulture.ts`). Comfort was added to the three named: trust without calling out. Decision: keep Comfort? Are the thresholds (4 and 4) right after a real week?
+- **What you walk in on:** the 2nd and 3rd talk with each person each week, 14 exchanges × 5 cultures, each ending with back-them-up or name-it (`floorTalks.ts`). They take priority over relationship scenes on those talks, as asked. Each person is described by two others on the crew page. Decision: in later weeks the same 14 situations replay in that week's culture; write new ones for week two and up?
+- **Tokens and toys** (`parlorPrizes.ts`, `PrizeShelf.tsx`): tokens from the eight levelled cabinets, at most 3 a cabinet a day, kept across weeks; six toys, one per person but Holt, each unlocked by that person's cabinet. Decision: prices (6 to 7) and the daily cap.
+- **Bug fixed:** relationship scenes and crew moments never played after day 1 in a normal week (`s.ended` is set every evening). Worth a human playtest of a full week now that they do.

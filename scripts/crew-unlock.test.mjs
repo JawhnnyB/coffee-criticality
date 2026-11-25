@@ -50,6 +50,10 @@ function texts(scene) {
   return lines;
 }
 
+
+// Overheard exchanges (floorTalks.ts) take a talk of their own; this test is about the four-A scene.
+const HEARD_FLOOR = Object.fromEntries(["mabel-holt", "mabel-jordan", "holt-elena", "holt-priya", "elena-jordan", "elena-tommy", "tommy-marcus", "tommy-mabel", "marcus-priya", "marcus-jordan", "priya-tommy", "priya-elena", "jordan-tommy", "jordan-holt"].map((id) => [`floor:${id}`, true]));
+
 test("four A's unlock one Elena scene, once, outside the week save", () => {
   store.clear();
   assert.equal(W.noteARotation(["A", "A", "A", "B"]).unlocked, false);
@@ -65,6 +69,7 @@ test("four A's unlock one Elena scene, once, outside the week save", () => {
   const s = W.createState();
   s.mode = "play";
   s.day = 1;
+  Object.assign(s.flags, HEARD_FLOOR);
   W.openTalk(s, "elena");
   assert.equal(W.addScene(s, true), null);
   assert.equal(W.readCrew().seen, false);
