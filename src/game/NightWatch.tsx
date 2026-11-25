@@ -52,7 +52,10 @@ import { gazeReplay } from "./nightwatch/gazeReplay";
 import { readDaily, recordDaily } from "./nightwatch/daily";
 import { nightsDone } from "./nightwatch/progress";
 import { noteCodexCamera, noteCodexCatch } from "./codex";
-import { elenaLine, oddityNotes, openerLine, recordNight, turnoverRows } from "./nightwatch/turnover";
+import { elenaLine, oddityNotes, recordNight, turnoverRows } from "./nightwatch/turnover";
+import { daysOffScene, openerScene, vanScene, type RotationScene, type WeekMood } from "./nightwatch/rotationScenes";
+import { NPCS } from "./content";
+import { RETURNING_FLAG } from "./crewCarry";
 
 const SITE_LABEL = { pwr: "PWR", bwr: "BWR", pebble: "Pebble bed", msr: "Salt" } as const;
 
@@ -744,6 +747,47 @@ function bestLetter(flags: Record<string, boolean>, night: number): string {
   return "";
 }
 
+/**
+ * One moment in the rotation: where and when, a face, lines that arrive one after another, then what you do next.
+ * The buttons are there from the start, so nobody waits on the words; reduced motion shows every line at once.
+ */
+function SceneCard({ scene, testId, children, calm }: { scene: RotationScene; testId: string; children: ReactNode; calm: boolean }) {
+  const face = scene.face ? NPCS[scene.face].portrait.src.replace("-smile", "-talk") : null;
+  return (
+    <div className="paper mx-auto w-full p-4 sm:p-5" style={CARD} data-testid={testId}>
+      <div className="flex items-start gap-3">
+        {face ? (
+          <img
+            src={face}
+            alt={NPCS[scene.face!].name}
+            width={72}
+            height={72}
+            style={{ width: 72, height: 72, imageRendering: "pixelated", border: "2px solid #16110d", background: "#e9dcc3", flexShrink: 0 }}
+          />
+        ) : null}
+        <div className="min-w-0">
+          <p className="font-mono text-[10px] tracking-widest text-[#6a4a32]">{scene.where}</p>
+          <h2 className="font-display mt-1 text-3xl">{scene.title}</h2>
+        </div>
+      </div>
+      <div className="mt-3 space-y-2">
+        {scene.lines.map((l, i) => (
+          <p
+            key={`${i}-${l.text}`}
+            className="text-sm leading-relaxed"
+            data-testid="scene-line"
+            style={{ animation: calm ? undefined : `cc-line-in 0.45s ease-out ${0.15 + i * 0.55}s both`, fontStyle: l.who ? undefined : "italic" }}
+          >
+            {l.who ? <strong>{l.who[0].toUpperCase() + l.who.slice(1)}: </strong> : null}
+            {l.text}
+          </p>
+        ))}
+      </div>
+      {children}
+    </div>
+  );
+}
+
 /** Days off, the night openers, the shifts, and the lot at dawn. Flags only. */
 export function NightRotation({ s, onNewWeek, onMenu }: { s: GameState; onNewWeek: () => void; onMenu: () => void }) {
   const next = Math.min(4, nightsDone(s.flags) + 1);
@@ -754,10 +798,14 @@ export function NightRotation({ s, onNewWeek, onMenu }: { s: GameState; onNewWee
   });
   const [endless, setEndless] = useState(0);
   const again = bestLetter(s.flags, next) === "D" || bestLetter(s.flags, next) === "F";
-  const weekLine = s.ended === "a" ? "The week held. You still wake at the wrong hour." : s.hides >= 3 ? "You keep replaying the things you did not say." : "The plant is someone else's problem until midnight.";
   const grades = [1, 2, 3, 4].map((k) => bestLetter(s.flags, k)).filter(Boolean);
   const avg = grades.length ? grades.reduce((sum, letter) => sum + { A: 4, B: 3, C: 2, D: 1, F: 0 }[letter as "A"], 0) / grades.length : 2;
-  const dawnLine = avg >= 3.2 ? "The lot is pale. Elena nods once and keeps walking." : avg >= 2 ? "Dawn on the lot. The log is what it is." : "The lot is empty. A night like that has to be stood again.";
+  const dawnLine =
+    avg >= 3.2
+      ? "The lot is pale and cold. Elena passes you on her way in and puts a hand on your shoulder, just for a second."
+      : avg >= 2
+        ? "Dawn on the lot. The log says what it says, and you wrote it straight."
+        : "The lot is empty. A night like that has to be stood again, and you knew it before anyone said so.";
   const last = (bestLetter(s.flags, 4) || "C") as "A";
   const letters = [1, 2, 3, 4].map((k) => bestLetter(s.flags, k));
   const paper = paperLines({
@@ -773,6 +821,8 @@ export function NightRotation({ s, onNewWeek, onMenu }: { s: GameState; onNewWee
     log: s.residue.log,
   });
   const [crewHeard, setCrewHeard] = useState(true);
+  const mood: WeekMood = { held: s.ended === "a", hides: s.hides, trust: s.trust, returning: !!s.flags[RETURNING_FLAG] };
+  const calm = !!s.desktop.reducedMotion || prefersReducedMotion();
   useEffect(() => {
     if (phase !== "dawn") return;
     const heard = readCrew().seen;
@@ -815,35 +865,35 @@ export function NightRotation({ s, onNewWeek, onMenu }: { s: GameState; onNewWee
   return (
     <div className="absolute inset-0 z-40 flex items-end justify-center overflow-y-auto overflow-x-hidden bg-bg/55 p-3 pb-28 sm:items-center sm:p-6">
       {phase === "off" ? (
-        <div className="paper mx-auto w-full p-4 sm:p-5" style={CARD} data-testid="days-off">
-          <p className="font-mono text-[10px] tracking-widest text-[#6a4a32]">Days off</p>
-          <h2 className="font-display mt-2 text-3xl">Three days off</h2>
-          <p className="mt-3 text-sm leading-relaxed">Three days off. You sleep wrong for two of them.</p>
-          <p className="mt-2 text-sm leading-relaxed">{weekLine}</p>
-          <p className="mt-3 text-[11px] text-[#6a4a32]">Teaching model only. The three days off are a story beat, not a work-hour rule. This game does not say how long a real watch may be.</p>
-          <button
-            type="button"
-            className="paper-btn-primary mt-5 w-full"
-            style={{ minHeight: 44 }}
-            data-testid="report-nights"
-            onClick={() => {
-              s.flags["rot:reported"] = true;
-              writeSave(s, true);
-              setPhase("opener");
-            }}
-          >
-            Report for nights
-          </button>
+        <div className="mx-auto w-full space-y-3" style={{ maxWidth: 560 }} data-testid="days-off">
+          <SceneCard scene={vanScene(mood)} testId="van-scene" calm={calm}>
+            {null}
+          </SceneCard>
+          <SceneCard scene={daysOffScene(mood)} testId="days-off-scene" calm={calm}>
+            <p className="mt-3 text-[11px] text-[#6a4a32]">Teaching model only. The three days off are a story beat, not a work-hour rule. This game does not say how long a real watch may be.</p>
+            <button
+              type="button"
+              className="paper-btn-primary mt-4 w-full"
+              style={{ minHeight: 44 }}
+              data-testid="report-nights"
+              onClick={() => {
+                s.flags["rot:reported"] = true;
+                writeSave(s, true);
+                setPhase("opener");
+              }}
+            >
+              Report for nights
+            </button>
+          </SceneCard>
         </div>
       ) : null}
       {phase === "opener" ? (
-        <div className="paper mx-auto w-full p-4 sm:p-5" style={CARD} data-testid="night-opener">
-          <p className="font-mono text-[10px] tracking-widest text-[#6a4a32]">{again ? `Night ${next}, again` : `Night ${next}`}</p>
-          <h2 className="font-display mt-2 text-3xl">{again ? "Stand it again" : "18:00 turnover"}</h2>
-          <p className="mt-3 text-sm leading-relaxed">{openerLine(next, again)}</p>
-          <button type="button" className="paper-btn-primary mt-5 w-full" style={{ minHeight: 44 }} data-testid="start-night" onClick={() => { writeSave(s, true); setPhase("shift"); }}>
-            Take the watch
-          </button>
+        <div className="mx-auto w-full" style={{ maxWidth: 560 }} data-testid="night-opener">
+          <SceneCard scene={openerScene(next, again, mood)} testId={`opener-${next}`} calm={calm}>
+            <button type="button" className="paper-btn-primary mt-5 w-full" style={{ minHeight: 44 }} data-testid="start-night" onClick={() => { writeSave(s, true); setPhase("shift"); }}>
+              Take the watch
+            </button>
+          </SceneCard>
         </div>
       ) : null}
       {phase === "dawn" ? (

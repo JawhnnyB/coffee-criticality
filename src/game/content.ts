@@ -1,3 +1,4 @@
+import { RETURNING_FLAG } from "./crewCarry";
 import { TILE } from "./const";
 
 export const TITLE = "Coffee & Criticality";
@@ -619,6 +620,8 @@ export function talkLines(
   if (ending) return endingLines(npc, residue, ended, week);
   const first = !flags[`${npc}Talked`];
   const hid = anyHid(residue) || !!flags.hid || !!flags.catchMiss;
+  const quiet = residue.valve === "open" && residue.tag === "open" && residue.dose === "open" && residue.log === "open";
+  if (!first && day === 1 && flags[RETURNING_FLAG] && quiet && !hid) return welcomeBack(npc, flags);
   if (npc === "mabel") {
     if (!first) {
       const caughtWeek = residue.valve === "caught" || residue.tag === "caught" || residue.dose === "caught" || residue.log === "caught";
@@ -1029,6 +1032,90 @@ export function talkLines(
       ],
     },
     { speaker: "Jordan", text: "Anyway. Welcome. It's a good crew. Mostly.", mood: "wry" },
+  ];
+}
+
+/**
+ * Day 1 of a returning week (crewCarry.ts): they know you, and they say so. Each remembers what you two have
+ * been through: Tommy's lock, Elena's van, Holt's board, Jordan's trust. Choice ids are the everyday ones.
+ */
+function welcomeBack(npc: NpcId, flags: Record<string, boolean>): Line[] {
+  if (npc === "mabel") {
+    return [
+      { speaker: "Mabel", text: "There you are. I kept your cup on the shelf all week. Same chair, if you want it.", mood: "warm" },
+      {
+        speaker: "Mabel",
+        text: flags.mabelChalk ? "The chalk's where you left it. The wall's been waiting for you." : "Now. What can I get you?",
+        mood: "soft",
+        choices: [
+          { id: "mabel-sit", label: "Just the coffee, thanks.", reply: "Coming up. Same as last week. I remembered.", trust: 2, culture: 1 },
+          { id: "mabel-catch", label: "Who hasn't sat down today?", reply: "Nobody yet. It's early. Give them till ten.", flag: "arcade" },
+        ],
+      },
+    ];
+  }
+  if (npc === "holt") {
+    return [
+      { speaker: "Holt", text: "Welcome back. Same favour as last week: times and places.", mood: "even" },
+      {
+        speaker: "Holt",
+        text: flags.holtBoard ? "Your seat on the review board is still yours. Last vote, as before." : "I read every line you wrote last week. Twice. Thank you.",
+        mood: "soft",
+      },
+    ];
+  }
+  if (npc === "elena") {
+    return [
+      { speaker: "Elena", text: "You came back. Good. I wasn't sure, after a rotation like that.", mood: "soft" },
+      {
+        speaker: "Elena",
+        text: flags.elenaVan ? "The van's open at five if you want to read the night log with me again." : "Eat something before you walk the floor. I mean it.",
+        mood: "even",
+      },
+    ];
+  }
+  if (npc === "tommy") {
+    return [
+      {
+        speaker: "Tommy",
+        text: flags.tommyLock ? "Look who's back. Your lock's still on my board. Nobody's touched it." : "Look who's back. Four words, boss, before anything else.",
+        mood: "warm",
+      },
+      { speaker: "Tommy", text: "Good to have you back. Honestly. The shop's quieter without an engineer asking questions.", mood: "wry" },
+    ];
+  }
+  if (npc === "marcus") {
+    return [
+      { speaker: "Marcus", text: "You're back. I checked every number I own twice over the days off. Old habit, new reason.", mood: "wry" },
+      {
+        speaker: "Marcus",
+        text: flags.marcusSay ? "People still mention the feedwater flow. Kindly, which is new." : "Bring me the ugly number first this week too.",
+        mood: "soft",
+      },
+    ];
+  }
+  if (npc === "priya") {
+    return [
+      { speaker: "Priya", text: "Welcome back. Your new core's already on my desk. I've read the sheet twice.", mood: "warm" },
+      {
+        speaker: "Priya",
+        text: flags.priyaWalk ? "Same deal as last week: we walk it before we sign it." : "This week, will you walk it with me? I'll find you some proper boots.",
+        mood: "even",
+      },
+    ];
+  }
+  return [
+    {
+      speaker: "Jordan",
+      text: flags.jordanTrust ? "Hey! You came back. I told Mabel you would. She said she already knew." : "Hey, you came back. Honestly, not everyone does.",
+      mood: "warm",
+    },
+    {
+      speaker: "Jordan",
+      text: "Caught anything yet?",
+      mood: "even",
+      choices: [{ id: "jordan-say", label: "Not yet. When I do, I'll say it out loud.", reply: "Then we're picking up where we left off. Good.", trust: 1 }],
+    },
   ];
 }
 

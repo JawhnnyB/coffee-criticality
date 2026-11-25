@@ -1,16 +1,17 @@
 /**
- * One profile for this machine: crew, the dawn paper, endless, and the daily board.
+ * One profile for this machine: crew, the dawn paper, endless, the daily board, and the crew carried between weeks.
  * A new week wipes cc.save.v2. This key stays.
  */
 export const PROFILE_KEY = "cc.profile";
 
-export type ProfileSection = "crew" | "paper" | "endless" | "daily";
+export type ProfileSection = "crew" | "paper" | "endless" | "daily" | "carry";
 
 const OLD: Record<ProfileSection, string> = {
   crew: "cc.crew",
   paper: "cc.paper",
   endless: "cc.endless",
   daily: "cc.daily",
+  carry: "cc.carry",
 };
 
 type Bag = Partial<Record<ProfileSection, unknown>>;

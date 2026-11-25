@@ -1,0 +1,20 @@
+PASS 1280 plant shrinks on the way out
+PASS 1280 desk opens after
+PASS 1280 plant grows back on return (play)
+PASS 1280 fuel desk opens the shuffle (shuffle)
+PASS 1280 the shuffle says it's the plan the outage carries out
+PASS 1280 signing Friday's plan hands over the outage
+PASS 1280 the outage shows Friday's plan
+PASS 1280 laying it out changes the real core (Fresh fuel on the outer third right now: 75%. → Fresh fuel on the outer third right now: 19%.)
+PASS 1280 the cycle says whether Friday's plan holds (Friday's plan peaks at 2.35 on the real core, over the 1.37 limit. The hall's core is small and forgiving at the edge; a)
+PASS 1280 no page errors
+PASS 390 plant shrinks on the way out
+PASS 390 desk opens after
+PASS 390 plant grows back on return (play)
+PASS 390 fuel desk opens the shuffle (shuffle)
+PASS 390 the shuffle says it's the plan the outage carries out
+PASS 390 signing Friday's plan hands over the outage
+PASS 390 the outage shows Friday's plan
+PASS 390 laying it out changes the real core (Fresh fuel on the outer third right now: 75%. → Fresh fuel on the outer third right now: 19%.)
+PASS 390 the cycle says whether Friday's plan holds (Friday's plan peaks at 2.35 on the real core, over the 1.37 limit. The hall's core is small and forgiving at the edge; a)
+PASS 390 no page errors

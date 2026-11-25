@@ -308,7 +308,7 @@ export function Desktop(props: DesktopProps) {
       data-season={season}
       aria-hidden={!shown}
       hidden={!shown}
-      className="absolute inset-0 z-40 overflow-hidden"
+      className="cc-fade-in absolute inset-0 z-40 overflow-hidden"
       style={
         {
           background: info.wall,

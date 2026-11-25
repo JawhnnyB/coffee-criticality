@@ -50,7 +50,7 @@ import { Chatter } from "./ChatterLine";
 import { heartCount } from "./pixel";
 import { drawWorld, glyphWidth, paintGlyphs, preloadRoomArt } from "./render";
 import { DEFAULT_PLANT, plantTitle, thermalState, type PlantDesign } from "./plant";
-import { usePrefersReducedMotion } from "./reducedMotion";
+import { prefersReducedMotion, usePrefersReducedMotion } from "./reducedMotion";
 import { bootSettings, frameChoice, setFrameChoice, type FrameChoice } from "./frameRate";
 import { hasSave, hydrateSave, peekSave, wipeSave, writeSave } from "./save";
 import { setNextNightSeed } from "./nightwatch/model";
@@ -59,7 +59,7 @@ import { NuclearDesk } from "./NuclearDesk";
 import { anatomyLines, hallBlurb, siteLine } from "./siteText";
 import { LoopSchematic } from "./LoopSchematic";
 import { readFace } from "./siteFace";
-import { DEPARTMENTS, dayDef, eodNpcLine, incidentOwner, shoreLine, yesterdayLine } from "./week";
+import { DEPARTMENTS, dayDef, eodNpcLine, incidentOwner, NOT_HELD_SHORE, shoreLine, yesterdayLine } from "./week";
 import { DEFAULT_PLAYER_LOOK, type PlayerLook } from "./artSpec";
 import { MAP_HUD, ROOM_BLURB, roomLinks } from "./site";
 import { TeachMeta, TeachPriya, TYPE_THUMB } from "./TeachFrame";
@@ -124,6 +124,7 @@ import { addScene, knownAbout, nextHint, tierOf, TIER_NAME, type Tier } from "./
 import { cabLevel, LADDERS, recordCab } from "./cabLevels";
 import { hostDayTrust } from "./hostTrust";
 import { ShiftBar } from "./ShiftBar";
+import { RETURNING_FLAG, applyCrew, readCarry, snapshotCrew, writeCarry } from "./crewCarry";
 import { barShown } from "./barRules";
 import type { AppId } from "./parlorOS";
 
@@ -293,6 +294,31 @@ export function GameApp() {
   const [ready, setReady] = useState(false);
   const [touch, setTouch] = useState(false);
   const [saved, setSaved] = useState(false);
+  /** The plant shrinking into its taskbar tab on the way out, or growing back out of it on return. */
+  const [plantAnim, setPlantAnim] = useState<"out" | "in" | null>(null);
+  const leavingRef = useRef(false);
+  const prevModeRef = useRef<Mode>(mode);
+  useEffect(() => {
+    const prev = prevModeRef.current;
+    prevModeRef.current = mode;
+    const fromDesk = prev === "desktop" || (stateRef.current.deskHost && DESK_HOSTS.includes(prev));
+    if (!fromDesk || mode !== "play") return;
+    setPlantAnim("in");
+    const id = window.setTimeout(() => setPlantAnim(null), 320);
+    return () => window.clearTimeout(id);
+    // Only the mode change matters here.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mode]);
+  // A returning week (crewCarry.ts): they've met you. The introductions are for the first week, so the intro
+  // hands straight to the morning brief, however the build finished.
+  useEffect(() => {
+    const st = stateRef.current;
+    if (mode !== "intro" || !st.flags[RETURNING_FLAG]) return;
+    st.mode = "brief";
+    st.introLock = 1.05;
+    modeRef.current = "brief";
+    setMode("brief");
+  }, [mode]);
   /** The plant's taskbar asked the desktop to open one app (or the start menu). n changes per click. */
   const [deskReq, setDeskReq] = useState<{ app: AppId | "start"; n: number } | null>(null);
   const [askWipe, setAskWipe] = useState(false);
@@ -977,7 +1003,23 @@ export function GameApp() {
    * nothing for a plain minimize). The same door as the desk in the plant, so sim.ts freezes the clock the same way.
    */
   const stepOut = (app: AppId | "start" | null) => {
-    if (s.mode !== "play") return;
+    if (s.mode !== "play" || leavingRef.current) return;
+    const calm = !!s.desktop.reducedMotion || prefersReducedMotion();
+    if (!calm) {
+      // Shrink the plant into its tab first, then open the desk. The clock is still running for these 0.2 s.
+      leavingRef.current = true;
+      setPlantAnim("out");
+      window.setTimeout(() => {
+        leavingRef.current = false;
+        setPlantAnim(null);
+        if (s.mode === "play") openOnDesk(app);
+      }, 200);
+      return;
+    }
+    openOnDesk(app);
+  };
+
+  const openOnDesk = (app: AppId | "start" | null) => {
     keysRef.current.clear();
     edgesRef.current.clear();
     stickRef.current = { x: 0, y: 0, active: false };
@@ -1003,6 +1045,7 @@ export function GameApp() {
     playBlip("ok");
     playBed("cafe");
     startShift(s, id, look);
+    applyCrew(s, readCarry());
     setSaved(false);
     setAskWipe(false);
     applyMode("build");
@@ -1010,7 +1053,9 @@ export function GameApp() {
   };
 
   /** A new week discards the saved shift. The setup and the desktop settings stay. */
-  const beginNewWeek = (next: WipeNext) => {
+  const beginNewWeek = (next: WipeNext, strangers = false) => {
+    // The crew remembers the week being thrown away (crewCarry.ts), unless the player asked to start as a stranger.
+    writeCarry(strangers ? null : snapshotCrew(s.role ? s : (peekSave() ?? s), readCarry()));
     wipeSave();
     resetShift(s);
     setSaved(false);
@@ -1305,6 +1350,8 @@ export function GameApp() {
             practice={s.returnMode === "academy" || s.day < 5 || !!s.flags.cabPractice}
             onDone={(fq, map) => {
               finishShuffle(s, fq, map);
+              // Signing Friday's plan hands you the outage that carries it out (outage/fridayPlan.ts).
+              if (s.shuffleDone) s.flags.outageOpen = true;
               applyMode(s.mode);
               playBlip("ok");
               refresh();
@@ -1445,7 +1492,7 @@ export function GameApp() {
   );
 
   return (
-    <div className={"relative flex h-svh min-h-[100dvh] flex-col overflow-hidden bg-bg text-fg" + (ART.hud || ART.menu ? " art-on" : "")}>
+    <div className={"relative flex h-svh min-h-[100dvh] flex-col overflow-hidden bg-bg text-fg" + (ART.hud || ART.menu ? " art-on" : "") + (s.desktop.reducedMotion ? " cc-calm" : "")}>
       <header className="pointer-events-none absolute inset-x-0 top-0 z-40 flex items-start justify-between gap-3 p-3 sm:p-4">
         {!playing && mode !== "splash" && mode !== "brief" && mode !== "intro" && mode !== "role" && mode !== "build" && mode !== "eod" && !(ART.menu && mode === "menu") ? (
           <div className="pointer-events-auto max-w-[58%] border border-border bg-bg-elevated px-3 py-2">
@@ -1464,7 +1511,7 @@ export function GameApp() {
         </div>
       </header>
 
-      <div ref={wrapRef} className="relative min-h-0 flex-1">
+      <div ref={wrapRef} className={"relative min-h-0 flex-1" + (plantAnim === "out" ? " cc-plant-out" : plantAnim === "in" ? " cc-plant-in" : "")}>
         {hold ? (
           <div className="absolute inset-0 z-50 flex items-center justify-center bg-bg/80" data-testid="hold-pause">
             <div className="cc-sheet">
@@ -1492,7 +1539,8 @@ export function GameApp() {
 
         {mode === "play" && !s.flags["rot:nights"] ? <CornerMonitor s={s} calm={!!s.desktop.reducedMotion || quietMotion} /> : null}
 
-        {mode === "play" && (
+        {/* The night rotation draws its own scenes; the day's room card and objective stay out from behind them. */}
+        {mode === "play" && !s.flags["rot:nights"] && (
           <Hud
             room={ROOMS[s.room].name}
             roomId={s.room}
@@ -1812,7 +1860,11 @@ export function GameApp() {
           />
         )}
 
-        {!deskHosted && simOverlays}
+        {!deskHosted && simOverlays ? (
+          <div key={mode} className="cc-fade-in">
+            {simOverlays}
+          </div>
+        ) : null}
         {mode === "pause" && (
           <PauseStage
             s={s}
@@ -1864,7 +1916,7 @@ export function GameApp() {
         {mode === "eod" && (
           <div className="absolute inset-0 z-30 overflow-y-auto bg-bg/70">
             <div className="flex min-h-full items-start justify-center p-3 pb-28 sm:items-center sm:p-6">
-            <div className="paper mx-auto w-full max-w-xl p-4 sm:p-5" data-testid="paper-eod">
+            <div className="paper cc-paper-in mx-auto w-full max-w-xl p-4 sm:p-5" data-testid="paper-eod">
               <div className="relative mb-3 h-[120px] w-[214px] max-w-full overflow-hidden border border-[#3a2818] sm:h-[180px] sm:w-[320px]" data-testid="eod-site">
                 <LakeScene season={seasonOrDefault(s.setup.season)} site={siteKind(s.plant)} power={sitePower(s.run)} testId="eod-lake" />
               </div>
@@ -1895,12 +1947,12 @@ export function GameApp() {
               ) : null}
               <p className="mt-2 text-[11px] text-[#6a4a32]">
                 {s.hides >= 3
-                  ? "Three hides close the week as unfinished power — even if the culture number looks fine."
+                  ? "Three things went unsaid. However good the numbers look, a week can't hold on that."
                   : s.ended === "a"
-                    ? "Honest catches outnumbered silence. Holt can fund a real review."
-                    : "Skill without a safe floor is unfinished power. The numbers can still run."}
+                    ? "More got said out loud than kept quiet. That's something Holt can take to a review."
+                    : "You're good at the work. The floor isn't safe enough yet for that to be enough."}
               </p>
-              <p className="mt-2 text-[11px] text-[#6a4a32]">Teaching model — not a license. Catch greater than heroics.</p>
+              <p className="mt-2 text-[11px] text-[#6a4a32]">Teaching model, not a license.</p>
               <div className="mt-5 flex flex-col gap-2">
                 <button
                   type="button"
@@ -1945,15 +1997,15 @@ export function GameApp() {
         {mode === "ending" && (
           <div className="absolute inset-0 z-30 overflow-y-auto bg-bg/55">
             <div className="flex min-h-full items-start justify-center p-3 pb-28 sm:items-center sm:p-6">
-            <div className="paper mx-auto w-full max-w-xl p-4 sm:p-5" data-testid="paper-ending">
+            <div className="paper cc-paper-in mx-auto w-full max-w-xl p-4 sm:p-5" data-testid="paper-ending">
               <p className="font-mono text-[10px] tracking-widest text-[#6a4a32]">
                 Dusk · {s.timeLabel} · Lot · Lake north
               </p>
-              <h2 className="font-display mt-2 text-3xl">{s.ended === "a" ? "The floor holds" : "Unfinished power"}</h2>
+              <h2 className="font-display mt-2 text-3xl">{s.ended === "a" ? "The floor holds" : "The week didn't hold"}</h2>
               <p className="mt-3 text-sm leading-relaxed">
                 {s.ended === "a"
                   ? shoreLine(s.ended, s.residue, s.shuffleDone, !!s.flags.elenaSecondEyes)
-                  : "The shore is empty except Mabel and Jordan. They are not looking at you. The hiss kept talking."}
+                  : NOT_HELD_SHORE}
               </p>
               {s.weekLog.length > 0 ? (
                 <ul className="mt-3 space-y-1 text-left text-[12px] leading-relaxed text-[#3a2818]" data-testid="week-log-ending">
@@ -1962,7 +2014,7 @@ export function GameApp() {
                   ))}
                 </ul>
               ) : null}
-              <p className="mt-3 text-[11px] text-[#6a4a32]">Teaching model — not a license. Catch greater than heroics.</p>
+              <p className="mt-3 text-[11px] text-[#6a4a32]">Teaching model, not a license.</p>
               <div className="mt-5 flex flex-col gap-2">
                 <button
                   type="button"
@@ -2124,10 +2176,16 @@ export function GameApp() {
               {(peekSave()?.plant ?? s.plant) ? ` and ${plantTitle((peekSave()?.plant ?? s.plant)!)}` : ""}. Culture,
               catches, and the saved shift go with it.
             </p>
-            <p className="mt-2 text-[11px] text-[#6a4a32]">You pick a badge again. Priya's designer is first.</p>
+            <p className="mt-2 text-sm leading-relaxed text-[#3a2818]" data-testid="wipe-crew-note">
+              The crew remembers you: who you've met, what you've been through together, and what they gave you.
+            </p>
+            <p className="mt-2 text-[11px] text-[#6a4a32]">You pick a badge again and design a new core. Priya's designer is first.</p>
             <div className="mt-5 flex flex-col gap-2">
               <button type="button" className="btn-primary" data-testid="wipe-confirm-yes" onClick={() => beginNewWeek(wipeNext)}>
                 New week
+              </button>
+              <button type="button" className="btn-ghost" data-testid="wipe-confirm-strangers" style={{ color: "#16110d", borderColor: "#16110d" }} onClick={() => beginNewWeek(wipeNext, true)}>
+                New week, as a stranger
               </button>
               <button type="button" className="btn-ghost" data-testid="wipe-confirm-no" style={{ color: "#16110d", borderColor: "#16110d" }} onClick={() => setAskWipe(false)}>
                 Keep this week

@@ -229,8 +229,9 @@ export function eodNpcLine(args: {
   return "Holt: You're skilled. That was never the question. The question is whether the floor is safe enough to use it.";
 }
 
+/** Who comes down to the shore after the last shift, and what it feels like. Voice: docs/characters.md. */
 export function shoreLine(ended: "a" | "c" | null, residue: Residue, shuffleDone: boolean, elenaSecondEyes: boolean) {
-  if (ended !== "a") return "The shore is empty except Mabel and Jordan. The hiss kept talking.";
+  if (ended !== "a") return NOT_HELD_SHORE;
   const names = ["Mabel"];
   if (residue.log === "caught") names.push("Holt");
   if (residue.valve === "caught" || elenaSecondEyes) names.push("Elena");
@@ -238,8 +239,14 @@ export function shoreLine(ended: "a" | "c" | null, residue: Residue, shuffleDone
   if (residue.tag === "caught") names.push("Tommy");
   if (residue.dose === "caught") names.push("Marcus");
   if (shuffleDone && !anyHid(residue)) names.push("Priya");
-  return `${names.join(", ")} came to the shore. They turned to look at you.`;
+  const who = names.length === 1 ? names[0] : `${names.slice(0, -1).join(", ")} and ${names[names.length - 1]}`;
+  if (names.length >= 6) return `${who} came down to the shore after shift. Nobody makes a speech. Mabel hands you a cup anyway.`;
+  if (names.length >= 3) return `${who} came down to the shore after shift. Nobody makes a speech. Somebody saved you a spot on the rail.`;
+  return `${who} came down to the shore after shift. It's quiet. You stand with them a while.`;
 }
+
+export const NOT_HELD_SHORE =
+  "Only Mabel and Jordan came down to the shore. Neither of them is looking at you. Some of what went unsaid this week is still out there on the floor.";
 
 /** Yesterday's last catch or hide, for the morning brief. Names the object that is still in the room. */
 export function yesterdayLine(day: number, log: WeekLogEntry[], residue: Residue): string | null {

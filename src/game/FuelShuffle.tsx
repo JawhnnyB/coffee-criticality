@@ -64,6 +64,12 @@ export function FuelShuffle({
           swap. Hold Fq under {FQ_MAX.toFixed(2)} and keep the rim share at {Math.round(RIM_MAX * 100)}% or less:
           burned toward the fence, fresh scattered inside.
         </p>
+        {!practice ? (
+          <p className="mt-2 max-w-xl text-sm leading-relaxed text-[#3a2818]" data-testid="shuffle-plan-note">
+            This small core is where you work out the plan. Once you sign it, the Refuelling Outage on the desk lays the
+            real 193-assembly core out the same way, and runs the cycle to see if your plan holds.
+          </p>
+        ) : null}
         <div className="mt-4 grid gap-4 sm:grid-cols-[1fr_11rem]">
           <div className="grid grid-cols-6 gap-1">
             {grid.map((b, i) => (

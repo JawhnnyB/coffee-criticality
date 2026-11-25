@@ -38,6 +38,8 @@ import { CORE, FIT_REPORT, PRESET_FIT } from "./outage/calibration";
 import { freshTypes, parseLatticeSet, type LatticeSet } from "./outage/lattice";
 import { presetSet } from "./outage/preset";
 import { PRESET_EOC1 } from "./outage/eoc1";
+import { freshOnRim, fridayLayout } from "./outage/fridayPlan";
+import type { ShuffleCell } from "./plant";
 import { CYCLE1_TUTORIAL, cycle1Batches, cycle1FuelCount } from "./outage/cycle1Lesson";
 
 const FIELD: CSSProperties = { fontFamily: "var(--font-body)", fontSize: "var(--text-body)", color: PAL.ink, lineHeight: 1.5 };
@@ -251,6 +253,49 @@ function DischargePick({ eoc, onConfirm }: { eoc: Core; onConfirm: (ids: number[
   );
 }
 
+/**
+ * The plan you signed on Friday, beside the real core (outage/fridayPlan.ts). One button lays the core out by it;
+ * the cycle run says whether the strategy holds at full scale. Without a Friday plan, it says where to make one.
+ */
+function FridayPlan({ map, draft, onLay, laid, result }: { map: ShuffleCell[] | undefined; draft: Core; onLay: () => void; laid: boolean; result: CycleResult | null }) {
+  const rim = Math.round(freshOnRim(draft) * 100);
+  if (!map || map.length !== 36) {
+    return (
+      <p style={{ ...SMALL, marginTop: 6 }} data-testid="outage-friday-none">
+        Sign the fuel shuffle in the reactor hall on Friday (day 5), and this desk can lay the real core out by your plan.
+      </p>
+    );
+  }
+  const tint: Record<string, string> = { F: PAL.gold, "1": PAL.steel, "2": PAL.steelD };
+  return (
+    <div style={{ display: "flex", gap: 10, alignItems: "flex-start", marginTop: 8, flexWrap: "wrap" }} data-testid="outage-friday">
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(6, 12px)", gap: 1, padding: 3, background: PAL.cream, border: `2px solid ${PAL.steel}` }} aria-label="Friday's signed fuel map">
+        {map.map((c) => (
+          <div key={`${c.i}-${c.j}`} style={{ width: 12, height: 12, background: tint[c.cycle] ?? PAL.steel }} />
+        ))}
+      </div>
+      <div style={{ flex: "1 1 220px", minWidth: 0 }}>
+        <p style={{ ...SMALL, margin: 0 }}>
+          Friday's plan, signed in the hall: burned toward the fence, fresh scattered inside. Lay the real core out the same way, then run the cycle to see whether it holds at full scale.
+        </p>
+        <p style={{ ...SMALL, margin: "4px 0" }} data-testid="outage-friday-rim">
+          Fresh fuel on the outer third right now: {rim}%.
+        </p>
+        <Btn onClick={onLay} testId="outage-friday-lay">
+          Lay out by Friday's plan
+        </Btn>
+        {laid && result ? (
+          <p style={{ ...SMALL, margin: "6px 0 0" }} data-testid="outage-friday-verdict">
+            {result.peak > ASSEMBLY_LIMIT
+              ? `Friday's plan peaks at ${result.peak.toFixed(2)} on the real core, over the ${ASSEMBLY_LIMIT.toFixed(2)} limit. The hall's core is small and forgiving at the edge; a real core loses more there, so the outer fuel has to work harder and the liveliest fuel can't all crowd the middle. Swap orbits until it holds.`
+              : `Friday's plan holds on the real core: peak ${result.peak.toFixed(2)} under the ${ASSEMBLY_LIMIT.toFixed(2)} limit, ${result.efpd.toFixed(0)} days of power.`}
+          </p>
+        ) : null}
+      </div>
+    </div>
+  );
+}
+
 export function OutageApp({ s }: { s: GameState }) {
   const [saved, setSaved] = useState<Saved>(readSaved);
   const set: LatticeSet = saved.useCustom && saved.custom ? saved.custom : PRESET;
@@ -261,6 +306,8 @@ export function OutageApp({ s }: { s: GameState }) {
   const [paste, setPaste] = useState("");
   const [pasteMsg, setPasteMsg] = useState("");
   const [freshPick, setFreshPick] = useState(0);
+  /** The draft on the desk started from Friday's plan (cleared when you go back to the plant's pattern). */
+  const [laidFriday, setLaidFriday] = useState(false);
 
   // End of Cycle 1 as the plant ran it (327.2 EFPD). Precomputed for the preset; worked out here for a player's set.
   const presetEoc1 = useMemo(() => beavrsCycle1().map((a, i) => (a ? { ...a, burnup: PRESET_EOC1[i] } : null)), []);
@@ -413,6 +460,20 @@ export function OutageApp({ s }: { s: GameState }) {
   return (
     <div className="app-pad" style={FIELD} data-testid="app-outage">
       <p style={{ margin: 0, fontSize: "var(--text-body)" }}>Refuelling Outage · Cycle {cycle}</p>
+      {cycle === 2 && !discharging ? (
+        <FridayPlan
+          map={s.plant?.shuffleMap}
+          draft={draft}
+          laid={laidFriday}
+          result={result}
+          onLay={() => {
+            if (busy || !s.plant?.shuffleMap) return;
+            setPick(null);
+            setLaidFriday(true);
+            update({ draft: fridayLayout(draft, s.plant.shuffleMap, set) });
+          }}
+        />
+      ) : null}
 
       {discharging && eoc1 ? (
         <DischargePick
@@ -488,7 +549,7 @@ export function OutageApp({ s }: { s: GameState }) {
           ) : null}
           <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center" }}>
             <Btn primary onClick={run} disabled={busy} testId="outage-run">{busy ? "Running the cycle…" : `Run Cycle ${cycle}`}</Btn>
-            {cycle === 2 && saved.draft ? <Btn onClick={() => update({ draft: null })} testId="outage-reset">Back to the plant's pattern</Btn> : null}
+            {cycle === 2 && saved.draft ? <Btn onClick={() => { setLaidFriday(false); update({ draft: null }); }} testId="outage-reset">Back to the plant's pattern</Btn> : null}
           </div>
           {cycle === 2 && !saved.draft ? <p style={SMALL}>This is the plant's own Cycle 2 loading. Run it as it is, or move fuel first.</p> : null}
           {result ? (

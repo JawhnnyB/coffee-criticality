@@ -1,0 +1,38 @@
+PASS 1280 ending card
+PASS 1280 no old slogan on the ending (THE FLOOR HOLDS)
+PASS 1280 Elena's van at dusk (Dusk on the lot. Elena's van is the only one with the engine running. | Elena: Good week. I mean that. Now the part nobody likes. | Elena: Three days off, then )
+PASS 1280 days off with the crew
+PASS 1280 night 1 opener (Elena: Eighteen hundred. Here's the log. Read it twice, then tell me what it says in your own words. | Elena: Cameras first, then the board.)
+PASS 1280 night 2 opener (Jordan: Radio check from the turbine deck. Loud and clear? Great. I'm your legs tonight. You're my eyes. | Jordan: If a camera looks weird, )
+PASS 1280 night 3 opener (There's a thermos on the watch desk, and a note taped to it. | Mabel: "Night three is the hard one. Your body thinks it's morning. Drink thi)
+PASS 1280 night 4 opener (Holt: Holt. Last night of the rotation. I won't keep you. | Holt: Whatever the board says at six, I want the log honest more than I want it )
+PASS 1280 dawn on the lot
+PASS 1280 new week says the crew remembers
+PASS 1280 a stranger option
+PASS 1280 to the desk (desktop)
+PASS 1280 badge picked, builder open (build)
+PASS 1280 returning week skips the introductions (brief)
+PASS 1280 the crew came back
+PASS 1280 into the plant, week two (play)
+PASS 1280 tommy says welcome back (Look who's back. Your lock's still on my board. Nobody's touched it. | Good to have you back. Honestly. The shop's quiet)
+PASS 1280 jordan says welcome back (Hey! You came back. I told Mabel you would. She said she already knew. | Caught anything yet?)
+PASS 1280 no page errors
+PASS 390 ending card
+PASS 390 no old slogan on the ending (THE FLOOR HOLDS)
+PASS 390 Elena's van at dusk (Dusk on the lot. Elena's van is the only one with the engine running. | Elena: Good week. I mean that. Now the part nobody likes. | Elena: Three days off, then )
+PASS 390 days off with the crew
+PASS 390 night 1 opener (Elena: Eighteen hundred. Here's the log. Read it twice, then tell me what it says in your own words. | Elena: Cameras first, then the board.)
+PASS 390 night 2 opener (Jordan: Radio check from the turbine deck. Loud and clear? Great. I'm your legs tonight. You're my eyes. | Jordan: If a camera looks weird, )
+PASS 390 night 3 opener (There's a thermos on the watch desk, and a note taped to it. | Mabel: "Night three is the hard one. Your body thinks it's morning. Drink thi)
+PASS 390 night 4 opener (Holt: Holt. Last night of the rotation. I won't keep you. | Holt: Whatever the board says at six, I want the log honest more than I want it )
+PASS 390 dawn on the lot
+PASS 390 new week says the crew remembers
+PASS 390 a stranger option
+PASS 390 to the desk (desktop)
+PASS 390 badge picked, builder open (build)
+PASS 390 returning week skips the introductions (brief)
+PASS 390 the crew came back
+PASS 390 into the plant, week two (play)
+PASS 390 tommy says welcome back (Look who's back. Your lock's still on my board. Nobody's touched it. | Good to have you back. Honestly. The shop's quiet)
+PASS 390 jordan says welcome back (Hey! You came back. I told Mabel you would. She said she already knew. | Caught anything yet?)
+PASS 390 no page errors

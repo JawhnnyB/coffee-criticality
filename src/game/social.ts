@@ -9,6 +9,7 @@
  *
  * Every line of scene text is in socialScenes.ts, drafted by Claude and listed for owner approval.
  */
+import { RETURNING_FLAG } from "./crewCarry";
 import { NPCS, type Line, type NpcId } from "./content";
 import { SCENES, type Scene } from "./socialScenes";
 import { A_ROTATION_NPC, A_ROTATION_SCENE, readCrew, takeARotationScene } from "./nightwatch/crewUnlock";
@@ -33,8 +34,10 @@ export function socialTier(trust: number, start: number, day: number): Tier {
   return t;
 }
 
-export function tierOf(s: { trust: Record<NpcId, number>; day: number }, npc: NpcId): Tier {
-  return socialTier(s.trust[npc] ?? NPCS[npc].startTrust, NPCS[npc].startTrust, s.day);
+export function tierOf(s: { trust: Record<NpcId, number>; day: number; flags?: Record<string, boolean> }, npc: NpcId): Tier {
+  // A returning week: they already know you. The day gates were for strangers, so they no longer hold you back.
+  const day = s.flags?.[RETURNING_FLAG] ? 5 : s.day;
+  return socialTier(s.trust[npc] ?? NPCS[npc].startTrust, NPCS[npc].startTrust, day);
 }
 
 const seenKey = (npc: NpcId, n: number) => `social:${npc}:${n}`;

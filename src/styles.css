@@ -683,6 +683,51 @@
   }
 }
 
+/*
+ * Moving between parts of the game (25 November 2026). Scene lines arrive one by one; paper cards ease in; the
+ * plant shrinks into its taskbar tab when you step out to the desk, and grows back out of it when you return.
+ * Settings > Reduced motion and the system setting both turn all of it off.
+ */
+@keyframes cc-line-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes cc-paper-in {
+  from { opacity: 0; transform: translateY(12px) scale(0.985); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes cc-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes cc-plant-out {
+  to { opacity: 0; transform: scale(0.1); }
+}
+@keyframes cc-plant-in {
+  from { opacity: 0; transform: scale(0.1); }
+  to { opacity: 1; transform: none; }
+}
+.cc-paper-in { animation: cc-paper-in 0.35s ease-out both; }
+.cc-fade-in { animation: cc-fade-in 0.25s ease-out both; }
+.cc-plant-out { animation: cc-plant-out 0.22s ease-in both; transform-origin: 90px 100%; }
+.cc-plant-in { animation: cc-plant-in 0.3s ease-out both; transform-origin: 90px 100%; }
+.cc-calm .cc-paper-in,
+.cc-calm .cc-fade-in,
+.cc-calm .cc-plant-in,
+.cc-calm .cc-plant-out,
+.cc-calm [data-testid="scene-line"] {
+  animation: none !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  .cc-paper-in,
+  .cc-fade-in,
+  .cc-plant-in,
+  .cc-plant-out,
+  [data-testid="scene-line"] {
+    animation: none !important;
+  }
+}
+
 /* Teaching desk — builder + Academy share this grid. 12 col / 16px gutter. */
 .teach-grid {
   display: grid;

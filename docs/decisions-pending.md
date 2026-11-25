@@ -159,3 +159,13 @@ The owner asked for a progressing social environment, progressing mini games, an
 - Still in the old voice because `sim.ts` is frozen: Mabel's three-hides line and Tommy's lockout result line.
 
 Decision: approve as written, or mark lines to change. This also counts toward the Steam AI disclosure (AI-drafted dialogue), like the crew moments.
+
+## Tying the game together (needs the owner)
+
+25 November 2026, Claude. The owner asked for all five cohesion fixes. Every new line: `docs/cohesion-draft.md`. Checks: `docs/audit/2026-11-25-cohesion/`.
+
+1. **The crew remembers you.** A new week keeps trust, who you've met, scenes, moments, gifts and outage progress (`crewCarry.ts`, in the machine profile). "New week, as a stranger" starts fresh. A returning week skips the introductions and the trust day-gates. Decision: is keeping full trust right, or should it cool a little over the days off?
+2. **The move to nights is scenes:** Elena's van, the days off with a text from Jordan or Mabel, and each night opened by a different person (Elena, Jordan, Mabel's thermos, Holt's call).
+3. **The reloads are linked:** signing Friday's shuffle opens the outage, and the outage can lay the real core out by Friday's plan. Decision: the faithful translation busts the real core's limit (about 2.3 against 1.37). Kept as the lesson. Alternative: tune the translation so it lands near the limit.
+4. **Transitions:** the plant shrinks into its taskbar tab and grows back; cards and the desk ease in; reduced motion turns it off.
+5. **Narration rewritten** on the ending, end-of-day footer, shore and dawn. `sim.ts` lines and the title tagline unchanged.
