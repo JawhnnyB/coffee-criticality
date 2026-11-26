@@ -6,6 +6,7 @@
  * Card text uses divs: the cabinet screen colours every <p> cream for its dark glass, which vanishes on a light card.
  */
 import { useState } from "react";
+import { plantOf, plantText } from "./coltVoice";
 import { NO_TOY_FOR_HOLT, TOYS, buyToy, readJar, toyState, writeJar, type Jar } from "./parlorPrizes";
 import { SPEAKER } from "./floorTalks";
 
@@ -54,7 +55,7 @@ export function PrizeShelf({ flags, onBought }: { flags: Record<string, boolean>
         })}
       </div>
       <p className="mt-1 text-[10px] text-[#b5a48c]" data-testid="toy-holt">
-        Holt · Mabel: &ldquo;{NO_TOY_FOR_HOLT}&rdquo;
+        {plantOf(flags) === "colt" ? "Colt" : "Holt"} · Mabel: &ldquo;{plantText(NO_TOY_FOR_HOLT, plantOf(flags))}&rdquo;
       </p>
     </section>
   );

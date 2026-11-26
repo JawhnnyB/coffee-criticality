@@ -59,7 +59,7 @@ import { NuclearDesk } from "./NuclearDesk";
 import { anatomyLines, hallBlurb, siteLine } from "./siteText";
 import { LoopSchematic } from "./LoopSchematic";
 import { readFace } from "./siteFace";
-import { DEPARTMENTS, dayDef, eodNpcLine, incidentOwner, NOT_HELD_SHORE, shoreLine, yesterdayLine } from "./week";
+import { DEPARTMENTS, dayDef, eodNpcLine, incidentOwner, NOT_HELD_SHORE, setWeekContext, shoreLine, yesterdayLine } from "./week";
 import { DEFAULT_PLAYER_LOOK, type PlayerLook } from "./artSpec";
 import { MAP_HUD, ROOM_BLURB, roomLinks } from "./site";
 import { TeachMeta, TeachPriya, TYPE_THUMB } from "./TeachFrame";
@@ -128,6 +128,30 @@ import { PrizeShelf } from "./PrizeShelf";
 import { readJar, tokensForRun, writeJar } from "./parlorPrizes";
 import { CULTURE_INFO, cultureAxes, cultureOf } from "./floorCulture";
 import { RETURNING_FLAG, applyCrew, readCarry, snapshotCrew, writeCarry } from "./crewCarry";
+import {
+  PLANTS,
+  advanceWeek,
+  choosePlant,
+  contextOf,
+  cycleWeek,
+  decideWeek,
+  fluxFriday,
+  fuelLine,
+  isOutageWeek,
+  readCampaign,
+  runOf,
+  stampShift,
+  transferTo,
+  verdictCard,
+  weekOf,
+  weekText,
+  writeCampaign,
+  STANDDOWN_FLAG,
+  type Campaign,
+  type PlantId,
+  type Verdict,
+} from "./campaign";
+import { coltDeskNote, coltDialogue, plantOf, plantSpeaker, plantText } from "./coltVoice";
 import { barShown } from "./barRules";
 import type { AppId } from "./parlorOS";
 
@@ -297,6 +321,9 @@ export function GameApp() {
   const [ready, setReady] = useState(false);
   const [touch, setTouch] = useState(false);
   const [saved, setSaved] = useState(false);
+  /** The long game (campaign.ts): which plant, which week, stand-downs. Machine profile, not the shift save. */
+  const [camp, setCamp] = useState<Campaign>(() => readCampaign());
+  const [verdict, setVerdict] = useState<Verdict | null>(null);
   /** The plant shrinking into its taskbar tab on the way out, or growing back out of it on return. */
   const [plantAnim, setPlantAnim] = useState<"out" | "in" | null>(null);
   const leavingRef = useRef(false);
@@ -884,6 +911,14 @@ export function GameApp() {
           s.flags[`social:met:${npc}`] = true;
           addScene(s, first);
         }
+        // At Colt's plant, Holt's lines are Colt's (coltVoice.ts); on a Flux map Friday, "outage" talk reads as
+        // the end of the week (campaign.ts). Copies: the content arrays are shared.
+        const ctx = contextOf(s.flags);
+        if (ctx.plant === "colt" || fluxFriday(ctx.week)) {
+          const voiced = ctx.plant === "colt" ? coltDialogue(s.dialogue) : s.dialogue.map((l) => ({ ...l }));
+          s.dialogue = voiced.map((l) => ({ ...l, text: weekText(l.text, ctx) }));
+          talkRef.current.dialogue = s.dialogue;
+        }
       }
       // Someone moved up a tier: say so once.
       talkRef.current.acc += dt;
@@ -995,7 +1030,25 @@ export function GameApp() {
     if (mode === "splash" || mode === "menu") setSaved(hasSave());
   }, [mode]);
 
+  // The week's verdict (campaign.ts), decided once when its ending is shown: held, stand-down, lifted, transfer,
+  // Colt's regroup, or the week-10 finale.
+  useEffect(() => {
+    if (mode !== "ending") return;
+    const st = stateRef.current;
+    const fear = cultureOf(st) === "fear";
+    const r = decideWeek(readCampaign(), st.flags, fear);
+    writeCampaign(r.c);
+    setCamp(r.c);
+    setVerdict(r.verdict);
+  }, [mode]);
+
   const s = stateRef.current;
+  // Which week and plant the shift is in. sim.ts reads its days through dayDef, so this keeps them in step.
+  const ctxNow = contextOf(s.flags);
+  setWeekContext(ctxNow);
+  const plantNow: PlantId = s.role ? plantOf(s.flags) : camp.plant;
+  /** A line as it reads at this plant, this week. */
+  const say = (t: string) => weekText(plantText(t, plantNow), ctxNow);
   const stage = cultureStage(s.culture);
   const playing = PLAY_MODES.includes(mode);
   const line = s.dialogue[s.dialogueI] as Line | undefined;
@@ -1047,8 +1100,12 @@ export function GameApp() {
     unlockAudio();
     playBlip("ok");
     playBed("cafe");
+    const c = readCampaign();
+    const run = runOf(c);
+    setWeekContext({ week: run.week, plant: c.plant, standDown: c.plant === "holt" && run.standDown });
     startShift(s, id, look);
-    applyCrew(s, readCarry());
+    stampShift(s.flags, c);
+    applyCrew(s, readCarry(c.plant));
     setSaved(false);
     setAskWipe(false);
     applyMode("build");
@@ -1058,7 +1115,14 @@ export function GameApp() {
   /** A new week discards the saved shift. The setup and the desktop settings stay. */
   const beginNewWeek = (next: WipeNext, strangers = false) => {
     // The crew remembers the week being thrown away (crewCarry.ts), unless the player asked to start as a stranger.
-    writeCarry(strangers ? null : snapshotCrew(s.role ? s : (peekSave() ?? s), readCarry()));
+    const was = s.role ? s : (peekSave() ?? s);
+    const wasPlant = plantOf(was.flags);
+    writeCarry(strangers ? null : snapshotCrew(was, readCarry(wasPlant)), wasPlant);
+    // The campaign moves on if the week reached its ending; a week abandoned part-way replays.
+    const nextCamp = advanceWeek(readCampaign());
+    writeCampaign(nextCamp);
+    setCamp(nextCamp);
+    setVerdict(null);
     wipeSave();
     resetShift(s);
     setSaved(false);
@@ -1075,6 +1139,36 @@ export function GameApp() {
       applyMode("desktop");
     }
     refresh();
+  };
+
+  /**
+   * The transfer ending (campaign.ts): leave Holt's plant for Colt's. Colt's crew don't know you, and Holt's plant
+   * starts over if you ever go back. No wipe question: the player already chose this on the ending card.
+   */
+  const startAtColt = () => {
+    const c = transferTo(readCampaign());
+    writeCampaign(c);
+    setCamp(c);
+    setVerdict(null);
+    writeCarry(null, "holt");
+    writeCarry(null, "colt");
+    wipeSave();
+    resetShift(s);
+    setSaved(false);
+    setAskWipe(false);
+    unlockAudio();
+    playBlip("ok");
+    playBed("menu");
+    applyMode("role");
+    refresh();
+  };
+
+  /** Pick a plant from the title screen. Each keeps its own week and its own crew memory. */
+  const pickPlant = (plant: PlantId) => {
+    const c = choosePlant(readCampaign(), plant);
+    writeCampaign(c);
+    setCamp(c);
+    playBlip("ok");
   };
 
   /** Start shift from the desktop. A running shift asks first, the same way Begin does. */
@@ -1353,10 +1447,29 @@ export function GameApp() {
           <FuelShuffle
             plant={s.plant ?? DEFAULT_PLANT}
             practice={s.returnMode === "academy" || s.day < 5 || !!s.flags.cabPractice}
+            review={
+              // Flux map Friday (campaign.ts): weeks without an outage measure the core you signed last time.
+              s.returnMode !== "academy" && s.day >= 5 && !s.flags.cabPractice && fluxFriday(weekOf(s.flags))
+                ? {
+                    map: runOf(camp, plantOf(s.flags)).lastMap,
+                    where: runOf(camp, plantOf(s.flags)).lastMap ? `${cycleWeek(weekOf(s.flags)).label}` : "the starting core",
+                  }
+                : undefined
+            }
             onDone={(fq, map) => {
+              const wasDone = s.shuffleDone;
               finishShuffle(s, fq, map);
-              // Signing Friday's plan hands you the outage that carries it out (outage/fridayPlan.ts).
-              if (s.shuffleDone) s.flags.outageOpen = true;
+              const week = weekOf(s.flags);
+              if (s.shuffleDone && !wasDone && !fluxFriday(week)) {
+                // Signing an outage's plan hands you the outage that carries it out (outage/fridayPlan.ts), and
+                // it's the core every Flux map Friday measures until the next one.
+                s.flags.outageOpen = true;
+                const c0 = readCampaign();
+                const pl = plantOf(s.flags);
+                const c1 = pl === "colt" ? { ...c0, colt: { ...c0.colt, lastMap: map } } : { ...c0, holt: { ...c0.holt, lastMap: map } };
+                writeCampaign(c1);
+                setCamp(c1);
+              }
               applyMode(s.mode);
               playBlip("ok");
               refresh();
@@ -1554,8 +1667,8 @@ export function GameApp() {
             time={s.timeLabel}
             period={s.period}
             dusk={!!s.flags.endingWalk}
-            toast={s.toastT > 0 ? s.toast : ""}
-            objective={s.objective}
+            toast={s.toastT > 0 ? say(s.toast) : ""}
+            objective={say(s.objective)}
             day={s.day}
             coach={coachLine({
               day: s.day,
@@ -1610,6 +1723,7 @@ export function GameApp() {
             }}
             onHow={() => goMenu("how")}
             onCredits={() => goMenu("credits")}
+            plantPick={<PlantPick plant={camp.plant} week={runOf(camp).week} standDown={camp.plant === "holt" && runOf(camp).standDown} onPick={pickPlant} dark />}
           />
         )}
 
@@ -1644,6 +1758,7 @@ export function GameApp() {
             </p>
             <p className="mt-2 text-xs text-subtle" data-testid="game-version">{GAME_VERSION}</p>
             <div className="mt-6 flex w-full max-w-xs flex-col gap-2">
+              <PlantPick plant={camp.plant} week={runOf(camp).week} standDown={camp.plant === "holt" && runOf(camp).standDown} onPick={pickPlant} />
               {saved ? (
                 <>
                 <button
@@ -1805,12 +1920,13 @@ export function GameApp() {
           />
         )}
 
+        {mode === "brief" && <WeekStrip s={s} />}
         {mode === "brief" && (
           <PixelBrief
             day={s.day || 1}
-            kicker={dayDef(s.day || 1).kicker}
+            kicker={say(dayDef(s.day || 1).kicker)}
             title={dayDef(s.day || 1).title}
-            holt={dayDef(s.day || 1).holt}
+            holt={say(dayDef(s.day || 1).holt)}
             items={dayDef(s.day || 1).items}
             yesterday={yesterdayLine(s.day || 1, s.weekLog, s.residue)}
             onWalk={() => {
@@ -1825,8 +1941,8 @@ export function GameApp() {
             line={line}
             npc={speakerNpc(line.speaker) ?? s.talkNpc}
             role={(speakerNpc(line.speaker) ?? s.talkNpc) ? NPCS[(speakerNpc(line.speaker) ?? s.talkNpc)!].role : ""}
-            beat={s.talkNpc && (speakerNpc(line.speaker) ?? s.talkNpc) === s.talkNpc ? NPC_INTRO[s.talkNpc].beat : undefined}
-            who={s.talkNpc && s.dialogueI === 0 && line.speaker ? NPC_INTRO[s.talkNpc].who : undefined}
+            beat={s.talkNpc && (speakerNpc(line.speaker) ?? s.talkNpc) === s.talkNpc ? say(NPC_INTRO[s.talkNpc].beat) : undefined}
+            who={s.talkNpc && s.dialogueI === 0 && line.speaker ? say(NPC_INTRO[s.talkNpc].who) : undefined}
             time={s.timeLabel}
             room={ROOMS[s.room].name}
             hearts={s.talkNpc ? heartCount(s.trust[s.talkNpc]) : 0}
@@ -1938,7 +2054,7 @@ export function GameApp() {
               </p>
               {s.plant ? <p className="mt-2 font-mono text-xs text-[#3d5c44]">{plantTitle(s.plant)}</p> : null}
               <p className="mt-2 text-sm leading-relaxed text-[#6a4a32]">
-                {eodNpcLine({ hides: s.hides, ended: s.ended, flags: s.flags })}
+                {say(eodNpcLine({ hides: s.hides, ended: s.ended, flags: s.flags }))}
               </p>
               <p className="mt-2 text-sm leading-relaxed text-[#3a2818]" data-testid="eod-culture">
                 The floor today: <strong>{CULTURE_INFO[cultureOf(s)].name}</strong>. {CULTURE_INFO[cultureOf(s)].line}
@@ -2012,7 +2128,7 @@ export function GameApp() {
               <h2 className="font-display mt-2 text-3xl">{s.ended === "a" ? "The floor holds" : "The week didn't hold"}</h2>
               <p className="mt-3 text-sm leading-relaxed">
                 {s.ended === "a"
-                  ? shoreLine(s.ended, s.residue, s.shuffleDone, !!s.flags.elenaSecondEyes)
+                  ? say(shoreLine(s.ended, s.residue, s.shuffleDone, !!s.flags.elenaSecondEyes))
                   : NOT_HELD_SHORE}
               </p>
               {s.weekLog.length > 0 ? (
@@ -2023,7 +2139,14 @@ export function GameApp() {
                 </ul>
               ) : null}
               <p className="mt-3 text-[11px] text-[#6a4a32]">Teaching model, not a license.</p>
+              {verdict && weekOf(s.flags) >= 1 ? <VerdictBlock verdict={verdict} week={weekOf(s.flags)} plant={plantNow} /> : null}
               <div className="mt-5 flex flex-col gap-2">
+                {verdict === "transfer" ? (
+                  <button type="button" className="paper-btn-primary" style={{ minHeight: 44 }} data-testid="transfer-colt" onClick={startAtColt}>
+                    {verdictCard("transfer", weekOf(s.flags), plantNow).next}
+                  </button>
+                ) : null}
+                {verdict === "transfer" ? null : (
                 <button
                   type="button"
                   className="paper-btn-primary"
@@ -2045,6 +2168,8 @@ export function GameApp() {
                 >
                   Rotate to nights
                 </button>
+                )}
+                {verdict === "transfer" ? null : (
                 <button
                   type="button"
                   className="paper-btn-primary"
@@ -2054,8 +2179,9 @@ export function GameApp() {
                     setAskWipe(true);
                   }}
                 >
-                  New week
+                  {verdict && weekOf(s.flags) >= 1 ? verdictCard(verdict, weekOf(s.flags), plantNow).next : "New week"}
                 </button>
+                )}
                 <button
                   type="button"
                   className="paper-btn"
@@ -2224,6 +2350,96 @@ function paperMood(mood?: Line["mood"]) {
 /**
  * The floor's culture (floorCulture.ts): which one, what it means, and which way your choices are pulling it.
  */
+/** Holt's plant or Colt's, on the title screen. A saved shift keeps its own plant; this picks the next new one. */
+function PlantPick({ plant, week, standDown, onPick, dark = false }: { plant: PlantId; week: number; standDown: boolean; onPick: (p: PlantId) => void; dark?: boolean }) {
+  const ink = dark ? "#f3e6d0" : undefined;
+  const chosen = PLANTS.find((p) => p.id === plant) ?? PLANTS[0];
+  return (
+    <div data-testid="plant-pick" role="radiogroup" aria-label="Which plant">
+      <div className="grid grid-cols-2 gap-2">
+        {PLANTS.map((p) => (
+          <button
+            key={p.id}
+            type="button"
+            role="radio"
+            aria-checked={plant === p.id}
+            data-testid={`plant-${p.id}`}
+            className={plant === p.id ? "btn-primary" : "btn-ghost"}
+            style={{ minHeight: 44 }}
+            onClick={() => onPick(p.id)}
+          >
+            {p.title}
+          </button>
+        ))}
+      </div>
+      <div className="mt-1 text-[12px] leading-snug" style={{ color: ink }} data-testid="plant-line">
+        {chosen.line} Week {week} of 10{standDown ? ", stand-down" : ""}.
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Above the morning brief: where this week sits in the fuel cycle (campaign.ts), how much of the core is still the
+ * starting fuel, a stand-down notice, and at Colt's plant whatever he left on your desk.
+ */
+function WeekStrip({ s }: { s: GameState }) {
+  const week = weekOf(s.flags);
+  const [open, setOpen] = useState(false);
+  if (week < 1) return null;
+  const cw = cycleWeek(week);
+  const colt = plantOf(s.flags) === "colt";
+  const standDown = !!s.flags[STANDDOWN_FLAG];
+  return (
+    <div className="absolute inset-x-0 top-0 z-40 flex justify-center px-2 pt-2" data-testid="week-strip">
+      <button
+        type="button"
+        className="paper w-full max-w-xl px-3 py-2 text-left"
+        style={{ minHeight: 44 }}
+        aria-expanded={open}
+        onClick={() => setOpen((o) => !o)}
+      >
+        <div className="font-mono text-[10px] tracking-widest text-[#6a4a32]">
+          {cw.label}
+          {standDown ? " · STAND-DOWN" : ""}
+          {colt ? " · Colt's plant" : ""}
+        </div>
+        <div className="mt-1 text-[12px] leading-snug text-[#3a2818]" data-testid="week-strip-line">
+          {colt && s.day >= 1 ? coltDeskNote(s.day) : standDown ? "Work stops until people talk. Say the small things this week, out loud, to the person." : cw.line.split(". ")[0] + "."}
+        </div>
+        {open ? (
+          <div className="mt-1 space-y-1 text-[12px] leading-snug text-[#3a2818]" data-testid="week-strip-more">
+            <div>{cw.line}</div>
+            <div>{fuelLine(week)}</div>
+            <div className="font-mono text-[10px] text-[#6a4a32]">
+              Boron ≈ {cw.boronPpm} ppm · ≈ {cw.efpd} EFPD · MTC ≈ {cw.mtcPcmPerF} pcm/°F · {cw.outageFriday ? "Friday: refuelling outage" : "Friday: flux map"}
+            </div>
+            <div className="text-[10px] text-[#6a4a32]">Teaching numbers, typical of a large PWR. Not any real plant&apos;s.</div>
+          </div>
+        ) : (
+          <div className="font-mono text-[10px] text-[#6a4a32]">Tap for the cycle</div>
+        )}
+      </button>
+    </div>
+  );
+}
+
+/** The week's verdict on the ending card: stand-down, lifted, transfer, Colt's regroup or the finale. */
+function VerdictBlock({ verdict, week, plant }: { verdict: Verdict; week: number; plant: PlantId }) {
+  const card = verdictCard(verdict, week, plant);
+  if (!card.title) return null;
+  return (
+    <div className="mt-4 border-t-2 border-[#16110d] pt-3" data-testid={`verdict-${verdict}`}>
+      <div className="font-display text-2xl">{card.title}</div>
+      <div className="mt-2 space-y-2 text-sm leading-relaxed">
+        {card.body.map((b) => (
+          <div key={b}>{b}</div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function FloorCultureCard({ s }: { s: GameState }) {
   const c = cultureOf(s);
   const { trust, candor } = cultureAxes(s);
@@ -2243,6 +2459,7 @@ function FloorCultureCard({ s }: { s: GameState }) {
 /** Whose face goes with a line: an overheard exchange (floorTalks.ts) has more than one speaker. */
 function speakerNpc(speaker: string): NpcId | null {
   const id = speaker.toLowerCase();
+  if (id === "colt") return "holt"; // Colt's plant: the same chair, the same portrait for now.
   return id in NPCS ? (id as NpcId) : null;
 }
 
@@ -2321,7 +2538,7 @@ function DialogueStage({
           <Chatter
             key={`${line.speaker}-${line.text}`}
             text={line.text}
-            voice={line.speaker}
+            voice={line.speaker === "Colt" ? "Holt" : line.speaker}
             className="dialogue-line mt-2 font-display text-base leading-relaxed"
           />
           {pendingChoices.length > 0 ? (
@@ -3073,6 +3290,7 @@ function PauseStage({
   const [help, setHelp] = useState(false);
   const here = npcsHere(s);
   const ties = floorTies(s.residue, s.flags);
+  const pv = (t: string) => plantText(t, plantOf(s.flags));
   const k = s.plant ? computeKeff(s.plant) : null;
   const visited = !!s.flags[`seen:${focus}`];
   return (
@@ -3138,23 +3356,23 @@ function PauseStage({
                   <div className="flex items-center gap-2">
                     <CastFace id={id} zoom={1} />
                     <div>
-                    <div className="text-sm text-fg">{NPCS[id].name}</div>
+                    <div className="text-sm text-fg">{pv(NPCS[id].name)}</div>
                     <div className="text-[11px] text-subtle">
                       {NPCS[id].role} · {met ? trustState(s.trust[id]) : "Not introduced"}
                     </div>
-                    {met ? <div className="text-[11px] text-muted">{relationLine(id, s.flags, s.trust[id])}</div> : null}
+                    {met ? <div className="text-[11px] text-muted">{pv(relationLine(id, s.flags, s.trust[id]))}</div> : null}
                     {met ? (
                       <div className="mt-0.5 text-[11px]" data-testid={`crew-${id}`}>
                         <span className="font-mono tracking-wide text-fg">{TIER_NAME[tierOf(s, id)]}</span>
                         <span className="text-subtle"> · {nextHint(s, id)}</span>
                         <ul className="mt-0.5 space-y-0.5 text-muted">
                           {knownAbout(s, id).slice(1).map((k) => (
-                            <li key={k}>· {k}</li>
+                            <li key={k}>· {pv(k)}</li>
                           ))}
                         </ul>
                       </div>
                     ) : null}
-                    <div className="text-[11px] text-[#b5a48c]">{met ? NPC_INTRO[id].who : NPC_INTRO[id].beat}</div>
+                    <div className="text-[11px] text-[#b5a48c]">{pv(met ? NPC_INTRO[id].who : NPC_INTRO[id].beat)}</div>
                     </div>
                   </div>
                   {met ? <HeartRow n={heartCount(s.trust[id])} /> : <span className="text-[11px] text-subtle">—</span>}
@@ -3168,8 +3386,8 @@ function PauseStage({
             <ul className="mt-3 space-y-1" data-testid="floor-ties">
               {ties.map((t) => (
                 <li key={t.pair} className="border border-border bg-surface px-2 py-1.5 text-[11px]">
-                  <div className="font-mono tracking-wide text-fg">{t.pair}</div>
-                  <div className="text-muted">{t.line}</div>
+                  <div className="font-mono tracking-wide text-fg">{pv(t.pair)}</div>
+                  <div className="text-muted">{pv(t.line)}</div>
                 </li>
               ))}
             </ul>

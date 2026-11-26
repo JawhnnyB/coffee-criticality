@@ -44,6 +44,7 @@ export function PixelMenu({
   onContinue,
   onHow,
   onCredits,
+  plantPick,
 }: {
   saved: boolean;
   saveNote: string;
@@ -51,6 +52,8 @@ export function PixelMenu({
   onContinue: () => void;
   onHow: () => void;
   onCredits: () => void;
+  /** Holt's plant or Colt's (campaign.ts), above New shift. */
+  plantPick?: ReactNode;
 }) {
   const host = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -183,6 +186,7 @@ export function PixelMenu({
               }
         }
       >
+        {plantPick}
         <button type="button" data-testid="new-shift" className="btn-primary" onClick={() => activate(0)}>
           {UI.menuBegin}
         </button>

@@ -1,5 +1,6 @@
 import type { NpcId, NpcSlot, Residue } from "./content";
 import { anyHid } from "./content";
+import { dayVariant, type WeekContext } from "./campaign";
 
 export interface DayDef {
   n: number;
@@ -191,8 +192,23 @@ export const DEPARTMENTS: { id: string; label: string; members: NpcId[] }[] = [
   { id: "floor", label: "Floor / Cafe", members: ["mabel", "jordan"] },
 ];
 
+/**
+ * Which week of the campaign is on screen (campaign.ts). The game sets it from the shift's flags; sim.ts reads days
+ * through dayDef, so a Flux map Friday or a stand-down reads the same everywhere. The default is week 0 at Holt's
+ * plant, which is exactly the original week.
+ */
+let weekCtx: WeekContext = { week: 0, plant: "holt", standDown: false };
+
+export function setWeekContext(ctx: WeekContext) {
+  weekCtx = ctx;
+}
+
+export function weekContext(): WeekContext {
+  return weekCtx;
+}
+
 export function dayDef(n: number) {
-  return WEEK[Math.max(0, Math.min(WEEK.length - 1, n - 1))];
+  return dayVariant(WEEK[Math.max(0, Math.min(WEEK.length - 1, n - 1))], weekCtx);
 }
 
 export function incidentOwner(kind: DayDef["incident"]): NpcId {

@@ -56,6 +56,7 @@ import { elenaLine, oddityNotes, recordNight, turnoverRows } from "./nightwatch/
 import { daysOffScene, openerScene, vanScene, type RotationScene, type WeekMood } from "./nightwatch/rotationScenes";
 import { NPCS } from "./content";
 import { RETURNING_FLAG } from "./crewCarry";
+import { plantOf, plantScene, plantSpeaker } from "./coltVoice";
 
 const SITE_LABEL = { pwr: "PWR", bwr: "BWR", pebble: "Pebble bed", msr: "Salt" } as const;
 
@@ -751,7 +752,8 @@ function bestLetter(flags: Record<string, boolean>, night: number): string {
  * One moment in the rotation: where and when, a face, lines that arrive one after another, then what you do next.
  * The buttons are there from the start, so nobody waits on the words; reduced motion shows every line at once.
  */
-function SceneCard({ scene, testId, children, calm }: { scene: RotationScene; testId: string; children: ReactNode; calm: boolean }) {
+function SceneCard({ scene: raw, testId, children, calm, plant = "holt" }: { scene: RotationScene; testId: string; children: ReactNode; calm: boolean; plant?: "holt" | "colt" }) {
+  const scene = plantScene(raw, plant);
   const face = scene.face ? NPCS[scene.face].portrait.src.replace("-smile", "-talk") : null;
   return (
     <div className="paper mx-auto w-full p-4 sm:p-5" style={CARD} data-testid={testId}>
@@ -759,7 +761,7 @@ function SceneCard({ scene, testId, children, calm }: { scene: RotationScene; te
         {face ? (
           <img
             src={face}
-            alt={NPCS[scene.face!].name}
+            alt={plantSpeaker(NPCS[scene.face!].name, plant)}
             width={72}
             height={72}
             style={{ width: 72, height: 72, imageRendering: "pixelated", border: "2px solid #16110d", background: "#e9dcc3", flexShrink: 0 }}
@@ -778,7 +780,7 @@ function SceneCard({ scene, testId, children, calm }: { scene: RotationScene; te
             data-testid="scene-line"
             style={{ animation: calm ? undefined : `cc-line-in 0.45s ease-out ${0.15 + i * 0.55}s both`, fontStyle: l.who ? undefined : "italic" }}
           >
-            {l.who ? <strong>{l.who[0].toUpperCase() + l.who.slice(1)}: </strong> : null}
+            {l.who ? <strong>{plantSpeaker(l.who[0].toUpperCase() + l.who.slice(1), plant)}: </strong> : null}
             {l.text}
           </p>
         ))}
@@ -866,10 +868,10 @@ export function NightRotation({ s, onNewWeek, onMenu }: { s: GameState; onNewWee
     <div className="absolute inset-0 z-40 flex items-end justify-center overflow-y-auto overflow-x-hidden bg-bg/55 p-3 pb-28 sm:items-center sm:p-6">
       {phase === "off" ? (
         <div className="mx-auto w-full space-y-3" style={{ maxWidth: 560 }} data-testid="days-off">
-          <SceneCard scene={vanScene(mood)} testId="van-scene" calm={calm}>
+          <SceneCard scene={vanScene(mood)} testId="van-scene" calm={calm} plant={plantOf(s.flags)}>
             {null}
           </SceneCard>
-          <SceneCard scene={daysOffScene(mood)} testId="days-off-scene" calm={calm}>
+          <SceneCard scene={daysOffScene(mood)} testId="days-off-scene" calm={calm} plant={plantOf(s.flags)}>
             <p className="mt-3 text-[11px] text-[#6a4a32]">Teaching model only. The three days off are a story beat, not a work-hour rule. This game does not say how long a real watch may be.</p>
             <button
               type="button"
@@ -889,7 +891,7 @@ export function NightRotation({ s, onNewWeek, onMenu }: { s: GameState; onNewWee
       ) : null}
       {phase === "opener" ? (
         <div className="mx-auto w-full" style={{ maxWidth: 560 }} data-testid="night-opener">
-          <SceneCard scene={openerScene(next, again, mood)} testId={`opener-${next}`} calm={calm}>
+          <SceneCard scene={openerScene(next, again, mood)} testId={`opener-${next}`} calm={calm} plant={plantOf(s.flags)}>
             <button type="button" className="paper-btn-primary mt-5 w-full" style={{ minHeight: 44 }} data-testid="start-night" onClick={() => { writeSave(s, true); setPhase("shift"); }}>
               Take the watch
             </button>

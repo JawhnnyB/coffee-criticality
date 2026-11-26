@@ -92,14 +92,15 @@ function valid(o: unknown): CrewCarry | null {
   return { week: c.week, trust: c.trust, flags: c.flags.filter((f): f is string => typeof f === "string") };
 }
 
-export function readCarry(): CrewCarry | null {
+/** Each plant has its own crew memory: Colt's people have never met the you that Holt's people know. */
+export function readCarry(plant: "holt" | "colt" = "holt"): CrewCarry | null {
   try {
-    return valid((profileGet("carry") as unknown) ?? null);
+    return valid((profileGet(plant === "colt" ? "carryColt" : "carry") as unknown) ?? null);
   } catch {
     return null;
   }
 }
 
-export function writeCarry(c: CrewCarry | null): void {
-  profileSet("carry", c);
+export function writeCarry(c: CrewCarry | null, plant: "holt" | "colt" = "holt"): void {
+  profileSet(plant === "colt" ? "carryColt" : "carry", c);
 }

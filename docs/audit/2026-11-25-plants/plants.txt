@@ -1,0 +1,62 @@
+PASS 1280 title: plant picker, Holt's plant chosen
+PASS 1280 title: week 1 of 10
+PASS 1280 the badge stamps week 1 at Holt's plant
+PASS 1280 Fear ends the week in a stand-down
+PASS 1280 the button begins the stand-down week
+PASS 1280 week 2 is a stand-down week
+PASS 1280 the brief says stand-down (Week 2 of 10 · Cycle 1 · Middle of cycle · STAND-DOWN
+Work stops until people talk. Say th)
+PASS 1280 Holt opens the stand-down
+PASS 1280 still afraid: the transfer ending
+PASS 1280 no nights or new week after a transfer
+PASS 1280 straight to the badge at the new plant (role)
+PASS 1280 Colt's plant, week 1, strangers
+PASS 1280 the director is Colt, in his own words (06:52 · Criticality Cafe · clock frozen Colt Director Come and find me. Any time. He's already standing when you come in, holding two coffee)
+PASS 1280 Colt's first meeting, not Holt's (There you are. The core designer. I came down to find you instead of sending for you. Coffee's on me. | Russ Colt. I run the site, which mostly means I walk it.)
+PASS 1280 crew page names Mr. Russell Colt
+PASS 1280 pick Colt's plant on the title
+PASS 1280 Colt's plant is at week 2
+PASS 1280 brief: week 2, middle of cycle, Colt's plant
+PASS 1280 Colt left something on your desk
+PASS 1280 tap: the cycle in numbers
+PASS 1280 Friday with no outage: the flux map (shuffle)
+PASS 1280 no fuel moves on a flux map day
+PASS 1280 a tap reads the detector (79%)
+PASS 1280 signing the flux map closes Friday's job, and opens no outage
+PASS 1280 week 3: end of cycle
+PASS 1280 outage week: the shuffle desk
+PASS 1280 week 10: the equilibrium core, none of the starting fuel left
+PASS 1280 the finale
+PASS 1280 then week 1 again
+PASS 1280 no page errors
+PASS 390 title: plant picker, Holt's plant chosen
+PASS 390 title: week 1 of 10
+PASS 390 the badge stamps week 1 at Holt's plant
+PASS 390 Fear ends the week in a stand-down
+PASS 390 the button begins the stand-down week
+PASS 390 week 2 is a stand-down week
+PASS 390 the brief says stand-down (Week 2 of 10 · Cycle 1 · Middle of cycle · STAND-DOWN
+Work stops until people talk. Say th)
+PASS 390 Holt opens the stand-down
+PASS 390 still afraid: the transfer ending
+PASS 390 no nights or new week after a transfer
+PASS 390 straight to the badge at the new plant (role)
+PASS 390 Colt's plant, week 1, strangers
+PASS 390 the director is Colt, in his own words (06:52 · Criticality Cafe · clock frozen Colt Director Come and find me. Any time. He's already standing when you come in, holding two coffee)
+PASS 390 Colt's first meeting, not Holt's (There you are. The core designer. I came down to find you instead of sending for you. Coffee's on me. | Russ Colt. I run the site, which mostly means I walk it.)
+PASS 390 crew page names Mr. Russell Colt
+PASS 390 pick Colt's plant on the title
+PASS 390 Colt's plant is at week 2
+PASS 390 brief: week 2, middle of cycle, Colt's plant
+PASS 390 Colt left something on your desk
+PASS 390 tap: the cycle in numbers
+PASS 390 Friday with no outage: the flux map (shuffle)
+PASS 390 no fuel moves on a flux map day
+PASS 390 a tap reads the detector (79%)
+PASS 390 signing the flux map closes Friday's job, and opens no outage
+PASS 390 week 3: end of cycle
+PASS 390 outage week: the shuffle desk
+PASS 390 week 10: the equilibrium core, none of the starting fuel left
+PASS 390 the finale
+PASS 390 then week 1 again
+PASS 390 no page errors

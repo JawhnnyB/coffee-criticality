@@ -178,3 +178,15 @@ Decision: approve as written, or mark lines to change. This also counts toward t
 - **What you walk in on:** the 2nd and 3rd talk with each person each week, 14 exchanges × 5 cultures, each ending with back-them-up or name-it (`floorTalks.ts`). They take priority over relationship scenes on those talks, as asked. Each person is described by two others on the crew page. Decision: in later weeks the same 14 situations replay in that week's culture; write new ones for week two and up?
 - **Tokens and toys** (`parlorPrizes.ts`, `PrizeShelf.tsx`): tokens from the eight levelled cabinets, at most 3 a cabinet a day, kept across weeks; six toys, one per person but Holt, each unlocked by that person's cabinet. Decision: prices (6 to 7) and the daily cap.
 - **Bug fixed:** relationship scenes and crew moments never played after day 1 in a normal week (`s.ended` is set every evening). Worth a human playtest of a full week now that they do.
+
+## Two plants and the ten-week campaign (25 November 2026, `c/two-plants`)
+
+Draft and full Holt → Colt line list: `docs/two-plants-draft.md`. Evidence: `docs/audit/2026-11-25-plants/`.
+
+- Colt's first name: Russell ("Russ"). Placeholder until the owner names him.
+- Colt borrows Holt's portrait and sprite. He needs his own art.
+- Week 1 now ends in a flux map. The first fuel shuffle is week 3 (owner's plan: shuffles at weeks 3, 6, 9).
+- Colt's floor starts 3 points ahead on trust and candor; Fear there takes three hides instead of two.
+- Stand-down: Fear at the end of a Holt's-plant week. Transfer: Fear again at the end of the stand-down week.
+- Cycle numbers (boron, EFPD, MTC) are typical-PWR teaching numbers, not tuned to the sim.
+- Pre-existing, not new: on the morning brief, Holt's line overlaps the first checklist item when it runs to two lines. The stand-down lines are kept no longer than the originals.

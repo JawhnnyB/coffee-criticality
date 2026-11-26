@@ -106,6 +106,11 @@ export function cultureAxes(s: CultureInput): { trust: number; candor: number } 
       trust += 1;
     }
   }
+  // Colt's plant: the floor starts with goodwill to spare (coltVoice.ts). A couple of good choices reach Respect.
+  if (s.flags["plant:colt"]) {
+    trust += COLT_HEADSTART;
+    candor += COLT_HEADSTART;
+  }
   candor += 2 * s.reports;
   trust += s.catches;
   candor += s.catches;
@@ -114,9 +119,14 @@ export function cultureAxes(s: CultureInput): { trust: number; candor: number } 
   return { trust, candor };
 }
 
+/** How far ahead Colt's floor starts on both axes. */
+export const COLT_HEADSTART = 3;
+
 export function cultureOf(s: CultureInput): Culture {
   const { trust, candor } = cultureAxes(s);
-  if (s.hides >= 2 || trust <= -2 || candor <= -2) return "fear";
+  // At Colt's plant one hide doesn't send heads down: it takes three, as it would anywhere people feel safe.
+  const hideLimit = s.flags["plant:colt"] ? 3 : 2;
+  if (s.hides >= hideLimit || trust <= -2 || candor <= -2) return "fear";
   if (trust >= 4 && candor >= 4) return "respect";
   if (trust >= 4 && candor <= 1) return "comfort";
   if (candor >= 4 && trust <= 1) return "distrust";
