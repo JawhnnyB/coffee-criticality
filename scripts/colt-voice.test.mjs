@@ -65,7 +65,7 @@ export function collect() {
     for (const s of [t.scene, t.title, t.ask, t.trust?.label, t.trust?.reply, t.callout?.label, t.callout?.reply, t.says?.text]) if (s && HOLT.test(s)) about.add(s);
   }
   const days = [];
-  for (const week of [1, 2, 3, 10]) for (const standDown of [false, true]) for (const d of W.WEEK) days.push(K.dayVariant(d, { week, plant: "colt", standDown: false }), K.dayVariant(d, { week, plant: "holt", standDown }));
+  for (const kind of ["pwr", "bwr", "pebble", "msr"]) for (const week of [1, 2, 3, 10]) for (const standDown of [false, true]) for (const d of W.WEEK) days.push(K.dayVariant(d, { week, plant: "colt", standDown: false, kind }), K.dayVariant(d, { week, plant: "holt", standDown, kind }));
   for (const d of days) {
     if (d.holt.startsWith("Holt: Last week ended") || /^Holt: (Yesterday people|I'm not counting|Every blank gets|Last day\.)/.test(d.holt)) continue; // stand-down: Holt's plant only
     said.add(d.holt);

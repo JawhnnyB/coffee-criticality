@@ -19,7 +19,11 @@
  * Cycle numbers are teaching numbers, typical of a large pressurised-water reactor on an 18-month cycle, not any
  * real plant's. Teaching model, not a license.
  */
-import type { ShuffleCell } from "./plant";
+import type { PlantType, ShuffleCell } from "./plant";
+import { FRIDAY, fridayJob, fridayText, hasOutages, type FridayJob } from "./refuel/byType";
+import { weekStart as saltWeekStart } from "./refuel/saltLoop";
+
+export { fridayJob, type FridayJob };
 import type { DayDef } from "./week";
 import { COLT_FULL, PLANT_FLAG, plantOf, type PlantId } from "./coltVoice";
 import { profileGet, profileSet } from "./profile";
@@ -39,6 +43,8 @@ export interface PlantRun {
   standDowns: number;
   /** The last fuel map you signed at an outage: what Flux map Fridays measure. */
   lastMap: ShuffleCell[] | null;
+  /** The other types' last signed Friday (refuel/): a BWR bundle, a pebble pass plan, a salt plan. */
+  lastDesk?: { bundle?: string[][]; passes?: { passes: number; burnup: number }; salt?: { feed: number; sparge: number; cleanup: number } };
   /** The verdict for the week that reached its ending. A week that's abandoned part-way replays. */
   decided: { week: number; verdict: Verdict } | null;
 }
@@ -68,6 +74,7 @@ function validRun(o: unknown): PlantRun {
     standDown: !!r.standDown,
     standDowns: typeof r.standDowns === "number" ? r.standDowns : 0,
     lastMap: Array.isArray(r.lastMap) ? (r.lastMap as ShuffleCell[]) : null,
+    lastDesk: r.lastDesk && typeof r.lastDesk === "object" ? r.lastDesk : undefined,
     decided: d && typeof d.week === "number" && typeof d.verdict === "string" ? d : null,
   };
 }
@@ -112,9 +119,9 @@ export function weekOf(flags: Record<string, boolean> | undefined): number {
   return 0;
 }
 
-/** A Friday with no outage: the flux map instead of the shuffle. Never in week 0. */
-export function fluxFriday(week: number) {
-  return week >= 1 && !isOutageWeek(week);
+/** A PWR Friday with no outage: the flux map instead of the shuffle. Never in week 0. */
+export function fluxFriday(week: number, kind: PlantType = "pwr") {
+  return fridayJob(week, kind) === "fluxmap";
 }
 
 /** Put the plant, the week and any stand-down on a fresh shift. */
@@ -167,6 +174,7 @@ function advanceRun(run: PlantRun): PlantRun {
     standDown: v === "standdown",
     standDowns: run.standDowns + (v === "standdown" ? 1 : 0),
     lastMap: v === "finale" ? null : run.lastMap,
+    lastDesk: v === "finale" ? undefined : run.lastDesk,
     decided: null,
   };
 }
@@ -201,15 +209,90 @@ export interface CycleWeek {
   restart: boolean;
   /** One line for the morning brief. */
   line: string;
+  /** The teaching numbers, one line, for the strip above the brief. */
+  numbers: string;
+  /** What Friday is this week. */
+  friday: string;
 }
 
 const PHASE_NAME: Record<Phase, string> = { boc: "Start of cycle", moc: "Middle of cycle", eoc: "End of cycle", eq: "Equilibrium core" };
 
-export function isOutageWeek(week: number) {
-  return OUTAGE_WEEKS.includes(week);
+export function isOutageWeek(week: number, kind: PlantType = "pwr") {
+  return hasOutages(kind) && OUTAGE_WEEKS.includes(week);
 }
 
-export function cycleWeek(week: number): CycleWeek {
+const FRIDAY_NAME: Record<FridayJob, string> = {
+  legacy: "Friday: fuel shuffle",
+  shuffle: "Friday: refuelling outage",
+  fluxmap: "Friday: flux map",
+  bundle: "Friday: refuelling outage, bundle bench",
+  tip: "Friday: TIP traces",
+  passes: "Friday: pass-count review",
+  salt: "Friday: salt review",
+};
+
+export function cycleWeek(week: number, kind: PlantType = "pwr"): CycleWeek {
+  const base = pwrWeek(week);
+  const friday = FRIDAY_NAME[fridayJob(base.week, kind)];
+  if (kind === "bwr") return { ...base, ...bwrWeek(base), friday };
+  if (kind === "pebble") return { ...base, ...pebbleWeek(base.week), outageFriday: false, restart: false, friday };
+  if (kind === "msr") return { ...base, ...saltWeek(base.week), outageFriday: false, restart: false, friday };
+  return { ...base, friday };
+}
+
+/** A BWR has no soluble boron: blades and gadolinia hold the fresh fuel down, and the power shape climbs the core. */
+function bwrWeek(b: CycleWeek): Pick<CycleWeek, "line" | "numbers"> {
+  const gad = b.phase === "moc" ? 35 : b.phase === "eoc" ? 0 : 100;
+  const line =
+    b.phase === "eq"
+      ? "Equilibrium. Three reloads have taken out every bundle you started with. Every bundle in the core is one you designed, and the loading now looks like last cycle's."
+      : b.phase === "boc"
+        ? b.restart
+          ? "Restart week. The reload is in, and the blades come out in sequence. Gadolinia in the new bundles holds them down while xenon builds."
+          : `Start of cycle ${b.cycle}. No boron in a BWR: control blades and gadolinia hold the fresh fuel down. Power leans to the bottom, where the water hasn't boiled yet.`
+        : b.phase === "moc"
+          ? "Middle of cycle. The gadolinia is burning out and the bottom burns first, so the power shape climbs the core. The blade pattern is swapped every few weeks so no bundle burns unevenly beside a blade."
+          : "End of cycle. The blades are nearly all out and the bottom is well burned, so power sits higher in the core. Friday the reactor comes down for refuelling.";
+  return { line, numbers: `Core void ≈ 40% · Blades: A/B sequence · Gadolinia left ≈ ${gad}% · No soluble boron` };
+}
+
+/** A pebble bed refuels every day at full power: the weeks are the core running in toward its equilibrium mix. */
+function pebbleWeek(week: number): Pick<CycleWeek, "line" | "numbers" | "label" | "phase"> {
+  const eq = week >= CAMPAIGN_WEEKS;
+  const line = eq
+    ? "Equilibrium. The pebbles in the core are the mix your pass count makes, and it stays that way as long as the settings hold."
+    : week <= 3
+      ? "Running in. The core started on its first load of pebbles. Each week more of them are on their second, third or fourth trip through."
+      : week <= 6
+        ? "Half the pebbles have been round more than once. At the bottom, the burnup meter decides one pebble at a time which go back in."
+        : "Nearly at equilibrium: fresh pebbles in at the top, spent ones out at the bottom, every day, at full power.";
+  return {
+    line,
+    phase: eq ? "eq" : "moc",
+    label: `Week ${week} of ${CAMPAIGN_WEEKS} · ${eq ? "Equilibrium core" : "Running in"}`,
+    numbers: "Helium 250 → 750 °C · About 400 fresh pebbles a day · No outages",
+  };
+}
+
+/** A molten-salt core has no fuel elements: the weeks are the salt ageing toward its equilibrium. */
+function saltWeek(week: number): Pick<CycleWeek, "line" | "numbers" | "label" | "phase"> {
+  const eq = week >= CAMPAIGN_WEEKS;
+  const line = eq
+    ? "Equilibrium salt. What you feed in, what the pump bowl strips out and what cleanup removes now balance, week after week."
+    : week <= 3
+      ? "Fresh salt. Fission products are only starting to build. Xenon leaves as a gas in the pump bowl, so it matters far less than in a solid-fuel core."
+      : week <= 6
+        ? "The salt is ageing. Lanthanides, fission products that soak up neutrons and don't leave as gas, are building. Cleanup is how they come out."
+        : "Old salt. Without cleanup, the lanthanides now take more fresh fuel every day just to stand still.";
+  return {
+    line,
+    phase: eq ? "eq" : "moc",
+    label: `Week ${week} of ${CAMPAIGN_WEEKS} · ${eq ? "Equilibrium salt" : `Salt week ${week}`}`,
+    numbers: `Salt outlet ≈ 650 °C · Lanthanides ≈ ${Math.round(saltWeekStart(week).lanth)} pcm · No outages`,
+  };
+}
+
+function pwrWeek(week: number): CycleWeek {
   const w = Math.max(1, Math.min(CAMPAIGN_WEEKS, Math.floor(week)));
   const cycle = Math.min(4, Math.ceil(w / 3));
   const pos = w === CAMPAIGN_WEEKS ? 0 : (w - 1) % 3;
@@ -242,12 +325,22 @@ export function cycleWeek(week: number): CycleWeek {
     outageFriday,
     restart,
     line,
+    numbers: `Boron ≈ ${boronPpm} ppm · ≈ ${efpd} EFPD · MTC ≈ ${mtcPcmPerF} pcm/°F`,
+    friday: "",
   };
 }
 
 /** How much of the starting core is left, for the brief. */
-export function fuelLine(week: number): string {
+export function fuelLine(week: number, kind: PlantType = "pwr"): string {
+  if (kind === "pebble") return "Fresh pebbles go in every day. Nothing waits for an outage.";
+  if (kind === "msr") return "There's no fuel to place. The fuel is in the salt.";
   const t = cycleWeek(week).startingFuelThirds;
+  if (kind === "bwr") {
+    if (t >= 3) return "Every bundle in the core is one the plant started with.";
+    if (t === 2) return "A third of the core is bundles you designed at the last outage.";
+    if (t === 1) return "Two thirds of the core is bundles you designed.";
+    return "None of the starting bundles are left. Every bundle in the core is one you designed.";
+  }
   if (t >= 3) return "All of the fuel in the core is the fuel the plant started with.";
   if (t === 2) return "A third of the core is fuel you placed at the last outage.";
   if (t === 1) return "Two thirds of the core is fuel you placed.";
@@ -261,23 +354,14 @@ export interface WeekContext {
   week: number;
   plant: PlantId;
   standDown: boolean;
+  /** The site's reactor type. Missing means a PWR. */
+  kind?: PlantType;
 }
 
-export function contextOf(flags: Record<string, boolean> | undefined): WeekContext {
+export function contextOf(flags: Record<string, boolean> | undefined, kind: PlantType = "pwr"): WeekContext {
   // Week 0 is the original single week (weekOf).
-  return { week: weekOf(flags), plant: plantOf(flags), standDown: !!flags?.[STANDDOWN_FLAG] };
+  return { week: weekOf(flags), plant: plantOf(flags), standDown: !!flags?.[STANDDOWN_FLAG], kind };
 }
-
-const FLUX_DAY: Pick<DayDef, "name" | "title" | "holt" | "items"> = {
-  name: "Day 5 · Flux map",
-  title: "Measure the core you built.",
-  holt: "Holt: Flux map today. Find where the power actually peaks, and tell Priya before she tells you.",
-  items: [
-    "Reactor hall — the flux map desk. The detectors are in.",
-    "Find the hottest assembly from what you know about the loading.",
-    "Close the week when Priya agrees with your read.",
-  ],
-};
 
 const STANDDOWN_TITLE = [
   "Stand-down. Nothing moves until we've talked.",
@@ -298,11 +382,20 @@ const STANDDOWN_HOLT = [
 /** Day text for this week. Week 0 (no campaign) is exactly the original week. */
 export function dayVariant(d: DayDef, ctx: WeekContext): DayDef {
   let out = d;
-  if (d.n === 5 && d.shuffle && fluxFriday(ctx.week)) {
-    out = { ...out, ...FLUX_DAY, goals: out.goals.map((g) => (g.id === "shuffle" ? { ...g, label: "Read the flux map" } : g)) };
+  const job = fridayJob(ctx.week, ctx.kind ?? "pwr");
+  const f = job === "legacy" || job === "shuffle" ? null : FRIDAY[job];
+  if (f && d.n === 5 && d.shuffle) {
+    out = {
+      ...out,
+      name: f.name,
+      title: f.title,
+      holt: f.holt,
+      items: f.items,
+      goals: out.goals.map((g) => (g.id === "shuffle" ? { ...g, label: f.goal } : g)),
+    };
   }
-  if (d.n === 4 && fluxFriday(ctx.week)) {
-    out = { ...out, items: out.items.map((i) => (i.startsWith("Tomorrow is the shuffle") ? "Tomorrow is the flux map. Priya wants the fuel map in your hands." : i)) };
+  if (f && d.n === 4) {
+    out = { ...out, items: out.items.map((i) => (i.startsWith("Tomorrow is the shuffle") ? f.thursday : i)) };
   }
   if (ctx.standDown && ctx.plant === "holt") {
     const i = Math.max(0, Math.min(4, d.n - 1));
@@ -311,20 +404,9 @@ export function dayVariant(d: DayDef, ctx: WeekContext): DayDef {
   return out;
 }
 
-/** Sim's own day-5 strings, read for a Flux map Friday. */
-export const FLUX_TEXT: Record<string, string> = {
-  "Outage week. Everyone's tired, and tired people round numbers. Please don't round numbers.":
-    "End of the week. Everyone's tired, and tired people round numbers. Please don't round numbers.",
-  "Outage week. Everyone's tired. If you're tired enough to round a number, come and tell me, and I'll find you a relief.":
-    "End of the week. Everyone's tired. If you're tired enough to round a number, come and tell me, and I'll find you a relief.",
-  "Reactor hall — fuel shuffle desk. Program the core.": "Reactor hall — flux map desk. Find where the power peaks.",
-  "Show Priya the map. She will not sign a peak she cannot explain.": "Show Priya your read of the map. She'll want to know why it peaks there.",
-};
-
+/** A sim or dialogue line as this week's Friday reads it (refuel/byType.ts). */
 export function weekText(t: string, ctx: WeekContext): string {
-  if (!t) return t;
-  if (fluxFriday(ctx.week) && Object.prototype.hasOwnProperty.call(FLUX_TEXT, t)) return FLUX_TEXT[t];
-  return t;
+  return fridayText(t, fridayJob(ctx.week, ctx.kind ?? "pwr"));
 }
 
 // ---------------------------------------------------------------------------------------------------------------
@@ -337,7 +419,7 @@ export interface VerdictCard {
   next: string;
 }
 
-export function verdictCard(v: Verdict, week: number, plant: PlantId): VerdictCard {
+export function verdictCard(v: Verdict, week: number, plant: PlantId, kind: PlantType = "pwr"): VerdictCard {
   const boss = plant === "colt" ? "Colt" : "Holt";
   switch (v) {
     case "standdown":
@@ -379,16 +461,29 @@ export function verdictCard(v: Verdict, week: number, plant: PlantId): VerdictCa
         ],
         next: `Week ${Math.min(CAMPAIGN_WEEKS, week + 1)}`,
       };
-    case "finale":
+    case "finale": {
+      const first: Record<PlantType, string> = {
+        pwr: "Ten weeks. Three outages. Every assembly in the core now is one you placed, and the loading pattern has settled into the same shape it'll keep, cycle after cycle.",
+        bwr: "Ten weeks. Three outages. Every bundle in the core now is one you designed, and the loading has settled into the shape it'll keep, cycle after cycle.",
+        pebble: "Ten weeks, and not one outage. The running-in is over: the pebbles in the core are the equilibrium mix your pass count makes.",
+        msr: "Ten weeks. The salt has reached equilibrium: what you feed in balances what the pump bowl strips and what cleanup takes out.",
+      };
+      const sign: Record<PlantType, string> = {
+        pwr: "The flux map is flat enough to sign.",
+        bwr: "The TIP traces are flat enough to sign.",
+        pebble: "The burnup meter clicks over at the bottom of the core.",
+        msr: "The salt temperature trace is flat enough to sign.",
+      };
       return {
-        title: "The equilibrium core",
+        title: kind === "msr" ? "The equilibrium salt" : "The equilibrium core",
         body: [
-          "Ten weeks. Three outages. Every assembly in the core now is one you placed, and the loading pattern has settled into the same shape it'll keep, cycle after cycle.",
-          `${boss === "Colt" ? "Colt" : "Holt"} walks the reactor hall with you and Priya one last time this rotation. Nobody says much. The flux map is flat enough to sign.`,
-          "The core repeats now. So does the floor: whatever you built with these people is what the next engineer walks into.",
+          first[kind],
+          `${boss} walks the reactor hall with you and Priya one last time this rotation. Nobody says much. ${sign[kind]}`,
+          `The ${kind === "msr" ? "salt" : "core"} repeats now. So does the floor: whatever you built with these people is what the next engineer walks into.`,
         ],
         next: "Begin again from week 1",
       };
+    }
     default:
       return { title: "", body: [], next: `Week ${Math.min(CAMPAIGN_WEEKS, week + 1)}` };
   }

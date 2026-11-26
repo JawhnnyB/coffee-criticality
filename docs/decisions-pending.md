@@ -199,3 +199,13 @@ Evidence: `docs/audit/2026-11-25-cycles/`. BWR and other types: `docs/reactor-re
 - New story beats I invented for cycles 2–3 that touch the characters' lives: Marcus's promotion to senior, Elena offered a day job in training, Tommy's retirement countdown (211 days) and his apprentice, Mabel's thirty years on the wall and the spare chalk going to Priya, Holt sitting in the break room. Change any of them freely.
 - Friday plan on the real core: two rules added (unpoisoned fresh fuel to the outer flats, most-burned fuel in the centre), "holds" now means within 10% of the plant's own pattern in the same simulator (the model reads the plant's own pattern at 1.45, above the 1.367 assembly limit), and Priya's pass (simulated annealing, about 15 s) to finish the job. The 10% margin is my choice.
 - Colt's portrait and sprites are recolours of Holt's (grey hair, short grey beard, sage zip-up, no tie). Placeholder quality until the art pass.
+
+## Approved 26 November 2026
+
+- The owner approved the cycle 2 and cycle 3 storylines (Marcus's promotion, Elena's day job, Tommy's retirement and keychain, Mabel's chalk going to Priya, Holt in the break room).
+- The owner approved the BWR plan and the pebble-bed and molten-salt advice in `docs/reactor-refuelling-by-type.md`. Step 1 is built on `c/two-plants`:
+  - BWR: the bundle bench at outages (weeks 3, 6, 9) and TIP traces in between.
+  - Pebble bed: the pass-count review every Friday, no outages (HTR-PM's published numbers as the teaching reference).
+  - Molten salt: the salt loop every Friday, no outages (MSRE as the teaching reference).
+  - The Refuelling Outage desk app stays PWR-only; signing a BWR bundle doesn't open it.
+- Still open: the BWR teaching limits (axial 1.45, pin 1.30, hottest pin 1.80, start-of-cycle k∞ 1.16, enrichment 3.9–4.4%), the pebble limits (6,500 pebbles a day through the burnup meter, 105 GWd/t for any pebble, 1.6 kW a pebble), and the salt band (645–655 °C). All are my teaching choices. Evidence: `docs/audit/2026-11-26-types/`.

@@ -224,6 +224,15 @@ export const COLT_LINES: Record<string, string> = {
   "Holt: Flux map today. Find where the power actually peaks, and tell Priya before she tells you.":
     "Colt: Flux map today. Find where the power peaks. Priya's saved you a seat, and so have I.",
 
+  "Holt: Outage week. Design the reload bundle today: three layers, one boiling channel. Take your time.":
+    "Colt: Outage week. Design the reload bundle today. Three layers, one boiling channel. Take all the time it needs.",
+  "Holt: TIP traces today. Run the probe up the channel and find where the power peaks now.":
+    "Colt: TIP traces today. Find where the power peaks now. Priya's got the kettle on.",
+  "Holt: Discharge review today. Set the pass count and the burnup that sends a pebble out.":
+    "Colt: Discharge review today. Set the pass count and the burnup. I'll sit in if you want a sounding board.",
+  "Holt: Salt sample's back. Set the feed, the sparge and the cleanup for next week.":
+    "Colt: Salt sample's back. Set the feed, the sparge and the cleanup. Ask me anything, it's my favourite desk.",
+
   // End of day.
   "Holt: Times and places, all week. That's a review I can actually fund. Thank you.":
     "Colt: You came and found me every time this week. Thank you. That's what makes this place work.",

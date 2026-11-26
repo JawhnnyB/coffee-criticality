@@ -49,7 +49,7 @@ import { isRevealing, requestSkip } from "./chatter";
 import { Chatter } from "./ChatterLine";
 import { heartCount } from "./pixel";
 import { drawWorld, glyphWidth, paintGlyphs, preloadRoomArt } from "./render";
-import { DEFAULT_PLANT, plantTitle, thermalState, type PlantDesign } from "./plant";
+import { DEFAULT_PLANT, plantTitle, thermalState, type PlantDesign, type PlantType, type ShuffleCell } from "./plant";
 import { prefersReducedMotion, usePrefersReducedMotion } from "./reducedMotion";
 import { bootSettings, frameChoice, setFrameChoice, type FrameChoice } from "./frameRate";
 import { hasSave, hydrateSave, peekSave, wipeSave, writeSave } from "./save";
@@ -135,9 +135,8 @@ import {
   contextOf,
   cycleWeek,
   decideWeek,
-  fluxFriday,
+  fridayJob,
   fuelLine,
-  isOutageWeek,
   readCampaign,
   runOf,
   stampShift,
@@ -152,6 +151,9 @@ import {
   type Verdict,
 } from "./campaign";
 import { setBossArt } from "./bossArt";
+import { fridayLog } from "./refuel/byType";
+import { validBundle, referenceBundle } from "./refuel/bwrBundle";
+import { BundleBench, PassDesk, SaltDesk, TipTrace } from "./refuel/RefuelDesks";
 import { coltDeskNote, coltDialogue, plantOf, plantSpeaker, plantText } from "./coltVoice";
 import { barShown } from "./barRules";
 import type { AppId } from "./parlorOS";
@@ -912,10 +914,10 @@ export function GameApp() {
           s.flags[`social:met:${npc}`] = true;
           addScene(s, first);
         }
-        // At Colt's plant, Holt's lines are Colt's (coltVoice.ts); on a Flux map Friday, "outage" talk reads as
-        // the end of the week (campaign.ts). Copies: the content arrays are shared.
-        const ctx = contextOf(s.flags);
-        if (ctx.plant === "colt" || fluxFriday(ctx.week)) {
+        // At Colt's plant, Holt's lines are Colt's (coltVoice.ts); on a Friday with no outage, "outage" talk reads
+        // as the end of the week (refuel/byType.ts). Copies: the content arrays are shared.
+        const ctx = contextOf(s.flags, s.plant?.type ?? "pwr");
+        if (ctx.plant === "colt" || ctx.week >= 1) {
           const voiced = ctx.plant === "colt" ? coltDialogue(s.dialogue) : s.dialogue.map((l) => ({ ...l }));
           s.dialogue = voiced.map((l) => ({ ...l, text: weekText(l.text, ctx) }));
           talkRef.current.dialogue = s.dialogue;
@@ -1045,7 +1047,8 @@ export function GameApp() {
 
   const s = stateRef.current;
   // Which week and plant the shift is in. sim.ts reads its days through dayDef, so this keeps them in step.
-  const ctxNow = contextOf(s.flags);
+  const kindNow = s.plant?.type ?? "pwr";
+  const ctxNow = contextOf(s.flags, kindNow);
   setWeekContext(ctxNow);
   setBossArt(plantOf(s.flags));
   const plantNow: PlantId = s.role ? plantOf(s.flags) : camp.plant;
@@ -1445,44 +1448,7 @@ export function GameApp() {
           />
         )}
 
-        {mode === "shuffle" && (
-          <FuelShuffle
-            plant={s.plant ?? DEFAULT_PLANT}
-            practice={s.returnMode === "academy" || s.day < 5 || !!s.flags.cabPractice}
-            review={
-              // Flux map Friday (campaign.ts): weeks without an outage measure the core you signed last time.
-              s.returnMode !== "academy" && s.day >= 5 && !s.flags.cabPractice && fluxFriday(weekOf(s.flags))
-                ? {
-                    map: runOf(camp, plantOf(s.flags)).lastMap,
-                    where: runOf(camp, plantOf(s.flags)).lastMap ? `${cycleWeek(weekOf(s.flags)).label}` : "the starting core",
-                  }
-                : undefined
-            }
-            onDone={(fq, map) => {
-              const wasDone = s.shuffleDone;
-              finishShuffle(s, fq, map);
-              const week = weekOf(s.flags);
-              if (s.shuffleDone && !wasDone && !fluxFriday(week)) {
-                // Signing an outage's plan hands you the outage that carries it out (outage/fridayPlan.ts), and
-                // it's the core every Flux map Friday measures until the next one.
-                s.flags.outageOpen = true;
-                const c0 = readCampaign();
-                const pl = plantOf(s.flags);
-                const c1 = pl === "colt" ? { ...c0, colt: { ...c0.colt, lastMap: map } } : { ...c0, holt: { ...c0.holt, lastMap: map } };
-                writeCampaign(c1);
-                setCamp(c1);
-              }
-              applyMode(s.mode);
-              playBlip("ok");
-              refresh();
-            }}
-            onAbort={() => {
-              abortOverlay(s);
-              applyMode(s.mode);
-              refresh();
-            }}
-          />
-        )}
+        {mode === "shuffle" && <FridayDesk s={s} camp={camp} setCamp={setCamp} done={() => { applyMode(s.mode); playBlip("ok"); refresh(); }} abort={() => { abortOverlay(s); applyMode(s.mode); refresh(); }} />}
 
         {mode === "maint" && (
           <MaintGame
@@ -2141,11 +2107,11 @@ export function GameApp() {
                 </ul>
               ) : null}
               <p className="mt-3 text-[11px] text-[#6a4a32]">Teaching model, not a license.</p>
-              {verdict && weekOf(s.flags) >= 1 ? <VerdictBlock verdict={verdict} week={weekOf(s.flags)} plant={plantNow} /> : null}
+              {verdict && weekOf(s.flags) >= 1 ? <VerdictBlock verdict={verdict} week={weekOf(s.flags)} plant={plantNow} kind={kindNow} /> : null}
               <div className="mt-5 flex flex-col gap-2">
                 {verdict === "transfer" ? (
                   <button type="button" className="paper-btn-primary" style={{ minHeight: 44 }} data-testid="transfer-colt" onClick={startAtColt}>
-                    {verdictCard("transfer", weekOf(s.flags), plantNow).next}
+                    {verdictCard("transfer", weekOf(s.flags), plantNow, kindNow).next}
                   </button>
                 ) : null}
                 {verdict === "transfer" ? null : (
@@ -2181,7 +2147,7 @@ export function GameApp() {
                     setAskWipe(true);
                   }}
                 >
-                  {verdict && weekOf(s.flags) >= 1 ? verdictCard(verdict, weekOf(s.flags), plantNow).next : "New week"}
+                  {verdict && weekOf(s.flags) >= 1 ? verdictCard(verdict, weekOf(s.flags), plantNow, kindNow).next : "New week"}
                 </button>
                 )}
                 <button
@@ -2352,6 +2318,128 @@ function paperMood(mood?: Line["mood"]) {
 /**
  * The floor's culture (floorCulture.ts): which one, what it means, and which way your choices are pulling it.
  */
+/**
+ * The fuel desk in the reactor hall, by reactor type and week (refuel/byType.ts). The Academy and week 0 (saves from
+ * before the campaign) keep the original PWR shuffle. Everything signs through the sim's finishShuffle (sim.ts is
+ * frozen); each desk passes its own figure, and the toast and week log are reworded for the desk.
+ */
+function FridayDesk({
+  s,
+  camp,
+  setCamp,
+  done,
+  abort,
+}: {
+  s: GameState;
+  camp: Campaign;
+  setCamp: (c: Campaign) => void;
+  done: () => void;
+  abort: () => void;
+}) {
+  const kind = s.plant?.type ?? "pwr";
+  const week = weekOf(s.flags);
+  const academy = s.returnMode === "academy";
+  const practice = academy || s.day < 5 || !!s.flags.cabPractice;
+  const job = academy ? "legacy" : fridayJob(week, kind);
+  const plant = plantOf(s.flags);
+  const run = runOf(camp, plant);
+  const save = (patch: (r: typeof run) => typeof run) => {
+    const c0 = readCampaign();
+    const c1 = plant === "colt" ? { ...c0, colt: patch(c0.colt) } : { ...c0, holt: patch(c0.holt) };
+    writeCampaign(c1);
+    setCamp(c1);
+  };
+  /** Sign through the sim, then reword its week-log line for this desk. */
+  const sign = (figure: number, map: ShuffleCell[]) => {
+    const wasDone = s.shuffleDone;
+    finishShuffle(s, figure, map);
+    const fresh = s.shuffleDone && !wasDone;
+    const line = fresh ? fridayLog(job, figure) : null;
+    if (line) {
+      const last = [...s.weekLog].reverse().find((e) => e.kind === "shuffle");
+      if (last) last.text = line;
+    }
+    return fresh;
+  };
+  const keepMap = s.plant?.shuffleMap ?? [];
+  if (job === "bundle" || (practice && !academy && kind === "bwr")) {
+    return (
+      <BundleBench
+        start={validBundle(run.lastDesk?.bundle)}
+        practice={practice}
+        onAbort={abort}
+        onDone={(hot, bundle) => {
+          if (sign(hot, keepMap)) save((r) => ({ ...r, lastDesk: { ...r.lastDesk, bundle } }));
+          done();
+        }}
+      />
+    );
+  }
+  if (job === "tip") {
+    const cw = cycleWeek(week, "bwr");
+    const last = validBundle(run.lastDesk?.bundle);
+    return (
+      <TipTrace
+        bundle={last ?? referenceBundle()}
+        phase={cw.phase}
+        where={last ? cw.label : "the plant's starting bundle"}
+        onAbort={abort}
+        onDone={(fz) => {
+          sign(fz, keepMap);
+          done();
+        }}
+      />
+    );
+  }
+  if (job === "passes" || (practice && !academy && kind === "pebble")) {
+    return (
+      <PassDesk
+        start={run.lastDesk?.passes ?? null}
+        practice={practice}
+        onAbort={abort}
+        onDone={(k, passes) => {
+          if (sign(k, keepMap)) save((r) => ({ ...r, lastDesk: { ...r.lastDesk, passes } }));
+          done();
+        }}
+      />
+    );
+  }
+  if (job === "salt" || (practice && !academy && kind === "msr")) {
+    return (
+      <SaltDesk
+        week={Math.max(1, week)}
+        start={run.lastDesk?.salt ?? null}
+        practice={practice}
+        onAbort={abort}
+        onDone={(maxC, salt) => {
+          if (sign(maxC, keepMap)) save((r) => ({ ...r, lastDesk: { ...r.lastDesk, salt } }));
+          done();
+        }}
+      />
+    );
+  }
+  // The PWR: the fuel shuffle at an outage, the flux map in between, the original shuffle in week 0.
+  const flux = !practice && job === "fluxmap";
+  return (
+    <FuelShuffle
+      plant={s.plant ?? DEFAULT_PLANT}
+      practice={practice}
+      review={flux ? { map: run.lastMap, where: run.lastMap ? cycleWeek(week).label : "the starting core" } : undefined}
+      onDone={(fq, map) => {
+        const fresh = sign(fq, map);
+        if (fresh && (job === "shuffle" || job === "legacy")) {
+          // Signing an outage's plan hands you the outage that carries it out (outage/fridayPlan.ts), and it's the
+          // core every Flux map Friday measures until the next one.
+          s.flags.outageOpen = true;
+          save((r) => ({ ...r, lastMap: map }));
+        }
+        done();
+      }}
+      onAbort={abort}
+    />
+  );
+}
+
 /** Holt's plant or Colt's, on the title screen. A saved shift keeps its own plant; this picks the next new one. */
 function PlantPick({ plant, week, standDown, onPick, dark = false }: { plant: PlantId; week: number; standDown: boolean; onPick: (p: PlantId) => void; dark?: boolean }) {
   const ink = dark ? "#f3e6d0" : undefined;
@@ -2389,7 +2477,8 @@ function WeekStrip({ s }: { s: GameState }) {
   const week = weekOf(s.flags);
   const [open, setOpen] = useState(false);
   if (week < 1) return null;
-  const cw = cycleWeek(week);
+  const kind = s.plant?.type ?? "pwr";
+  const cw = cycleWeek(week, kind);
   const colt = plantOf(s.flags) === "colt";
   const standDown = !!s.flags[STANDDOWN_FLAG];
   return (
@@ -2412,9 +2501,9 @@ function WeekStrip({ s }: { s: GameState }) {
         {open ? (
           <div className="mt-1 space-y-1 text-[12px] leading-snug text-[#3a2818]" data-testid="week-strip-more">
             <div>{cw.line}</div>
-            <div>{fuelLine(week)}</div>
+            <div>{fuelLine(week, kind)}</div>
             <div className="font-mono text-[10px] text-[#6a4a32]">
-              Boron ≈ {cw.boronPpm} ppm · ≈ {cw.efpd} EFPD · MTC ≈ {cw.mtcPcmPerF} pcm/°F · {cw.outageFriday ? "Friday: refuelling outage" : "Friday: flux map"}
+              {cw.numbers} · {cw.friday}
             </div>
             <div className="text-[10px] text-[#6a4a32]">Teaching numbers, typical of a large PWR. Not any real plant&apos;s.</div>
           </div>
@@ -2427,8 +2516,8 @@ function WeekStrip({ s }: { s: GameState }) {
 }
 
 /** The week's verdict on the ending card: stand-down, lifted, transfer, Colt's regroup or the finale. */
-function VerdictBlock({ verdict, week, plant }: { verdict: Verdict; week: number; plant: PlantId }) {
-  const card = verdictCard(verdict, week, plant);
+function VerdictBlock({ verdict, week, plant, kind }: { verdict: Verdict; week: number; plant: PlantId; kind: PlantType }) {
+  const card = verdictCard(verdict, week, plant, kind);
   if (!card.title) return null;
   return (
     <div className="mt-4 border-t-2 border-[#16110d] pt-3" data-testid={`verdict-${verdict}`}>

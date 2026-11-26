@@ -1,0 +1,50 @@
+PASS 1280 BWR site
+PASS 1280 BWR week strip: no soluble boron, outage Friday (End of cycle. The blades are nearly all out and the bottom is well burned, so power sits higher in the core. Friday the reactor comes down f)
+PASS 1280 BWR outage Friday: the bundle bench (shuffle day 5 flags cw:3)
+PASS 1280 the all-high start fails four checks (enrich,fz,hot,kboc)
+PASS 1280 low edges: enrichment fixed, the bottom still peaks (fz,hot,kboc)
+PASS 1280 gadolinia low: every check passes
+PASS 1280 signed: Friday's job done, no PWR outage opened
+PASS 1280 the week log records the bundle, not an Fq (Day 5 · Reload bundle signed, hottest pin 1.57. Teaching model only.)
+PASS 1280 the bundle is kept for the TIP traces
+PASS 1280 BWR week without an outage: the TIP trace
+PASS 1280 the trace is found and shown
+PASS 1280 signed the trace
+PASS 1280 pebble site
+PASS 1280 pebble week strip: running in, no outages
+PASS 1280 pebble Friday: the pass count
+PASS 1280 two passes at 95 fails
+PASS 1280 HTR-PM's 15 passes at 90 GWd/t holds (15 / 90 GWd/t)
+PASS 1280 signed the pass count
+PASS 1280 salt site
+PASS 1280 salt week strip
+PASS 1280 salt Friday: the salt loop
+PASS 1280 last month's settings drift out of the band
+PASS 1280 feed 2.8, strip 50%, clean 1%: in the band all week (✓ Salt outlet all week: 650–651 °C)
+PASS 1280 signed the salt week
+PASS 1280 no page errors
+PASS 390 BWR site
+PASS 390 BWR week strip: no soluble boron, outage Friday (End of cycle. The blades are nearly all out and the bottom is well burned, so power sits higher in the core. Friday the reactor comes down f)
+PASS 390 BWR outage Friday: the bundle bench (shuffle day 5 flags cw:3)
+PASS 390 the all-high start fails four checks (enrich,fz,hot,kboc)
+PASS 390 low edges: enrichment fixed, the bottom still peaks (fz,hot,kboc)
+PASS 390 gadolinia low: every check passes
+PASS 390 signed: Friday's job done, no PWR outage opened
+PASS 390 the week log records the bundle, not an Fq (Day 5 · Reload bundle signed, hottest pin 1.57. Teaching model only.)
+PASS 390 the bundle is kept for the TIP traces
+PASS 390 BWR week without an outage: the TIP trace
+PASS 390 the trace is found and shown
+PASS 390 signed the trace
+PASS 390 pebble site
+PASS 390 pebble week strip: running in, no outages
+PASS 390 pebble Friday: the pass count
+PASS 390 two passes at 95 fails
+PASS 390 HTR-PM's 15 passes at 90 GWd/t holds (15 / 90 GWd/t)
+PASS 390 signed the pass count
+PASS 390 salt site
+PASS 390 salt week strip
+PASS 390 salt Friday: the salt loop
+PASS 390 last month's settings drift out of the band
+PASS 390 feed 2.8, strip 50%, clean 1%: in the band all week (✓ Salt outlet all week: 650–651 °C)
+PASS 390 signed the salt week
+PASS 390 no page errors

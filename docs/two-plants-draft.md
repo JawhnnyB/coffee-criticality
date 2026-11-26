@@ -127,6 +127,10 @@ AI-drafted. Needs the owner's approval, and counts toward the Steam AI disclosur
 | Holt: A log in Control has no initials. I need to know who stood those hours. Close the day with me. | Colt: A log in Control has no initials. Nobody's in trouble. Let's find out what happened. |
 | Holt: Outage week. You program the fuel shuffle today. Teaching model, not a license. Take your time. | Colt: Outage week. You program the fuel shuffle today. Teaching model. Take all the time it needs. |
 | Holt: Flux map today. Find where the power actually peaks, and tell Priya before she tells you. | Colt: Flux map today. Find where the power peaks. Priya's saved you a seat, and so have I. |
+| Holt: Outage week. Design the reload bundle today: three layers, one boiling channel. Take your time. | Colt: Outage week. Design the reload bundle today. Three layers, one boiling channel. Take all the time it needs. |
+| Holt: TIP traces today. Run the probe up the channel and find where the power peaks now. | Colt: TIP traces today. Find where the power peaks now. Priya's got the kettle on. |
+| Holt: Discharge review today. Set the pass count and the burnup that sends a pebble out. | Colt: Discharge review today. Set the pass count and the burnup. I'll sit in if you want a sounding board. |
+| Holt: Salt sample's back. Set the feed, the sparge and the cleanup for next week. | Colt: Salt sample's back. Set the feed, the sparge and the cleanup. Ask me anything, it's my favourite desk. |
 | Holt: Times and places, all week. That's a review I can actually fund. Thank you. | Colt: You came and found me every time this week. Thank you. That's what makes this place work. |
 | Holt: You're skilled. That was never the question. The question is whether the floor is safe enough to use it. | Colt: You're skilled. My job is making the floor safe enough for you to use it. Tell me where I fell short. |
 | Holt. Last night of the rotation. I won't keep you. | Colt here. Last night of the rotation. Just ringing to say thanks. How are you holding up? |

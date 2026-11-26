@@ -1,6 +1,6 @@
 # Refuelling for every reactor type: evaluation and proposal
 
-Written by Claude, 25 November 2026, for the owner. Nothing here is built yet; it's what I'd build and why.
+Written by Claude, 25 November 2026, for the owner. **Approved by the owner on 26 November 2026.** Step 1 of "What I'd build" is now built (`src/game/refuel/`): every site has its own Friday desk, and the weeks read for its type. Steps 2–4 are still proposals.
 
 ## Where the game is now
 
