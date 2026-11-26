@@ -1,6 +1,6 @@
 import { spawnSync } from "node:child_process";
 import { writeFileSync } from "node:fs";
-const r = spawnSync("process.env.ESBUILD ?? "esbuild"", ["src/game/coltVoice.ts", "--bundle", "--platform=node", "--format=esm", "--outfile=/tmp/cv.mjs"], { encoding: "utf8" });
+const r = spawnSync(process.env.ESBUILD ?? "esbuild", ["src/game/coltVoice.ts", "--bundle", "--platform=node", "--format=esm", "--outfile=/tmp/cv.mjs"], { encoding: "utf8" });
 if (r.status) throw new Error(r.stderr);
 const V = await import("/tmp/cv.mjs");
 const rows = Object.entries(V.COLT_LINES).map(([h, c]) => `| ${h.replace(/\|/g, "/")} | ${c.replace(/\|/g, "/")} |`);

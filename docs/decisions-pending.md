@@ -190,3 +190,12 @@ Draft and full Holt → Colt line list: `docs/two-plants-draft.md`. Evidence: `d
 - Stand-down: Fear at the end of a Holt's-plant week. Transfer: Fear again at the end of the stand-down week.
 - Cycle numbers (boron, EFPD, MTC) are typical-PWR teaching numbers, not tuned to the sim.
 - Pre-existing, not new: on the morning brief, Holt's line overlaps the first checklist item when it runs to two lines. The stand-down lines are kept no longer than the originals.
+
+## Cycle exchanges, Friday plan, Colt's art (25 November 2026, `c/two-plants`)
+
+Evidence: `docs/audit/2026-11-25-cycles/`. BWR and other types: `docs/reactor-refuelling-by-type.md`.
+
+- 28 new overheard exchanges (14 for weeks 4–6, 14 for weeks 7–10), all in `docs/floor-talk-draft.md`, with 101 Colt versions in `src/game/coltVoiceCycles.ts`. Owner approval pending; counts toward the AI disclosure.
+- New story beats I invented for cycles 2–3 that touch the characters' lives: Marcus's promotion to senior, Elena offered a day job in training, Tommy's retirement countdown (211 days) and his apprentice, Mabel's thirty years on the wall and the spare chalk going to Priya, Holt sitting in the break room. Change any of them freely.
+- Friday plan on the real core: two rules added (unpoisoned fresh fuel to the outer flats, most-burned fuel in the centre), "holds" now means within 10% of the plant's own pattern in the same simulator (the model reads the plant's own pattern at 1.45, above the 1.367 assembly limit), and Priya's pass (simulated annealing, about 15 s) to finish the job. The 10% margin is my choice.
+- Colt's portrait and sprites are recolours of Holt's (grey hair, short grey beard, sage zip-up, no tie). Placeholder quality until the art pass.

@@ -1,4 +1,5 @@
 import { TILE } from "./const";
+import { artId } from "./bossArt";
 import {
   HAIR_HEX,
   HEART,
@@ -71,7 +72,7 @@ function blitBody(
   playerLook?: PlayerLook,
   sitting = false,
 ) {
-  const walk = loadArt(`/art/gen/sprites/${who}_walk4.png`);
+  const walk = loadArt(`/art/gen/sprites/${artId(who)}_walk4.png`);
   const a6 = !!(walk && walk.naturalWidth === 128 && walk.naturalHeight === 192);
   if (!a6) return false;
   pix(ctx);
@@ -510,7 +511,7 @@ export function drawChibi(
 
 export function drawPortrait(ctx: CanvasRenderingContext2D, look: Look, size: number, who?: NpcId | "player") {
   pix(ctx);
-  const im = who ? loadArt(`/art/ui/portraits/portrait-${who}-talk.png`) : null;
+  const im = who ? loadArt(`/art/ui/portraits/portrait-${artId(who)}-talk.png`) : null;
   if (im && im.naturalWidth > 0) {
     ctx.drawImage(im, 0, 0, im.naturalWidth, im.naturalHeight, 0, 0, size, size);
     return;

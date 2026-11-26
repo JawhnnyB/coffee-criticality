@@ -38,7 +38,7 @@ import { CORE, FIT_REPORT, PRESET_FIT } from "./outage/calibration";
 import { freshTypes, parseLatticeSet, type LatticeSet } from "./outage/lattice";
 import { presetSet } from "./outage/preset";
 import { PRESET_EOC1 } from "./outage/eoc1";
-import { freshOnRim, fridayLayout } from "./outage/fridayPlan";
+import { HOLD_MARGIN, freshOnRim, fridayLayoutWithNotes, holds, priyaPass, type PassProgress } from "./outage/fridayPlan";
 import type { ShuffleCell } from "./plant";
 import { CYCLE1_TUTORIAL, cycle1Batches, cycle1FuelCount } from "./outage/cycle1Lesson";
 
@@ -257,7 +257,29 @@ function DischargePick({ eoc, onConfirm }: { eoc: Core; onConfirm: (ids: number[
  * The plan you signed on Friday, beside the real core (outage/fridayPlan.ts). One button lays the core out by it;
  * the cycle run says whether the strategy holds at full scale. Without a Friday plan, it says where to make one.
  */
-function FridayPlan({ map, draft, onLay, laid, result }: { map: ShuffleCell[] | undefined; draft: Core; onLay: () => void; laid: boolean; result: CycleResult | null }) {
+function FridayPlan({
+  map,
+  draft,
+  onLay,
+  laid,
+  result,
+  reference,
+  notes,
+  onPriya,
+  priya,
+  busy,
+}: {
+  map: ShuffleCell[] | undefined;
+  draft: Core;
+  onLay: () => void;
+  laid: boolean;
+  result: CycleResult | null;
+  reference: CycleResult | null;
+  notes: { toFlats: number; toCentre: number } | null;
+  onPriya: () => void;
+  priya: PassProgress | null;
+  busy: boolean;
+}) {
   const rim = Math.round(freshOnRim(draft) * 100);
   if (!map || map.length !== 36) {
     return (
@@ -284,13 +306,28 @@ function FridayPlan({ map, draft, onLay, laid, result }: { map: ShuffleCell[] | 
         <Btn onClick={onLay} testId="outage-friday-lay">
           Lay out by Friday's plan
         </Btn>
-        {laid && result ? (
-          <p style={{ ...SMALL, margin: "6px 0 0" }} data-testid="outage-friday-verdict">
-            {result.peak > ASSEMBLY_LIMIT
-              ? `Friday's plan peaks at ${result.peak.toFixed(2)} on the real core, over the ${ASSEMBLY_LIMIT.toFixed(2)} limit. The hall's core is small and forgiving at the edge; a real core loses more there, so the outer fuel has to work harder and the liveliest fuel can't all crowd the middle. Swap orbits until it holds.`
-              : `Friday's plan holds on the real core: peak ${result.peak.toFixed(2)} under the ${ASSEMBLY_LIMIT.toFixed(2)} limit, ${result.efpd.toFixed(0)} days of power.`}
+        {laid && notes ? (
+          <p style={{ ...SMALL, margin: "6px 0 0" }} data-testid="outage-friday-rules">
+            Priya laid it out with two rules the hall&apos;s small core doesn&apos;t need. Fresh fuel without absorber rods goes on the outer flats
+            ({notes.toFlats} {notes.toFlats === 1 ? "orbit" : "orbits"} moved): inside a real core, unpoisoned fresh fuel is a peak. And the very centre holds the most-burned fuel
+            ({notes.toCentre} {notes.toCentre === 1 ? "orbit" : "orbits"}): &quot;inside&quot; means the middle ring, not the middle. Everything else follows your plan.
           </p>
         ) : null}
+        {laid && result && reference ? (
+          <p style={{ ...SMALL, margin: "6px 0 0" }} data-testid="outage-friday-verdict" data-holds={holds(result.peak, reference.peak) ? "yes" : "no"}>
+            {holds(result.peak, reference.peak)
+              ? `Friday's plan holds on the real core: peak ${result.peak.toFixed(2)}, within ${Math.round((HOLD_MARGIN - 1) * 100)}% of the plant's own pattern (${reference.peak.toFixed(2)}) in the same simulator. ${result.efpd.toFixed(0)} days of power.`
+              : `Friday's plan peaks at ${result.peak.toFixed(2)} on the real core. The plant's own pattern reads ${reference.peak.toFixed(2)} in this simulator; a plan holds within ${Math.round((HOLD_MARGIN - 1) * 100)}% of it (${(reference.peak * HOLD_MARGIN).toFixed(2)}). Swap orbits yourself, or ask Priya to work it.`}
+          </p>
+        ) : null}
+        {laid && result && reference && !holds(result.peak, reference.peak) ? (
+          <Btn onClick={onPriya} disabled={busy} testId="outage-friday-priya">
+            {priya ? `Priya is working it: ${priya.tried} of ${priya.of} swaps tried, best start peak ${priya.best.toFixed(2)}` : "Ask Priya to work the layout (about 15 seconds)"}
+          </Btn>
+        ) : null}
+        <p style={{ ...SMALL, margin: "6px 0 0", opacity: 0.8 }}>
+          The plant&apos;s FΔH limit is {FDH_LIMIT}; the teaching model reads even the plant&apos;s own pattern above it, so plans are judged against that pattern, not the license number.
+        </p>
       </div>
     </div>
   );
@@ -308,6 +345,10 @@ export function OutageApp({ s }: { s: GameState }) {
   const [freshPick, setFreshPick] = useState(0);
   /** The draft on the desk started from Friday's plan (cleared when you go back to the plant's pattern). */
   const [laidFriday, setLaidFriday] = useState(false);
+  /** What Priya's real-core rules did when she laid Friday's plan out, and her pass in progress. */
+  const [fridayNotes, setFridayNotes] = useState<{ toFlats: number; toCentre: number } | null>(null);
+  const [priya, setPriya] = useState<PassProgress | null>(null);
+  const [passes, setPasses] = useState(0);
 
   // End of Cycle 1 as the plant ran it (327.2 EFPD). Precomputed for the preset; worked out here for a player's set.
   const presetEoc1 = useMemo(() => beavrsCycle1().map((a, i) => (a ? { ...a, burnup: PRESET_EOC1[i] } : null)), []);
@@ -412,11 +453,12 @@ export function OutageApp({ s }: { s: GameState }) {
     if (next) update({ draft: next });
   };
 
-  const run = () => {
+  const run = () => runOn(draft);
+  const runOn = (core: Core) => {
     setBusy(true);
     // Let the "Running" line paint before the solver takes the thread.
     setTimeout(() => {
-      const mine = runCycle(draft, set, 0.5);
+      const mine = runCycle(core, set, 0.5);
       let reference = plantRun;
       if (cycle === 2 && !reference) {
         reference = runCycle(plant.loaded, set, 0.5);
@@ -466,11 +508,30 @@ export function OutageApp({ s }: { s: GameState }) {
           draft={draft}
           laid={laidFriday}
           result={result}
+          reference={reference}
+          notes={fridayNotes}
+          priya={priya}
+          busy={busy}
           onLay={() => {
             if (busy || !s.plant?.shuffleMap) return;
             setPick(null);
             setLaidFriday(true);
-            update({ draft: fridayLayout(draft, s.plant.shuffleMap, set) });
+            const laid = fridayLayoutWithNotes(draft, s.plant.shuffleMap, set);
+            setFridayNotes({ toFlats: laid.toFlats, toCentre: laid.toCentre });
+            update({ draft: laid.core });
+          }}
+          onPriya={() => {
+            if (busy) return;
+            setBusy(true);
+            const seed = passes + 1;
+            setPasses(seed);
+            void priyaPass(draft, set, { tries: 150, seed, yieldEvery: 3, onProgress: setPriya }).then((r) => {
+              setPriya(null);
+              update({ draft: r.core });
+              setBusy(false);
+              // Run the cycle on her layout straight away: the run, not her search, is the judge.
+              setTimeout(() => runOn(r.core), 30);
+            });
           }}
         />
       ) : null}

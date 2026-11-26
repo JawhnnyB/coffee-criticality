@@ -41,7 +41,7 @@ const WALKERS = ["player", "mabel", "holt", "elena", "tommy", "marcus", "priya",
 export function preloadRoomArt(roomId?: string) {
   const ids = roomId && ROOM_ATLAS[roomId] ? [roomId] : Object.keys(ROOM_ATLAS);
   for (const id of ids) warm(ROOM_ATLAS[id].src);
-  for (const who of WALKERS) warm(`/art/gen/sprites/${who}_walk4.png`);
+  for (const who of [...WALKERS, "colt"]) warm(`/art/gen/sprites/${who}_walk4.png`);
 }
 
 function getBuf(w: number, h: number) {

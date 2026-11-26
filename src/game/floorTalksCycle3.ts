@@ -1,0 +1,560 @@
+/**
+ * Floor talk, cycle 3 and the equilibrium week (weeks 7–10): the floor you've built.
+ *
+ * By now the player has been here two months. People are passing things on: Tommy is counting down to retirement,
+ * Jordan is asked to train someone, Elena is offered a day job, Mabel's thirty years on the wall come round, and
+ * Priya is planning the core that will repeat. Whatever culture the floor has now is the one the next engineer will
+ * walk into.
+ *
+ * Same rules as floorTalks.ts. DRAFT by Claude, waiting for the owner's approval (docs/floor-talk-draft.md).
+ */
+import type { FloorTalk } from "./floorTalks";
+
+export const FLOOR_TALKS_CYCLE3: FloorTalk[] = [
+  {
+    id: "c3-mabel-elena",
+    npc: "mabel",
+    with: "elena",
+    n: 2,
+    title: "The day job",
+    scene: "Elena's at the café with a letter she keeps folding smaller. Mabel's already poured two cups.",
+    lines: {
+      guarded: [
+        ["elena", "Training department offered me days. Nine to five. Home for tea."],
+        ["mabel", "And you haven't said yes."],
+        ["elena", "I keep thinking about who'd read the night log in the van."],
+      ],
+      respect: [
+        ["mabel", "Take it, love. Your crew will read the log. You taught them how."],
+        ["elena", "That's what scares me. That they'd be fine."],
+        ["mabel", "That's what you were building. It's allowed to work."],
+      ],
+      comfort: [
+        ["mabel", "Days! You'll love it. Everyone will miss you terribly."],
+        ["elena", "Will they be all right without me?"],
+        ["mabel", "Oh, of course. ...Probably. Who'd do your turnovers?"],
+      ],
+      distrust: [
+        ["elena", "If I go, someone will say I left before the floor fell apart."],
+        ["mabel", "Someone always says something."],
+        ["elena", "This month, someone always writes it down."],
+      ],
+      fear: [
+        ["elena", "I'm going to say yes. I can't keep holding this floor up on my own."],
+        ["mabel", "You shouldn't have been holding it on your own."],
+        ["elena", "No. But here we are."],
+      ],
+    },
+    ask: "I trained her. Do I tell her to go?",
+    trust: { label: "Tell her the floor will hold. She built it to.", reply: "I will. She deserves to hear it from me. She's been waiting for me to say it since she was twenty-three." },
+    callout: { label: "Ask her who her relief is before she goes.", reply: "That's the right question. A good supervisor leaves a name, not a gap. I'll ask her who, and I'll ask them too." },
+    says: { about: "elena", text: "Mabel says Elena has spent nine years making herself unnecessary, and it's finally working." },
+  },
+  {
+    id: "c3-mabel-holt",
+    npc: "mabel",
+    with: "holt",
+    n: 3,
+    title: "Thirty years",
+    scene: "There's a cake on the café counter for Mabel's thirty years on the wall. Holt's been asked to say something.",
+    lines: {
+      guarded: [
+        ["holt", "I have been asked to make a speech. I have prepared three sentences."],
+        ["mabel", "Three's plenty, Reggie. Say them sitting down."],
+        ["holt", "I will stand. Some habits are earned."],
+      ],
+      respect: [
+        ["holt", "The first mark on that wall was yours, for a relief valve you didn't report. I only learned that this year."],
+        ["mabel", "I told you, did I?"],
+        ["holt", "You told everyone. That is why the wall works. Thank you for the first mark, Mabel."],
+      ],
+      comfort: [
+        ["holt", "Thirty years of lovely coffee. Thank you, Mabel."],
+        ["mabel", "Lovely coffee? That's the speech?"],
+        ["holt", "I had a longer one. It mentioned the wall. It felt too serious for cake."],
+      ],
+      distrust: [
+        ["holt", "Some people have asked whether the wall should be retired with you."],
+        ["mabel", "Some people want fewer marks on it. That's a different thing, Reggie."],
+        ["holt", "Yes. I know who. I will not let it come down."],
+      ],
+      fear: [
+        ["mabel", "Hardly anyone came. There's a lot of cake."],
+        ["holt", "People are keeping their heads down this month."],
+        ["mabel", "Then who's going to keep the wall, Reggie? Not you. You only read it."],
+      ],
+    },
+    ask: "Thirty years. Who keeps the wall when I go?",
+    trust: { label: "Give the chalk to someone and tell everyone you did.", reply: "Yes. A thing passed on in public stays passed on. I'll do it at the next coffee, with cake left over." },
+    callout: { label: "Holt should keep a mark too. His own.", reply: "Oh, I like that. The director's first chalk mark, for his own miss. He'll hate it. He'll do it." },
+    says: { about: "holt", text: "Mabel says Holt was the best junior she trained, and the only one who still stands up for the cake." },
+  },
+  {
+    id: "c3-holt-priya",
+    npc: "holt",
+    with: "priya",
+    n: 2,
+    title: "The repeating core",
+    scene: "Priya's showing Holt a loading pattern that looks almost the same as last cycle's.",
+    lines: {
+      guarded: [
+        ["priya", "Next cycle's pattern. It'll look like this one from now on, give or take."],
+        ["holt", "Why the same?"],
+        ["priya", "Because every assembly lives three cycles. The core's found its rhythm."],
+      ],
+      respect: [
+        ["holt", "So the hard work is done, and now the danger is getting bored."],
+        ["priya", "Exactly that. Same pattern, same numbers, and people stop looking."],
+        ["holt", "Then we change who checks it, every cycle. New eyes on an old map."],
+      ],
+      comfort: [
+        ["priya", "Equilibrium. It basically designs itself now."],
+        ["holt", "Excellent. Then we can cut the review hours."],
+        ["priya", "...I didn't mean that. I really didn't mean that."],
+      ],
+      distrust: [
+        ["holt", "Corporate says if the pattern repeats, we don't need a reactor engineer on every reload."],
+        ["priya", "Did you agree?"],
+        ["holt", "I asked them to put it in writing. They haven't."],
+      ],
+      fear: [
+        ["priya", "I'll just reuse last cycle's pattern. Nobody will question it."],
+        ["holt", "Will it be right?"],
+        ["priya", "Probably. Nobody's checked anything twice in weeks."],
+      ],
+    },
+    ask: "Priya says the core repeats now. What's the risk in that?",
+    trust: { label: "Trust her. She'll keep checking even when it's boring.", reply: "She will. She walks the bottom nozzles every cycle. I will make sure she has the hours." },
+    callout: { label: "Repetition is when people stop looking. Rotate the checkers.", reply: "Yes. A familiar pattern is the easiest one to sign without reading. New eyes every cycle. I will put it in the procedure." },
+    says: { about: "priya", text: "Holt says Priya's core has found its rhythm, and the danger now is getting bored." },
+  },
+  {
+    id: "c3-holt-mabel",
+    npc: "holt",
+    with: "mabel",
+    n: 3,
+    title: "Two minutes",
+    scene: "Holt's at the café counter. For once, he's sitting down.",
+    lines: {
+      guarded: [
+        ["holt", "You said two minutes. I am sitting for two minutes."],
+        ["mabel", "Fifteen years I've been asking. What happened?"],
+        ["holt", "Someone told me people go quiet when I walk in. I wanted to see what it was like to stay."],
+      ],
+      respect: [
+        ["mabel", "You went and apologised to Marcus. He told me. He couldn't believe it."],
+        ["holt", "It took thirty seconds. I have been saving it up for ten years."],
+        ["mabel", "There's my best junior. Have a biscuit, Reggie."],
+      ],
+      comfort: [
+        ["holt", "Everyone seems very happy lately."],
+        ["mabel", "Happy's nice. Are they telling you things?"],
+        ["holt", "They are telling me they are happy."],
+      ],
+      distrust: [
+        ["holt", "I am getting reports about reports. People are writing each other up."],
+        ["mabel", "They're writing to you because they don't talk to each other."],
+        ["holt", "And they don't talk to each other because they think I am reading."],
+      ],
+      fear: [
+        ["holt", "Nobody looked up when I came in."],
+        ["mabel", "That's what quiet looks like from where you stand."],
+        ["holt", "I used to think quiet meant safe."],
+      ],
+    },
+    ask: "Mabel has asked me to sit for fifteen years. Will I keep doing it?",
+    trust: { label: "Make it a habit. Same time every day.", reply: "Then nine o'clock, before corporate. I will tell her. She will pretend not to be pleased." },
+    callout: { label: "Only if you listen without making it a meeting.", reply: "Yes. Sitting is the easy part. Listening without taking notes is the hard part. I will leave the notebook in my office." },
+    says: { about: "mabel", text: "Holt says Mabel asked him to sit for two minutes for fifteen years, and he finally did." },
+  },
+  {
+    id: "c3-elena-jordan",
+    npc: "elena",
+    with: "jordan",
+    n: 2,
+    title: "The new rover",
+    scene: "Elena's paired Jordan with a new hire for the night rounds. Jordan looks like he's been handed a baby.",
+    lines: {
+      guarded: [
+        ["jordan", "Why me? I've been here a year."],
+        ["elena", "Because you read every line before you sign. I want her to learn that first."],
+        ["jordan", "Okay. Honestly, okay. No pressure."],
+      ],
+      respect: [
+        ["jordan", "I told her about my last plant. The log I signed blind. Was that too much?"],
+        ["elena", "It's the best thing you could have told her. Now she'll never sign blind either."],
+        ["jordan", "She asked me if I was still scared. I said yes. Was that okay?"],
+      ],
+      comfort: [
+        ["elena", "She'll love you. Everyone loves you."],
+        ["jordan", "Yeah! It'll be fun. I'll show her the good coffee."],
+        ["elena", "And the log?"],
+      ],
+      distrust: [
+        ["jordan", "Is she shadowing me to learn, or to report on me?"],
+        ["elena", "To learn. Jordan, I chose you."],
+        ["jordan", "I know. Sorry. Old plant. Old habits."],
+      ],
+      fear: [
+        ["jordan", "What do I tell her if she finds something on nights?"],
+        ["elena", "To write it down."],
+        ["jordan", "Even now? Even this month?"],
+      ],
+    },
+    ask: "Jordan thinks he's not ready to teach. Is he?",
+    trust: { label: "He's ready. Tell him you'd let him train your daughter.", reply: "Ha. I would, you know. I'll tell him exactly that. He'll go red." },
+    callout: { label: "He's ready, but he needs to say why he never signs blind.", reply: "Yes. The rule without the story doesn't stick. He has to tell her about his last plant. I'll ask him to." },
+    says: { about: "jordan", text: "Elena says Jordan reads every line before he signs, and she wants every new rover to learn that from him." },
+  },
+  {
+    id: "c3-elena-marcus",
+    npc: "elena",
+    with: "marcus",
+    n: 3,
+    title: "Senior",
+    scene: "Marcus has a new badge: senior reactor engineer. Elena's the first one to notice.",
+    lines: {
+      guarded: [
+        ["elena", "Senior. Congratulations. Does it feel different?"],
+        ["marcus", "It feels like everyone's waiting for me to be wrong."],
+        ["elena", "Everyone's always waiting for that. Now you sign it."],
+      ],
+      respect: [
+        ["marcus", "First thing I did as senior was ask Tommy to check one of my packages. On purpose."],
+        ["elena", "How did he take it?"],
+        ["marcus", "He sent it back with two notes and a smiley face. I deserved both notes."],
+      ],
+      comfort: [
+        ["elena", "Senior! We knew you'd get it. Drinks Friday?"],
+        ["marcus", "Drinks Friday. Yes. Everyone was really nice about it."],
+        ["elena", "Of course they were."],
+      ],
+      distrust: [
+        ["marcus", "Half the floor thinks I got it because I told on myself."],
+        ["elena", "And the other half?"],
+        ["marcus", "Thinks I got it because I told on other people. Neither's true."],
+      ],
+      fear: [
+        ["marcus", "Now I'm senior, I can't afford a single mistake."],
+        ["elena", "You'll make one. Everyone does."],
+        ["marcus", "Then I'll make sure nobody sees it."],
+      ],
+    },
+    ask: "Marcus is senior now. What's the first thing he needs to get right?",
+    trust: { label: "Asking for checks. He's already doing it.", reply: "He is. Asking Tommy, of all people. I'll make sure the crew knows he asked." },
+    callout: { label: "Showing his juniors his mistakes, out loud.", reply: "That's it. If the senior hides his misses, the juniors learn to hide theirs. I'll tell him: first in the log, first in the meeting." },
+    says: { about: "marcus", text: "Elena says the first thing Marcus did as senior was ask Tommy to check his work." },
+  },
+  {
+    id: "c3-tommy-marcus",
+    npc: "tommy",
+    with: "marcus",
+    n: 2,
+    title: "Two notes",
+    scene: "Tommy's handing Marcus back a work package. There are two notes on it and a small drawing of a smiley face.",
+    lines: {
+      guarded: [
+        ["tommy", "Two notes. Second one's important. First one's just me being picky, boss."],
+        ["marcus", "Picky's fine. Which one would have hurt someone?"],
+        ["tommy", "Second. Breaker's not on the drawing. Same as the one that nearly took my apprentice's hand."],
+      ],
+      respect: [
+        ["marcus", "Thank you. I'd have missed the breaker. I'm sure of it."],
+        ["tommy", "You asked me to look. Ten years ago nobody asked me anything."],
+        ["marcus", "Then I'll keep asking. Picky notes included."],
+      ],
+      comfort: [
+        ["tommy", "Couple of tiny notes. Nothing much. Looks great, Marcus."],
+        ["marcus", "Thanks, Tommy. I'll... just sign it, then?"],
+        ["tommy", "Well. The second note's maybe not tiny."],
+      ],
+      distrust: [
+        ["marcus", "Did you send this package back because it's wrong, or because it's mine?"],
+        ["tommy", "Because it's wrong. Same as last time. Same as I would for anyone."],
+        ["marcus", "Last time you made me look stupid in front of the floor."],
+      ],
+      fear: [
+        ["tommy", "I found something on your package. I'll fix it quietly. No notes."],
+        ["marcus", "Why quietly?"],
+        ["tommy", "So neither of us ends up in the morning meeting."],
+      ],
+    },
+    ask: "Marcus asks me to check his work now. Ten years ago we couldn't stand each other. What changed?",
+    trust: { label: "He trusts you to find what he missed.", reply: "Yeah. Funny, that. The man I sent back a package to is the one who asks me first now. I'll keep earning it." },
+    callout: { label: "You both started saying the misses out loud.", reply: "That's it. Neither of us has to win anymore. We just say it. Took us ten years and a new engineer watching." },
+    says: { about: "marcus", text: "Tommy says Marcus is the only engineer who asks him to check a package before it's signed." },
+  },
+  {
+    id: "c3-tommy-priya",
+    npc: "tommy",
+    with: "priya",
+    n: 3,
+    title: "The countdown",
+    scene: "Tommy's taped a countdown to his toolbox: 211 days to retirement. Priya's reading it.",
+    lines: {
+      guarded: [
+        ["priya", "Two hundred and eleven days. Who gets your locks?"],
+        ["tommy", "The apprentice. If he's ready. He's nearly ready."],
+        ["priya", "What does nearly mean?"],
+      ],
+      respect: [
+        ["tommy", "Nearly means he still rushes the try. I've told him. I'll tell him every day till I go."],
+        ["priya", "Can I watch the next one? I want to learn how you teach it."],
+        ["tommy", "Watch away. Bring the boots. It's a long walk to 2A."],
+      ],
+      comfort: [
+        ["priya", "Retirement! You'll have such a lovely time."],
+        ["tommy", "Fishing. Every day. No pumps, no cards."],
+        ["priya", "And the apprentice?"],
+      ],
+      distrust: [
+        ["tommy", "Management wants the apprentice signed off early. Saves a salary."],
+        ["priya", "Is he ready?"],
+        ["tommy", "If I say no, it's me being difficult. If I say yes, it's my name on it."],
+      ],
+      fear: [
+        ["tommy", "I'm going early. Taking the package."],
+        ["priya", "Why?"],
+        ["tommy", "Because I don't want my last lock to be on a floor like this."],
+      ],
+    },
+    ask: "Two hundred and eleven days. What do I leave behind?",
+    trust: { label: "The apprentice. Back him, and he'll be ready.", reply: "Yeah. He's good, Priya says so too. I'll keep telling him the four words till he's sick of them." },
+    callout: { label: "Tell management he's not ready until he is.", reply: "Right. My name on a sign-off means it's true. If they want it early, they can hear why not, out loud." },
+    says: { about: "priya", text: "Tommy says Priya asked to watch him teach the try, and turned up in her scuffed boots." },
+  },
+  {
+    id: "c3-marcus-jordan",
+    npc: "marcus",
+    with: "jordan",
+    n: 2,
+    title: "The second apology",
+    scene: "Marcus has caught Jordan at the lockers. He's been working up to this.",
+    lines: {
+      guarded: [
+        ["marcus", "I snapped at you over the dose sticker. Weeks ago. I apologised, but badly."],
+        ["jordan", "You apologised twice, honestly. It's fine."],
+        ["marcus", "It wasn't fine. I want to do it once, properly."],
+      ],
+      respect: [
+        ["marcus", "You were right about the sticker and I was rude because it was my survey. I'm sorry."],
+        ["jordan", "Thanks. Really. I'll take that one. Can I ask you to check my log some time?"],
+        ["marcus", "Yes. And you check my sheets. Deal?"],
+      ],
+      comfort: [
+        ["marcus", "Sorry about... you know. The sticker thing."],
+        ["jordan", "Ha, ancient history! Bowling Thursday?"],
+        ["marcus", "Bowling. Right. I'll... I'll come."],
+      ],
+      distrust: [
+        ["jordan", "Is this an apology, or are you making sure I don't bring it up at your review?"],
+        ["marcus", "...Both? No. Mostly the first. I deserve the question."],
+        ["jordan", "You do. I'll think about it."],
+      ],
+      fear: [
+        ["marcus", "If anyone asks about the sticker, can you say it was a misunderstanding?"],
+        ["jordan", "It wasn't."],
+        ["marcus", "I know. I'm asking anyway. I'm sorry for asking."],
+      ],
+    },
+    ask: "Two apologies already. Why does a third one matter?",
+    trust: { label: "Because this one's the one he'll believe.", reply: "Yes. Once, plainly, no excuses. I've been getting that wrong for a decade. Thanks for watching me get it right." },
+    callout: { label: "Because the first two were about you, not him.", reply: "Ouch. Yes. The first two were about making me feel better. This one's about what I did to him. Noted, and fair." },
+    says: { about: "jordan", text: "Marcus says Jordan took his third apology and then asked him to check his log. That's Jordan." },
+  },
+  {
+    id: "c3-marcus-tommy",
+    npc: "marcus",
+    with: "tommy",
+    n: 3,
+    title: "The try button",
+    scene: "Marcus is shadowing Tommy's apprentice on a lockout. Tommy's watching both of them.",
+    lines: {
+      guarded: [
+        ["tommy", "He's going to push the try. Watch his hand, not the pump."],
+        ["marcus", "Why the hand?"],
+        ["tommy", "Because the hand tells you if he expects it to turn."],
+      ],
+      respect: [
+        ["marcus", "He paused before the try. Was that you teaching him to?"],
+        ["tommy", "That was him. I never taught him the pause. He worked it out."],
+        ["marcus", "Then he's ready, and you should tell him so where people can hear."],
+      ],
+      comfort: [
+        ["marcus", "Looks great. Textbook."],
+        ["tommy", "Textbook. Yeah. He nearly skipped the try, but textbook."],
+        ["marcus", "Nearly skipped it?"],
+      ],
+      distrust: [
+        ["marcus", "Are you watching him or me?"],
+        ["tommy", "Him. You're the one with the clipboard."],
+        ["marcus", "The clipboard's for the procedure. Not for people."],
+      ],
+      fear: [
+        ["tommy", "He's going to skip the try. He always does when someone's watching."],
+        ["marcus", "Then why's he afraid of being watched?"],
+        ["tommy", "Because the last kid who got watched got written up."],
+      ],
+    },
+    ask: "Tommy watches the hand, not the pump. Should I be teaching that to engineers?",
+    trust: { label: "Yes. Ask Tommy to show your juniors.", reply: "I will. Engineers learn the drawing. Tommy learned the hands. I'll book him an hour. He'll grumble." },
+    callout: { label: "Yes, and you should say where you learned it.", reply: "Right. Credit goes to the person who taught it, by name. I'll say 'Tommy showed me' in front of the whole room." },
+    says: { about: "tommy", text: "Marcus says Tommy watches the hand on the try button, not the pump." },
+  },
+  {
+    id: "c3-priya-elena",
+    npc: "priya",
+    with: "elena",
+    n: 2,
+    title: "Who reads the log",
+    scene: "Elena's teaching her relief to read the night log in the van with a torch. Priya's come along to watch.",
+    lines: {
+      guarded: [
+        ["priya", "Why the van? You could read it at the desk."],
+        ["elena", "At the desk, the night crew's watching. In the van, I read it honestly."],
+        ["priya", "So the van is for you, not them."],
+      ],
+      respect: [
+        ["elena", "She found something I missed. Second page. A valve left in the wrong place for an hour."],
+        ["priya", "Did you tell her she found it?"],
+        ["elena", "In front of the whole turnover. She went red. She'll never stop looking now."],
+      ],
+      comfort: [
+        ["elena", "She's doing brilliantly. Honestly, she barely needs me."],
+        ["priya", "Has she found anything yet?"],
+        ["elena", "Not yet. It's been very quiet."],
+      ],
+      distrust: [
+        ["priya", "Is she reading the log, or looking for who to blame?"],
+        ["elena", "That's the bit I'm trying to teach her. It's harder than the reading."],
+        ["priya", "It's harder than the physics, honestly."],
+      ],
+      fear: [
+        ["elena", "I've told her to skim the night log. Faster that way."],
+        ["priya", "You never skim."],
+        ["elena", "I've never been this tired. And nobody's writing anything real in it anyway."],
+      ],
+    },
+    ask: "Elena's training her own replacement. How do I help her let go?",
+    trust: { label: "Tell her the relief is good. She'll believe you.", reply: "Yes. She trusts my eyes on a map. I'll tell her I'd sign her relief's turnover. That'll do it." },
+    callout: { label: "Ask her what she's scared her relief will miss.", reply: "Good question. The thing she's scared of is the thing she hasn't taught yet. I'll ask her, and we'll write it down." },
+    says: { about: "elena", text: "Priya says Elena reads the night log in the van because at the desk the night crew is watching." },
+  },
+  {
+    id: "c3-priya-mabel",
+    npc: "priya",
+    with: "mabel",
+    n: 3,
+    title: "The second chalk",
+    scene: "Mabel's holding out a piece of chalk. Priya's not sure she should take it.",
+    lines: {
+      guarded: [
+        ["mabel", "Twenty years I've had this spare. Take it."],
+        ["priya", "Why me? I'm an engineer. I'm not even on the floor half the day."],
+        ["mabel", "You read the wall like a map. You'll notice when it goes quiet."],
+      ],
+      respect: [
+        ["priya", "I'll chalk my own miss first. The reload where I put the fresh fuel together because it looked tidy."],
+        ["mabel", "That's twenty years old, love."],
+        ["priya", "It's never been on the wall. That's the point, isn't it?"],
+      ],
+      comfort: [
+        ["mabel", "Here. You keep the wall now. It's a lovely job, really. Mostly quiet."],
+        ["priya", "Mostly quiet?"],
+        ["mabel", "Well. People don't really bring me things the way they used to."],
+      ],
+      distrust: [
+        ["priya", "If I keep the wall, people will say engineering is keeping score."],
+        ["mabel", "They'll say that whoever keeps it."],
+        ["priya", "Then maybe it's not a wall problem. It's a floor problem."],
+      ],
+      fear: [
+        ["mabel", "Take the chalk. I don't want it anymore."],
+        ["priya", "Mabel."],
+        ["mabel", "There's nothing to write. Nobody's said anything in weeks."],
+      ],
+    },
+    ask: "Mabel wants me to keep the wall. Should I take the chalk?",
+    trust: { label: "Take it. She chose you for a reason.", reply: "All right. I'll take it. And I'll keep pouring her cup, so she knows the wall's still hers too." },
+    callout: { label: "Take it, and put your own miss up first.", reply: "Yes. The first mark has to be the keeper's own. Mabel's was. Mine will be. Then anyone can follow." },
+    says: { about: "mabel", text: "Priya says Mabel kept a spare piece of chalk for twenty years, waiting for the right person." },
+  },
+  {
+    id: "c3-jordan-holt",
+    npc: "jordan",
+    with: "holt",
+    n: 2,
+    title: "The break room chair",
+    scene: "Holt's sitting in the break room. Jordan's just walked in and stopped dead in the doorway.",
+    lines: {
+      guarded: [
+        ["holt", "Jordan. I am told this is where people talk. I am here to listen."],
+        ["jordan", "Right. Okay. Should I... sit?"],
+        ["holt", "Please. And talk about anything except the plant."],
+      ],
+      respect: [
+        ["jordan", "Sir, honestly? You used to make my stomach drop. Even when you were being nice."],
+        ["holt", "I know. Mabel told me. I am sorry. What should I do differently?"],
+        ["jordan", "Say the good news first. Every time. Then the question."],
+      ],
+      comfort: [
+        ["holt", "Everyone seems happy in here."],
+        ["jordan", "We are, sir! Best crew on the coast."],
+        ["holt", "Good. ...Nobody is going to tell me anything, are they."],
+      ],
+      distrust: [
+        ["jordan", "Are you sitting in here to hear what people say about you?"],
+        ["holt", "Yes. That is exactly why. I would rather hear it here than in a report."],
+        ["jordan", "Okay. That's... actually fair."],
+      ],
+      fear: [
+        ["jordan", "Everyone left when you came in, sir."],
+        ["holt", "I noticed."],
+        ["jordan", "It's not you. It's... okay, honestly, it's a bit you."],
+      ],
+    },
+    ask: "Holt's sitting in our break room. What do I do with that?",
+    trust: { label: "Give him a chance. He's trying.", reply: "Yeah. Okay. I'll ask him about bowling. If he says yes, the whole floor's going to lose its mind." },
+    callout: { label: "Tell him what you told me. Straight.", reply: "...Right. Good news first, then the question. I'll tell him. If you're standing there with me." },
+    says: { about: "holt", text: "Jordan says Holt sat in the break room to listen, and asked what to do differently." },
+  },
+  {
+    id: "c3-jordan-tommy",
+    npc: "jordan",
+    with: "tommy",
+    n: 3,
+    title: "The keychain",
+    scene: "Tommy's showing Jordan the little plastic wrench on his keychain. It's nearly worn through.",
+    lines: {
+      guarded: [
+        ["tommy", "My kid gave me this when I started. I look at it every time I hang a lock."],
+        ["jordan", "Why are you showing me?"],
+        ["tommy", "Because I'm going to give it to the apprentice when I go. Don't tell him."],
+      ],
+      respect: [
+        ["jordan", "Tommy, that's... honestly, that's the nicest thing I've seen on this site."],
+        ["tommy", "It's a bit of plastic. It's what it reminds you of. Who you're going home to."],
+        ["jordan", "Can I tell the new rover about it? On nights. When she's tired."],
+      ],
+      comfort: [
+        ["jordan", "Ah, that's so sweet. You'll miss this place."],
+        ["tommy", "Course I will. Best years of my life."],
+        ["jordan", "Will the apprentice be all right?"],
+      ],
+      distrust: [
+        ["tommy", "I'm giving the apprentice my keychain. Not my notes. My notes go to Elena."],
+        ["jordan", "Why not him?"],
+        ["tommy", "Because if something goes wrong, I want a supervisor to have them. Not a kid."],
+      ],
+      fear: [
+        ["tommy", "I was going to give the apprentice this. Now I'm not sure I want him working here."],
+        ["jordan", "Tommy."],
+        ["tommy", "I'm serious. I'd tell my own kid to find another plant right now."],
+      ],
+    },
+    ask: "Tommy's going to give that keychain away. What should I tell him?",
+    trust: { label: "Tell him the apprentice will treasure it.", reply: "He will. I'll make sure the kid knows what it means. Honestly, I might cry." },
+    callout: { label: "Tell him to give it in front of everyone.", reply: "Yeah. Not in a corner. In front of the crew, so we all know what we're handing on. I'll organise it. With cake." },
+    says: { about: "tommy", text: "Jordan says Tommy's going to give his keychain to the apprentice, and it's the nicest thing he's seen on site." },
+  },
+];

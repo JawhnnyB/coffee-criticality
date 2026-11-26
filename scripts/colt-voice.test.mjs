@@ -60,7 +60,7 @@ export function collect() {
                       }
   for (const npc of ids) for (const sc of S.SCENES[npc] ?? []) { sc.lines.forEach(line); if (HOLT.test(sc.known ?? "")) about.add(sc.known); }
   for (const m of CM.MOMENTS) { m.lines.forEach(line); if (HOLT.test(m.known ?? "")) about.add(m.known); }
-  for (const t of FT.FLOOR_TALKS) {
+  for (const t of FT.ALL_FLOOR_TALKS) {
     for (const cul of ["guarded", "respect", "comfort", "distrust", "fear"]) FT.floorLines(t, cul).forEach(line);
     for (const s of [t.scene, t.title, t.ask, t.trust?.label, t.trust?.reply, t.callout?.label, t.callout?.reply, t.says?.text]) if (s && HOLT.test(s)) about.add(s);
   }

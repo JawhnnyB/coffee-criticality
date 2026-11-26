@@ -118,3 +118,39 @@ test("day 2 onward: the end of day 1 doesn't silence scenes, exchanges or gifts"
   s.dialogue = [];
   assert.equal(F.addScene(s, false), null, "the walk to the shore stays quiet");
 });
+
+test("each fuel cycle has its own fourteen exchanges, built to the same rules", () => {
+  const ids = new Set();
+  assert.equal(F.FLOOR_TALK_SETS.length, 3);
+  for (const { talks } of F.FLOOR_TALK_SETS) {
+    assert.equal(talks.length, 14);
+    for (const id of Object.keys(F.NPCS)) {
+      const mine = talks.filter((t) => t.npc === id);
+      assert.deepEqual(mine.map((t) => t.n).sort(), [2, 3], id);
+      for (const t of mine) assert.notEqual(t.with, id);
+      assert.equal(talks.filter((t) => t.says.about === id).length, 2, `${id} is talked about twice`);
+    }
+    for (const t of talks) {
+      assert.ok(!ids.has(t.id), `unique id ${t.id}`);
+      ids.add(t.id);
+      for (const c of CULTURES) {
+        assert.ok(t.lines[c]?.length >= 3, `${t.id} ${c}`);
+        for (const [, text] of t.lines[c]) assert.ok(text.length <= 125, `${t.id} ${c}: ${text}`);
+      }
+      assert.ok(t.trust.label.length <= 90 && t.callout.label.length <= 90, t.id);
+      assert.ok(t.trust.reply.length <= 150 && t.callout.reply.length <= 150, t.id);
+    }
+  }
+});
+
+test("the week picks the cycle's exchanges; old saves keep the first set", () => {
+  assert.equal(F.talksForWeek(0), F.FLOOR_TALKS);
+  assert.equal(F.talksForWeek(3), F.FLOOR_TALKS);
+  assert.equal(F.talksForWeek(4)[0].id.startsWith("c2-"), true);
+  assert.equal(F.talksForWeek(6)[0].id.startsWith("c2-"), true);
+  assert.equal(F.talksForWeek(7)[0].id.startsWith("c3-"), true);
+  assert.equal(F.talksForWeek(10)[0].id.startsWith("c3-"), true);
+  const due = F.dueFloorTalk({ "cw:5": true }, "tommy", 2);
+  assert.equal(due.id, "c2-tommy-jordan");
+  assert.equal(F.dueFloorTalk({}, "tommy", 2).id.startsWith("c2-"), false);
+});

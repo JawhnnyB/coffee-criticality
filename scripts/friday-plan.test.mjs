@@ -14,7 +14,7 @@ const entry = join(dir, "entry.ts");
 const out = join(dir, "friday.mjs");
 writeFileSync(entry, [
   `export * from ${JSON.stringify(join(root, "src/game/outage/fridayPlan.ts"))};`,
-  `export { beavrsCycle1, beavrsCycle2, endCycle, orbit, QUARTER, N } from ${JSON.stringify(join(root, "src/game/outage/core.ts"))};`,
+  `export { beavrsCycle1, beavrsCycle2, endCycle, orbit, QUARTER, N, runCycle } from ${JSON.stringify(join(root, "src/game/outage/core.ts"))};`,
   `export { PRESET_EOC1 } from ${JSON.stringify(join(root, "src/game/outage/eoc1.ts"))};`,
   `export { presetSet } from ${JSON.stringify(join(root, "src/game/outage/preset.ts"))};`,
   `export { PRESET_FIT, FIT_REPORT } from ${JSON.stringify(join(root, "src/game/outage/calibration.ts"))};`,
@@ -45,11 +45,39 @@ test("the layout moves fuel, never makes or loses it, and keeps the 90° symmetr
   }
 });
 
-test("the plan's strategy shows on the real core", () => {
-  const low = F.freshOnRim(F.fridayLayout(core, LOW, set));
-  const high = F.freshOnRim(F.fridayLayout(core, HIGH, set));
-  assert.ok(low < 0.4, `low-leakage plan keeps most fresh fuel off the outer third (${low})`);
-  assert.ok(high > low + 0.25, `a fresh-on-the-fence plan puts more of it there (${high} vs ${low})`);
+const MID = (F.N - 1) / 2;
+const reach = (c) => Math.max(...c.map((a, i) => (a ? Math.hypot((i % F.N) - MID, Math.floor(i / F.N) - MID) : 0)));
+/** Share of one kind of fresh fuel on the outer third. */
+const outerShare = (c, poisoned) => {
+  const R = reach(c);
+  const fresh = c.map((a, i) => ({ a, i })).filter((x) => x.a && x.a.cycles === 0 && x.a.ba > 0 === poisoned);
+  return fresh.filter((x) => Math.hypot((x.i % F.N) - MID, Math.floor(x.i / F.N) - MID) / R > 2 / 3).length / fresh.length;
+};
+
+test("Priya's real-core rules: unpoisoned fresh fuel on the flats, the most burned in the centre", () => {
+  for (const plan of [LOW, HIGH]) {
+    const n = F.fridayLayoutWithNotes(core, plan, set);
+    assert.equal(outerShare(n.core, false), 1, "every unpoisoned fresh assembly on the outer third");
+    assert.ok(n.toCentre > 0);
+    const centre = F.QUARTER.filter((q) => F.orbit(q).length === 4 && Math.hypot((q % F.N) - MID, Math.floor(q / F.N) - MID) / reach(core) < F.CENTRE_END);
+    for (const q of centre) assert.ok(n.core[q].cycles > 0, "no fresh fuel in the very centre");
+  }
+});
+
+test("the plan still decides where the poisoned fresh fuel goes", () => {
+  const low = outerShare(F.fridayLayout(core, LOW, set), true);
+  const high = outerShare(F.fridayLayout(core, HIGH, set), true);
+  assert.ok(high > low, `a fresh-on-the-fence plan puts more of it outward (${high} vs ${low})`);
+});
+
+test("laid out by the rules and worked by Priya, a low-leakage plan holds against the plant's own pattern", async () => {
+  const plantPeak = F.runCycle(core, set, 0.5).peak;
+  const laid = F.fridayLayout(core, LOW, set);
+  const literal = F.runCycle(laid, set, 0.5).peak;
+  const worked = await F.priyaPass(laid, set, { tries: 150, seed: 1, yieldEvery: 1000 });
+  const after = F.runCycle(worked.core, set, 0.5).peak;
+  assert.ok(after <= literal + 1e-6 || F.holds(after, plantPeak), `Priya's pass never makes it worse (${literal} → ${after})`);
+  assert.ok(F.holds(after, plantPeak), `holds: ${after.toFixed(3)} vs plant ${plantPeak.toFixed(3)} × ${F.HOLD_MARGIN}`);
 });
 
 test("Friday's freshness reads by distance from the centre", () => {

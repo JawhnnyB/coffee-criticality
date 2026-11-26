@@ -1,5 +1,5 @@
 // Generates docs/floor-talk-draft.md from the code.
-import { FLOOR_TALKS, SPEAKER } from "../../../src/game/floorTalks";
+import { FLOOR_TALK_SETS, SPEAKER } from "../../../src/game/floorTalks";
 import { CULTURE_INFO, CHOICE_AXES, type Culture } from "../../../src/game/floorCulture";
 import { TOYS, NO_TOY_FOR_HOLT, TOKENS_PER_DAY_PER_CAB } from "../../../src/game/parlorPrizes";
 const C: Culture[] = ["guarded", "respect", "comfort", "distrust", "fear"];
@@ -18,7 +18,10 @@ out.push("", "Thresholds: Respect at trust 4 and calling-out 4; Comfort at trust
   "The crew page shows the culture, both numbers and what moves them. The end-of-day card names the floor's culture that day.", "",
   "## What you walk in on", "",
   "Your 2nd and 3rd talk with each person each week opens with them and someone else. The same situation is written five ways, one per culture. It ends with them turning to you: back someone up (trust +1, and +1 trust with that person) or name the problem (calling out +1, culture +1). Afterward, the crew page shows what one of them said about the other.", "");
-for (const t of FLOOR_TALKS) {
+const SET_NAME = ["Cycle 1 (weeks 1–3): the first weeks", "Cycle 2 (weeks 4–6): after the first outage", "Cycle 3 and the equilibrium week (weeks 7–10): what you've built"];
+for (const [k, set] of FLOOR_TALK_SETS.entries()) {
+out.push(`## ${SET_NAME[k]}`, "");
+for (const t of set.talks) {
   out.push(`### ${SPEAKER[t.npc]} and ${SPEAKER[t.with]}: "${t.title}" (talk ${t.n})`, "", `_${t.scene}_`, "");
   for (const c of C) {
     out.push(`**${CULTURE_INFO[c].name}**`, "");
@@ -26,6 +29,7 @@ for (const t of FLOOR_TALKS) {
     out.push("");
   }
   out.push(`**${SPEAKER[t.npc]}, to you:** ${t.ask}`, "", `- *Back them up:* "${t.trust.label}" → ${t.trust.reply}`, `- *Name it:* "${t.callout.label}" → ${t.callout.reply}`, "", `**Crew page, about ${SPEAKER[t.says.about]}:** ${t.says.text}`, "");
+}
 }
 out.push("## Tokens and toys", "",
   `Brass tokens from Mabel's jar. On the eight levelled cabinets, a finished run pays 1 and clearing the level's score pays 2, at most ${TOKENS_PER_DAY_PER_CAB} per cabinet per day. The jar survives a new week.`, "",

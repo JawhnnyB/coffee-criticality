@@ -14,6 +14,9 @@
  */
 import type { Choice, Line, NpcId } from "./content";
 import type { Culture } from "./floorCulture";
+import { weekOf } from "./campaign";
+import { FLOOR_TALKS_CYCLE2 } from "./floorTalksCycle2";
+import { FLOOR_TALKS_CYCLE3 } from "./floorTalksCycle3";
 
 type Beat = [NpcId | null, string];
 
@@ -607,7 +610,7 @@ export const talkKey = (npc: NpcId, n: number) => `talks:${npc}:${n}`;
  * first exchange and the 3rd the second; one held back (a gift was given that talk) plays at the next talk.
  */
 export function dueFloorTalk(flags: Record<string, boolean>, npc: NpcId, n: number): FloorTalk | null {
-  return FLOOR_TALKS.filter((f) => f.npc === npc && f.n <= n && !flags[floorKey(f.id)]).sort((a, b) => a.n - b.n)[0] ?? null;
+  return talksFor(flags).filter((f) => f.npc === npc && f.n <= n && !flags[floorKey(f.id)]).sort((a, b) => a.n - b.n)[0] ?? null;
 }
 
 /** The exchange as dialogue lines, in the given culture. Narration has an empty speaker. */
@@ -625,5 +628,25 @@ export function floorLines(t: FloorTalk, culture: Culture): Line[] {
 
 /** What you've heard others say about this person, this week. */
 export function saysAbout(flags: Record<string, boolean>, npc: NpcId): string[] {
-  return FLOOR_TALKS.filter((t) => t.says.about === npc && flags[floorKey(t.id)]).map((t) => t.says.text);
+  return talksFor(flags).filter((t) => t.says.about === npc && flags[floorKey(t.id)]).map((t) => t.says.text);
+}
+
+/**
+ * Each fuel cycle has its own exchanges (the owner, 25 November 2026: ten weeks of the same fourteen got repetitive).
+ * Weeks 1–3 (and saves from before the campaign) use the first set; weeks 4–6 cycle 2's; weeks 7–10 cycle 3's.
+ */
+export const FLOOR_TALK_SETS: { weeks: [number, number]; talks: FloorTalk[] }[] = [
+  { weeks: [0, 3], talks: FLOOR_TALKS },
+  { weeks: [4, 6], talks: FLOOR_TALKS_CYCLE2 },
+  { weeks: [7, 10], talks: FLOOR_TALKS_CYCLE3 },
+];
+
+export const ALL_FLOOR_TALKS: FloorTalk[] = FLOOR_TALK_SETS.flatMap((x) => x.talks);
+
+export function talksForWeek(week: number): FloorTalk[] {
+  return (FLOOR_TALK_SETS.find((x) => week >= x.weeks[0] && week <= x.weeks[1]) ?? FLOOR_TALK_SETS[0]).talks;
+}
+
+export function talksFor(flags: Record<string, boolean>): FloorTalk[] {
+  return talksForWeek(weekOf(flags));
 }

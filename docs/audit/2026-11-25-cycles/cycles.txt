@@ -1,0 +1,18 @@
+PASS 1280 Priya says which real-core rules she applied (Priya laid it out with two rules the hall's small core doesn't need. Fresh fuel without absorber rod)
+PASS 1280 judged against the plant's own pattern (Friday's plan peaks at 1.72 on the real core. The plant's own pattern reads 1.45 in this simulator; a plan holds within 10% of it (1.60). Sw)
+PASS 1280 Priya shows her work (Priya is working it: 30 of 150 swaps tried, best start peak 1.70)
+PASS 1280 after Priya's pass, Friday's plan holds on the real core (Friday's plan holds on the real core: peak 1.50, within 10% of the plant's own pattern (1.45) in the same simulator. 269 days of power.)
+PASS 1280 week 5: Tommy and Jordan at the second lock (Jordan's watching Tommy hang a second lock on a breaker that already has one. | Two locks? Is that a new rule? | No. It's a me rule. Outage brain. I don't trust)
+PASS 1280 the exchange shows on screen
+PASS 1280 Colt has his own portrait (/art/ui/portraits/portrait-colt-talk.png)
+PASS 1280 week 8: Colt and Priya at the repeating core, in Colt's words (Priya's showing Colt a loading pattern that looks almost the same as last cycle's. | Next cycle's pattern. It'll look like this one from now on, give or take. | Why the same? Walk )
+PASS 1280 no page errors
+PASS 390 Priya says which real-core rules she applied (Priya laid it out with two rules the hall's small core doesn't need. Fresh fuel without absorber rod)
+PASS 390 judged against the plant's own pattern (Friday's plan peaks at 1.72 on the real core. The plant's own pattern reads 1.45 in this simulator; a plan holds within 10% of it (1.60). Sw)
+PASS 390 Priya shows her work (Priya is working it: 30 of 150 swaps tried, best start peak 1.70)
+PASS 390 after Priya's pass, Friday's plan holds on the real core (Friday's plan holds on the real core: peak 1.50, within 10% of the plant's own pattern (1.45) in the same simulator. 269 days of power.)
+PASS 390 week 5: Tommy and Jordan at the second lock (Jordan's watching Tommy hang a second lock on a breaker that already has one. | Two locks? Is that a new rule? | No. It's a me rule. Outage brain. I don't trust)
+PASS 390 the exchange shows on screen
+PASS 390 Colt has his own portrait (/art/ui/portraits/portrait-colt-talk.png)
+PASS 390 week 8: Colt and Priya at the repeating core, in Colt's words (Priya's showing Colt a loading pattern that looks almost the same as last cycle's. | Next cycle's pattern. It'll look like this one from now on, give or take. | Why the same? Walk )
+PASS 390 no page errors

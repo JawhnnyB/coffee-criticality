@@ -1,5 +1,6 @@
 "use client";
 
+import { artId } from "./bossArt";
 import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { PHONE_VIEW_W, integerScale } from "./artScale";
 import { DEFAULT_PLAYER_LOOK, type HairId, type HoodieId, type PlayerLook } from "./artSpec";
@@ -272,8 +273,8 @@ export function PixelBeat({
   useEffect(() => {
     const srcs = [
       `/art/intro/scene-${scene}.png`,
-      `/art/ui/portraits/portrait-${who}-smile.png`,
-      `/art/ui/portraits/portrait-${who}-talk.png`,
+      `/art/ui/portraits/portrait-${artId(who)}-smile.png`,
+      `/art/ui/portraits/portrait-${artId(who)}-talk.png`,
       "/art/ui/portraits/portrait-player-smile.png",
       "/art/ui/portraits/portrait-player-talk.png",
       "/art/ui/portraits/portrait-player-smile-noglasses.png",
@@ -409,7 +410,7 @@ export function PixelBrief({
   const [tick, setTick] = useState(0);
   useEffect(() => {
     return watchImages(
-      ["/art/intro/scene-control.png", "/art/ui/portraits/portrait-holt-smile.png", "/art/ui/portraits/portrait-holt-talk.png"],
+      ["/art/intro/scene-control.png", `/art/ui/portraits/portrait-${artId("holt")}-smile.png`, `/art/ui/portraits/portrait-${artId("holt")}-talk.png`],
       () => setTick((n) => n + 1),
     );
   }, []);
@@ -444,7 +445,7 @@ export function PixelBrief({
 export function CastFace({ id, zoom = 4, live = false }: { id: string; zoom?: number; live?: boolean }) {
   const talking = useTalking();
   const mouth = live && talking ? "talk" : "smile";
-  const src = `/art/ui/portraits/portrait-${id}-${mouth}.png`;
+  const src = `/art/ui/portraits/portrait-${artId(id)}-${mouth}.png`;
   const px = 48 * zoom;
   return (
     <img

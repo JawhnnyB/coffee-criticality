@@ -14,6 +14,8 @@
  *
  * AI-drafted: owner approval pending, and it counts toward the Steam AI disclosure.
  */
+import { COLT_LINES_CYCLES } from "./coltVoiceCycles";
+
 export type PlantId = "holt" | "colt";
 
 export const PLANT_FLAG = "plant:colt";
@@ -314,6 +316,8 @@ export const COLT_LINES: Record<string, string> = {
   "Find Holt. Afternoon check-in.": "Find Colt. Afternoon check-in.",
   "Afternoon. The stack's shadow is long. Holt will want a real answer.": "Afternoon. The stack's shadow is long. Colt will want to know how the day went.",
 };
+
+Object.assign(COLT_LINES, COLT_LINES_CYCLES);
 
 /** Lines built from numbers. */
 export const COLT_PATTERNS: [RegExp, string][] = [

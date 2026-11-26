@@ -1,4 +1,5 @@
 /** 384×216 intro chrome. Glyphs match tools/artkit/intro_mock.py. Spoken lines are not drawn here. */
+import { artId } from "./bossArt";
 import type { HairId, HoodieId, PlayerLook } from "./artSpec";
 import { fillRect, nameChip, panel, pixelButton, text3, text5 } from "./pxFont";
 
@@ -246,7 +247,7 @@ export function playerPortrait(look: PlayerLook, mouth: "smile" | "talk"): Canva
 }
 
 export function castPortrait(who: string, mouth: "smile" | "talk"): CanvasImageSource | null {
-  return needImage(`/art/ui/portraits/portrait-${who}-${mouth}.png`);
+  return needImage(`/art/ui/portraits/portrait-${artId(who)}-${mouth}.png`);
 }
 
 function blitPortrait(ctx: CanvasRenderingContext2D, im: CanvasImageSource | null, x: number, y: number) {

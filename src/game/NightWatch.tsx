@@ -754,7 +754,7 @@ function bestLetter(flags: Record<string, boolean>, night: number): string {
  */
 function SceneCard({ scene: raw, testId, children, calm, plant = "holt" }: { scene: RotationScene; testId: string; children: ReactNode; calm: boolean; plant?: "holt" | "colt" }) {
   const scene = plantScene(raw, plant);
-  const face = scene.face ? NPCS[scene.face].portrait.src.replace("-smile", "-talk") : null;
+  const face = scene.face ? NPCS[scene.face].portrait.src.replace("-smile", "-talk").replace("portrait-holt", plant === "colt" ? "portrait-colt" : "portrait-holt") : null;
   return (
     <div className="paper mx-auto w-full p-4 sm:p-5" style={CARD} data-testid={testId}>
       <div className="flex items-start gap-3">

@@ -151,6 +151,7 @@ import {
   type PlantId,
   type Verdict,
 } from "./campaign";
+import { setBossArt } from "./bossArt";
 import { coltDeskNote, coltDialogue, plantOf, plantSpeaker, plantText } from "./coltVoice";
 import { barShown } from "./barRules";
 import type { AppId } from "./parlorOS";
@@ -1046,6 +1047,7 @@ export function GameApp() {
   // Which week and plant the shift is in. sim.ts reads its days through dayDef, so this keeps them in step.
   const ctxNow = contextOf(s.flags);
   setWeekContext(ctxNow);
+  setBossArt(plantOf(s.flags));
   const plantNow: PlantId = s.role ? plantOf(s.flags) : camp.plant;
   /** A line as it reads at this plant, this week. */
   const say = (t: string) => weekText(plantText(t, plantNow), ctxNow);
