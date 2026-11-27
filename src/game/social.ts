@@ -16,7 +16,7 @@ import { A_ROTATION_NPC, A_ROTATION_SCENE, readCrew, takeARotationScene } from "
 import { dueMoment, knownMoments, markMoment, type MomentState } from "./crewMoments";
 import { dueFloorTalk, floorKey, floorLines, saysAbout, talkKey } from "./floorTalks";
 import { cultureOf, type Culture } from "./floorCulture";
-import { TOYS, giftDue, giftKey, giveToy, readJar, writeJar } from "./parlorPrizes";
+import { TOYS, giftDue, giftKey, giveToy, readJar, toyArt, writeJar } from "./parlorPrizes";
 
 export type Tier = 0 | 1 | 2 | 3;
 
@@ -88,7 +88,8 @@ export function addScene(s: TalkState, firstMeeting: boolean): Scene | null {
   const jar = readJar();
   const toy = giftDue(npc, s.flags, jar);
   if (toy) {
-    s.dialogue.push(...copy(toy.scene));
+    // The toy is held up over the talk box for the whole scene (GameApp's DialogueStage looks back for it).
+    s.dialogue.push(...copy(toy.scene).map((l) => ({ ...l, item: toyArt(toy.npc) })));
     writeJar(giveToy(toy, s.flags, jar));
     s.trust[npc] = Math.min(100, (s.trust[npc] ?? 0) + 4);
     return { tier: 1, title: toy.name, known: toy.known, lines: toy.scene };

@@ -96,9 +96,44 @@ function canvas() {
   const rect = (x, y, rw, rh, hex) => {
     for (let yy = 0; yy < rh; yy++) for (let xx = 0; xx < rw; xx++) set(x + xx, y + yy, hex);
   };
-  return { set, rect, px };
+  const clear = (x, y) => {
+    if (x < 0 || y < 0 || x >= w || y >= h) return;
+    px.fill(0, (y * w + x) * 4, (y * w + x) * 4 + 4);
+  };
+  return { set, rect, clear, px };
 }
 
+/** Copy one 32×64 cell out of a sheet. */
+function cell(img, cx, cy) {
+  const out = Buffer.alloc(32 * 64 * 4);
+  for (let y = 0; y < 64; y++) img.px.copy(out, y * 32 * 4, ((cy + y) * 128 + cx) * 4, ((cy + y) * 128 + cx + 32) * 4);
+  return out;
+}
+
+/**
+ * 26 November 2026: the walkers now match the dialogue portraits (tools/artkit/cast.py, portrait.py), which are
+ * the faces players remember: Holt's sandy hair and red tie, Elena's ponytail and gold top, Tommy's hard hat, Marcus's
+ * beard, Priya's green top, Jordan's orange. Colours are taken from the portrait specs. Colt (the second plant's
+ * director) gets his own: silver hair, a short grey beard, a sage zip-up, no tie.
+ */
+const P = (skin, skinD, hair, hairL, shirt, shirtL, shirtD, rest = {}) => ({
+  outline: PAL.outline,
+  skin,
+  skinD,
+  hair,
+  hairL,
+  blush: PAL.skinBlush,
+  eye: PAL.ink,
+  white: PAL.white,
+  mouth: PAL.bad,
+  glasses: PAL.outline,
+  shirt,
+  shirtL,
+  shirtD,
+  pants: PAL.woodDark,
+  shoe: PAL.ink,
+  ...rest,
+});
 const CASTS = {
   player: {
     outline: TINT.outline,
@@ -118,133 +153,14 @@ const CASTS = {
     shoe: PAL.ink,
     extra: "glasses",
   },
-  mabel: {
-    outline: PAL.outline,
-    hair: PAL.ash,
-    hairL: PAL.muted,
-    skin: PAL.skin,
-    skinD: PAL.skin2,
-    blush: PAL.skinBlush,
-    eye: PAL.ink,
-    white: PAL.white,
-    mouth: PAL.bad,
-    glasses: PAL.outline,
-    shirt: PAL.copper,
-    shirtL: PAL.copperL,
-    shirtD: PAL.copperD,
-    pants: PAL.woodMid,
-    shoe: PAL.ink,
-    apron: PAL.cream,
-    bun: true,
-  },
-  holt: {
-    outline: PAL.outline,
-    hair: PAL.ash,
-    hairL: PAL.muted,
-    skin: PAL.skin2,
-    skinD: PAL.skinTan,
-    blush: PAL.skinBlush,
-    eye: PAL.ink,
-    white: PAL.white,
-    mouth: PAL.wood,
-    glasses: PAL.gold,
-    shirt: PAL.steel,
-    shirtL: PAL.steelL,
-    shirtD: PAL.ink,
-    pants: PAL.woodDark,
-    shoe: PAL.ink,
-    tie: PAL.gold,
-    extra: "glasses",
-  },
-  elena: {
-    outline: PAL.outline,
-    hair: PAL.outline,
-    hairL: PAL.woodDark,
-    skin: PAL.skinTan,
-    skinD: PAL.skinBrown,
-    blush: PAL.skinBlush,
-    eye: PAL.ink,
-    white: PAL.white,
-    mouth: PAL.bad,
-    glasses: PAL.outline,
-    shirt: PAL.leaf,
-    shirtL: PAL.cream,
-    shirtD: PAL.leafD,
-    pants: PAL.wood,
-    shoe: PAL.ink,
-    braid: true,
-  },
-  tommy: {
-    outline: PAL.outline,
-    hair: PAL.woodMid,
-    hairL: PAL.woodL,
-    skin: PAL.skinTan,
-    skinD: PAL.copperD,
-    blush: PAL.skinBlush,
-    eye: PAL.ink,
-    white: PAL.white,
-    mouth: PAL.wood,
-    glasses: PAL.outline,
-    shirt: PAL.wood,
-    shirtL: PAL.woodL,
-    shirtD: PAL.woodDark,
-    pants: PAL.steel,
-    shoe: PAL.ink,
-    cap: PAL.copper,
-  },
-  marcus: {
-    outline: PAL.outline,
-    hair: PAL.copperD,
-    hairL: PAL.copper,
-    skin: PAL.skin2,
-    skinD: PAL.skin,
-    blush: PAL.skinBlush,
-    eye: PAL.ink,
-    white: PAL.white,
-    mouth: PAL.bad,
-    glasses: PAL.steel,
-    shirt: PAL.creamD,
-    shirtL: PAL.cream,
-    shirtD: PAL.muted,
-    pants: PAL.woodMid,
-    shoe: PAL.ink,
-    extra: "glasses",
-  },
-  priya: {
-    outline: PAL.outline,
-    hair: PAL.outline,
-    hairL: PAL.woodDark,
-    skin: PAL.skinBrown,
-    skinD: PAL.copperD,
-    blush: PAL.wine,
-    eye: PAL.ink,
-    white: PAL.white,
-    mouth: PAL.wine,
-    glasses: PAL.outline,
-    shirt: PAL.wine,
-    shirtL: PAL.copperL,
-    shirtD: PAL.ink,
-    pants: PAL.woodDark,
-    shoe: PAL.ink,
-    bun: true,
-  },
-  jordan: {
-    outline: PAL.outline,
-    hair: PAL.wood,
-    hairL: PAL.copperL,
-    skin: PAL.skinTan,
-    skinD: PAL.skinBrown,
-    blush: PAL.skinBlush,
-    eye: PAL.ink,
-    white: PAL.white,
-    mouth: PAL.copperD,
-    glasses: PAL.outline,
-    shirt: PAL.leaf,
-    shirtL: PAL.gold,
-    shirtD: PAL.leafD,
-    pants: PAL.woodMid,
-    shoe: PAL.ink,
-  },
+  mabel: P("#f5c9a0", "#dba37a", "#cfc8bc", "#efe9dd", "#c8643c", "#e0845a", "#9e4a2a", { pants: PAL.woodMid, apron: PAL.cream, bun: true }),
+  holt: P("#f5c9a0", "#dba37a", "#c8a878", "#e0c498", "#a8764a", "#c4905a", "#805634", { mouth: PAL.wood, tie: "#a82a3a", collar: "#f4ecd8" }),
+  colt: P("#f5c9a0", "#dba37a", "#c8c0b4", "#e4ded2", "#6b8f71", "#8cb492", "#48684e", { mouth: PAL.wood, beard: "#b4aca0", collar: "#f4ecd8" }),
+  elena: P("#e0a878", "#c08850", "#6a4030", "#8a5a40", "#d8a63a", "#ecc460", "#b08428", { pants: PAL.wood, pony: "#a82a3a" }),
+  tommy: P("#e0a878", "#c08850", "#3a2a22", "#5a4030", "#efe2c4", "#fff6e6", "#c8b890", { mouth: PAL.wood, pants: PAL.steel, hardhat: ["#e0b030", "#f4d060", "#c89820"] }),
+  marcus: P("#f0c498", "#d49c70", "#9e4a2a", "#c0643a", "#c4603a", "#dc8058", "#9a4428", { pants: PAL.woodMid, beard: "#9e4a2a" }),
+  priya: P("#c98e62", "#a8704a", "#2b1d18", "#4a3328", "#488038", "#68a058", "#305824", { blush: PAL.wine, mouth: PAL.wine, bun: true, bindi: "#c04a38" }),
+  jordan: P("#d8a070", "#b88050", "#4a3028", "#6a4a3a", "#d08c30", "#e8a850", "#a86c20", { pants: PAL.woodMid, mouth: PAL.copperD, messy: true }),
 };
 
 function paintDown(img, ox, oy, c, phase) {
@@ -279,17 +195,43 @@ function paintDown(img, ox, oy, c, phase) {
   img.rect(x + 3 - Math.max(step, 0), y + 29, 3, 2, c.shoe);
   img.rect(x + 8 + Math.max(-step, 0), y + 29, 3, 2, c.shoe);
   if (c.apron) img.rect(x + 5, y + 16, 4, 6, c.apron);
+  if (c.collar) {
+    img.set(x + 5, y + 14, c.collar);
+    img.set(x + 8, y + 14, c.collar);
+  }
   if (c.tie) img.rect(x + 6, y + 14, 2, 6, c.tie);
   if (c.bun) {
     img.rect(x + 5, y - 4, 4, 1, c.hair);
     img.rect(x + 4, y - 3, 6, 3, c.hair);
     img.set(x + 5, y - 3, c.hairL);
   }
-  if (c.cap) {
-    img.rect(x + 2, y - 2, 10, 2, c.cap);
-    img.rect(x + 1, y, 12, 2, c.cap);
+  if (c.messy) {
+    img.set(x + 4, y - 1, c.hair);
+    img.set(x + 7, y - 1, c.hair);
+    img.set(x + 10, y - 1, c.hair);
   }
-  if (c.braid) img.rect(x + 1, y + 6, 1, 8, c.hair);
+  if (c.pony) {
+    img.rect(x + 12, y + 3, 2, 7, c.hair);
+    img.set(x + 13, y + 8, c.hairL);
+    img.rect(x + 12, y + 3, 2, 1, c.pony);
+  }
+  if (c.hardhat) {
+    const [h, hl, hd] = c.hardhat;
+    img.rect(x + 3, y - 3, 8, 1, h);
+    img.rect(x + 2, y - 2, 10, 3, h);
+    img.rect(x + 4, y - 2, 3, 1, hl);
+    img.rect(x + 6, y - 3, 2, 4, hd);
+    img.rect(x + 1, y + 1, 12, 1, hd);
+  }
+  if (c.beard) {
+    img.rect(x + 3, y + 9, 1, 3, c.beard);
+    img.rect(x + 10, y + 9, 1, 3, c.beard);
+    img.set(x + 4, y + 11, c.beard);
+    img.set(x + 9, y + 11, c.beard);
+    img.rect(x + 4, y + 12, 6, 2, c.beard);
+    img.rect(x + 5, y + 11, 4, 1, c.mouth);
+  }
+  if (c.bindi) img.set(x + 6, y + 6, c.bindi);
   if (c.extra === "glasses") {
     img.set(x + 4, y + 6, c.glasses);
     img.set(x + 5, y + 6, c.glasses);
@@ -324,13 +266,32 @@ function paintSide(img, ox, oy, c, phase) {
   img.rect(x + 4, y + 29, 3, 2, c.shoe);
   img.rect(x + 6, y + 29 - Math.min(step, 0), 3, 2, c.shoe);
   if (c.apron) img.rect(x + 5, y + 16, 3, 6, c.apron);
+  if (c.collar) img.set(x + 7, y + 14, c.collar);
   if (c.tie) img.rect(x + 6, y + 14, 1, 6, c.tie);
   if (c.bun) {
     img.rect(x, y, 3, 3, c.hair);
     img.rect(x + 1, y - 1, 2, 1, c.hair);
   }
-  if (c.cap) img.rect(x + 1, y - 1, 9, 2, c.cap);
-  if (c.braid) img.rect(x + 2, y + 8, 1, 8, c.hair);
+  if (c.messy) {
+    img.set(x + 3, y - 1, c.hair);
+    img.set(x + 6, y - 1, c.hair);
+  }
+  if (c.pony) {
+    img.rect(x, y + 2, 2, 7, c.hair);
+    img.rect(x, y + 2, 2, 1, c.pony);
+  }
+  if (c.hardhat) {
+    const [h, hl, hd] = c.hardhat;
+    img.rect(x + 2, y - 3, 7, 1, h);
+    img.rect(x + 1, y - 2, 9, 3, h);
+    img.rect(x + 3, y - 2, 2, 1, hl);
+    img.rect(x + 1, y + 1, 10, 1, hd);
+  }
+  if (c.beard) {
+    img.rect(x + 3, y + 9, 1, 3, c.beard);
+    img.rect(x + 4, y + 11, 5, 3, c.beard);
+    img.rect(x + 7, y + 11, 2, 1, c.mouth);
+  }
   if (c.extra === "glasses") img.set(x + 8, y + 6, c.glasses);
 }
 
@@ -360,8 +321,49 @@ function paintUp(img, ox, oy, c, phase) {
     img.rect(x + 5, y - 4, 4, 1, c.hair);
     img.rect(x + 4, y - 3, 6, 3, c.hair);
   }
-  if (c.cap) img.rect(x + 2, y - 2, 10, 3, c.cap);
-  if (c.braid) img.rect(x + 11, y + 6, 1, 8, c.hair);
+  if (c.messy) {
+    img.set(x + 4, y - 1, c.hair);
+    img.set(x + 8, y - 1, c.hair);
+  }
+  if (c.pony) {
+    img.rect(x + 6, y + 6, 2, 8, c.hair);
+    img.rect(x + 6, y + 6, 2, 1, c.pony);
+  }
+  if (c.hardhat) {
+    const [h, hl, hd] = c.hardhat;
+    img.rect(x + 3, y - 3, 8, 1, h);
+    img.rect(x + 2, y - 2, 10, 3, h);
+    img.rect(x + 6, y - 3, 2, 4, hd);
+    img.rect(x + 1, y + 1, 12, 1, hd);
+  }
+}
+
+/** Seated, facing you: the intro's café scene sits Mabel at a table. Same head and torso as the down frame. */
+function shade(hex, f) {
+  const n = Number.parseInt(hex.slice(1), 16);
+  const ch = (v) => Math.max(0, Math.min(255, Math.round(v * f)));
+  return `#${[(n >> 16) & 255, (n >> 8) & 255, n & 255].map((v) => ch(v).toString(16).padStart(2, "0")).join("")}`;
+}
+
+function paintSit(img, ox, oy, c) {
+  paintDown(img, ox, oy, c, 0);
+  const x = ox + 9;
+  const y = oy + 32;
+  // Seated, facing the viewer: clear the standing legs, then knees come forward wider than the hips,
+  // short shins hang in front of the seat, and the chair shows between them.
+  for (let yy = y + 22; yy < y + 32; yy++) for (let xx = x - 1; xx < x + 15; xx++) img.clear(xx, yy);
+  const lit = shade(c.pants, 1.3);
+  const dark = shade(c.pants, 0.72);
+  img.rect(x + 2, y + 22, 10, 1, c.pants);
+  img.rect(x + 1, y + 23, 12, 2, c.pants);
+  img.rect(x + 2, y + 23, 3, 1, lit);
+  img.rect(x + 9, y + 23, 3, 1, lit);
+  img.rect(x + 6, y + 23, 2, 2, dark);
+  img.rect(x + 2, y + 25, 3, 2, dark);
+  img.rect(x + 9, y + 25, 3, 2, dark);
+  img.rect(x + 1, y + 27, 4, 1, c.shoe);
+  img.rect(x + 9, y + 27, 4, 1, c.shoe);
+  if (c.apron) img.rect(x + 4, y + 21, 6, 3, c.apron);
 }
 
 const out = process.argv[2] || "public/art/gen/sprites";
@@ -373,5 +375,10 @@ for (const [name, spec] of Object.entries(CASTS)) {
     for (let frame = 0; frame < 4; frame++) paint[row](img, frame * 32, row * 64, spec, frame);
   }
   writeFileSync(`${out}/${name}_walk4.png`, png(128, 192, img.px));
+  // The intro tableaux (tools/artkit/scenes.py) stand people in their idle frame, or sit them.
+  writeFileSync(`${out}/${name}_idle_32.png`, png(32, 64, cell(img, 0, 0)));
+  const sit = canvas();
+  paintSit(sit, 0, 0, spec);
+  writeFileSync(`${out}/${name}_sit.png`, png(32, 64, cell(sit, 0, 0)));
 }
 console.log("wrote", Object.keys(CASTS).length, "sheets to", out);

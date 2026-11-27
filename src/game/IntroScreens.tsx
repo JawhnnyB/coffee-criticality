@@ -1,6 +1,6 @@
 "use client";
 
-import { artId } from "./bossArt";
+import { artId, sceneArt } from "./bossArt";
 import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { PHONE_VIEW_W, integerScale } from "./artScale";
 import { DEFAULT_PLAYER_LOOK, type HairId, type HoodieId, type PlayerLook } from "./artSpec";
@@ -272,7 +272,7 @@ export function PixelBeat({
 
   useEffect(() => {
     const srcs = [
-      `/art/intro/scene-${scene}.png`,
+      `/art/intro/scene-${sceneArt(scene)}.png`,
       `/art/ui/portraits/portrait-${artId(who)}-smile.png`,
       `/art/ui/portraits/portrait-${artId(who)}-talk.png`,
       "/art/ui/portraits/portrait-player-smile.png",
@@ -410,7 +410,7 @@ export function PixelBrief({
   const [tick, setTick] = useState(0);
   useEffect(() => {
     return watchImages(
-      ["/art/intro/scene-control.png", `/art/ui/portraits/portrait-${artId("holt")}-smile.png`, `/art/ui/portraits/portrait-${artId("holt")}-talk.png`],
+      [`/art/intro/scene-${sceneArt("control")}.png`, `/art/ui/portraits/portrait-${artId("holt")}-smile.png`, `/art/ui/portraits/portrait-${artId("holt")}-talk.png`],
       () => setTick((n) => n + 1),
     );
   }, []);

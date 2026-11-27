@@ -95,7 +95,7 @@ function readSaved(): Saved {
     const raw = localStorage.getItem(STORE);
     if (raw) {
       const v = JSON.parse(raw) as Saved;
-      if (!("discharged" in v)) v.discharged = null;
+      if ((v as Partial<Saved>).discharged === undefined) v.discharged = null; // older saves have no field
       return v;
     }
   } catch {

@@ -1,5 +1,5 @@
 /** 384×216 intro chrome. Glyphs match tools/artkit/intro_mock.py. Spoken lines are not drawn here. */
-import { artId } from "./bossArt";
+import { artId, sceneArt } from "./bossArt";
 import type { HairId, HoodieId, PlayerLook } from "./artSpec";
 import { fillRect, nameChip, panel, pixelButton, text3, text5 } from "./pxFont";
 
@@ -146,7 +146,7 @@ function topbar(ctx: CanvasRenderingContext2D, left: string, n?: number, total =
 
 function sceneWindow(ctx: CanvasRenderingContext2D, name: string, oy: number, x: number, y: number, w: number, h: number) {
   fillRect(ctx, x - 1, y - 1, w + 2, h + 2, "#3b2318");
-  const im = needImage(`/art/intro/scene-${name}.png`);
+  const im = needImage(`/art/intro/scene-${sceneArt(name)}.png`);
   if (!im) {
     fillRect(ctx, x, y, w, h, "#2a1c14");
     return;
@@ -362,17 +362,18 @@ export function paintBadge(
   text3(ctx, 24, 116, "BADGE PHOTO", "#a8937a");
   text3(ctx, 24, 124, "STILL WARM.", "#a8937a");
   fillRect(ctx, 23, 138, 136, 1, "#3a2a1e");
-  text3(ctx, 24, 143, "ON THE FLOOR", "#e0a850");
-  const faces = [0, 64, 128];
-  faces.forEach((sy, i) => {
-    const cx = 46 + i * 30;
+  text3(ctx, 104, 156, "ON THE FLOOR", "#e0a850");
+  // Front, side mid-stride, back. The people are taller than the old chibi cast, so the label sits beside them.
+  const faces: Array<[number, number]> = [[0, 0], [32, 64], [0, 128]];
+  faces.forEach(([sx, sy], i) => {
+    const cx = 38 + i * 24;
     ctx.fillStyle = "rgba(42,22,16,0.32)";
     ctx.beginPath();
     ctx.ellipse(cx, 175, 6, 2, 0, 0, Math.PI * 2);
     ctx.fill();
     if (!o.sprites) return;
     ctx.imageSmoothingEnabled = false;
-    ctx.drawImage(o.sprites, 0, sy, 32, 64, cx - 16, 176 - 64, 32, 64);
+    ctx.drawImage(o.sprites, sx, sy, 32, 64, cx - 16, 176 - 64, 32, 64);
   });
   ROLES.forEach((r, i) => {
     const x = 176 + (i % 2) * 100;

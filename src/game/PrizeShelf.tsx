@@ -4,10 +4,11 @@
  * Mabel's prize shelf, under the cabinets in the parlor. Rules: parlorPrizes.ts (named so it never clashes with this file on a case-insensitive disk).
  * Six toys, one per person but Holt. A toy goes on the shelf when you clear level 1 of that person's cabinet.
  * Card text uses divs: the cabinet screen colours every <p> cream for its dark glass, which vanishes on a light card.
+ * Each toy is 24x24 pixel art (tools/artkit/toys.py) at 2x. Until you clear the cabinet it's only a shadow on the shelf.
  */
 import { useState } from "react";
 import { plantOf, plantText } from "./coltVoice";
-import { NO_TOY_FOR_HOLT, TOYS, buyToy, readJar, toyState, writeJar, type Jar } from "./parlorPrizes";
+import { NO_TOY_FOR_HOLT, TOYS, buyToy, readJar, toyArt, toyState, writeJar, type Jar } from "./parlorPrizes";
 import { SPEAKER } from "./floorTalks";
 
 export function PrizeShelf({ flags, onBought }: { flags: Record<string, boolean>; onBought?: () => void }) {
@@ -26,8 +27,19 @@ export function PrizeShelf({ flags, onBought }: { flags: Record<string, boolean>
           const who = SPEAKER[toy.npc];
           return (
             <div key={toy.npc} className="border border-[#c4783a]/50 bg-[#f3e6d0] px-2 py-2 text-[#2a2218]" data-testid={`toy-${toy.npc}`} data-state={st}>
-              <div className="font-mono text-[10px] tracking-widest">
-                {toy.name.toUpperCase()} · {who}
+              <div className="flex items-center gap-2">
+                <img
+                  src={toyArt(toy.npc)}
+                  alt=""
+                  width={48}
+                  height={48}
+                  className="shrink-0"
+                  data-testid={`toy-art-${toy.npc}`}
+                  style={{ imageRendering: "pixelated", filter: st === "locked" ? "brightness(0)" : undefined, opacity: st === "locked" ? 0.22 : 1 }}
+                />
+                <div className="min-w-0 font-mono text-[10px] tracking-widest">
+                  {toy.name.toUpperCase()} · {who}
+                </div>
               </div>
               <div className="mt-0.5 text-[10px] leading-snug text-[#6a4a32]">{st === "locked" ? `Clear ${toy.cabTitle} level 1 to put it on the shelf.` : toy.blurb}</div>
               {st === "shelf" ? (

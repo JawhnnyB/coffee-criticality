@@ -6,7 +6,7 @@ import { spawnSync } from "node:child_process";
 import test from "node:test";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { mkdtempSync, writeFileSync } from "node:fs";
+import { mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
@@ -108,6 +108,30 @@ test("six toys, one per person but Holt; each earned through their own cabinet",
     assert.equal(ask.choices.length, 2);
     for (const l of t.scene) { assert.equal(l.speaker, F.SPEAKER[t.npc]); assert.ok(l.text.length <= 125, l.text); }
   }
+});
+
+test("every toy has its 24x24 pixel art, and the gift scene holds it up", () => {
+  for (const t of F.TOYS) {
+    const path = F.toyArt(t.npc);
+    assert.equal(path, `/art/ui/toys/toy-${t.npc}.png`);
+    const png = readFileSync(join(root, "public", path));
+    assert.equal(png.toString("latin1", 1, 4), "PNG");
+    assert.deepEqual([png.readUInt32BE(16), png.readUInt32BE(20)], [24, 24], t.npc);
+  }
+  if (!globalThis.localStorage) {
+    const m = new Map();
+    globalThis.localStorage = { getItem: (k) => m.get(k) ?? null, setItem: (k, v) => m.set(k, String(v)), removeItem: (k) => m.delete(k) };
+  }
+  const toy = F.TOYS.find((t) => t.npc === "tommy");
+  F.writeJar({ tokens: 0, pocket: ["tommy"] });
+  const s = { mode: "dialogue", talkNpc: "tommy", dialogue: [{ speaker: "Tommy", text: "Hey." }], day: 2, trust: { tommy: F.NPCS.tommy.startTrust }, flags: { tommyTalked: true }, ended: null, reports: 0, catches: 0, hides: 0, residue: F.emptyResidue(), maintDone: false };
+  const scene = F.addScene(s, false);
+  assert.equal(scene?.title, toy.name);
+  const gift = s.dialogue.slice(1);
+  assert.equal(gift.length, toy.scene.length);
+  assert.ok(gift.every((l) => l.item === "/art/ui/toys/toy-tommy.png"), "every gift line carries the toy");
+  assert.equal(s.dialogue[0].item, undefined, "the hello before it doesn't");
+  assert.equal(toy.scene[0].item, undefined, "the shelf's own scene isn't changed");
 });
 
 test("day 2 onward: the end of day 1 doesn't silence scenes, exchanges or gifts", () => {

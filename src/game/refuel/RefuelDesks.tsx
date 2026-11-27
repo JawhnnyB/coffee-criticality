@@ -3,19 +3,73 @@
  * bed's pass count, and the molten-salt site's salt loop. Same paper as the PWR fuel desk (FuelShuffle.tsx).
  * Teaching model, not a license.
  */
-import { useMemo, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { usePrefersReducedMotion } from "../reducedMotion";
 import * as B from "./bwrBundle";
+import * as A from "./deskArt";
 import * as P from "./pebbleBed";
 import * as S from "./saltLoop";
 
 const INK = "#1a1410";
 const PAPER = "#f3e6d0";
 
+/**
+ * A moving cutaway beside a desk's introduction (deskArt.ts): 96x72 pixels at 2x on a phone, 3x wider up. Stepped at
+ * ten frames a second; one still frame when motion is reduced. `paint` is read fresh each frame, so it follows the desk.
+ */
+function DeskArt({ testId, caption, paint }: { testId: string; caption: string; paint: (g: CanvasRenderingContext2D, t: number) => void }) {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const reduced = usePrefersReducedMotion();
+  const paintRef = useRef(paint);
+  paintRef.current = paint;
+  useEffect(() => {
+    const g = ref.current?.getContext("2d");
+    if (!g) return;
+    if (reduced) {
+      paintRef.current(g, 0);
+      return;
+    }
+    let raf = 0;
+    let last = -1;
+    const t0 = performance.now();
+    const tick = (now: number) => {
+      const step = Math.floor((now - t0) / 100);
+      if (step !== last) {
+        last = step;
+        paintRef.current(g, step / 10);
+      }
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [reduced]);
+  useEffect(() => {
+    if (!reduced) return;
+    const g = ref.current?.getContext("2d");
+    if (g) paint(g, 0);
+  });
+  return (
+    <figure className="m-0 shrink-0" data-testid={testId} data-still={reduced ? "1" : "0"}>
+      <canvas
+        ref={ref}
+        width={A.ART_W}
+        height={A.ART_H}
+        role="img"
+        aria-label={caption}
+        className="block w-[192px] sm:w-[288px]"
+        style={{ imageRendering: "pixelated" }}
+      />
+      <figcaption className="mt-1 w-[192px] font-mono text-[10px] leading-snug text-[#6a4a32] sm:w-[288px]">{caption}</figcaption>
+    </figure>
+  );
+}
+
 function Desk({
   testId,
   kicker,
   title,
   intro,
+  art,
   children,
   onAbort,
   onSign,
@@ -27,6 +81,7 @@ function Desk({
   kicker: string;
   title: string;
   intro: ReactNode;
+  art?: ReactNode;
   children: ReactNode;
   onAbort: () => void;
   onSign: () => void;
@@ -41,7 +96,10 @@ function Desk({
           {kicker} · {practice ? "practice" : "Friday"} · teaching only
         </div>
         <h2 className="font-display mt-2 text-2xl">{title}</h2>
-        <div className="mt-2 max-w-2xl text-sm leading-relaxed text-[#3a2818]">{intro}</div>
+        <div className="mt-2 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+          <div className="max-w-2xl text-sm leading-relaxed text-[#3a2818]">{intro}</div>
+          {art}
+        </div>
         <div className="mt-4">{children}</div>
         <div className="mt-5 flex flex-wrap gap-2">
           <button type="button" className="btn-ghost" onClick={onAbort} style={{ minHeight: 44 }}>
@@ -120,9 +178,17 @@ export function BundleBench({
   const paint = (layer: number, i: number) =>
     setBundle((b) => b.map((l, k) => (k === layer ? l.map((p, j) => (j === i ? tool : p)) : l)));
   const copyTo = (from: number) => setBundle((b) => b.map(() => b[from].slice()));
+  const row = useMemo(() => A.channelRow(B.WATER_RODS, B.PART_LENGTH), []);
   return (
     <Desk
       testId="bundle-bench"
+      art={
+        <DeskArt
+          testId="bundle-art"
+          caption="One row of this bundle, side on. Steam shows as dots: none at the bottom, thickest at the top, from the void figures on this bench. The part-length rods at each edge stop short of the top."
+          paint={(g, t) => A.paintChannel(g, row, r.voidFrac, t)}
+        />
+      }
       kicker="BUNDLE.BENCH · BWR · 10×10"
       title="Design the reload bundle"
       practice={practice}
@@ -299,6 +365,13 @@ export function PassDesk({
   return (
     <Desk
       testId="pass-desk"
+      art={
+        <DeskArt
+          testId="pass-art"
+          caption="Each pebble that leaves the bottom is measured. Green: it goes round again. Amber: out to the drum, and a fresh one drops in from the hopper. The darker the pebble, the more passes it has had. Helium flows down through the bed."
+          paint={(g, t) => A.paintPebbles(g, plan.passes, t)}
+        />
+      }
       kicker="PEBBLE.DESK · PEBBLE BED · 250 MWt"
       title="Set how the pebbles move"
       practice={practice}
@@ -395,6 +468,13 @@ export function SaltDesk({
   return (
     <Desk
       testId="salt-desk"
+      art={
+        <DeskArt
+          testId="salt-art"
+          caption="The pump bowl. The spray ring throws salt into the helium so xenon comes out (the dots leaving to the right). The salt's colour is its temperature, played through your week. The thermometer's green is the band."
+          paint={(g, t) => A.paintSaltBowl(g, { sparge: plan.sparge, spargeMax: S.LIMITS.spargeMax, tempC: run.tempC, lowC: S.BAND.lowC, highC: S.BAND.highC }, t)}
+        />
+      }
       kicker="SALT.DESK · MOLTEN SALT · weekly sample"
       title="Balance the salt for the week"
       practice={practice}

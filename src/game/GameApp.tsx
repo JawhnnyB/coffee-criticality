@@ -1907,6 +1907,7 @@ export function GameApp() {
         {mode === "dialogue" && line && (
           <DialogueStage
             line={line}
+            item={heldItem(s.dialogue, s.dialogueI)}
             npc={speakerNpc(line.speaker) ?? s.talkNpc}
             role={(speakerNpc(line.speaker) ?? s.talkNpc) ? NPCS[(speakerNpc(line.speaker) ?? s.talkNpc)!].role : ""}
             beat={s.talkNpc && (speakerNpc(line.speaker) ?? s.talkNpc) === s.talkNpc ? say(NPC_INTRO[s.talkNpc].beat) : undefined}
@@ -2089,7 +2090,10 @@ export function GameApp() {
         {mode === "ending" && (
           <div className="absolute inset-0 z-30 overflow-y-auto bg-bg/55">
             <div className="flex min-h-full items-start justify-center p-3 pb-28 sm:items-center sm:p-6">
-            <div className="paper cc-paper-in mx-auto w-full max-w-xl p-4 sm:p-5" data-testid="paper-ending">
+            <div
+              className={"paper cc-paper-in mx-auto w-full max-w-xl p-4 sm:p-5" + (verdict && weekOf(s.flags) >= 1 && verdictCard(verdict, weekOf(s.flags), plantNow, kindNow).plate ? " md:max-w-[688px]" : "")}
+              data-testid="paper-ending"
+            >
               <p className="font-mono text-[10px] tracking-widest text-[#6a4a32]">
                 Dusk · {s.timeLabel} · Lot · Lake north
               </p>
@@ -2521,6 +2525,18 @@ function VerdictBlock({ verdict, week, plant, kind }: { verdict: Verdict; week: 
   if (!card.title) return null;
   return (
     <div className="mt-4 border-t-2 border-[#16110d] pt-3" data-testid={`verdict-${verdict}`}>
+      {card.plate ? (
+        // 320x180 native, plus a 2px frame (border-box): 1x on a phone, 2x from md up (the ending paper widens to fit it).
+        <img
+          src={`/art/plates/plate-${card.plate}.png`}
+          alt=""
+          width={320}
+          height={180}
+          data-testid="verdict-plate"
+          className="mb-3 block h-auto w-[324px] max-w-full border-2 border-[#16110d] md:w-[644px]"
+          style={{ imageRendering: "pixelated" }}
+        />
+      ) : null}
       <div className="font-display text-2xl">{card.title}</div>
       <div className="mt-2 space-y-2 text-sm leading-relaxed">
         {card.body.map((b) => (
@@ -2574,8 +2590,19 @@ function HeartRow({ n }: { n: number }) {
   );
 }
 
+/** The item held up over the talk box: the nearest line at or before this one that carries one. A gift scene is the
+ * tail of the talk (social.ts), so a choice's reply line (sim.ts adds it without the item) keeps the toy up. */
+function heldItem(lines: Line[], i: number): string | undefined {
+  for (let k = Math.min(i, lines.length - 1); k >= 0; k--) {
+    const it = lines[k]?.item;
+    if (it) return it;
+  }
+  return undefined;
+}
+
 function DialogueStage({
   line,
+  item,
   npc,
   role,
   beat,
@@ -2588,6 +2615,7 @@ function DialogueStage({
   onContinue,
 }: {
   line: Line;
+  item?: string;
   npc: NpcId | null;
   role: string;
   beat?: string;
@@ -2602,7 +2630,7 @@ function DialogueStage({
   return (
     <div className="pointer-events-none absolute inset-x-0 bottom-0 z-20 p-3 pb-24 sm:p-5 sm:pb-8">
       <div
-        className="paper pointer-events-auto mx-auto flex max-w-2xl flex-col gap-3 p-3 sm:flex-row sm:gap-4 sm:p-4"
+        className="paper pointer-events-auto relative mx-auto flex max-w-2xl flex-col gap-3 p-3 sm:flex-row sm:gap-4 sm:p-4"
         data-testid="paper-talk"
         onClick={(e) => {
           if ((e.target as HTMLElement).closest("button")) return;
@@ -2610,6 +2638,11 @@ function DialogueStage({
           else onContinue();
         }}
       >
+        {item ? (
+          <div className="pointer-events-none absolute -top-[92px] right-4 border-2 border-[#3b2318] bg-[#f3e6d0] p-1">
+            <img src={item} alt="" width={72} height={72} data-testid="talk-item" className="block" style={{ imageRendering: "pixelated" }} />
+          </div>
+        ) : null}
         {npc ? <PixelPortrait npc={npc} /> : null}
         <div className="min-w-0 flex-1">
           <p className="font-mono text-[10px] tracking-widest text-[#6a4a32]">

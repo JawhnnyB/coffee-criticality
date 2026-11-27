@@ -12,3 +12,8 @@ export function setBossArt(plant: "holt" | "colt") {
 export function artId<T extends string>(who: T): T | "colt" {
   return who === "holt" && boss === "colt" ? "colt" : who;
 }
+
+/** Intro tableaux with the director painted in. Only the control room has him; Colt's plant has its own bake. */
+export function sceneArt(name: string): string {
+  return name === "control" && boss === "colt" ? "control-colt" : name;
+}

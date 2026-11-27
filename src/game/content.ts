@@ -97,6 +97,8 @@ export interface Line {
   text: string;
   mood?: Mood;
   choices?: Choice[];
+  /** Something held up over the talk box while this line plays (an image under /art), e.g. a gift toy. */
+  item?: string;
 }
 
 /** 1: plain terms, one idea, no formula. 2: heat, physics or several ideas. 3: states an equation already in nuclearLab.ts. */

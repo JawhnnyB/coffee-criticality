@@ -90,7 +90,7 @@ Other options: leave the old sheets, or paint the player in palette colours and 
 
 Changed 18 Nov by Claude: every front and back head had a light pixel at each top corner. On Mabel's grey hair the cream highlight read as two horns. The corners are now plain hair with one shine across the crown, buns are rounded, and Mabel's highlight is `muted` grey. Run `node scripts/draw-cast.mjs` to rebuild the sheets.
 
-Still open: the intro scenes (`public/art/intro/scene-*.png`) and the badge have the old chibi cast painted in. In-game walkers and intro art no longer match.
+Done 26 Nov by Claude: the intro scenes and the badge are re-baked from these sheets (`tools/artkit/scenes.py`, `intro_mock.py`), so intro and play show the same people. Mabel has a seated pose (`_sit.png`), and Colt's plant has its own control-room scene. Evidence: `docs/audit/2026-11-26-art/02-intro-before-after.png`.
 
 
 

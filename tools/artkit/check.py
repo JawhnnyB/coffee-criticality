@@ -51,6 +51,7 @@ PAIRS = [
     ("scene-bench.png", "reference/intro/scene-bench.png"),
     ("scene-break.png", "reference/intro/scene-break.png"),
     ("scene-control.png", "reference/intro/scene-control.png"),
+    ("scene-control-colt.png", "reference/intro/scene-control-colt.png"),
     ("scene-threshold.png", "reference/intro/scene-threshold.png"),
     ("portrait-priya-smile.png", "reference/portraits/portrait-priya-smile.png"),
     ("portrait-priya-talk.png", "reference/portraits/portrait-priya-talk.png"),
@@ -66,6 +67,8 @@ PAIRS = [
     ("portrait-jordan-talk.png", "reference/portraits/portrait-jordan-talk.png"),
     ("portrait-holt-smile.png", "reference/portraits/portrait-holt-smile.png"),
     ("portrait-holt-talk.png", "reference/portraits/portrait-holt-talk.png"),
+    ("portrait-colt-smile.png", "reference/portraits/portrait-colt-smile.png"),
+    ("portrait-colt-talk.png", "reference/portraits/portrait-colt-talk.png"),
     ("portrait-player-smile.png", "reference/portraits/portrait-player-smile.png"),
     ("portrait-player-talk.png", "reference/portraits/portrait-player-talk.png"),
     ("portrait-player-smile-noglasses.png", "reference/portraits/portrait-player-smile-noglasses.png"),
@@ -77,6 +80,18 @@ PAIRS = [
     ("intro-you.png", "reference/intro/intro-you.png"),
     ("intro-door.png", "reference/intro/intro-door.png"),
     ("badge.png", "reference/intro/badge.png"),
+    ("toy-mabel.png", "reference/toys/toy-mabel.png"),
+    ("toy-jordan.png", "reference/toys/toy-jordan.png"),
+    ("toy-elena.png", "reference/toys/toy-elena.png"),
+    ("toy-tommy.png", "reference/toys/toy-tommy.png"),
+    ("toy-marcus.png", "reference/toys/toy-marcus.png"),
+    ("toy-priya.png", "reference/toys/toy-priya.png"),
+    ("toys-sheet.png", "reference/toys/toys-sheet.png"),
+    ("plate-standdown.png", "reference/plates/plate-standdown.png"),
+    ("plate-regroup.png", "reference/plates/plate-regroup.png"),
+    ("plate-transfer.png", "reference/plates/plate-transfer.png"),
+    ("plate-finale.png", "reference/plates/plate-finale.png"),
+    ("plate-finale-colt.png", "reference/plates/plate-finale-colt.png"),
     ("brief.png", "reference/intro/brief.png"),
 ]
 
@@ -102,6 +117,8 @@ def main() -> int:
     env = os.environ.copy()
     env["UI_OUT"] = str(ui)
     env["REACTOR_OUT"] = str(reactors)
+    env["TOYS_GAME"] = str(ui / "game")    # the check never writes into public/
+    env["PLATES_GAME"] = str(ui / "game")
     steps = [
         [sys.executable, str(ART / "menu.py")],
         [sys.executable, str(ART / "cab.py")],
@@ -111,6 +128,8 @@ def main() -> int:
         [sys.executable, str(ART / "scenes.py")],
         [sys.executable, str(ART / "cast.py")],
         [sys.executable, str(ART / "intro_mock.py")],
+        [sys.executable, str(ART / "toys.py")],
+        [sys.executable, str(ART / "plates.py")],
     ]
     for cmd in steps:
         subprocess.check_call(cmd, cwd=ROOT, env=env)

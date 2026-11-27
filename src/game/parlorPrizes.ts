@@ -32,6 +32,11 @@ export interface Toy {
   scene: Line[];
 }
 
+/** The toy's 24x24 pixel art (tools/artkit/toys.py). The shelf shows it at 2x, the gift scene at 3x. */
+export function toyArt(npc: string): string {
+  return `/art/ui/toys/toy-${npc}.png`;
+}
+
 export const NO_TOY_FOR_HOLT = "Reggie doesn't take presents. Never has. He'd only file it under \"gifts, declared\".";
 
 export const TOYS: Toy[] = [

@@ -12,6 +12,16 @@ OUT = os.environ.get('UI_OUT', './out/ui')
 os.makedirs(OUT, exist_ok=True)
 
 _cache = {}
+def tint_player(im):
+    """Default look = copper hoodie (artSpec DEFAULT_PLAYER_LOOK): green hoodie keys -> copper ramp by brightness."""
+    im = im.copy(); px_ = im.load()
+    for yy in range(im.height):
+        for xx in range(im.width):
+            r, g, b, a = px_[xx, yy]
+            if a and g > r + 20 and g > b + 20:
+                lum = g
+                px_[xx, yy] = ((0xe8, 0xa8, 0x60) if lum > 0x90 else (0xc4, 0x78, 0x3a) if lum > 0x60 else (0x8a, 0x48, 0x20)) + (a,)
+    return im
 def spr(who, facing='down'):
     k = (who, facing)
     if k in _cache: return _cache[k]
@@ -20,16 +30,10 @@ def spr(who, facing='down'):
     else:
         sh = Image.open(f'{SPR}/{who}_walk4.png').convert('RGBA')
         row = 2 if facing == 'up' else 1
-        im = sh.crop((0, row*64, 32, row*64+64))
+        col = 1 if row == 1 else 0      # side views mid-stride, so the tableau has some life
+        im = sh.crop((col*32, row*64, col*32+32, row*64+64))
         if facing == 'left': im = im.transpose(Image.FLIP_LEFT_RIGHT)
-    if who == 'player':   # default look = copper hoodie (artSpec DEFAULT_PLAYER_LOOK)
-        px_ = im.load()
-        for yy in range(im.height):
-            for xx in range(im.width):
-                r, g, b, a = px_[xx, yy]
-                if a and g > r + 20 and g > b + 20:           # green hoodie -> copper ramp by brightness
-                    lum = g
-                    px_[xx, yy] = ((0xe8, 0xa8, 0x60) if lum > 0x90 else (0xc4, 0x78, 0x3a) if lum > 0x60 else (0x8a, 0x48, 0x20)) + (a,)
+    if who == 'player': im = tint_player(im)
     bb = im.getbbox(); im = im.crop(bb); _cache[k] = im; return im
 def put(cv, who, facing, cx, feet):
     im = spr(who, facing)
@@ -81,7 +85,7 @@ def scene_core():
     return crop(cv, 16, 44)
 def scene_cafe():
     cv = rr.render_room('cafe', chars=False, border_on=False)
-    put(cv, 'mabel', 'sit', 154, 184); cup(cv, 172, 99)
+    put(cv, 'mabel', 'sit', 160, 182); cup(cv, 172, 99)
     put(cv, 'player', 'right', 122, 176)
     return crop(cv, 0, 36)
 def scene_lot():
@@ -109,7 +113,7 @@ def scene_break():
     put(cv, 'jordan', 'left', 98, 170)
     put(cv, 'player', 'left', 140, 178)
     return crop(cv, -16, 52)
-def scene_control():
+def scene_control(boss='holt'):
     cv = rr.render_room('control', chars=False, border_on=False)
     import random
     rg = random.Random(4)
@@ -117,7 +121,7 @@ def scene_control():
         for c in range(8):
             col = '#7ac870' if rg.random() > .08 else '#e8d070'
             cv.r(74+c*8, 90+r*8, 4, 4, hx(col)); 
-    put(cv, 'holt', 'down', 182, 176)
+    put(cv, boss, 'down', 182, 176)      # Colt's plant gets its own bake (scene-control-colt.png)
     put(cv, 'player', 'up', 150, 196)
     return crop(cv, 16, 56)
 def scene_threshold():
@@ -125,7 +129,7 @@ def scene_threshold():
     hooks(cv, 98, 22)
     put(cv, 'player', 'up', 186, 78)
     return crop(cv, 32, 0)
-SCENES = [('core', scene_core), ('cafe', scene_cafe), ('lot', scene_lot), ('wing', scene_wing), ('bench', scene_bench), ('break', scene_break), ('control', scene_control), ('threshold', scene_threshold)]
+SCENES = [('core', scene_core), ('cafe', scene_cafe), ('lot', scene_lot), ('wing', scene_wing), ('bench', scene_bench), ('break', scene_break), ('control', scene_control), ('control-colt', lambda: scene_control('colt')), ('threshold', scene_threshold)]
 if __name__ == '__main__':
     want = sys.argv[1:] or [n for n, _ in SCENES]
     for n, f in SCENES:

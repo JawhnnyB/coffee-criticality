@@ -5,7 +5,7 @@ import { spawnSync } from "node:child_process";
 import test from "node:test";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { mkdtempSync, writeFileSync } from "node:fs";
+import { existsSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
@@ -161,6 +161,24 @@ test("every verdict has a card, and the transfer is written as an ending, not a 
   assert.match(t.body.join(" "), /This is an ending/);
   assert.equal(t.next, "Start at Colt's plant");
   assert.match(K.verdictCard("finale", 10, "colt").body.join(" "), /Colt walks/);
+});
+
+test("the stand-down, the regroup, the transfer and the finale each have a plate; the finale has Colt at Colt's plant", () => {
+  const plates = {
+    standdown: K.verdictCard("standdown", 4, "holt").plate,
+    regroup: K.verdictCard("regroup", 4, "colt").plate,
+    transfer: K.verdictCard("transfer", 2, "holt").plate,
+    finale: K.verdictCard("finale", 10, "holt").plate,
+    finaleColt: K.verdictCard("finale", 10, "colt", "msr").plate,
+  };
+  assert.deepEqual(plates, { standdown: "standdown", regroup: "regroup", transfer: "transfer", finale: "finale", finaleColt: "finale-colt" });
+  assert.equal(K.verdictCard("lifted", 5, "holt").plate, undefined);
+  for (const id of Object.values(plates)) {
+    const f = join(root, "public/art/plates", `plate-${id}.png`);
+    assert.ok(existsSync(f), f);
+    const png = readFileSync(f);
+    assert.deepEqual([png.readUInt32BE(16), png.readUInt32BE(20)], [320, 180], id);
+  }
 });
 
 test("a saved campaign survives a bad read", () => {

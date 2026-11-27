@@ -14,6 +14,9 @@ SPEC = {
  'marcus': dict(skin='#f0c498', skinS='#d49c70', hair='#9e4a2a', hairL='#c0643a', hairD='#6a3018', top='#c4603a', topL='#dc8058', topD='#9a4428', style='short', glasses=False, beard=True),
  'jordan': dict(skin='#d8a070', skinS='#b88050', hair='#4a3028', hairL='#6a4a3a', hairD='#2a1810', top='#d08c30', topL='#e8a850', topD='#a86c20', style='messy', glasses=False),
  'holt':   dict(skin='#f5c9a0', skinS='#dba37a', hair='#c8a878', hairL='#e0c498', hairD='#a08050', top='#a8764a', topL='#c4905a', topD='#805634', style='part', glasses=False, age=True, tie=True),
+ # Colt, the second plant's director (src/game/coltVoice.ts): Holt's build, silver hair, a short grey beard, a sage
+ # zip-up with an open collar instead of the tie. 26 November 2026.
+ 'colt':   dict(skin='#f5c9a0', skinS='#dba37a', hair='#c8c0b4', hairL='#e4ded2', hairD='#a8a094', top='#6b8f71', topL='#8cb492', topD='#48684e', style='part', glasses=False, age=True, beard=True),
 }
 def face(who, mouth='smile', bg='#f3c9a0', over=None):
     s = dict(SPEC[who]); s.update(over or {}); cv = Cv(48, 48); d = cv.d
@@ -103,13 +106,13 @@ def face(who, mouth='smile', bg='#f3c9a0', over=None):
         cv.r(22, 31, 5, 1, mc)
     return cv
 
-ORDER = ['priya', 'mabel', 'elena', 'tommy', 'marcus', 'jordan', 'holt', 'player']
-BG = {'priya': '#f0d8b8', 'mabel': '#f0d0b0', 'elena': '#f0d890', 'tommy': '#c8d8e8', 'marcus': '#e8c8b0', 'jordan': '#e8d0a0', 'holt': '#d8c8b0', 'player': '#c8e0b0'}
+ORDER = ['priya', 'mabel', 'elena', 'tommy', 'marcus', 'jordan', 'holt', 'player', 'colt']
+BG = {'priya': '#f0d8b8', 'mabel': '#f0d0b0', 'elena': '#f0d890', 'tommy': '#c8d8e8', 'marcus': '#e8c8b0', 'jordan': '#e8d0a0', 'holt': '#d8c8b0', 'player': '#c8e0b0', 'colt': '#d4dcc4'}
 def get(who, mouth='smile', bg=None, over=None):
     return portrait.priya(mouth, bg or BG[who]) if who == 'priya' else face(who, mouth, bg or BG[who], over)
 def _main():
     os.makedirs(OUT, exist_ok=True)
-    sheet = Cv(8*60+10, 2*60*2+30, (236, 214, 176, 255))
+    sheet = Cv(len(ORDER)*60+10, 2*60*2+30, (236, 214, 176, 255))
     for i, w in enumerate(ORDER):
         for j, m in enumerate(('smile', 'talk')):
             sheet.im.alpha_composite(get(w, m).im, (10+i*60, 10+j*60+ (0)))

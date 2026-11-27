@@ -417,6 +417,8 @@ export interface VerdictCard {
   body: string[];
   /** The main button. */
   next: string;
+  /** A 320x180 picture above the card: public/art/plates/plate-<plate>.png (tools/artkit/plates.py). */
+  plate?: "standdown" | "regroup" | "transfer" | "finale" | "finale-colt";
 }
 
 export function verdictCard(v: Verdict, week: number, plant: PlantId, kind: PlantType = "pwr"): VerdictCard {
@@ -431,6 +433,7 @@ export function verdictCard(v: Verdict, week: number, plant: PlantId, kind: Plan
           "One week. If the floor is still afraid when it ends, you can ask to go somewhere it isn't.",
         ],
         next: "Begin the stand-down week",
+        plate: "standdown",
       };
     case "lifted":
       return {
@@ -451,6 +454,7 @@ export function verdictCard(v: Verdict, week: number, plant: PlantId, kind: Plan
           "This is an ending. The floor stayed afraid, and you chose not to stay with it. That's a real choice people make, and it's an honest one.",
         ],
         next: "Start at Colt's plant",
+        plate: "transfer",
       };
     case "regroup":
       return {
@@ -460,6 +464,7 @@ export function verdictCard(v: Verdict, week: number, plant: PlantId, kind: Plan
           "Colt: Heads went down this week. When that happens here, it's usually something I did or didn't do. So, tell me. Then we go again.",
         ],
         next: `Week ${Math.min(CAMPAIGN_WEEKS, week + 1)}`,
+        plate: "regroup",
       };
     case "finale": {
       const first: Record<PlantType, string> = {
@@ -482,6 +487,7 @@ export function verdictCard(v: Verdict, week: number, plant: PlantId, kind: Plan
           `The ${kind === "msr" ? "salt" : "core"} repeats now. So does the floor: whatever you built with these people is what the next engineer walks into.`,
         ],
         next: "Begin again from week 1",
+        plate: plant === "colt" ? "finale-colt" : "finale",
       };
     }
     default:

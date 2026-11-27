@@ -1,0 +1,92 @@
+PASS 1280 first meeting holds nothing up
+PASS 1280 six toy pictures on the shelf (toy-art-mabel,toy-art-jordan,toy-art-elena,toy-art-tommy,toy-art-marcus,toy-art-priya)
+PASS 1280 each loaded at 24 px, shown at 48 (2x) ([[24,48],[24,48],[24,48],[24,48],[24,48],[24,48]])
+PASS 1280 four on the shelf, two still shadows ({"mabel":"shelf","jordan":"shelf","elena":"shelf","tommy":"locked","marcus":"locked","priya":"shelf"})
+PASS 1280 a locked toy is a shadow
+PASS 1280 bought Jordan's pin
+PASS 1280 Jordan gets his pin
+PASS 1280 the pin is held up over the talk ({"src":"/art/ui/toys/toy-jordan.png","nw":24,"w":72,"top":343})
+PASS 1280 and on screen ({"src":"/art/ui/toys/toy-jordan.png","nw":24,"w":72,"top":343})
+PASS 1280 and he keeps it
+PASS 1280 no page errors
+PASS 390 first meeting holds nothing up
+PASS 390 six toy pictures on the shelf (toy-art-mabel,toy-art-jordan,toy-art-elena,toy-art-tommy,toy-art-marcus,toy-art-priya)
+PASS 390 each loaded at 24 px, shown at 48 (2x) ([[24,48],[24,48],[24,48],[24,48],[24,48],[24,48]])
+PASS 390 four on the shelf, two still shadows ({"mabel":"shelf","jordan":"shelf","elena":"shelf","tommy":"locked","marcus":"locked","priya":"shelf"})
+PASS 390 a locked toy is a shadow
+PASS 390 bought Jordan's pin
+PASS 390 Jordan gets his pin
+PASS 390 the pin is held up over the talk ({"src":"/art/ui/toys/toy-jordan.png","nw":24,"w":72,"top":201})
+PASS 390 and on screen ({"src":"/art/ui/toys/toy-jordan.png","nw":24,"w":72,"top":201})
+PASS 390 and he keeps it
+PASS 390 no page errors
+PASS 1280 BWR outage Friday: the bundle bench
+PASS 1280 bundle bench: the cutaway is there
+PASS 1280 bundle bench: 96x72 at a whole-number scale ({"nw":96,"nh":72,"w":288,"h":216})
+PASS 1280 bundle bench: 3x on a wide screen
+PASS 1280 bundle bench: it moves
+PASS 1280 pebble Friday: the pass desk
+PASS 1280 pass desk: the cutaway is there
+PASS 1280 pass desk: 96x72 at a whole-number scale ({"nw":96,"nh":72,"w":288,"h":216})
+PASS 1280 pass desk: 3x on a wide screen
+PASS 1280 pass desk: it moves
+PASS 1280 salt Friday: the salt desk
+PASS 1280 salt desk: the cutaway is there
+PASS 1280 salt desk: 96x72 at a whole-number scale ({"nw":96,"nh":72,"w":288,"h":216})
+PASS 1280 salt desk: 3x on a wide screen
+PASS 1280 salt desk: it moves
+PASS 1280 reduced motion: the salt bowl holds still
+PASS 1280 reduced motion: no frames change by themselves
+PASS 1280 reduced motion: more stripping redraws the still
+PASS 1280 no page errors
+PASS 390 BWR outage Friday: the bundle bench
+PASS 390 bundle bench: the cutaway is there
+PASS 390 bundle bench: 96x72 at a whole-number scale ({"nw":96,"nh":72,"w":192,"h":144})
+PASS 390 bundle bench: 2x on a phone
+PASS 390 bundle bench: it moves
+PASS 390 pebble Friday: the pass desk
+PASS 390 pass desk: the cutaway is there
+PASS 390 pass desk: 96x72 at a whole-number scale ({"nw":96,"nh":72,"w":192,"h":144})
+PASS 390 pass desk: 2x on a phone
+PASS 390 pass desk: it moves
+PASS 390 salt Friday: the salt desk
+PASS 390 salt desk: the cutaway is there
+PASS 390 salt desk: 96x72 at a whole-number scale ({"nw":96,"nh":72,"w":192,"h":144})
+PASS 390 salt desk: 2x on a phone
+PASS 390 salt desk: it moves
+PASS 390 reduced motion: the salt bowl holds still
+PASS 390 reduced motion: no frames change by themselves
+PASS 390 reduced motion: more stripping redraws the still
+PASS 390 no page errors
+PASS 1280 standdown: the card
+PASS 1280 standdown: its plate
+PASS 1280 standdown: plate-standdown, 320x180 shown at 2x ({"src":"/art/plates/plate-standdown.png","nw":320,"nh":180,"cw":640,"ch":360})
+PASS 1280 transfer: the card
+PASS 1280 transfer: its plate
+PASS 1280 transfer: plate-transfer, 320x180 shown at 2x ({"src":"/art/plates/plate-transfer.png","nw":320,"nh":180,"cw":640,"ch":360})
+PASS 1280 regroup: the card
+PASS 1280 regroup: its plate
+PASS 1280 regroup: plate-regroup, 320x180 shown at 2x ({"src":"/art/plates/plate-regroup.png","nw":320,"nh":180,"cw":640,"ch":360})
+PASS 1280 finale: the card
+PASS 1280 finale: its plate
+PASS 1280 finale: plate-finale, 320x180 shown at 2x ({"src":"/art/plates/plate-finale.png","nw":320,"nh":180,"cw":640,"ch":360})
+PASS 1280 finale: the card
+PASS 1280 finale: its plate
+PASS 1280 finale: plate-finale-colt, 320x180 shown at 2x ({"src":"/art/plates/plate-finale-colt.png","nw":320,"nh":180,"cw":640,"ch":360})
+PASS 1280 no page errors
+PASS 390 standdown: the card
+PASS 390 standdown: its plate
+PASS 390 standdown: plate-standdown, 320x180 shown at 1x ({"src":"/art/plates/plate-standdown.png","nw":320,"nh":180,"cw":320,"ch":180})
+PASS 390 transfer: the card
+PASS 390 transfer: its plate
+PASS 390 transfer: plate-transfer, 320x180 shown at 1x ({"src":"/art/plates/plate-transfer.png","nw":320,"nh":180,"cw":320,"ch":180})
+PASS 390 regroup: the card
+PASS 390 regroup: its plate
+PASS 390 regroup: plate-regroup, 320x180 shown at 1x ({"src":"/art/plates/plate-regroup.png","nw":320,"nh":180,"cw":320,"ch":180})
+PASS 390 finale: the card
+PASS 390 finale: its plate
+PASS 390 finale: plate-finale, 320x180 shown at 1x ({"src":"/art/plates/plate-finale.png","nw":320,"nh":180,"cw":320,"ch":180})
+PASS 390 finale: the card
+PASS 390 finale: its plate
+PASS 390 finale: plate-finale-colt, 320x180 shown at 1x ({"src":"/art/plates/plate-finale-colt.png","nw":320,"nh":180,"cw":320,"ch":180})
+PASS 390 no page errors

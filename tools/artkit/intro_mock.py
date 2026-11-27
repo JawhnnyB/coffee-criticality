@@ -62,10 +62,13 @@ def badge():
     cv.r(84, 122, 9, 9, OL); cv.r(85, 123, 7, 7, hx('#f6e2c4')); cv.r(87, 125, 3, 3, hx('#6b8f71'))
     text(cv, 98, 125, 'GLASSES', CREAM)
     text(cv, 24, 116, 'BADGE PHOTO', hx('#a8937a')); text(cv, 24, 124, 'STILL WARM.', hx('#a8937a'))
-    cv.r(23, 138, 136, 1, hx('#3a2a1e')); text(cv, 24, 143, 'ON THE FLOOR', AMB)
+    cv.r(23, 138, 136, 1, hx('#3a2a1e')); text(cv, 104, 156, 'ON THE FLOOR', AMB)
     import scenes
-    for i, f in enumerate(('down', 'right', 'up')):
-        im = scenes.spr('player', f); cv.ellipse_shadow(46+i*30, 175, 6, 2, .32); cv.im.alpha_composite(im, (46+i*30-im.width//2, 176-im.height))
+    from PIL import Image as _I
+    sheet = scenes.tint_player(_I.open(f'{scenes.SPR}/player_walk4.png').convert('RGBA'))
+    for i, (sx, sy) in enumerate(((0, 0), (32, 64), (0, 128))):    # same cells introPaint.ts draws: front, side mid-stride, back
+        cx = 38+i*24; cv.ellipse_shadow(cx, 175, 6, 2, .32)
+        cv.im.alpha_composite(sheet.crop((sx, sy, sx+32, sy+64)), (cx-16, 176-64))
     roles = [('TRANSFERRED ENGINEER', 'NEW SITE, SAME PHYSICS. WATCH THE FLOOR; GROW WHERE TRUTH CAN BE SPOKEN.'),
              ('RECENTLY PROMOTED', 'THE TITLE IS NEW. THE HISS IS NOT. CATCH IT CHEAP.'),
              ('FORMER MILITARY', 'ORDERS WERE A LANGUAGE. HERE THE CATCH IS THE ORDER.'),
