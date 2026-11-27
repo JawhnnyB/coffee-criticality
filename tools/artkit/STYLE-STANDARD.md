@@ -15,7 +15,7 @@ One rule: **everything on screen is native-resolution pixel art, scaled by whole
 ## 2. Global rules (all art)
 1. Outline `#3b2318`, 1 px, on every object. No pure black, no pure white (use `#fff8e4`).
 2. Flat 3-tone shading, light from top-left. No dithering, gradients, glows, blur, alpha-feathering.
-3. Warm mid-saturation daytime palette. Ground shadows are flat translucent shapes.
+3. Warm mid-saturation daytime palette. Ground shadows are flat translucent shapes. A room may carry painted light: a light map screened and a shade map multiplied over the room and the people in it. Both are drawn in flat steps (no smooth gradients), as in the café (`tools/roomkit/cafe_candy.py`).
 4. Native sizes: screens/schematics 384×216 (shown ×3 = 1152×648); cabinet canvases 320×180; Builder mock 640×360 (×2); portraits 48×48 (×6 in dialogue); tile 16.
 5. Display with `image-rendering: pixelated` and **integer scale only**. If the window is not an integer multiple, letterbox; never fractional-scale.
 6. No CRT filter, scanlines, vignette, bloom or chromatic effects anywhere. Atmosphere comes from palette only.

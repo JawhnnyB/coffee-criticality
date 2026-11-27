@@ -80,6 +80,19 @@ PAIRS = [
     ("intro-you.png", "reference/intro/intro-you.png"),
     ("intro-door.png", "reference/intro/intro-door.png"),
     ("badge.png", "reference/intro/badge.png"),
+    ("chibi-sheet.png", "reference/cast/chibi-sheet.png"),
+    ("cast/player_walk4.png", "public/art/gen/sprites/player_walk4.png"),
+    ("cast/mabel_walk4.png", "public/art/gen/sprites/mabel_walk4.png"),
+    ("cast/holt_walk4.png", "public/art/gen/sprites/holt_walk4.png"),
+    ("cast/colt_walk4.png", "public/art/gen/sprites/colt_walk4.png"),
+    ("cast/elena_walk4.png", "public/art/gen/sprites/elena_walk4.png"),
+    ("cast/tommy_walk4.png", "public/art/gen/sprites/tommy_walk4.png"),
+    ("cast/marcus_walk4.png", "public/art/gen/sprites/marcus_walk4.png"),
+    ("cast/priya_walk4.png", "public/art/gen/sprites/priya_walk4.png"),
+    ("cast/jordan_walk4.png", "public/art/gen/sprites/jordan_walk4.png"),
+    ("cafe/candy.png", "public/art/rooms/cafe/candy.png"),
+    ("cafe/candy-light.png", "public/art/rooms/cafe/candy-light.png"),
+    ("cafe/candy-shade.png", "public/art/rooms/cafe/candy-shade.png"),
     ("toy-mabel.png", "reference/toys/toy-mabel.png"),
     ("toy-jordan.png", "reference/toys/toy-jordan.png"),
     ("toy-elena.png", "reference/toys/toy-elena.png"),
@@ -119,7 +132,11 @@ def main() -> int:
     env["REACTOR_OUT"] = str(reactors)
     env["TOYS_GAME"] = str(ui / "game")    # the check never writes into public/
     env["PLATES_GAME"] = str(ui / "game")
+    env["CAST_OUT"] = str(ui / "cast")         # the chibi sheets, regenerated beside public/ and compared
+    env["CAFE_OUT"] = str(ui / "cafe")
     steps = [
+        [sys.executable, str(ART / "chibi.py")],
+        [sys.executable, str(ROOT / "tools" / "roomkit" / "cafe_candy.py")],
         [sys.executable, str(ART / "menu.py")],
         [sys.executable, str(ART / "cab.py")],
         [sys.executable, str(ART / "portrait.py")],

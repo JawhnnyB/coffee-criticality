@@ -83,11 +83,34 @@ def scene_core():
     put(cv, 'priya', 'right', 148, 178); sheet(cv, 158, 150)
     put(cv, 'player', 'left', 230, 180)
     return crop(cv, 16, 44)
+def candy_cafe(people):
+    """The painted cafe (tools/roomkit/cafe_candy.py) as the game draws it: shell, stamps and people by their feet,
+    the pendants last, then the room's shade and light. people: (who, facing, cx, feet)."""
+    import json
+    from PIL import ImageChops
+    base = f'{REPO}/public/art/rooms/cafe'
+    atlas = Image.open(f'{base}/candy.png').convert('RGBA')
+    meta = json.load(open(f'{base}/candy.json'))
+    cv = Cv(320, 256)
+    cv.im.alpha_composite(atlas.crop((0, 0, 320, 256)), (0, 0))
+    items = [(m['foot'], 0, m) for m in meta] + [(p[3], 1, p) for p in people]
+    for foot, kind, it in sorted(items, key=lambda t: (t[0], t[1])):
+        if kind == 0:
+            cv.im.alpha_composite(atlas.crop((it['sx'], it['sy'], it['sx'] + it['sw'], it['sy'] + it['sh'])), (it['x'], it['y']))
+        else:
+            put(cv, it[0], it[1], it[2], it[3])
+    shade = Image.open(f'{base}/candy-shade.png').convert('RGB')
+    light = Image.open(f'{base}/candy-light.png').convert('RGBA')
+    rgb = ImageChops.multiply(cv.im.convert('RGB'), shade)
+    lrgb = Image.new('RGB', (320, 256), (0, 0, 0)); lrgb.paste(light.convert('RGB'), (0, 0), light.split()[3])
+    rgb = ImageChops.screen(rgb, lrgb)
+    cv.im = rgb.convert('RGBA'); cv.d = __import__('PIL.ImageDraw', fromlist=['ImageDraw']).Draw(cv.im)
+    return cv
+
 def scene_cafe():
-    cv = rr.render_room('cafe', chars=False, border_on=False)
-    put(cv, 'mabel', 'sit', 160, 182); cup(cv, 172, 99)
-    put(cv, 'player', 'right', 122, 176)
-    return crop(cv, 0, 36)
+    # Mabel in her armchair, you coming in past the little table.
+    cv = candy_cafe([('mabel', 'sit', 160, 190), ('player', 'right', 124, 198)])
+    return crop(cv, 0, 28)
 def scene_lot():
     import lot
     os.environ['LOT_CHARS'] = '0'

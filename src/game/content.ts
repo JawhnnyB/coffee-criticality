@@ -1288,8 +1288,9 @@ export const ROOMS: Record<RoomId, RoomDef> = {
       // The laptop on the counter. Drawn in code (render.ts), not from the atlas. Opens the desktop.
       { rect: t(7, 6, 2, 2), kind: "laptop", block: false },
       { rect: t(9, 10, 2, 2), kind: "chair", block: false },
-      { rect: t(12, 10, 2, 2), kind: "chair", block: false },
-      { rect: t(15, 11, 2, 2), kind: "chair", block: false },
+      // Only the first armchair is for sitting; the other two are furniture now (cafe_candy.py).
+      { rect: { x: 194, y: 166, w: 28, h: 22 }, kind: "chair" },
+      { rect: { x: 242, y: 182, w: 28, h: 22 }, kind: "chair" },
       { rect: t(14, 6, 5, 3), kind: "rug", block: false },
       { rect: t(1, 4, 2, 3), kind: "poster" },
       { rect: t(1, 1, 2, 2), kind: "poster", block: false },
@@ -1297,6 +1298,9 @@ export const ROOMS: Record<RoomId, RoomDef> = {
       { rect: t(17, 4, 2, 3), kind: "plant" },
       { rect: t(1, 10, 2, 2), kind: "plant" },
       { rect: t(17, 10, 2, 2), kind: "lamp", block: false },
+      // The little table between the first two armchairs, and the record player in the corner (cafe_candy.py).
+      { rect: { x: 178, y: 172, w: 14, h: 12 }, kind: "table" },
+      { rect: t(1, 13, 2, 2), kind: "shelf" },
     ],
     interacts: [
       { id: "coffee", rect: t(3, 6, 6, 3), label: "Kettle", kind: "coffee" },

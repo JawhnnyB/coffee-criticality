@@ -209,3 +209,19 @@ Evidence: `docs/audit/2026-11-25-cycles/`. BWR and other types: `docs/reactor-re
   - Molten salt: the salt loop every Friday, no outages (MSRE as the teaching reference).
   - The Refuelling Outage desk app stays PWR-only; signing a BWR bundle doesn't open it.
 - Still open: the BWR teaching limits (axial 1.45, pin 1.30, hottest pin 1.80, start-of-cycle k∞ 1.16, enrichment 3.9–4.4%), the pebble limits (6,500 pebbles a day through the burnup meter, 105 GWd/t for any pebble, 1.6 kW a pebble), and the salt band (645–655 °C). All are my teaching choices. Evidence: `docs/audit/2026-11-26-types/`.
+
+## Look pass: the café and the cast (26 November, Claude)
+
+The owner asked for Mabel's café to be "beautiful and stunning, pixel art candy almost", and for the characters to go back to having "more charm, personality, and love in each design".
+
+Chosen:
+- **Cast:** chibi walkers drawn by hand in `tools/artkit/chibi.py`, with big heads and real faces (Mabel's eyes smile shut, Holt's brows are level, Jordan's are crooked). Each has a shape you can name from across the room: Mabel's bun and apron, Tommy's hard hat, Marcus's flannel and beard, Priya's top bun and lanyard. Same 128×192 sheets and footprint. The player keeps the tintA6 key colours, and the glasses sit on the eye rows so the toggle still works. The 17 November generator is kept at `reference/old-sprites/draw-cast-1117.mjs`.
+- **Café:** painted in `tools/roomkit/cafe_candy.py` on the same collision, plus a small table and the record player as two new solid props. The two spare armchairs are solid now too; only the teal one is for sitting.
+  - Painted light and shade maps (`candy-light.png`, `candy-shade.png`) are blended over the room in flat steps, so people walk through the window light and the lamp pools.
+  - `src/game/cafeLife.ts` adds the moving parts: bulbs, the clock showing the shift's time, the cat, steam, dust and the record. Reduced motion holds all of it still.
+- The intro café tableau, the badge and the plates are re-baked with the new cast. The intro café is now the painted room.
+
+Still open:
+- Other rooms keep the old room kit. The café is the target look; tell me which room is next.
+- The portraits (48×48) were already in this style and are unchanged.
+- The cat is new decor with no name and no story. Say if it should have either, or none.

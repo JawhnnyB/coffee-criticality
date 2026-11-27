@@ -4,6 +4,8 @@ import { boardFace } from "./boardMark";
 import { LOOKS, PAL, drawChibi, drawEmote, pix, steam } from "./pixel";
 import { maintenanceSteamOn } from "./steamRule";
 import { A6_ROOMS } from "./roomArt";
+import { ROOM_LIGHT, drawCafeBack, drawCafeFront } from "./cafeLife";
+import { prefersReducedMotion } from "./reducedMotion";
 import { ROOM_ATLAS, type AtlasStamp } from "./roomAtlas";
 import { HALL_PIPES, drawHallReactor, drawLaggedPipe, drawLotRoof, drawMimic, type HallState } from "./hallPlant";
 import { PLANTS, cherenkov, siteKind, sitePower } from "./plantLoops";
@@ -126,10 +128,12 @@ export function drawWorld(
       blitStamp(g, atlas, st);
     }
     if (s.room === "corridor") drawHallRunner(g, room.w, room.h);
+    // Rooms with painted light (cafeLife.ts ROOM_LIGHT) carry their own lamp pools.
     for (const p of room.props) {
-      if (p.kind !== "lamp") continue;
+      if (p.kind !== "lamp" || ROOM_LIGHT[room.id]) continue;
       lampPool(g, p.rect.x + p.rect.w / 2, p.rect.y + p.rect.h);
     }
+    if (s.room === "cafe") drawCafeBack(g, now, s.minutes, prefersReducedMotion());
   }
 
   fillEdge(g, room);
@@ -220,6 +224,23 @@ export function drawWorld(
   for (const d of drawables) d.draw();
   for (const p of room.props) {
     if (p.kind === "laptop") drawLaptop(g, p.rect.x, p.rect.y);
+  }
+  if (usingA6 && s.room === "cafe") drawCafeFront(g, now, prefersReducedMotion());
+  const painted = usingA6 ? ROOM_LIGHT[room.id] : undefined;
+  if (painted) {
+    // Light that falls on people too: shade multiplied, then the warm light screened, all in room pixels.
+    const shade = img(painted.shade);
+    const light = img(painted.light);
+    g.save();
+    if (shade) {
+      g.globalCompositeOperation = "multiply";
+      g.drawImage(shade, 0, 0);
+    }
+    if (light) {
+      g.globalCompositeOperation = "screen";
+      g.drawImage(light, 0, 0);
+    }
+    g.restore();
   }
   if (s.room === "maintenance" && maintenanceSteamOn(s.day, s.residue.valve)) {
     const valve = room.props.find((p) => p.kind === "valve");
