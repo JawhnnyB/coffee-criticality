@@ -151,6 +151,7 @@ import {
   type Verdict,
 } from "./campaign";
 import { setBossArt } from "./bossArt";
+import { setSkyOverride } from "./daylight";
 import { fridayLog } from "./refuel/byType";
 import { validBundle, referenceBundle } from "./refuel/bwrBundle";
 import { BundleBench, PassDesk, SaltDesk, TipTrace } from "./refuel/RefuelDesks";
@@ -733,6 +734,7 @@ export function GameApp() {
       getEnded: () => stateRef.current.ended,
       getTimeLabel: () => stateRef.current.timeLabel,
       getClosePrompt: () => stateRef.current.closePrompt,
+      setSky: (m: number | null) => setSkyOverride(m),
       getSitting: () => stateRef.current.sitting,
       getMoving: () => stateRef.current.moving,
       getPhase: () => stateRef.current.walkPhase,
@@ -4074,6 +4076,7 @@ declare global {
       getEnded: () => "a" | "c" | null;
       getTimeLabel: () => string;
       getClosePrompt: () => boolean;
+      setSky: (m: number | null) => void;
       getSitting: () => boolean;
       getMoving: () => boolean;
       getPhase: () => number;

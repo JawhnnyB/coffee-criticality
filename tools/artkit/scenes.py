@@ -100,10 +100,9 @@ def candy_cafe(people):
         else:
             put(cv, it[0], it[1], it[2], it[3])
     shade = Image.open(f'{base}/candy-shade.png').convert('RGB')
-    light = Image.open(f'{base}/candy-light.png').convert('RGBA')
-    rgb = ImageChops.multiply(cv.im.convert('RGB'), shade)
-    lrgb = Image.new('RGB', (320, 256), (0, 0, 0)); lrgb.paste(light.convert('RGB'), (0, 0), light.split()[3])
-    rgb = ImageChops.screen(rgb, lrgb)
+    sys.path.insert(0, f'{REPO}/tools/roomkit')
+    import cafe_candy
+    rgb = cafe_candy.daylight_light(ImageChops.multiply(cv.im.convert('RGB'), shade), base)
     cv.im = rgb.convert('RGBA'); cv.d = __import__('PIL.ImageDraw', fromlist=['ImageDraw']).Draw(cv.im)
     return cv
 

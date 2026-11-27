@@ -4,7 +4,8 @@ import { boardFace } from "./boardMark";
 import { LOOKS, PAL, drawChibi, drawEmote, pix, steam } from "./pixel";
 import { maintenanceSteamOn } from "./steamRule";
 import { A6_ROOMS } from "./roomArt";
-import { ROOM_LIGHT, drawCafeBack, drawCafeFront } from "./cafeLife";
+import { ROOM_LIGHT, drawCafeBack, drawCafeFront, drawCafeLights } from "./cafeLife";
+import { daylightAt, skyMinutes } from "./daylight";
 import { prefersReducedMotion } from "./reducedMotion";
 import { ROOM_ATLAS, type AtlasStamp } from "./roomAtlas";
 import { HALL_PIPES, drawHallReactor, drawLaggedPipe, drawLotRoof, drawMimic, type HallState } from "./hallPlant";
@@ -42,7 +43,11 @@ const WALKERS = ["player", "mabel", "holt", "elena", "tommy", "marcus", "priya",
 /** Start atlas and walk-sheet loads. Call when a door fade begins so the next room is ready. */
 export function preloadRoomArt(roomId?: string) {
   const ids = roomId && ROOM_ATLAS[roomId] ? [roomId] : Object.keys(ROOM_ATLAS);
-  for (const id of ids) warm(ROOM_ATLAS[id].src);
+  for (const id of ids) {
+    warm(ROOM_ATLAS[id].src);
+    const lit = ROOM_LIGHT[id];
+    if (lit) for (const src of [lit.shade, lit.lamps, lit.window]) warm(src);
+  }
   for (const who of [...WALKERS, "colt"]) warm(`/art/gen/sprites/${who}_walk4.png`);
 }
 
@@ -133,7 +138,7 @@ export function drawWorld(
       if (p.kind !== "lamp" || ROOM_LIGHT[room.id]) continue;
       lampPool(g, p.rect.x + p.rect.w / 2, p.rect.y + p.rect.h);
     }
-    if (s.room === "cafe") drawCafeBack(g, now, s.minutes, prefersReducedMotion());
+    if (s.room === "cafe") drawCafeBack(g, now, skyMinutes(s.minutes), prefersReducedMotion());
   }
 
   fillEdge(g, room);
@@ -225,22 +230,55 @@ export function drawWorld(
   for (const p of room.props) {
     if (p.kind === "laptop") drawLaptop(g, p.rect.x, p.rect.y);
   }
-  if (usingA6 && s.room === "cafe") drawCafeFront(g, now, prefersReducedMotion());
+  if (usingA6 && s.room === "cafe") drawCafeFront(g, now, prefersReducedMotion(), skyMinutes(s.minutes));
   const painted = usingA6 ? ROOM_LIGHT[room.id] : undefined;
   if (painted) {
-    // Light that falls on people too: shade multiplied, then the warm light screened, all in room pixels.
+    // Light that falls on people too, in room pixels, by the hour (daylight.ts). First a light map, multiplied over
+    // the room: the hour's ambient everywhere but the window, plus the lamps' warm light and the light through the
+    // window added on top, so after dark the lamp pools stay warm and bright while the rest goes blue. Then a gentle
+    // glow screened over it, which is all the light there is to see by day.
+    const day = daylightAt(skyMinutes(s.minutes));
     const shade = img(painted.shade);
-    const light = img(painted.light);
-    g.save();
-    if (shade) {
-      g.globalCompositeOperation = "multiply";
-      g.drawImage(shade, 0, 0);
+    const lamps = img(painted.lamps);
+    const glow = img(painted.window);
+    const tinted = glow ? tintedMask(glow, day.outside) : null;
+    const gl = painted.glass;
+    const lm = lightBuffer(room.w, room.h);
+    if (lm) {
+      lm.globalCompositeOperation = "source-over";
+      lm.globalAlpha = 1;
+      lm.fillStyle = day.ambient;
+      lm.fillRect(0, 0, room.w, room.h);
+      lm.fillStyle = "#ffffff";
+      lm.fillRect(gl.x, gl.y, gl.w, gl.h);
+      lm.fillStyle = day.ambient;
+      for (const r of painted.inside) lm.fillRect(r.x, r.y, r.w, r.h);
+      lm.globalCompositeOperation = "lighter";
+      if (lamps) {
+        // The lamp mask is drawn soft for the glow; as light on the room it counts three times over.
+        lm.globalAlpha = Math.min(1, day.lamps);
+        for (let k = 0; k < 3; k++) lm.drawImage(lamps, 0, 0);
+      }
+      if (tinted) {
+        lm.globalAlpha = day.outsideStrength;
+        lm.drawImage(tinted, 0, 0);
+      }
     }
-    if (light) {
-      g.globalCompositeOperation = "screen";
-      g.drawImage(light, 0, 0);
+    g.save();
+    g.globalCompositeOperation = "multiply";
+    if (shade) g.drawImage(shade, 0, 0);
+    if (lm) g.drawImage(lm.canvas, 0, 0);
+    g.globalCompositeOperation = "screen";
+    if (lamps) {
+      g.globalAlpha = 0.25 + 0.35 * day.lamps;
+      g.drawImage(lamps, 0, 0);
+    }
+    if (tinted) {
+      g.globalAlpha = day.outsideStrength * 0.8;
+      g.drawImage(tinted, 0, 0);
     }
     g.restore();
+    if (s.room === "cafe") drawCafeLights(g, now, skyMinutes(s.minutes), prefersReducedMotion());
   }
   if (s.room === "maintenance" && maintenanceSteamOn(s.day, s.residue.valve)) {
     const valve = room.props.find((p) => p.kind === "valve");
@@ -295,7 +333,8 @@ export function drawWorld(
     applyWorldPostFx(ctx, { x: ox, y: oy, w: dw, h: dh }, lights);
   }
 
-  if (s.period !== "midday") {
+  // Rooms with painted light do their own time of day (daylight.ts); the rest take the period tint.
+  if (s.period !== "midday" && !(usingA6 && ROOM_LIGHT[room.id])) {
     ctx.save();
     ctx.globalCompositeOperation = "multiply";
     ctx.fillStyle = s.period === "morning" ? "#fff2dc" : "#f0c8a0";
@@ -525,4 +564,38 @@ function drawPaperLog(ctx: CanvasRenderingContext2D, day: number, mark: ResidueH
 
 export function roomName(id: RoomId) {
   return ROOMS[id].name;
+}
+
+/** A white light mask recoloured, cached by colour (the colour changes in five-minute steps). */
+const tintCache = new Map<string, HTMLCanvasElement>();
+function tintedMask(mask: HTMLImageElement, color: string): HTMLCanvasElement | null {
+  const key = `${mask.src}|${color}`;
+  const hit = tintCache.get(key);
+  if (hit) return hit;
+  if (typeof document === "undefined") return null;
+  const c = document.createElement("canvas");
+  c.width = mask.naturalWidth;
+  c.height = mask.naturalHeight;
+  const x = c.getContext("2d");
+  if (!x) return null;
+  x.drawImage(mask, 0, 0);
+  x.globalCompositeOperation = "source-in";
+  x.fillStyle = color;
+  x.fillRect(0, 0, c.width, c.height);
+  if (tintCache.size > 24) tintCache.clear();
+  tintCache.set(key, c);
+  return c;
+}
+
+/** The light map's own small canvas, reused frame to frame. */
+let lightCtx: CanvasRenderingContext2D | null = null;
+function lightBuffer(w: number, h: number): CanvasRenderingContext2D | null {
+  if (typeof document === "undefined") return null;
+  if (!lightCtx || lightCtx.canvas.width !== w || lightCtx.canvas.height !== h) {
+    const c = document.createElement("canvas");
+    c.width = w;
+    c.height = h;
+    lightCtx = c.getContext("2d");
+  }
+  return lightCtx;
 }

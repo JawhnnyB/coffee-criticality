@@ -1,14 +1,18 @@
 PASS 1280 day 1 starts in the café
-PASS 1280 painted atlas, light map and walk sheets load ({"atlas":[470,256],"light":[320,256],"walk":[128,192]})
+PASS 1280 painted atlas, lamp and window light, and walk sheets load ({"atlas":[470,256],"light":[320,256],"glow":[320,256],"walk":[128,192]})
 PASS 1280 sat in the teal armchair (160,190)
 PASS 1280 stood up again
-PASS 1280 walked up past the counter to the window (y 92.83333333333381)
+PASS 1280 walked up past the counter to the window (y 94.00000000000048)
 PASS 1280 Mabel talks (06:53 · Criticality Cafe · clock frozen Mabel Cafe / retired floor Pours before )
+PASS 1280 sunrise, midday, sunset and night each look different
+PASS 1280 the clock didn't move for the preview, and the shift goes on (413.9101666666633 dialogue)
 PASS 1280 no page errors
 PASS 390 day 1 starts in the café
-PASS 390 painted atlas, light map and walk sheets load ({"atlas":[470,256],"light":[320,256],"walk":[128,192]})
+PASS 390 painted atlas, lamp and window light, and walk sheets load ({"atlas":[470,256],"light":[320,256],"glow":[320,256],"walk":[128,192]})
 PASS 390 sat in the teal armchair (160,190)
 PASS 390 stood up again
 PASS 390 walked up past the counter to the window (y 94.00000000000048)
 PASS 390 Mabel talks (06:53 · Criticality Cafe · clock frozen Mabel Cafe / retired floor Pours before )
+PASS 390 sunrise, midday, sunset and night each look different
+PASS 390 the clock didn't move for the preview, and the shift goes on (413.91533333332995 dialogue)
 PASS 390 no page errors

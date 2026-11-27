@@ -9,7 +9,8 @@ lamps over the counter.
 
 Writes into public/art/rooms/cafe/:
     candy.png        the atlas: the shell (floor, walls, rug) at 0,0 (320x256), the stamps packed to its right
-    candy-light.png  warm light, screen-blended over everything (window shaft, pendant pools, lamp pool)
+    candy-window.png light through the window, a white mask the game tints by the time of day
+    candy-lamps.png  the lamps' warm light (pendants, reading lamp, string lights), turned up as it gets dark
     candy-shade.png  ambient shade, multiplied over everything (the room's edges and corners, under the counter)
     candy.json       the stamp list for src/game/roomAtlas.ts
 
@@ -485,22 +486,30 @@ def pendant():
 # =====================================================================================================================
 # Light and shade maps
 # =====================================================================================================================
-def light_map():
+def window_glow():
+    """Light through the window, as a white mask in three gentle steps: the sill and the wainscot under it, and a
+    soft pool on the floor in front. The game tints it by the time of day (src/game/daylight.ts): pale gold by day,
+    orange at sunrise and sunset, a cool white under the moon."""
     L = C(RW, RH)
-    warm = '#ffe4a8'
-    # the window shaft: from the glass down and to the right across the floor, in two steps
-    for y in range(36, 150):
-        t = (y - 36) / 114
-        x0 = 96 + round(t * 54); x1 = 176 + round(t * 70)
-        a = 46 if t < .55 else 30 if t < .85 else 16
-        for x in range(x0, x1):
-            edge = min(x - x0, x1 - 1 - x)
-            L.px(x, y, warm, a if edge > 5 else a * 2 // 3)
-    for (cx, cy, rx, ry) in ((78, 104, 22, 9), (118, 104, 22, 9)):        # pendant pools on the counter top
-        for rr, a in ((1.0, 34), (.66, 58), (.36, 80)):
-            L.ellipse(cx, cy, round(rx * rr), round(ry * rr), '#ffdc98', a)
-    for rr, a in ((1.0, 36), (.62, 64), (.32, 92)):                         # reading lamp
-        L.ellipse(288, 190, round(40 * rr), round(16 * rr), '#ffd088', a)
+    white = '#ffffff'
+    L.r(90, 34, 92, 14, white, 26); L.r(96, 34, 80, 6, white, 44)
+    for rr, a in ((1.0, 30), (.68, 54), (.38, 80)):
+        L.ellipse(136, 60, round(66 * rr), round(19 * rr), white, a)
+    return L
+
+def lamp_map():
+    """The lamps' own light, warm: pools under the two pendants and round their bulbs, the reading lamp's pool and
+    its glowing shade, and a faint wash along the string lights. The game turns it up as it gets dark."""
+    L = C(RW, RH)
+    for cx in (78, 118):                                                   # pendants: the counter top and the floor
+        for rr, a in ((1.0, 22), (.7, 40), (.42, 64), (.2, 86)):
+            L.ellipse(cx, 104, round(30 * rr), round(12 * rr), '#ffdc98', a)
+        L.ellipse(cx, 76, 9, 5, '#ffe8b0', 46); L.ellipse(cx, 76, 5, 3, '#fff4c8', 110)
+    for rr, a in ((1.0, 30), (.62, 56), (.32, 86)):                         # reading lamp
+        L.ellipse(288, 190, round(42 * rr), round(17 * rr), '#ffd088', a)
+    L.ellipse(288, 149, 13, 8, '#ffe0a0', 48); L.ellipse(288, 153, 9, 3, '#fff2c0', 100)
+    for x0, x1 in ((0, 92), (180, RW)):                                     # string lights (not over the glass)
+        L.r(x0, 1, x1 - x0, 9, '#ffe0a0', 18); L.r(x0, 3, x1 - x0, 4, '#ffe0a0', 22)
     return L
 
 def shade_map():
@@ -554,11 +563,26 @@ def build():
     atlas.alpha_composite(sh.im, (0, 0))
     for s in placed: atlas.alpha_composite(s['im'].im, (s['sx'], s['sy']))
     atlas.save(f'{OUT}/candy.png')
-    light_map().im.save(f'{OUT}/candy-light.png')
+    window_glow().im.save(f'{OUT}/candy-window.png')
+    lamp_map().im.save(f'{OUT}/candy-lamps.png')
     shade_map().save(f'{OUT}/candy-shade.png')
     meta = [{k: v for k, v in s.items() if k != 'im'} for s in placed]
     with open(f'{OUT}/candy.json', 'w') as fh: json.dump(meta, fh, indent=1)
     return atlas, meta
+
+def daylight_light(rgb, base, outside=(255, 236, 196), outside_a=.6, lamps_a=.5):
+    """Mid-morning light, for stills (the game does this live by the clock): the window glow tinted pale gold, and
+    the lamps half up. rgb is an RGB image of the room after the shade."""
+    from PIL import ImageChops
+    win = Image.open(f'{base}/candy-window.png').convert('RGBA')
+    lam = Image.open(f'{base}/candy-lamps.png').convert('RGBA')
+    for im, col, a in ((lam, None, lamps_a), (win, outside, outside_a)):
+        layer = Image.new('RGB', (RW, RH), (0, 0, 0))
+        src = im.convert('RGB') if col is None else Image.new('RGB', (RW, RH), col)
+        mask = im.split()[3].point(lambda v: round(v * a))
+        layer.paste(src, (0, 0), mask)
+        rgb = ImageChops.screen(rgb, layer)
+    return rgb
 
 def preview(atlas, meta, path, scale=2, people=()):
     """The room as the game would draw it: shell, stamps by foot (with any people), light, shade."""
@@ -573,9 +597,7 @@ def preview(atlas, meta, path, scale=2, people=()):
     from PIL import ImageChops
     shade = Image.open(f'{OUT}/candy-shade.png').convert('RGB')
     rgb = ImageChops.multiply(cv.convert('RGB'), shade)
-    light = Image.open(f'{OUT}/candy-light.png').convert('RGBA')
-    lrgb = Image.new('RGB', (RW, RH), (0, 0, 0)); lrgb.paste(light.convert('RGB'), (0, 0), light.split()[3])
-    rgb = ImageChops.screen(rgb, lrgb)
+    rgb = daylight_light(rgb, OUT)
     rgb.resize((RW * scale, RH * scale), Image.NEAREST).save(path)
 
 if __name__ == '__main__':

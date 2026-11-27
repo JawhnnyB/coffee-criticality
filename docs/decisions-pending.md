@@ -221,7 +221,10 @@ Chosen:
   - `src/game/cafeLife.ts` adds the moving parts: bulbs, the clock showing the shift's time, the cat, steam, dust and the record. Reduced motion holds all of it still.
 - The intro café tableau, the badge and the plates are re-baked with the new cast. The intro café is now the painted room.
 
+Light by the hour (27 Nov, owner's ask): there's no window shaft now. The window gives a gentle glow, and the pendants and reading lamp give warm light. The clock (`src/game/daylight.ts`) runs dawn, sunrise, morning, midday, golden hour, sunset, dusk and night. A shift (06:40 to 16:48) opens on the sunrise and ends in the sunset. At night the window light is a cool white and the lamps are at full.
+
 Still open:
+- **Night never comes in play yet:** the day shift's clock stops at 16:48. Seeing the café at night needs an evening visit, for example walking out through the café after clock-out, or the café before a night watch. Until then, night is only visible through the labelled `setSky` test hook.
 - Other rooms keep the old room kit. The café is the target look; tell me which room is next.
 - The portraits (48×48) were already in this style and are unchanged.
 - The cat is new decor with no name and no story. Say if it should have either, or none.
