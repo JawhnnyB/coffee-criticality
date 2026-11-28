@@ -5,7 +5,7 @@ import { LOOKS, PAL, drawChibi, drawEmote, pix, steam } from "./pixel";
 import { maintenanceSteamOn } from "./steamRule";
 import { A6_ROOMS } from "./roomArt";
 import { ROOM_LIGHT, drawCafeBack, drawCafeFront, drawCafeLights } from "./cafeLife";
-import { daylightAt, skyMinutes } from "./daylight";
+import { daylightAt, skyMinutes, skyOverridden } from "./daylight";
 import { prefersReducedMotion } from "./reducedMotion";
 import { ROOM_ATLAS, type AtlasStamp } from "./roomAtlas";
 import { HALL_PIPES, drawHallReactor, drawLaggedPipe, drawLotRoof, drawMimic, type HallState } from "./hallPlant";
@@ -279,6 +279,31 @@ export function drawWorld(
     }
     g.restore();
     if (s.room === "cafe") drawCafeLights(g, now, skyMinutes(s.minutes), prefersReducedMotion());
+  } else if (skyOverridden()) {
+    // Rooms without painted light, at night (the walk in to a night watch): the hour's ambient over everything,
+    // then warm pools round their lamps, in stepped rings.
+    const day = daylightAt(skyMinutes(s.minutes));
+    g.save();
+    g.globalCompositeOperation = "multiply";
+    g.fillStyle = day.ambient;
+    g.fillRect(0, 0, room.w, room.h);
+    g.globalCompositeOperation = "lighter";
+    for (const p of room.props) {
+      if (!/lamp/.test(p.kind)) continue;
+      const cx = p.rect.x + p.rect.w / 2;
+      const cy = p.rect.y + p.rect.h;
+      for (const [rx, ry, a] of [[44, 16, 0.12], [30, 11, 0.16], [17, 6, 0.22]] as const) {
+        g.globalAlpha = a * day.lamps;
+        g.fillStyle = "#ffcf80";
+        g.beginPath();
+        g.ellipse(cx, cy, rx, ry, 0, 0, Math.PI * 2);
+        g.fill();
+      }
+      g.globalAlpha = 0.5 * day.lamps;
+      g.fillStyle = "#fff0c0";
+      g.fillRect(Math.round(cx) - 2, Math.round(p.rect.y) - 2, 4, 3);
+    }
+    g.restore();
   }
   if (s.room === "maintenance" && maintenanceSteamOn(s.day, s.residue.valve)) {
     const valve = room.props.find((p) => p.kind === "valve");

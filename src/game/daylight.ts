@@ -96,6 +96,12 @@ export function setSkyOverride(minutes: number | null) {
 export function skyMinutes(clock: number): number {
   return override ?? clock;
 }
+export function skyOverridden(): boolean {
+  return override !== null;
+}
+
+/** The walk in to a night watch happens at this hour (the openers say 18:00). */
+export const NIGHT_WALK_MINUTES = 18 * 60;
 
 /** The sun is up between these (it touches the far shore at each end). */
 export const SUNRISE = 395;

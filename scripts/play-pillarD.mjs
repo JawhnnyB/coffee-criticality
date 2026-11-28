@@ -24,7 +24,7 @@ await page.waitForTimeout(600);
 
 const cafeHud = await page.evaluate(() => {
   const t = window.__controlsTest;
-  const plan = document.querySelector('[data-testid="site-plan"]');
+  const plan = document.querySelector('[data-testid="mission-board"]');
   const inst = document.querySelector('[data-testid="instrument"]');
   const cs = plan ? getComputedStyle(plan) : null;
   return {
@@ -132,7 +132,7 @@ await page.waitForTimeout(400);
 await page.setViewportSize({ width: 390, height: 844 });
 await page.waitForTimeout(500);
 const mobileHud = await page.evaluate(() => {
-  const plan = document.querySelector('[data-testid="site-plan"]');
+  const plan = document.querySelector('[data-testid="mission-board"]');
   const inst = document.querySelector('[data-testid="instrument"]');
   const cs = plan ? getComputedStyle(plan) : null;
   return {

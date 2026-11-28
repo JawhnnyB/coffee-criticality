@@ -1,0 +1,33 @@
+PASS 1280 no site plan in the corner any more
+PASS 1280 a mission board instead
+PASS 1280 day 1: sitting with Mabel is the thing to do now (mabel:now meet:todo study:todo truth:todo)
+PASS 1280 the count reads none of four done
+PASS 1280 the night's opener
+PASS 1280 it offers the walk, and a way straight to the desk
+PASS 1280 in the café, in play
+PASS 1280 the corner says night (18:00 NIGHT 1 LESS CRITICALITY CAFE TONIGHT 0/2 Walk to the )
+PASS 1280 tonight's board: walk to the watch desk
+PASS 1280 the day crew has gone home; Mabel is closing up (["mabel"])
+PASS 1280 out onto the lot (gate)
+PASS 1280 Jordan's on the lot with his rounds (["jordan"])
+PASS 1280 through the plant door into the hall (corridor)
+PASS 1280 into Control, and the watch starts
+PASS 1280 the clock and sky are back to themselves
+PASS 1280 no page errors
+PASS 390 no site plan in the corner any more
+PASS 390 folded on a phone: just what to do now (Sit with Mabel)
+PASS 390 a mission board instead
+PASS 390 day 1: sitting with Mabel is the thing to do now (mabel:now meet:todo study:todo truth:todo)
+PASS 390 the count reads none of four done
+PASS 390 the night's opener
+PASS 390 it offers the walk, and a way straight to the desk
+PASS 390 in the café, in play
+PASS 390 the corner says night (18:00 NIGHT 1 MORE CRITICALITY CAFE Walk to the watch desk i)
+PASS 390 tonight, folded: walk to the watch desk (Walk to the watch desk in Control)
+PASS 390 the day crew has gone home; Mabel is closing up (["mabel"])
+PASS 390 out onto the lot (gate)
+PASS 390 Jordan's on the lot with his rounds (["jordan"])
+PASS 390 through the plant door into the hall (corridor)
+PASS 390 into Control, and the watch starts
+PASS 390 the clock and sky are back to themselves
+PASS 390 no page errors

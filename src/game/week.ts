@@ -291,6 +291,33 @@ export function yesterdayLine(day: number, log: WeekLogEntry[], residue: Residue
 }
 
 /**
+ * The walk in to a night watch (GameApp, before the shift): 18:00, the day crew gone home. Mabel is behind her
+ * counter closing up and Jordan is on the lot with a torch, starting his rounds. Everyone else is off the map.
+ * Module state like the week context, because sim.ts (frozen) asks occupancyOverlay and nothing else.
+ */
+let nightWalk = false;
+export function setNightWalk(on: boolean) {
+  nightWalk = on;
+}
+export function nightWalkOn(): boolean {
+  return nightWalk;
+}
+export function nightPost(id: NpcId): NpcSlot {
+  if (id === "mabel") return { room: "cafe", x: 92, y: 90, face: "down", radius: 8 };
+  if (id === "jordan") return { room: "gate", x: 790, y: 236, face: "left", radius: 8 };
+  return { room: "parlor", x: -400, y: -400, face: "down", radius: 0 };
+}
+
+/** Where to go next on the way to the watch desk, from wherever you are. */
+export function nightWalkDirection(room: string): string {
+  if (room === "cafe") return "East door to the lot.";
+  if (room === "gate") return "East along the lot to the plant door.";
+  if (room === "corridor") return "North door: Control.";
+  if (room === "control") return "The watch desk.";
+  return "Back to the hall, then north to Control.";
+}
+
+/**
  * Posts that hold a face. Radius 12 so they do not wander off it.
  * Day posts ignore the clock. The dusk lot ignores the day.
  */
@@ -303,6 +330,7 @@ export function occupancyOverlay(
   shuffleDone: boolean,
   elenaSecondEyes: boolean,
 ): NpcSlot | undefined {
+  if (nightWalk) return nightPost(id);
   if (ending) return duskPost(id, residue, ended, shuffleDone, elenaSecondEyes) ?? away(id);
   if (id === "jordan" && anyHid(residue)) return { room: "breakroom", x: 248, y: 160, face: "right", radius: 12 };
   if (id === "elena" && residue.valve === "caught") return { room: "gate", x: 400, y: 248, face: "right", radius: 12 };

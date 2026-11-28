@@ -791,9 +791,25 @@ function SceneCard({ scene: raw, testId, children, calm, plant = "holt" }: { sce
 }
 
 /** Days off, the night openers, the shifts, and the lot at dawn. Flags only. */
-export function NightRotation({ s, onNewWeek, onMenu }: { s: GameState; onNewWeek: () => void; onMenu: () => void }) {
+export function NightRotation({
+  s,
+  onNewWeek,
+  onMenu,
+  onWalk,
+}: {
+  s: GameState;
+  onNewWeek: () => void;
+  onMenu: () => void;
+  /** Walk in to the watch desk first (GameApp): from the café, across the lot, through the hall, at night. */
+  onWalk?: (night: number) => void;
+}) {
   const next = Math.min(4, nightsDone(s.flags) + 1);
   const [phase, setPhase] = useState<"off" | "opener" | "shift" | "dawn">(() => {
+    if (s.flags["rot:atDesk"]) {
+      // Just walked in: straight to the watch.
+      delete s.flags["rot:atDesk"];
+      return "shift";
+    }
     if (s.flags["rot:dawn"]) return "dawn";
     if (!s.flags["rot:reported"]) return "off";
     return "opener";
@@ -892,8 +908,13 @@ export function NightRotation({ s, onNewWeek, onMenu }: { s: GameState; onNewWee
       {phase === "opener" ? (
         <div className="mx-auto w-full" style={{ maxWidth: 560 }} data-testid="night-opener">
           <SceneCard scene={openerScene(next, again, mood)} testId={`opener-${next}`} calm={calm} plant={plantOf(s.flags)}>
-            <button type="button" className="paper-btn-primary mt-5 w-full" style={{ minHeight: 44 }} data-testid="start-night" onClick={() => { writeSave(s, true); setPhase("shift"); }}>
-              Take the watch
+            {onWalk ? (
+              <button type="button" className="paper-btn-primary mt-5 w-full" style={{ minHeight: 44 }} data-testid="walk-in" onClick={() => { writeSave(s, true); onWalk(next); }}>
+                Walk in through the café
+              </button>
+            ) : null}
+            <button type="button" className={`${onWalk ? "paper-btn mt-2" : "paper-btn-primary mt-5"} w-full`} style={{ minHeight: 44 }} data-testid="start-night" onClick={() => { writeSave(s, true); setPhase("shift"); }}>
+              {onWalk ? "Straight to the desk" : "Take the watch"}
             </button>
           </SceneCard>
         </div>

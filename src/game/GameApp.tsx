@@ -151,7 +151,9 @@ import {
   type Verdict,
 } from "./campaign";
 import { setBossArt } from "./bossArt";
-import { setSkyOverride } from "./daylight";
+import { NIGHT_WALK_MINUTES, setSkyOverride } from "./daylight";
+import { type Mission, missionBoard, nightMissions } from "./missionBoard";
+import { nightWalkDirection, setNightWalk } from "./week";
 import { fridayLog } from "./refuel/byType";
 import { validBundle, referenceBundle } from "./refuel/bwrBundle";
 import { BundleBench, PassDesk, SaltDesk, TipTrace } from "./refuel/RefuelDesks";
@@ -361,6 +363,49 @@ export function GameApp() {
   const [look, setLook] = useState<PlayerLook>(DEFAULT_PLAYER_LOOK);
   const [, bump] = useState(0);
   const refresh = () => bump((n) => n + 1);
+  /**
+   * The walk in to a night watch: from the café at 18:00, across the lot and through the hall to the watch desk
+   * in Control, in the dark (daylight.ts holds the sky at night; week.ts sends the day crew home). Arriving in
+   * Control hands over to the night shift. Nothing is saved mid-walk: a reload goes back to the night's opener.
+   */
+  const nightWalkRef = useRef<null | { n: number; arrived: number; prev: Pick<GameState, "mode" | "room" | "x" | "y" | "facing" | "minutes" | "period" | "timeLabel"> }>(null);
+  const [nightWalkNo, setNightWalkNo] = useState(0);
+  const startNightWalk = (n: number) => {
+    const s = stateRef.current;
+    nightWalkRef.current = { n, arrived: 0, prev: { mode: s.mode, room: s.room, x: s.x, y: s.y, facing: s.facing, minutes: s.minutes, period: s.period, timeLabel: s.timeLabel } };
+    setNightWalk(true);
+    setSkyOverride(NIGHT_WALK_MINUTES);
+    s.mode = "play";
+    s.room = "cafe";
+    s.x = CAFE_SPAWN.x;
+    s.y = CAFE_SPAWN.y;
+    s.facing = "up";
+    s.sitting = false;
+    s.minutes = 700; // the sim's clock sits mid-shift, well clear of the day's close; the sky says 18:00
+    s.period = "midday";
+    s.closePrompt = false;
+    s.npcLive = {};
+    s.announce = `Night ${n} · Cafe`;
+    s.announceT = 2.6;
+    pushMsg(s, "Mabel's closing up. \"Go on, love. The light will be on when you're done.\"");
+    setNightWalkNo(n);
+    applyMode("play");
+    refresh();
+  };
+  const endNightWalk = () => {
+    const w = nightWalkRef.current;
+    if (!w) return;
+    const s = stateRef.current;
+    Object.assign(s, w.prev);
+    s.npcLive = {};
+    s.flags["rot:atDesk"] = true;
+    nightWalkRef.current = null;
+    setNightWalk(false);
+    setSkyOverride(null);
+    setNightWalkNo(0);
+    applyMode(s.mode);
+    refresh();
+  };
   const [hold, setHold] = useState(false);
   const [issues, setIssues] = useState(false);
   const quietMotion = usePrefersReducedMotion();
@@ -382,7 +427,7 @@ export function GameApp() {
     const edges = edgesRef.current;
 
     const down = (e: KeyboardEvent) => {
-      const nights = !!stateRef.current.flags["rot:nights"];
+      const nights = !!stateRef.current.flags["rot:nights"] && !nightWalkRef.current;
       if (isPadEcho() && (arrowNav(modeRef.current, nights) || isKeyMode(modeRef.current))) return;
       // Night rotation owns 1–8, Space, B, R and E. The lot underneath does not walk or pause.
       if (nights) return;
@@ -393,7 +438,7 @@ export function GameApp() {
       const tag = (e.target as HTMLElement | null)?.tagName;
       if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
       const mode = modeRef.current;
-      const nights = !!stateRef.current.flags["rot:nights"];
+      const nights = !!stateRef.current.flags["rot:nights"] && !nightWalkRef.current;
       if (shiftHeld()) {
         e.preventDefault();
         e.stopImmediatePropagation();
@@ -412,7 +457,7 @@ export function GameApp() {
     const nav = (e: KeyboardEvent) => {
       const tag = (e.target as HTMLElement | null)?.tagName;
       if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
-      const nights = !!stateRef.current.flags["rot:nights"];
+      const nights = !!stateRef.current.flags["rot:nights"] && !nightWalkRef.current;
       if (!arrowNav(modeRef.current, nights)) return;
       const dir = dirOf(e.code);
       if (dir) {
@@ -883,7 +928,7 @@ export function GameApp() {
         }
         for (const code of Object.values(binds())) keys.delete(code);
       }
-      if (s.flags["rot:nights"]) {
+      if (s.flags["rot:nights"] && !nightWalkRef.current) {
         keys.clear();
         edges.clear();
         stickRef.current.x = 0;
@@ -892,10 +937,18 @@ export function GameApp() {
       }
       padRef.current = applyPad(padRef.current, readPad(), {
         mode: s.mode,
-        nights: !!s.flags["rot:nights"],
+        nights: !!s.flags["rot:nights"] && !nightWalkRef.current,
         edges,
       });
-      const a = s.flags["rot:nights"] ? emptyActions() : collectActions(keys, edges, stickRef.current);
+      const walking = nightWalkRef.current;
+      const a = s.flags["rot:nights"] && !walking ? emptyActions() : collectActions(keys, edges, stickRef.current);
+      if (walking) {
+        // A walk, not a shift: no talking, sitting, peer-checks or reports on the way in.
+        a.interact = false;
+        a.peer = false;
+        a.report = false;
+        a.hide = false;
+      }
       if (!s.flags["rot:nights"] && edges.has("KeyK")) tryCloseShift(s);
       // Fixed 1/60 step. A 30 Hz picture runs two of them, so walking speed does not change.
       let edge = true;
@@ -907,6 +960,10 @@ export function GameApp() {
         steps += 1;
       }
       const dt = steps * STEP;
+      if (walking && s.room === "control" && !s.pendingRoom && s.fade === 0) {
+        walking.arrived += dt;
+        if (walking.arrived > 0.9) endNightWalk();
+      }
       // A conversation just opened: add the person's due scene after what they would have said anyway.
       if (s.mode === "dialogue" && s.dialogue !== talkRef.current.dialogue) {
         talkRef.current.dialogue = s.dialogue;
@@ -949,7 +1006,7 @@ export function GameApp() {
         scram: s.run.scram,
         soundOn: !isMuted(),
       });
-      if (s.mode === "play") {
+      if (s.mode === "play" && !nightWalkRef.current) {
         saveAcc += dt;
         if (saveAcc >= 60) {
           writeSave(s);
@@ -1478,7 +1535,7 @@ export function GameApp() {
             hide={dayIncident(s).hide}
             time={s.timeLabel}
             room={ROOMS[s.room].name}
-            coach={coachLine({
+            coach={nightWalkNo ? null : coachLine({
               day: s.day,
               mode,
               moved: true,
@@ -1625,22 +1682,24 @@ export function GameApp() {
 
         {!ready && <div className="absolute inset-0 z-50 bg-bg" />}
 
-        {mode === "play" && !s.flags["rot:nights"] ? <CornerMonitor s={s} calm={!!s.desktop.reducedMotion || quietMotion} /> : null}
+        {mode === "play" && !s.flags["rot:nights"] && !nightWalkNo ? <CornerMonitor s={s} calm={!!s.desktop.reducedMotion || quietMotion} /> : null}
 
         {/* The night rotation draws its own scenes; the day's room card and objective stay out from behind them. */}
-        {mode === "play" && !s.flags["rot:nights"] && (
+        {mode === "play" && (!s.flags["rot:nights"] || nightWalkNo > 0) && (
           <Hud
             room={ROOMS[s.room].name}
             roomId={s.room}
             culture={s.culture}
             stage={stage}
-            time={s.timeLabel}
             period={s.period}
-            dusk={!!s.flags.endingWalk}
+            dusk={!!s.flags.endingWalk && !nightWalkNo}
             toast={s.toastT > 0 ? say(s.toast) : ""}
-            objective={say(s.objective)}
+            objective={nightWalkNo ? nightWalkDirection(s.room) : say(s.objective)}
+            missions={nightWalkNo ? nightMissions(false) : missionBoard(s.goals.map((g) => ({ ...g, label: say(g.label) })))}
+            night={nightWalkNo}
+            time={nightWalkNo ? "18:00" : s.timeLabel}
             day={s.day}
-            coach={coachLine({
+            coach={nightWalkNo ? null : coachLine({
               day: s.day,
               mode,
               moved: s.room !== "cafe" || Math.hypot(s.x - 152, s.y - 220) > 8,
@@ -2171,9 +2230,10 @@ export function GameApp() {
           </div>
         )}
 
-        {s.flags["rot:nights"] && (!s.flags["rot:complete"] || mode === "play") ? (
+        {s.flags["rot:nights"] && !nightWalkNo && (!s.flags["rot:complete"] || mode === "play") ? (
           <NightRotation
             s={s}
+            onWalk={startNightWalk}
             onNewWeek={() => {
               setWipeNext("desk");
               setAskWipe(true);
@@ -2182,7 +2242,7 @@ export function GameApp() {
           />
         ) : null}
 
-        {mode === "play" && s.closePrompt && (
+        {mode === "play" && s.closePrompt && !nightWalkNo && (
           <div className="pointer-events-none absolute inset-x-0 bottom-20 z-20 flex justify-center px-4 sm:bottom-12">
             <button
               type="button"
@@ -2199,7 +2259,7 @@ export function GameApp() {
           </div>
         )}
 
-        {touch && !s.flags["rot:nights"] && (mode === "play" || mode === "dialogue" || mode === "incident") && (
+        {touch && (!s.flags["rot:nights"] || nightWalkNo > 0) && (mode === "play" || mode === "dialogue" || mode === "incident") && (
           <TouchPad stickRef={stickRef} edges={edgesRef} />
         )}
       </div>
@@ -3727,6 +3787,67 @@ function PixelLine({ text, color = "#16110d", scale = 2 }: { text: string; color
   );
 }
 
+/** A 9px pixel tick-box: ticked green when done, amber while it's the thing to do now, empty otherwise. */
+function MissionBox({ state }: { state: Mission["state"] }) {
+  const fill = state === "done" ? "#6b8f71" : state === "now" ? "#e0a850" : "#fff8e4";
+  const edge = state === "optional" ? "#a89478" : "#3b2318";
+  return (
+    <svg width="11" height="11" viewBox="0 0 11 11" shapeRendering="crispEdges" aria-hidden className="mt-[2px] shrink-0">
+      <rect x="0" y="0" width="11" height="11" fill={edge} />
+      <rect x="1" y="1" width="9" height="9" fill={fill} />
+      {state === "done" ? (
+        <g fill="#fff8e4">
+          <rect x="2" y="5" width="1" height="1" />
+          <rect x="3" y="6" width="1" height="1" />
+          <rect x="4" y="7" width="1" height="1" />
+          <rect x="5" y="6" width="1" height="1" />
+          <rect x="6" y="5" width="1" height="1" />
+          <rect x="7" y="4" width="1" height="1" />
+          <rect x="8" y="3" width="1" height="1" />
+        </g>
+      ) : state === "now" ? (
+        <rect x="4" y="4" width="3" height="3" fill="#3b2318" />
+      ) : null}
+    </svg>
+  );
+}
+
+/** What the day (or the night's walk) asks of you, in order, in place of the old corner site plan. */
+function MissionBoard({ missions, title }: { missions: Mission[]; title: string }) {
+  const required = missions.filter((m) => m.state !== "optional");
+  const done = required.filter((m) => m.state === "done").length;
+  return (
+    <div className="mt-2 border border-[#3b2318]/60 bg-[#fff8e4]/55 px-2 pb-1.5 pt-1" data-testid="mission-board">
+      <div className="flex items-center justify-between">
+        <span className="cc-label-sm">{title}</span>
+        <span className="cc-label-sm" style={{ color: "#8a5a38" }} data-testid="mission-count">
+          {done}/{required.length}
+        </span>
+      </div>
+      <ul className="mt-1 space-y-[3px]">
+        {missions.map((m) => (
+          <li key={m.id} className="flex items-start gap-1.5" data-testid={`mission-${m.id}`} data-state={m.state}>
+            <MissionBox state={m.state} />
+            <span
+              style={{
+                fontFamily: "var(--font-body)",
+                fontSize: "var(--text-small)",
+                lineHeight: 1.3,
+                color: m.state === "now" ? "#16110d" : m.state === "done" ? "#8a7864" : "#5a4430",
+                fontWeight: m.state === "now" ? 600 : 400,
+                textDecoration: m.state === "done" ? "line-through" : "none",
+              }}
+            >
+              {m.label}
+              {m.state === "optional" ? <span style={{ color: "#a89478" }}> · if you like</span> : null}
+            </span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
 function Hud({
   room,
   roomId,
@@ -3740,6 +3861,8 @@ function Hud({
   day,
   coach,
   nearLabel,
+  missions,
+  night = 0,
 }: {
   room: string;
   roomId: RoomId;
@@ -3753,12 +3876,13 @@ function Hud({
   day: number;
   coach: string | null;
   nearLabel: string;
+  missions: Mission[];
+  /** On the walk in to a night watch: which night. */
+  night?: number;
 }) {
-  const hud = MAP_HUD[roomId] ?? MAP_HUD.cafe;
   const [open, setOpen] = useState(() => typeof window === "undefined" || window.innerWidth >= 720);
-  const wash =
-    period === "afternoon" ? "rgba(90,48,28,0.28)" : period === "morning" ? "rgba(243,214,170,0.22)" : "rgba(170,200,220,0.16)";
-  const when = `${time} D${day} ${dusk ? "DUSK" : periodLabel(period)}`;
+  const when = night ? `${time} NIGHT ${night}` : `${time} D${day} ${dusk ? "DUSK" : periodLabel(period)}`;
+  const now = missions.find((m) => m.state === "now");
   const obj = objective;
   const label = (text: string, small = false) =>
     ART.hud ? (
@@ -3788,31 +3912,23 @@ function Hud({
         <div className="mt-1">{label(room)}</div>
         {open ? (
           <>
-            <div className="relative mt-2 aspect-[2/1] w-full border border-[#1a1410]" data-testid="site-plan">
-              <img
-                src="/art/gen/ui/site_plan.png?v=plan3"
-                alt=""
-                width={64}
-                height={32}
-                className="h-full w-full"
-                style={{ imageRendering: "pixelated" }}
-              />
-              <span className="pointer-events-none absolute inset-0" style={{ background: wash }} />
-              <span
-                className="absolute h-2 w-2 -translate-x-1/2 -translate-y-1/2 border border-[#16110d] bg-[#c4783a]"
-                style={{ left: `${hud.x}%`, top: `${hud.y}%` }}
-              />
-            </div>
+            <MissionBoard missions={missions} title={night ? "TONIGHT" : "TODAY"} />
             <div className="mt-2 flex items-center gap-2">
               {ART.hud ? <span className="cc-label-sm">{stage}</span> : <PixelLine text={stage} color="#16110d" scale={1} />}
               <div className="pixel-meter" aria-hidden>
                 <span style={{ width: `${Math.max(4, Math.min(100, culture))}%` }} />
               </div>
             </div>
-            <div className="mt-2 border-t border-[#3b2318]/30 pt-1">
-              <span style={{ display: "block", fontFamily: "var(--font-body)", fontSize: "var(--text-small)", lineHeight: 1.4, color: "#3a2818" }}>{obj}</span>
+            <div className="mt-2 border-t border-[#3b2318]/30 pt-1" data-testid="next-step">
+              <span className="cc-label-sm" style={{ color: "#8a5a38" }}>NEXT STEP</span>
+              <span style={{ display: "block", marginTop: 2, fontFamily: "var(--font-body)", fontSize: "var(--text-small)", lineHeight: 1.4, color: "#3a2818" }}>{obj}</span>
             </div>
           </>
+        ) : now ? (
+          <div className="mt-1 flex items-start gap-1.5" data-testid="mission-now-folded">
+            <MissionBox state="now" />
+            <span style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-small)", lineHeight: 1.3, color: "#16110d" }}>{now.label}</span>
+          </div>
         ) : null}
         {coach ? (
           <span data-testid="day-coach" style={{ display: "block", marginTop: 4, fontFamily: "var(--font-mono, monospace)", fontSize: "var(--text-small)", lineHeight: 1.4, color: "#6a4a32" }}>
