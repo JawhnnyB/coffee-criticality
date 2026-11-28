@@ -1,6 +1,6 @@
 /** 384×216 intro chrome. Glyphs match tools/artkit/intro_mock.py. Spoken lines are not drawn here. */
 import { artId, sceneArt } from "./bossArt";
-import type { HairId, HoodieId, PlayerLook } from "./artSpec";
+import { HAIR_RAMP, type HairId, type HoodieId, type PlayerLook } from "./artSpec";
 import { fillRect, nameChip, panel, pixelButton, text3, text5 } from "./pxFont";
 
 export const NW = 384;
@@ -41,28 +41,8 @@ const HOOD: Record<HoodieId, RGB[]> = {
     [0xb0, 0x84, 0x28],
   ],
 };
-const HAIR: Record<HairId, RGB[]> = {
-  brown: [
-    [0x7a, 0x4a, 0x2a],
-    [0x9a, 0x62, 0x38],
-    [0x57, 0x33, 0x20],
-  ],
-  ink: [
-    [0x2a, 0x18, 0x10],
-    [0x4a, 0x33, 0x28],
-    [0x1b, 0x11, 0x0e],
-  ],
-  silver: [
-    [0xc8, 0xc0, 0xb4],
-    [0xe4, 0xde, 0xd2],
-    [0xa8, 0xa0, 0x94],
-  ],
-  copper: [
-    [0x8a, 0x48, 0x20],
-    [0xb0, 0x64, 0x2c],
-    [0x64, 0x2a, 0x18],
-  ],
-};
+const hexRgb = (h: string): RGB => [Number.parseInt(h.slice(1, 3), 16), Number.parseInt(h.slice(3, 5), 16), Number.parseInt(h.slice(5, 7), 16)];
+const HAIR = Object.fromEntries(Object.entries(HAIR_RAMP).map(([id, r]) => [id, r.map(hexRgb)])) as Record<HairId, RGB[]>;
 
 const COPPER = HOOD.copper;
 

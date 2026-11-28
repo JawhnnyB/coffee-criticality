@@ -225,7 +225,13 @@ Light by the hour (27 Nov, owner's ask): there's no window shaft now. The window
 
 Still open:
 - Night in play (27 Nov, owner's ask): each night's opener now offers **Walk in through the café**. It's a walk at 18:00 from the café, across the lot and through the hall to the watch desk in Control, and the watch starts on arrival. **Straight to the desk** keeps the old way. On the walk, Mabel is closing up and Jordan is on the lot; the rest of the crew has gone home. Evidence: `docs/audit/2026-11-27-night`.
+- **Dialogue for approval (AI-drafted; counts toward the Steam AI disclosure):** on the night walk, the café toast reads: Mabel's closing up. "Go on, love. The light will be on when you're done." (`GameApp.tsx`, `startNightWalk`). Approve, rewrite or cut.
 - The corner site plan is replaced by a mission board (the day's goals in order, the next thing marked). The pause screen's plant map is unchanged.
 - Other rooms keep the old room kit. The café is the target look; tell me which room is next.
 - The portraits (48×48) were already in this style and are unchanged.
 - The cat is new decor with no name and no story. Say if it should have either, or none.
+
+The player's look (28 Nov, owner's ask: "something feels off about his new design"):
+- **Diagnosis:** the glasses were 1-px outline posts that read as a squint; the picker's brown hair was a step off the outline, so his head looked like a helmet; his mouth pouted; and he had no signature item while every NPC has one.
+- **Fixed:** bold square glasses in their own key colours (so the no-glasses toggle is exact), a tousled cut with a tuft, a smile, and hair that uses the portrait's ramps for every choice.
+- **Chosen without the owner:** the satchel as his signature item (variant C), because it's the one item that reads from the back and side. The other kits (dosimeter badge, travel mug, or all three) are one env var away: `CHIBI_PLAYER_KIT=badge,bag,mug`. See `docs/audit/2026-11-28-player/variants.png` and say if you'd rather have B, D or E.

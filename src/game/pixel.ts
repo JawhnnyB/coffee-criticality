@@ -2,6 +2,7 @@ import { TILE } from "./const";
 import { artId } from "./bossArt";
 import {
   HAIR_HEX,
+  HAIR_RAMP,
   HEART,
   HOODIE_HEX,
   RAIL_H,
@@ -115,15 +116,46 @@ const HAIR_DARK: Array<[number, number, number]> = [
   [0x4a, 0x2c, 0x1c],
   [0x4a, 0x2c, 0x18],
 ];
-const A6_OUTLINE: [number, number, number] = [0x3b, 0x23, 0x18];
-const A6_EYE: [number, number, number] = [0x2a, 0x18, 0x10];
 const A6_SKIN: [number, number, number] = [0xf5, 0xc9, 0xa0];
+/** tools/artkit/chibi.py draws the player's glasses in these two keys and nothing else does. */
+const GLASS_FRAME: [number, number, number] = [0x3a, 0x2a, 0x2c];
+const GLASS_LENS: [number, number, number] = [0xfb, 0xe6, 0xd2];
 
 function same(r: number, g: number, b: number, c: [number, number, number]) {
   return r === c[0] && g === c[1] && b === c[2];
 }
 
-/** Exact whole-colour swap. Outline, skin, and eyes stay. Glasses posts are the baked 1px outline; turning them off clears those pixels. */
+function mix(a: [number, number, number], b: [number, number, number]): [number, number, number] {
+  return [Math.round((a[0] + b[0]) / 2), Math.round((a[1] + b[1]) / 2), Math.round((a[2] + b[2]) / 2)];
+}
+
+/**
+ * The player's key colours swapped in place (RGBA, any size). Hoodie keys take the picked hoodie; hair keys take
+ * the picked hair's ramp, the same one his portrait uses. Glasses off turns the frame and lens keys to skin; the
+ * eyes are drawn over the lenses, so they stay. Outline, skin, eyes, and the satchel stay on their own pixels.
+ */
+export function recolorA6(d: Uint8ClampedArray | Uint8Array, look: PlayerLook) {
+  const hoodie = parseHex(HOODIE_HEX[look.hoodie]);
+  const shirtLight = shade(hoodie, 1.22);
+  const shirtShade = shade(hoodie, 0.72);
+  const [hairBase, hairLight, hairDark] = HAIR_RAMP[look.hair].map(parseHex);
+  const hairStep = mix(hairBase, hairDark);
+  for (let i = 0; i < d.length; i += 4) {
+    if (d[i + 3] < 8) continue;
+    const r = d[i];
+    const gv = d[i + 1];
+    const b = d[i + 2];
+    if (!look.glasses && (same(r, gv, b, GLASS_FRAME) || same(r, gv, b, GLASS_LENS))) paint(d, i, A6_SKIN);
+    else if (same(r, gv, b, SHIRT_BASE)) paint(d, i, hoodie);
+    else if (same(r, gv, b, SHIRT_SHADE)) paint(d, i, shirtShade);
+    else if (same(r, gv, b, SHIRT_LIGHT)) paint(d, i, shirtLight);
+    else if (same(r, gv, b, HAIR_BASE)) paint(d, i, hairBase);
+    else if (same(r, gv, b, HAIR_LIGHT)) paint(d, i, hairLight);
+    else if (same(r, gv, b, HAIR_STEP)) paint(d, i, hairStep);
+    else if (HAIR_DARK.some((c0) => same(r, gv, b, c0))) paint(d, i, hairDark);
+  }
+}
+
 export function tintA6(im: HTMLImageElement, look: PlayerLook): CanvasImageSource {
   const key = `a6|${im.src}|${look.hoodie}|${look.hair}|${look.glasses ? 1 : 0}`;
   const hit = recolorCache.get(key);
@@ -136,61 +168,7 @@ export function tintA6(im: HTMLImageElement, look: PlayerLook): CanvasImageSourc
   g.imageSmoothingEnabled = false;
   g.drawImage(im, 0, 0);
   const img = g.getImageData(0, 0, c.width, c.height);
-  const d = img.data;
-  const w = c.width;
-  const h = c.height;
-  if (!look.glasses) {
-    const eye = new Uint8Array(w * h);
-    for (let p = 0; p < w * h; p++) {
-      const i = p * 4;
-      if (d[i + 3] > 8 && same(d[i], d[i + 1], d[i + 2], A6_EYE)) eye[p] = 1;
-    }
-    for (let cy = 0; cy < h; cy += WALK_H) {
-      for (let cx = 0; cx < w; cx += WALK_W) {
-        let minX = 99;
-        let maxX = -1;
-        let minY = 99;
-        let maxY = -1;
-        for (let y = cy; y < cy + WALK_H && y < h; y++) {
-          for (let x = cx; x < cx + WALK_W && x < w; x++) {
-            if (!eye[y * w + x]) continue;
-            if (x < minX) minX = x;
-            if (x > maxX) maxX = x;
-            if (y < minY) minY = y;
-            if (y > maxY) maxY = y;
-          }
-        }
-        if (maxX < 0) continue;
-        for (let y = minY; y <= maxY; y++) {
-          for (let x = minX - 1; x <= maxX + 1; x++) {
-            if (x < 0 || x >= w) continue;
-            const i = (y * w + x) * 4;
-            if (d[i + 3] > 8 && same(d[i], d[i + 1], d[i + 2], A6_OUTLINE)) paint(d, i, A6_SKIN);
-          }
-        }
-      }
-    }
-  }
-  const hoodie = parseHex(HOODIE_HEX[look.hoodie]);
-  const hair = parseHex(HAIR_HEX[look.hair]);
-  const shirtLight = shade(hoodie, 1.22);
-  const shirtShade = shade(hoodie, 0.72);
-  const hairLight = shade(hair, 1.18);
-  const hairStep = shade(hair, 0.72);
-  const hairDark = shade(hair, 0.55);
-  for (let i = 0; i < d.length; i += 4) {
-    if (d[i + 3] < 8) continue;
-    const r = d[i];
-    const gv = d[i + 1];
-    const b = d[i + 2];
-    if (same(r, gv, b, SHIRT_BASE)) paint(d, i, hoodie);
-    else if (same(r, gv, b, SHIRT_SHADE)) paint(d, i, shirtShade);
-    else if (same(r, gv, b, SHIRT_LIGHT)) paint(d, i, shirtLight);
-    else if (same(r, gv, b, HAIR_BASE)) paint(d, i, hair);
-    else if (same(r, gv, b, HAIR_LIGHT)) paint(d, i, hairLight);
-    else if (same(r, gv, b, HAIR_STEP)) paint(d, i, hairStep);
-    else if (HAIR_DARK.some((c0) => same(r, gv, b, c0))) paint(d, i, hairDark);
-  }
+  recolorA6(img.data, look);
   g.putImageData(img, 0, 0);
   recolorCache.set(key, c);
   return c;
@@ -279,7 +257,7 @@ function isEyePixel(r: number, g: number, b: number) {
   return hi < 48 && hi - lo < 22;
 }
 
-function paint(d: Uint8ClampedArray, i: number, rgb: [number, number, number]) {
+function paint(d: Uint8ClampedArray | Uint8Array, i: number, rgb: [number, number, number]) {
   d[i] = rgb[0];
   d[i + 1] = rgb[1];
   d[i + 2] = rgb[2];

@@ -130,11 +130,19 @@ def eyes_front(f, style):
         f.rect(10, 35, 4, 1, 'brow'); f.rect(18, 35, 4, 1, 'brow')
 
 def glasses_front(f):
-    """Round frames drawn as corner pixels and a bridge, all on the eye rows, so tintA6 can lift them off with the
-    glasses toggle and the eyes still read through the lenses."""
-    for x0 in (10, 18):
-        for x, y in ((x0, 36), (x0 + 3, 36), (x0, 38), (x0 + 3, 38)): f.put(x, y, 'glass')
-    f.rect(14, 36, 4, 1, 'glass')
+    """Big square frames, like the portrait: a box round each eye with a pale lens between eye and frame, and a
+    bridge. Frame and lens are their own key colours (GLASS_FRAME, GLASS_LENS in src/game/pixel.ts), so tintA6 can
+    lift them off cleanly when the glasses toggle is off."""
+    for x0 in (9, 17):
+        f.rect(x0, 35, 6, 1, 'glass'); f.rect(x0, 39, 6, 1, 'glass')
+        f.rect(x0, 36, 1, 3, 'glass'); f.rect(x0 + 5, 36, 1, 3, 'glass')
+        f.rect(x0 + 1, 36, 4, 3, 'lens')
+    f.rect(15, 36, 2, 1, 'glass')
+
+def glasses_side(f):
+    f.rect(17, 35, 6, 1, 'glass'); f.rect(17, 39, 6, 1, 'glass'); f.rect(17, 36, 1, 3, 'glass'); f.rect(22, 36, 1, 3, 'glass')
+    f.rect(18, 36, 4, 3, 'lens')
+    f.rect(15, 36, 2, 1, 'glass')                                          # the arm, back to the ear
 
 def mouth_front(f, style):
     if style == 'smile':  f.put(14, 40, 'mouth'); f.rect(15, 41, 2, 1, 'mouth'); f.put(17, 40, 'mouth')
@@ -212,50 +220,49 @@ def body_sit(f, wide=False):
 # Each entry: view -> (top row, rows of 18 chars over cols 7..24). '.' leaves what's under it.
 HAIR = {}
 
-HAIR['player'] = {
- 'front': (27, [
-  "......hhhhhH......",
-  "....LhhhhhhhhH....",
-  "...LhhhhhhhhhhH...",
-  "..LLhhhhhhhhhhhH..",
-  ".LhhhhhhhhhhhhhhH.",
-  ".LhhhhhhhhhhhhhhH.",
-  "hhhhhhhhhhhhhhhhhH",
-  "hhhh.hhhh..hhhhhhH",
-  "hhh...hh....h..hhH",
-  "hh..............hh",
-  "h................H",
- ]),
- 'side': (27, [
-  "......hhhhhH......",
-  "....LhhhhhhhhH....",
-  "...LhhhhhhhhhhH...",
+HAIR['player'] = {                      # warm brown, short, a side-swept fringe and the one tuft that won't lie down
+ 'front': (25, [
+  ".........Hh.......",
+  "........hh........",
+  ".....LLhhhhhH.....",
+  "...LLhhhhhhhhhH...",
   "..LhhhhhhhhhhhhH..",
   ".LhhhhhhhhhhhhhhH.",
-  ".hhhhhhhhhhhhhhhhH",
-  "hhhhhhhhhhhhhhhhhh",
-  "hhhhhhh..hhh.hhhhh",
-  "hhhhhH.......h..h.",
+  "hhhhhhhhhhhhhhhhhH",
+  "hhhhhhhhhhhhhhhhhH",
+  "hhhhhhhhhhhh....hH",
+  "hhhH.hhhh.......hH",
+  "hh..............hH",
+  "h................H",
+ ]),
+ 'side': (25, [
+  "..........Hh......",
+  ".........hh.......",
+  "......LLhhhhH.....",
+  "....LLhhhhhhhhH...",
+  "...LhhhhhhhhhhhH..",
+  "..LhhhhhhhhhhhhhH.",
+  ".hhhhhhhhhhhhhhH..",
+  "hhhhhhhhhhhhhhhH..",
+  "hhhhhhhhhhhhhhhh..",
+  "hhhhhhhh.....hh...",
+  "hhhhhhH...........",
+  "hhhhhH............",
   "hhhhH.............",
   "hhhH..............",
   ".hH...............",
  ]),
- 'back': (27, [
-  "......hhhhhH......",
-  "....LhhhhhhhhH....",
-  "...LhhhhhhhhhhH...",
-  "..LLhhhhhhhhhhhH..",
+ 'back': (25, [
+  ".........Hh.......",
+  "........hh........",
+  ".....LLhhhhhH.....",
+  "...LLhhhhhhhhhH...",
+  "..LhhhhhhhhhhhhH..",
   ".LhhhhhhhhhhhhhhH.",
-  ".LhhhhhhhhhhhhhhH.",
   "hhhhhhhhhhhhhhhhhH",
-  "hhhhhhhhhhhhhhhhhH",
-  "hhhhhhhhhhhhhhhhhH",
-  "hhhhhhhhhhhhhhhhhH",
-  "hhhhhhhhhhhhhhhhHH",
-  "Hhhhhhhhhhhhhhhh.H",
-  ".HhhhhhhhhhhhhhHH.",
-  "..HHhhhhhhhhhhHH..",
-  "....HHHHHHHHHH....",
+  "hhhhhhhhHhhhhhhhhH",
+  "hhhhhhhhhhhhHhhhhH",
+  "hhhhhHhhhhhhhhhhhH",
  ]),
 }
 
@@ -723,7 +730,7 @@ def outfit(f, who, view, frame):
             f.rect(11, 44, 10, 4, 'topS'); f.rect(12, 45, 8, 2, 'top')
         if view == 'side':
             f.rect(11, 44, 4, 4, 'topS'); f.put(19, 47, 'a1')
-    elif who == 'player':                    # hoodie in the picker's key colours
+    elif who == 'player':                    # hoodie in the picker's key colours, plus whatever kit he carries
         if view == 'front':
             f.rect(11, 44, 10, 1, 'topS'); f.put(14, 46, 'a1'); f.put(14, 47, 'a1'); f.put(17, 46, 'a1'); f.put(17, 47, 'a1')
             f.rect(12, 51, 8, 3, 'topS'); f.rect(13, 51, 6, 1, 'top')
@@ -731,6 +738,38 @@ def outfit(f, who, view, frame):
             f.rect(11, 44, 10, 4, 'topS'); f.rect(12, 45, 8, 2, 'top')
         if view == 'side':
             f.rect(11, 44, 4, 4, 'topS')
+        player_kit(f, view, frame)           # over the hoodie, so the strap runs unbroken across it
+
+# The satchel is his signature: it is the one item that reads from the back and side, where the camera sees him most.
+# CHIBI_PLAYER_KIT=badge,bag,mug overrides it for previews ('' for none).
+PLAYER_KIT = set(filter(None, os.environ.get('CHIBI_PLAYER_KIT', 'bag').split(',')))
+
+def player_kit(f, view, frame):
+    sw = ARM[frame]
+    if 'badge' in PLAYER_KIT and view == 'front':                         # TLD dosimeter clipped on the chest
+        f.rect(18, 47, 3, 4, 'kb'); f.rect(18, 47, 3, 1, 'kbS'); f.put(19, 49, 'kmS')
+    if 'badge' in PLAYER_KIT and view == 'side':
+        f.rect(19, 47, 2, 3, 'kb'); f.put(19, 47, 'kbS')
+    if 'bag' in PLAYER_KIT:                                               # satchel: strap across, bag at the hip
+        if view == 'front':
+            for i in range(9): f.put(11 + i, 45 + i, 'kst'); f.put(12 + i, 45 + i, 'kst')
+            f.rect(19, 52, 5, 5, 'kbg'); f.rect(19, 52, 5, 2, 'kbgS'); f.put(21, 54, 'a1'); f.rect(19, 52, 1, 5, 'kbgL')
+        if view == 'back':
+            for i in range(9): f.put(20 - i, 45 + i, 'kst'); f.put(19 - i, 45 + i, 'kst')
+            f.rect(8, 52, 5, 5, 'kbg'); f.rect(8, 52, 5, 1, 'kbgS'); f.rect(12, 52, 1, 5, 'kbgS')
+        if view == 'side':
+            for i in range(8): f.put(17 - i, 45 + i, 'kst')
+            f.rect(8, 51, 5, 6, 'kbg'); f.rect(8, 51, 5, 2, 'kbgS'); f.rect(8, 51, 1, 6, 'kbgL')
+    if 'mug' in PLAYER_KIT:                                               # a travel mug of Mabel's coffee
+        if view == 'front':
+            y = 50 + sw
+            f.rect(7, y, 3, 5, 'km'); f.rect(7, y, 3, 1, 'kml'); f.rect(7, y + 2, 3, 1, 'kmb'); f.put(7, y + 1, 'kmL')
+        if view == 'side':
+            x = 16 - STEP[frame] // 2
+            f.rect(x, 50, 3, 5, 'km'); f.rect(x, 50, 3, 1, 'kml'); f.rect(x, 52, 3, 1, 'kmb'); f.put(x, 51, 'kmL')
+        if view == 'back':
+            y = 50 - sw
+            f.rect(22, y, 3, 5, 'km'); f.rect(22, y, 3, 1, 'kml'); f.rect(22, y + 2, 3, 1, 'kmb')
 
 def beard(f, view, full):
     if view == 'front':
@@ -755,7 +794,11 @@ def pal_for(who):
     return {
         'player': dict(P, skin='#f5c9a0', skinS='#e0ac84', hair='#7a4028', hairL='#c47840', hairS='#6a4028',
                        hairD='#4e2818', brow='#4e2818', top='#5a9438', topL='#98c860', topS='#3a6824',
-                       pants='#3a2818', pantsS='#2a1c14', eye='#2a1810', mouth='#a04a3a', a1='#f4ecd8'),
+                       pants='#3a2818', pantsS='#2a1c14', eye='#2a1810', mouth='#a04a3a', a1='#f4ecd8',
+                       glass='#3a2a2c', lens='#fbe6d2',
+                       # kit, none of them a key colour: dosimeter badge, satchel, travel mug
+                       kb='#f4ecd8', kbS='#c04a38', kbg='#8a5a38', kbgS='#70462c', kbgL='#b07a4c', kst='#4a3020',
+                       km='#9aa4ac', kmL='#dfe4e8', kmS='#6a7480', kml='#f4ecd8', kmb='#c04a38'),
         'mabel': person('#f5c9a0', '#dba37a', '#d6d0c6', '#f6f2ea', '#c8643c', '#e0845a', '#9e4a2a', '#6a4060',
                         hairS='#aaa2b0', a1='#f6ecd8', a1L='#fffaf0', a1S='#d8c8b0', a2='#e0b030', a2S='#a87a20',
                         brow='#a8a0a8', blush='#f08878'),
@@ -776,7 +819,7 @@ def pal_for(who):
     }[who]
 
 LOOK = {                                  # eyes, mouth, build, extras
-    'player': ('round', 'small', False, {'glasses'}),
+    'player': ('round', 'smile', False, {'glasses'}),
     'mabel': ('happy', 'smile', True, set()),
     'holt': ('stern', 'flat', False, set()),
     'colt': ('kind', 'smile', False, {'beard'}),
@@ -797,7 +840,10 @@ def build(who, view, frame):
         outfit(f, who, view, frame)
         eyes_front(f, eyes)
         mouth_front(f, mouth)
-        if 'glasses' in extra: glasses_front(f)
+        if 'glasses' in extra:
+            glasses_front(f)
+            eyes_front(f, eyes)                                            # eyes over the lenses
+            f.put(9, 40, 'blush'); f.put(10, 40, 'blush'); f.put(21, 40, 'blush'); f.put(22, 40, 'blush')
         if 'bindi' in extra: f.put(15, 34, 'a2'); f.put(16, 34, 'a2')
         if 'beard' in extra: beard(f, 'front', False)
         if 'fullbeard' in extra: beard(f, 'front', True)
@@ -809,7 +855,8 @@ def build(who, view, frame):
         outfit(f, who, 'side', frame)
         face_side(f, eyes, mouth)
         if 'glasses' in extra:
-            f.put(18, 36, 'glass'); f.put(18, 37, 'glass'); f.put(18, 38, 'glass'); f.put(21, 37, 'glass')
+            glasses_side(f)
+            face_side(f, eyes, mouth)
         if 'bindi' in extra: f.put(21, 34, 'a2')
         if 'beard' in extra: beard(f, 'side', False)
         if 'fullbeard' in extra: beard(f, 'side', True)

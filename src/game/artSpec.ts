@@ -23,11 +23,18 @@ export const HOODIE_HEX: Record<HoodieId, string> = {
   steel: PAL.steel,
   gold: PAL.gold,
 };
+/** Hair ramps: base, light, dark. One source for the portrait (introPaint) and the walker (pixel.ts tintA6). */
+export const HAIR_RAMP: Record<HairId, readonly [string, string, string]> = {
+  brown: ["#7a4a2a", "#9a6238", "#573320"],
+  ink: ["#2a1810", "#4a3328", "#1b110e"],
+  silver: ["#c8c0b4", "#e4ded2", "#a8a094"],
+  copper: ["#8a4820", "#b0642c", "#642a18"],
+};
 export const HAIR_HEX: Record<HairId, string> = {
-  brown: PAL.woodMid,
-  ink: PAL.outline,
-  silver: "#c8c0b4",
-  copper: PAL.copperD,
+  brown: HAIR_RAMP.brown[0],
+  ink: HAIR_RAMP.ink[0],
+  silver: HAIR_RAMP.silver[0],
+  copper: HAIR_RAMP.copper[0],
 };
 
 export const PROP_NATIVE: Record<string, { w: number; h: number }> = {

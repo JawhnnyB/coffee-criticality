@@ -12,15 +12,21 @@ OUT = os.environ.get('UI_OUT', './out/ui')
 os.makedirs(OUT, exist_ok=True)
 
 _cache = {}
-def tint_player(im):
-    """Default look = copper hoodie (artSpec DEFAULT_PLAYER_LOOK): green hoodie keys -> copper ramp by brightness."""
+def _hx(h): return tuple(int(h[k:k+2], 16) for k in (1, 3, 5))
+def _shade(c, k): return tuple(max(0, min(255, int(v * k + 0.5))) for v in c)
+def tint_player(im, hoodie='#c4783a', hair=('#7a4a2a', '#9a6238', '#573320'), glasses=True):
+    """pixel.ts recolorA6, key for key. Defaults = artSpec DEFAULT_PLAYER_LOOK (copper hoodie, brown hair, glasses)."""
+    hood = _hx(hoodie); base, light, dark = (_hx(h) for h in hair)
+    step = tuple(int((a + b) / 2 + 0.5) for a, b in zip(base, dark))
+    swap = {(0x5a, 0x94, 0x38): hood, (0x3a, 0x68, 0x24): _shade(hood, .72), (0x98, 0xc8, 0x60): _shade(hood, 1.22),
+            (0x7a, 0x40, 0x28): base, (0xc4, 0x78, 0x40): light, (0x6a, 0x40, 0x28): step,
+            (0x4e, 0x28, 0x18): dark, (0x4a, 0x2c, 0x1c): dark, (0x4a, 0x2c, 0x18): dark}
+    if not glasses: swap.update({(0x3a, 0x2a, 0x2c): (0xf5, 0xc9, 0xa0), (0xfb, 0xe6, 0xd2): (0xf5, 0xc9, 0xa0)})
     im = im.copy(); px_ = im.load()
     for yy in range(im.height):
         for xx in range(im.width):
             r, g, b, a = px_[xx, yy]
-            if a and g > r + 20 and g > b + 20:
-                lum = g
-                px_[xx, yy] = ((0xe8, 0xa8, 0x60) if lum > 0x90 else (0xc4, 0x78, 0x3a) if lum > 0x60 else (0x8a, 0x48, 0x20)) + (a,)
+            if a >= 8 and (r, g, b) in swap: px_[xx, yy] = swap[(r, g, b)] + (a,)
     return im
 def spr(who, facing='down'):
     k = (who, facing)

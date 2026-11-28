@@ -1,0 +1,14 @@
+PASS 1280 reached the badge screen with real clicks (role)
+PASS 1280 day 1 in the café
+PASS 1280 facing right after D
+PASS 1280 facing up after W
+PASS 1280 facing left after A
+PASS 1280 facing down after S
+PASS 1280 no page or console errors
+PASS 390 reached the badge screen with real clicks (role)
+PASS 390 day 1 in the café
+PASS 390 facing right after D
+PASS 390 facing up after W
+PASS 390 facing left after A
+PASS 390 facing down after S
+PASS 390 no page or console errors
